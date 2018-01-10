@@ -1,0 +1,227 @@
+#Code to create ScotPHO's Shiny profile platform
+# This script includes the user-interface definition of the app.
+#
+#TODO:
+#see server syntax
+
+
+###############################################.
+## Header ----
+###############################################.
+fluidPage(theme = shinytheme("cerulean"), # shinythemes::themeSelector() to swap while developing
+
+#Title style and content, using html tags
+  div(style="height: 80px;  ", 
+    tags$a(
+      img(src='scotpho_logo.png', height=70, style="float: left; padding-right: 40px;"),
+      href= "http://www.scotpho.org" #hyperlink
+    ),
+    h3("ScotPHO Online Profile Tool v2.0 - DRAFT 0.2", style="vertical-align: bottom; padding-top:25px; ")
+  ),
+  navbarPage("", # Navigation bar
+###############################################.             
+##############Introduction tab ----    
+###############################################.
+    tabPanel("Introduction", icon = icon("th"),
+      p(tags$b("Welcome to the ScotPHO Online Profiles Tool (OPT)"), "designed to allow users 
+        to view the various different profiles produced by the ScotPHO collaboration."),
+      p("The profiles are intended to increase understanding of local health issues 
+        and to prompt further investigation, rather than to be used as a performance 
+        management tool. The information needs to be interpreted within a local 
+        framework; an indicator may be higher or lower in one area compared to another, 
+        but local knowledge is needed to understand and interpret differences."),
+      p("If you have any trouble accessing any information on this site or have
+        any further questions relating to the data or the tool, then please contact us at: ",
+        tags$b(tags$a(href="mailto:ScotPHO@nhs.net", "ScotPHO@nhs.net")),
+        "and we will be happy to help."),
+      shiny::hr(), 
+      h4("Notes", style="color: black;"), # Notes
+      tags$ul( 
+        tags$li("The time periods can vary between indicators."),
+        tags$li("Due to differences in data availability, data reported in the profiles 
+        may not be consistent with that of published reports.")
+      ),  
+      shiny::hr(),
+      h4("Resources", style="color: black;"), # Resources
+      tags$ul( 
+        tags$li(tags$a(href="http://www.scotpho.org.uk/opt/Reports/ScotPHO%20Online%20Profiles%20Tool%20-%20User%20Guide.pdf",
+             "User guide"), #Link to user guide
+          " (1.3 Mb) - Learn how to use and get the most out of the tool."
+        ),
+        tags$li(tags$a(href="http://www.scotpho.org.uk/opt/Reports/HWP-2015-technical-report-17072015.pdf",
+             "Technical report"), #Link to technical report
+          " - Detailed description of the methodology, statistics and caveats of the tool."
+        ),
+        tags$li(tags$a(href="http://www.scotpho.org.uk/opt/Reports/20170228-Rolling-updates-timetable.xlsx",
+             "Timetable of updates"), #Link to timetable of updates
+          "- List of available indicators, date of last update and expected next update"
+        )
+      )
+    ),
+###############################################.          
+###########Dashboard tab ----
+###############################################.
+# Dashboard
+    tabPanel("Dashboard", icon = icon("dashboard"),
+                              
+# Create a spot for the plots
+        # mainPanel(
+          tabsetPanel(
+###############################################.
+## Spine chart tab ----
+###############################################.
+            tabPanel("Spine chart",
+              sidebarLayout(      
+                sidebarPanel(width = 4, position = "right",
+                  uiOutput("geotype_ui_spine"),  
+                  uiOutput("geoname_ui_spine"),  
+                  selectInput("geocomp_spine", "Comparator", choices = unique(optdata$areaname),
+                              selectize=TRUE, selected = "Scotland"),
+                  selectInput("topic_spine", "Topic", 
+                              choices = c(unique(optdata$topic1), unique(optdata$topic2), unique(optdata$topic3)),
+                              selectize=TRUE, selected = "Scotland"),
+                  selectInput("year_spine", "Year", choices = unique(optdata$year), selected=2012 ),
+                  downloadButton(outputId = "down_spineplot", label = "Save chart"),
+                  #Legend
+                  shiny::hr(),
+                  h4("Legend", style="color: black;"),
+                  p(img(src='negative.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
+                    "Statistically significantly worse than comparator average."), 
+                  p(img(src='neutral.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
+                    "Statistically not significantly different from comparator average."),
+                  p(img(src='positive.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
+                    "Statistically significantly better than comparator average."),
+                  p(img(src='noable.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
+                    "No significance can be calculated.")
+                ),
+                mainPanel(
+                    plotOutput("dynamic_spine") #Graph
+                )
+              )
+            ),
+###############################################.
+## Comparison and time trend tab   ---- 
+###############################################.
+            tabPanel("Comparison and time trend",
+                mainPanel(width = 12,
+        #Time trend plot
+                  div(style="height: 40px;", 
+                    h4("Trend chart")
+                  ),
+                  wellPanel( tags$style(".well {background-color:#d9e6f2; border: 1px solid #336699;}"), #color sidebars/well panels
+                    fluidRow(
+                      column(4,
+                        selectInput("indic_trend", "Indicator", choices=unique(optdata$indicator)),
+                        downloadButton('download_trend', 'Download data')  #For downloading the data
+                      ),
+                      column(4,    
+                        selectInput("scotname_trend", "Scotland", choices = c("", "Scotland"), 
+                                    selectize=TRUE, selected = "Scotland"),
+                        selectInput("hbname_trend", "Health Board", choices = hb_name,
+                                multiple=TRUE, selectize=TRUE, selected = "")
+                      ),
+                      column(4, 
+                        selectInput("laname_trend", "Local Authority", choices = la_name,
+                                         multiple=TRUE, selectize=TRUE, selected = ""),
+                        selectInput("izname_trend", "Intermediate Zone", choices = intzone01,
+                                multiple=TRUE, selectize=TRUE, selected = "")
+                      )
+                    )  
+                  ),
+                  dygraphOutput("timetrendPlot"),
+                  shiny::hr(),
+###############################################.
+        #Bar plot
+                  div(style="height: 40px;", 
+                    h4("Rank chart")
+                    ),
+                  wellPanel( 
+                    fluidRow(
+                      column(6,
+                        radioButtons("geotype_bar", label = "Geography level",
+                                    choices = c("Health Board", "Local Authority", "Intermediate Zone"), selected = "Health Board"),
+                        downloadButton('download_bar', 'Download data')  #For downloading the data
+                      ),  
+                      column(6,
+                        selectInput("indic_bar", "Indicator", choices=unique(optdata$indicator)),
+                        selectInput("year_bar", "Year", choices = unique(optdata$year) ),
+                        selectInput("geocomp_bar", "Comparator", choices = unique(optdata$areaname),
+                                selectize=TRUE, selected = "Scotland")
+                      )  
+                    )
+                  ),
+                  ggiraphOutput("barPlot") 
+                )
+            ),
+###############################################.
+## Table tab    ----
+###############################################.
+            tabPanel("Table",
+              wellPanel(    
+                fluidRow(
+                  column(4,
+                    uiOutput("indic_ui_table"),  
+                    uiOutput("topic_ui_table")), 
+                  column(4,
+                    selectInput("geoname_table", "Area name", choices = unique(optdata$areaname),
+                          multiple=TRUE, selectize=TRUE, selected = "Scotland")),
+                  column(4,
+                    sliderInput("year_table", "Time range", 
+                                min=2002, max = 2015, value = c(2002,2015)),
+                    downloadButton('download_table', 'Download data')  #For downloading the data
+                  )
+                )
+              ),  
+              DT::dataTableOutput('mytable')
+            ),
+###############################################.
+## Projection tab    ----
+###############################################.
+            tabPanel("Projection",
+              sidebarLayout(
+                sidebarPanel(
+                  uiOutput("indic_pred1"),
+                  uiOutput("indic_pred2"),
+                  sliderInput("xaxis", "Years for prediction",
+                    min=2016, max = 2026, value = 2020, step = 1, sep = ""),
+                  actionButton("do_pred", "Create prediction")
+                ),
+                mainPanel(h4("Observed and predicted measure"),
+                  plotOutput("by_pred_plot", width = 600),
+                  p("The predictions above (to the right of the vertical black line) are based on a smoothed regression model. These should be treated with caution."))
+              )
+            )
+          )  
+    ),
+
+###############################################.
+###########Map tab ----
+###############################################.
+# Map
+    tabPanel("Map", icon = icon("globe"),
+      wellPanel(    
+        fluidRow(
+          column(8,
+            selectInput("indic_map", "Indicator", choices=unique(optdata$indicator))
+          ),
+          column(4,
+            selectInput("year_map", "Year", choices = unique(optdata$year),
+               selected = "2012"))
+        )
+      ), 
+      h4(textOutput("title_map")),
+      leafletOutput("map")
+    )
+  ),
+
+###############################################.
+## Copyright notice ----
+###############################################.
+  div(style="height: 40px; background: linear-gradient(#54b4eb, #2fa4e7 60%, #1d9ce5); display:inline-block; width:100%  ", 
+      tags$b("© Scottish Public Health Observatory 2017", style="color: white; padding-top: 14px; padding-left: 30px; 
+           padding-right: 60%; line-height:40px; font-size:70%;"),
+    bookmarkButton(style="height:25px; font-size:70%; vertical-align:middle; margin-bottom:3px ")
+  )
+)
+
+##END
