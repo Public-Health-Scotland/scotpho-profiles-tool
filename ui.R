@@ -4,7 +4,6 @@
 #TODO:
 #see server syntax
 
-
 ###############################################.
 ## Header ----
 ###############################################.
@@ -20,9 +19,9 @@ fluidPage(theme = shinytheme("cerulean"), # shinythemes::themeSelector() to swap
   ),
   navbarPage("", # Navigation bar
 ###############################################.             
-##############Introduction tab ----    
+##############Introduction----    
 ###############################################.
-    tabPanel("Introduction", icon = icon("th"),
+    tabPanel("Intro", icon = icon("info-circle"),
       p(tags$b("Welcome to the ScotPHO Online Profiles Tool (OPT)"), "designed to allow users 
         to view the various different profiles produced by the ScotPHO collaboration."),
       p("The profiles are intended to increase understanding of local health issues 
@@ -55,30 +54,25 @@ fluidPage(theme = shinytheme("cerulean"), # shinythemes::themeSelector() to swap
         tags$li(tags$a(href="http://www.scotpho.org.uk/opt/Reports/20170228-Rolling-updates-timetable.xlsx",
              "Timetable of updates"), #Link to timetable of updates
           "- List of available indicators, date of last update and expected next update"
+        ),
+        tags$li(tags$a(href="https://github.com/Health-SocialCare-Scotland/",
+                       "Code"), #Link to Github repositories
+                "- Access the code used to produce the indicator data and this tool."
         )
       )
     ),
-###############################################.          
-###########Dashboard tab ----
+
 ###############################################.
-# Dashboard
-    tabPanel("Dashboard", icon = icon("dashboard"),
-                              
-# Create a spot for the plots
-        # mainPanel(
-          tabsetPanel(
+## Spine chart ----
 ###############################################.
-## Spine chart tab ----
-###############################################.
-            tabPanel("Spine chart",
+            tabPanel("Spine chart", icon = icon("align-center"),
               sidebarLayout(      
                 sidebarPanel(width = 4, position = "right",
                   uiOutput("geotype_ui_spine"),  
                   uiOutput("geoname_ui_spine"),  
-                  selectInput("geocomp_spine", "Comparator", choices = unique(optdata$areaname),
+                  selectInput("geocomp_spine", "Comparator", choices = area_list,
                               selectize=TRUE, selected = "Scotland"),
-                  selectInput("topic_spine", "Topic", 
-                              choices = c(unique(optdata$topic1), unique(optdata$topic2), unique(optdata$topic3)),
+                  selectInput("topic_spine", "Topic", choices = topic_list,
                               selectize=TRUE, selected = "Scotland"),
                   selectInput("year_spine", "Year", choices = unique(optdata$year), selected=2012 ),
                   downloadButton(outputId = "down_spineplot", label = "Save chart"),
@@ -100,9 +94,9 @@ fluidPage(theme = shinytheme("cerulean"), # shinythemes::themeSelector() to swap
               )
             ),
 ###############################################.
-## Comparison and time trend tab   ---- 
+## Time trend ---- 
 ###############################################.
-            tabPanel("Comparison and time trend",
+            tabPanel("Time trend", icon = icon("area-chart"),
                 mainPanel(width = 12,
         #Time trend plot
                   div(style="height: 40px;", 
@@ -111,7 +105,7 @@ fluidPage(theme = shinytheme("cerulean"), # shinythemes::themeSelector() to swap
                   wellPanel( tags$style(".well {background-color:#d9e6f2; border: 1px solid #336699;}"), #color sidebars/well panels
                     fluidRow(
                       column(4,
-                        selectInput("indic_trend", "Indicator", choices=unique(optdata$indicator)),
+                        selectInput("indic_trend", "Indicator", choices=indicator_list),
                         downloadButton('download_trend', 'Download data')  #For downloading the data
                       ),
                       column(4,    
@@ -123,15 +117,22 @@ fluidPage(theme = shinytheme("cerulean"), # shinythemes::themeSelector() to swap
                       column(4, 
                         selectInput("laname_trend", "Local Authority", choices = la_name,
                                          multiple=TRUE, selectize=TRUE, selected = ""),
-                        selectInput("izname_trend", "Intermediate Zone", choices = intzone01,
-                                multiple=TRUE, selectize=TRUE, selected = "")
+                        selectInput("izname_trend", "Locality", choices = locality_name,
+                                    multiple=TRUE, selectize=TRUE, selected = "")
+#                         selectInput("izname_trend", "Intermediate Zone", choices = intzone01,
+#                                 multiple=TRUE, selectize=TRUE, selected = "")
                       )
                     )  
                   ),
                   dygraphOutput("timetrendPlot"),
-                  shiny::hr(),
+                  shiny::hr()
+                )
+),
 ###############################################.
-        #Bar plot
+## Rank chart ---- 
+###############################################.
+tabPanel("Rank chart", icon = icon("signal"),
+         mainPanel(width = 12,
                   div(style="height: 40px;", 
                     h4("Rank chart")
                     ),
@@ -139,31 +140,31 @@ fluidPage(theme = shinytheme("cerulean"), # shinythemes::themeSelector() to swap
                     fluidRow(
                       column(6,
                         radioButtons("geotype_bar", label = "Geography level",
-                                    choices = c("Health Board", "Local Authority", "Intermediate Zone"), selected = "Health Board"),
+                                    choices = areatype_list, selected = "Health Board"),
                         downloadButton('download_bar', 'Download data')  #For downloading the data
                       ),  
                       column(6,
-                        selectInput("indic_bar", "Indicator", choices=unique(optdata$indicator)),
+                        selectInput("indic_bar", "Indicator", choices=indicator_list),
                         selectInput("year_bar", "Year", choices = unique(optdata$year) ),
-                        selectInput("geocomp_bar", "Comparator", choices = unique(optdata$areaname),
+                        selectInput("geocomp_bar", "Comparator", choices = area_list,
                                 selectize=TRUE, selected = "Scotland")
                       )  
                     )
                   ),
-                  ggiraphOutput("barPlot") 
+                  plotOutput("barPlot") 
                 )
             ),
 ###############################################.
-## Table tab    ----
+## Table ----
 ###############################################.
-            tabPanel("Table",
+            tabPanel("Table", icon = icon("table"),
               wellPanel(    
                 fluidRow(
                   column(4,
                     uiOutput("indic_ui_table"),  
                     uiOutput("topic_ui_table")), 
                   column(4,
-                    selectInput("geoname_table", "Area name", choices = unique(optdata$areaname),
+                    selectInput("geoname_table", "Area name", choices = area_list,
                           multiple=TRUE, selectize=TRUE, selected = "Scotland")),
                   column(4,
                     sliderInput("year_table", "Time range", 
@@ -175,9 +176,21 @@ fluidPage(theme = shinytheme("cerulean"), # shinythemes::themeSelector() to swap
               DT::dataTableOutput('mytable')
             ),
 ###############################################.
-## Projection tab    ----
+## Deprivation     ----
 ###############################################.
-            tabPanel("Projection",
+tabPanel("Deprivation", icon = icon("gbp"),
+         sidebarLayout(
+           sidebarPanel(
+             p("Chart selections")
+           ),
+           mainPanel(h4("Deprivation by SIMD quintile"),
+                     p("Spaceholder"))
+         )
+),
+###############################################.
+## Projection   ----
+###############################################.
+            tabPanel("Projection", icon = icon("line-chart"),
               sidebarLayout(
                 sidebarPanel(
                   uiOutput("indic_pred1"),
@@ -190,19 +203,16 @@ fluidPage(theme = shinytheme("cerulean"), # shinythemes::themeSelector() to swap
                   plotOutput("by_pred_plot", width = 600),
                   p("The predictions above (to the right of the vertical black line) are based on a smoothed regression model. These should be treated with caution."))
               )
-            )
-          )  
-    ),
-
+            ),
 ###############################################.
-###########Map tab ----
+###########Map ----
 ###############################################.
 # Map
     tabPanel("Map", icon = icon("globe"),
       wellPanel(    
         fluidRow(
           column(8,
-            selectInput("indic_map", "Indicator", choices=unique(optdata$indicator))
+            selectInput("indic_map", "Indicator", choices=indicator_list)
           ),
           column(4,
             selectInput("year_map", "Year", choices = unique(optdata$year),

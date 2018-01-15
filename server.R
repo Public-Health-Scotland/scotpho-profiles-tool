@@ -2,28 +2,49 @@
 #In this script include all the server side functions: plots, reactive objects, etc.
 
 # TODO:
+#Spine chart:
 #   Fix issues spine chart: too many dots in iz (diff graph for different plots?),
 #   Fix spine chart size issue, both in app and pdf download
 #   add table to spine chart, figure out behaviour when signicance cannot be calculated
-#   Check why Young people not in emplyment and others not working in dygraph
+#   Add error bars in/out button in plots/also in/out for other geographies in spine chart
+#   How to introduce an order/grouping system for spine chart (once profile is selected, like current domains)
+#   Try google charts package for table + charts
+#----------------.
+#Time trend:
+#   Switch to Plotly? If not fix dygraphs labels and other issues
+#----------------.
+#Rank chart
 #   Make barcharts work with IZ (needs reducing numbers to plot)
+#   Fix issue that breaks R
+#   Switch to Plotly?
+#----------------.
+#Table:
 #   Add "all" for table tab. Can be done?
+#   Add filtering through using table inbuilt filters
+#----------------.
+#General:
 #   See how to organize dropdown better, using lists, using conditional dropdowns 
 #   Improve selection methods for dropdowns for localities (first select HB, which then limits selection)
-#   Choices of dropdown boxes as vectors: c(), better than uniques, subsets...
-#   Avoid redrawing of map:leafletProxy
-#   Add error bars in/out button in plots/also in/out for other geographies in spine chart
-#   fix dygraphs issue w/ time periods(through js?)
+#   Choices of dropdown boxes as vectors: c(), better than uniques, subsets, saves computation...
 #   Add saving buttons to all plots
-#   Add intermediate zones to map
-#   See how to deal with deprivation
-#   How to introduce an order/grouping system for spine chart (once profile is selected, like current domains)
 #   Mini map for selecting geographies? include appendix with locations? like pdf?
-#   Figure out what is best model for data projections
-#   Change from read.csv to fread once R version is updated
 #   Sanitize error messages 
 #   Loading screen/bars?
-
+#   Each tab should have a brief intro. Work on the text
+#   Include report functionality
+#   Create user guide
+#----------------.
+#Map:
+#   Avoid redrawing of map:leafletProxy
+#   Add intermediate zones to map
+#   How to save map? Move away from Leaflet? Will be faster
+#----------------.
+#Deprivation
+#   See how to deal with deprivation, same app?
+#----------------.
+#Projection
+#   Figure out what is best model for data projections
+#----------------.
 
 ###############################################.
 
@@ -35,7 +56,8 @@ function(input, output) {
 #####################################.   
 #controls for spine chart
   output$geotype_ui_spine <- renderUI({
-    selectInput("geotype_spine", "Geography level", choices=c("Health Board", "Local Authority", "Intermediate Zone"))
+    selectInput("geotype_spine", "Geography level", 
+                choices=c("Health Board", "Local Authority", "Locality"))
   })
   
   output$geoname_ui_spine <- renderUI({
@@ -128,21 +150,29 @@ function(input, output) {
     dyLegend(width = 400) %>% 
     dyOptions(axisLineWidth = 1.5, drawGrid = FALSE, drawPoints = TRUE, pointSize = 2) 
   })
+  
+  #Downloading data
+  output$download_trend <- downloadHandler(
+    filename =  'timetrend_data.csv',
+    content = function(file) {
+      write.csv(timetrend(), file)
+    }
+  )
 
 #####################################          
-#### Bar plot ----
+#### Rank plot ----
 ###############################################.     
-  #Bar plot data
+  #Rank plot data
   barpl <- reactive({filter(optdata, areatype==input$geotype_bar &
                            year == input$year_bar & indicator == input$indic_bar)})
   # Comparator data bar plot
   compar_bar <- reactive({filter(optdata, year == input$year_bar &
                                   areaname == input$geocomp_bar & indicator == input$indic_bar)})
   
-#   # Create bar plot
+# Create Rank plot
   
-  output$barPlot <- renderggiraph({
-    ggiraph(code = print(
+  output$barPlot <- renderPlot({
+    # ggiraph(code = print(
     ggplot(data=barpl(), aes(reorder(areaname, -measure), measure) ) +
       geom_bar_interactive(stat = "identity", fill="steelblue", 
                            aes(tooltip= paste("<font size=2><u>", areaname, "</u>", "<br>",  "Measure: ", "<b>", measure, "</b>",  "<br>",  "Numerator: ",  
@@ -162,11 +192,20 @@ function(input, output) {
             panel.grid.minor = element_blank(),
             legend.position="none" #taking out legends
       )
-  ), 
-  width = .7, 
-  hover_css = "cursor:pointer;fill:lightsteelblue;" , 
-  tooltip_extra_css = "background-color:#99BF9E; 
-  border: 2px #45B563 solid; border-radius: 5px; font-family:Calibri;")}) 
+#   ), 
+#   width = .7, 
+#   hover_css = "cursor:pointer;fill:lightsteelblue;" , 
+#   tooltip_extra_css = "background-color:#99BF9E; 
+#   border: 2px #45B563 solid; border-radius: 5px; font-family:Calibri;")
+}) 
+  
+  #Downloading data
+  output$download_bar <- downloadHandler(
+    filename =  'barplot_data.csv',
+    content = function(file) {
+      write.csv(barpl(), file) 
+    }
+  )
   
 #####################################.      
 #### Table ----
@@ -199,9 +238,16 @@ function(input, output) {
     )
   })
   
+  #Downloading data 
+  output$download_table <- downloadHandler(
+    filename =  'table_data.csv',
+    content = function(file) {
+      write.csv(table_data()[input[["table_explorer_rows_all"]], ], file) 
+    }
+  )
 
 #####################################.      
-#### Predicted indicators  ----
+#### Projection  ----
 #####################################.      
   # Context sensitive menu creation again
   output$indic_pred1 <- renderUI({
@@ -297,35 +343,12 @@ function(input, output) {
   })
   
 
-#####################################      
-#### For downloading data ----
-#for bar plot
-  output$download_bar <- downloadHandler(
-    filename =  'barplot_data.csv',
-    content = function(file) {
-      write.csv(barpl(), file) 
-    }
-  )
-#for table  
-  output$download_table <- downloadHandler(
-    filename =  'table_data.csv',
-    content = function(file) {
-      write.csv(table_data(), file) 
-    }
-  )
-  #for time trend   
-  output$download_trend <- downloadHandler(
-    filename =  'timetrend_data.csv',
-    content = function(file) {
-      write.csv(timetrend(), file)
-    }
-  )
 #####################################    
 ## For allowing bookmarking ----
 #####################################.      
   enableBookmarking(store = "url")
 }
-`
+
 #########################  END ----
 
 

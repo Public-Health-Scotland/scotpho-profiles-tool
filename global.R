@@ -33,27 +33,18 @@ library(data.table) #for quick reading of csv files - Does not work with the act
 ###############################################.
 ## Data ----
 ###############################################.    
-optdata<- read.csv("./data/all_OPTdata.csv", na.strings=c(""," ","NA")) %>%
-  subset(year>2013 & areatype != "Intermediate Zone") %>%  # reducing size dataset for testing purposes
-  mutate_at(.funs=funs(round(.,2)), .cols=vars(numerator, measure, lowci, upci)) 
-
-
-#Scaling measures (0 to 1) in groups by year, area type and indicator. 
-#Does not work well for Scotland totals.
-optdata <- optdata %>% group_by(indicator, year, areatype) %>% 
-  mutate(measure_sc = ifelse(interpret=="Highgood", as.vector(rescale(measure, to=c(1,0))), 
-                             as.vector(rescale(measure, to=c(0,1)))))
-
-#Creating variables for topic/profile filters
-optdata$topic1 <- "All"
-optdata$topic2 <- as.character(optdata$topic2)
-optdata$topic3 <- as.character(optdata$topic3)
+optdata <- readRDS("./data/optdata_test.rds") 
 
 #Geographies names
 hb_name <- unique(optdata$areaname[optdata$areatype=="Health Board"])
 la_name <- unique(optdata$areaname[optdata$areatype=="Local Authority"])
-intzone01 <- unique(optdata$areaname[optdata$areatype=="Intermediate Zone"])
+#intzone01 <- unique(optdata$areaname[optdata$areatype=="Intermediate Zone"])
+locality_name <- unique(optdata$areaname[optdata$areatype=="Locality"])
 
+indicator_list <- unique(optdata$indicator)
+area_list <- unique(optdata$areaname)
+topic_list <- c(unique(optdata$topic1), unique(optdata$topic2))
+areatype_list <- unique(optdata$areatype)
 ##########.
 #Map data
 CA_bound<-readOGR("./shapefiles","CA_simpl") #Reading file with council shapefiles
