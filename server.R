@@ -2,6 +2,12 @@
 #In this script include all the server side functions: plots, reactive objects, etc.
 
 # TODO:
+#Data manipulation:
+#   Decide what goes in the dataset and what doesn't
+#   Do we need names loaded? or would be better to call to the lookup files
+#   Refine indicator lookup
+#   Figure out what to do with topic variables
+#----------------.
 #Spine chart:
 #   Fix issues spine chart: too many dots in iz (diff graph for different plots?),
 #   Fix spine chart size issue, both in app and pdf download
@@ -9,8 +15,10 @@
 #   Add error bars in/out button in plots/also in/out for other geographies in spine chart
 #   How to introduce an order/grouping system for spine chart (once profile is selected, like current domains)
 #   Try google charts package for table + charts
+#   Figure out how to include definition, time period etc.
+#   What to do do with population indicators? Exclude? or show as numbers, but no plot?
 #----------------.
-#Time trend:
+#Time trend: 
 #   Switch to Plotly? If not fix dygraphs labels and other issues
 #----------------.
 #Rank chart
@@ -20,7 +28,6 @@
 #----------------.
 #Table:
 #   Add "all" for table tab. Can be done?
-#   Add filtering through using table inbuilt filters
 #----------------.
 #General:
 #   See how to organize dropdown better, using lists, using conditional dropdowns 
@@ -37,7 +44,7 @@
 #Map:
 #   Avoid redrawing of map:leafletProxy
 #   Add intermediate zones to map
-#   How to save map? Move away from Leaflet? Will be faster
+#   How to save map? Move away from Leaflet? Will likely be faster
 #----------------.
 #Deprivation
 #   See how to deal with deprivation, same app?
@@ -132,7 +139,7 @@ function(input, output) {
 ###############################################.      
 
   #Time trend data. Filtering based on user input values.
-  timetrend <- reactive({ optdata %>% subset( 
+  trend_data <- reactive({ optdata %>% subset( 
                                 (areaname %in% input$hbname_trend
                                  | areaname %in% input$laname_trend
                                  | areaname %in% input$scotname_trend                       
@@ -151,11 +158,33 @@ function(input, output) {
     dyOptions(axisLineWidth = 1.5, drawGrid = FALSE, drawPoints = TRUE, pointSize = 2) 
   })
   
+  #Plotting 
+#   output$trend_plot <- renderPlotly({
+#         #Text for tooltip
+#       tooltip <- c(paste0(trend_data()$measure, "<br>",
+#                           trend_data()$quarter_name, "<br>",
+#                           input$measure_trend, ": ", trend_data()[[input$measure_trend]]))
+#       
+#       #Plotting time trend
+#       plot_ly(data=trend_data(), x=~quarter_date2, 
+#               y = ~get(input$measure_trend), 
+#               text=tooltip, hoverinfo="text",
+#               type = 'scatter', mode = 'lines+markers',
+#               color=~measure, colors = trend_pal) %>% 
+#         #Layout
+#         layout(annotations = list(), #It needs this because of a buggy behaviour
+#                yaxis = list(title = input$measure_trend, rangemode="tozero"), 
+#                xaxis = list(title = "Time period"),  #axis parameter
+#                hovermode = 'false') %>%  # to get hover compare mode as default
+#         config(displaylogo = F, collaborate=F, editable =F) # taking out plotly logo and collaborate button
+#     
+#   }) 
+  
   #Downloading data
   output$download_trend <- downloadHandler(
     filename =  'timetrend_data.csv',
     content = function(file) {
-      write.csv(timetrend(), file)
+      write.csv(trend_data(), file)
     }
   )
 

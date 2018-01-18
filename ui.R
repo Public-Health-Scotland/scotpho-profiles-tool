@@ -5,7 +5,7 @@
 #see server syntax
 
 ###############################################.
-## Header ----
+## Header ---- 
 ###############################################.
 fluidPage(theme = shinytheme("cerulean"), # shinythemes::themeSelector() to swap while developing
 
@@ -124,7 +124,7 @@ fluidPage(theme = shinytheme("cerulean"), # shinythemes::themeSelector() to swap
                       )
                     )  
                   ),
-                  dygraphOutput("timetrendPlot"),
+                  dygraphOutput("trend_plot"),
                   shiny::hr()
                 )
 ),
