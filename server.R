@@ -7,6 +7,7 @@
 #   Do we need names loaded? or would be better to call to the lookup files
 #   Refine indicator lookup
 #   Figure out what to do with topic variables
+#   Need to create a geography lookup with parent geographies (which level to use CA, HB?)
 #----------------.
 #Spine chart:
 #   Fix issues spine chart: too many dots in iz (diff graph for different plots?),
@@ -17,6 +18,7 @@
 #   Try google charts package for table + charts
 #   Figure out how to include definition, time period etc.
 #   What to do do with population indicators? Exclude? or show as numbers, but no plot?
+#   Why size fo each indicator row does not work for all geographies?
 #----------------.
 #Time trend: 
 #   Switch to Plotly? If not fix dygraphs labels and other issues
@@ -40,10 +42,14 @@
 #   Each tab should have a brief intro. Work on the text
 #   Include report functionality
 #   Create user guide
+#   Idea: One dashboard per profile, reduce complexity, but maybe not enough
+#   add progress bars
+#   Incorporate Google analytics
 #----------------.
 #Map:
 #   Avoid redrawing of map:leafletProxy
-#   Add intermediate zones to map
+#   Add intermediate zones to map, or is it going to be too big?
+#   What about partnerships?
 #   How to save map? Move away from Leaflet? Will likely be faster
 #----------------.
 #Deprivation
@@ -52,6 +58,10 @@
 #Projection
 #   Figure out what is best model for data projections
 #----------------.
+#URGENT ONES
+#   Dygraph to plotly as now does not work
+#   Fix map so it works with new data set
+#   Fix rank as ir does not work with locality, iz nor partnerhsip
 
 ###############################################.
 
@@ -64,7 +74,7 @@ function(input, output) {
 #controls for spine chart
   output$geotype_ui_spine <- renderUI({
     selectInput("geotype_spine", "Geography level", 
-                choices=c("Health Board", "Local Authority", "Locality"))
+                choices= areatype_noscot_list)
   })
   
   output$geoname_ui_spine <- renderUI({
@@ -151,14 +161,30 @@ function(input, output) {
 
   # Create time trend plot
   
-  output$timetrendPlot <- renderDygraph({
-    dygraph(timetrend(), main=paste(input$indic_trend)) %>% 
+  output$trend_plot <- renderDygraph({
+    dygraph(trend_data(), main=paste(input$indic_trend)) %>% 
     dyRangeSelector() %>% 
     dyLegend(width = 400) %>% 
     dyOptions(axisLineWidth = 1.5, drawGrid = FALSE, drawPoints = TRUE, pointSize = 2) 
   })
   
-  #Plotting 
+  
+#   plot_plotly <- plot_ly(data=data, x=data[,xvar], y = round(data[,yvar],1),
+#                          type = 'scatter', mode = 'lines',
+#                          color=as.factor(data[,group]), colors = pal_chose[1:cat_length],
+#                          width = 650, height = 500) %>%
+#     #Layout
+#     layout(title = paste(title, "<br>", "<sup><i>Source: ", sourc, sep=""), #title
+#            titlefont = list(size=15), #title size
+#            annotations = list(), #It needs this because of a buggy behaviour
+#            yaxis = list(title = yaxtitle, rangemode="tozero"),
+#            xaxis = list(title = xaxtitle, tickangle = 270, tickfont =list(size=10)), #axis parameter
+#            margin=list( l = 70, r = 50, b = 150, t = 50, pad = 4 ), #margin-paddings
+#            hovermode = 'false', # to get hover compare mode as default
+#            images = scotpho_logo) %>%
+#     config(displaylogo = F, collaborate=F, editable =F) # taking out plotly logo and collaborate button
+
+   #Plotting 
 #   output$trend_plot <- renderPlotly({
 #         #Text for tooltip
 #       tooltip <- c(paste0(trend_data()$measure, "<br>",
@@ -192,25 +218,25 @@ function(input, output) {
 #### Rank plot ----
 ###############################################.     
   #Rank plot data
-  barpl <- reactive({filter(optdata, areatype==input$geotype_bar &
-                           year == input$year_bar & indicator == input$indic_bar)})
-  # Comparator data bar plot
-  compar_bar <- reactive({filter(optdata, year == input$year_bar &
-                                  areaname == input$geocomp_bar & indicator == input$indic_bar)})
+  rank_bar_data <- reactive({filter(optdata, areatype==input$geotype_rank &
+                           year == input$year_rank & indicator == input$indic_rank)})
+  # Comparator data rank plot
+  rank_compar <- reactive({filter(optdata, year == input$year_rank &
+                                  areaname == input$geocomp_rank & indicator == input$indic_rank)})
   
 # Create Rank plot
   
-  output$barPlot <- renderPlot({
+  output$rank_plot <- renderPlot({
     # ggiraph(code = print(
-    ggplot(data=barpl(), aes(reorder(areaname, -measure), measure) ) +
+    ggplot(data=rank_bar_data(), aes(reorder(areaname, -measure), measure) ) +
       geom_bar_interactive(stat = "identity", fill="steelblue", 
                            aes(tooltip= paste("<font size=2><u>", areaname, "</u>", "<br>",  "Measure: ", "<b>", measure, "</b>",  "<br>",  "Numerator: ",  
                                               "<b>", numerator, "</b>", "<br>",  "CI: ", "<b>", lowci, " - ", upci, "</b>", "</font>"), 
                                data_id=areaname)) +
       geom_errorbar(aes(ymax=upci, ymin=lowci), width=0.5)+
-      geom_hline(data = compar_bar(), aes(yintercept=measure,  col = areaname)) + #comparator
-      labs(title = paste(input$indic_bar),
-           subtitle = paste(unique(barpl()$def_period)),
+      geom_hline(data = rank_compar(), aes(yintercept=measure,  col = areaname)) + #comparator
+      labs(title = paste(input$indic_rank),
+           subtitle = paste(unique(rank_bar_data()$def_period)),
            y = "Measure") + #title and subtitle
       theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), #rotating labels
             axis.title.x=element_blank(), #Taking out x axis title
@@ -229,38 +255,25 @@ function(input, output) {
 }) 
   
   #Downloading data
-  output$download_bar <- downloadHandler(
-    filename =  'barplot_data.csv',
+  output$download_rank <- downloadHandler(
+    filename =  'rankplot_data.csv',
     content = function(file) {
-      write.csv(barpl(), file) 
+      write.csv(rank_bar_data(), file) 
     }
   )
   
 #####################################.      
 #### Table ----
 #####################################.      
-#controls for table
-  output$topic_ui_table <- renderUI({
-    selectInput("topic_table", "Topic", choices = c(unique(optdata$topic1), unique(optdata$topic2)),
-                selectize=TRUE, selected = "Scotland")
-  })
-  
-  output$indic_ui_table <- renderUI({
-    selectInput("indic_table", "Indicator", 
-               choices=unique(subset(optdata,optdata$topic1 == input$topic_table 
-                                     | optdata$topic2 == input$topic_table, select=c("indicator"))),
-               multiple=TRUE)
-    })
 
 #Table data
-  table_data <- reactive({subset(optdata, year>=input$year_table[1] & year<=input$year_table[2]
-                                 & areaname %in% input$geoname_table & indicator %in% input$indic_table &
-                                 (topic1 %in% input$topic_table | topic2 %in% input$topic_table),
-                                 select=c("code", "areaname", "areatype", "indicator", "year", "numerator", "measure", "lowci",
-                                          "upci", "def_period"))})
+  table_data <- reactive({
+    subset(optdata, select=c("code", "areaname", "areatype", "indicator", "year", 
+                            "numerator", "measure", "lowci","upci", "def_period"))
+    })
 
 #Actual table.
-  output$mytable <- DT::renderDataTable({
+  output$table_opt <- DT::renderDataTable({
     DT::datatable(table_data(), style = 'bootstrap', filter = 'top', rownames = FALSE,
       colnames = c("Code", "Area", "Type", "Indicator", "Year", "Numerator", "Measure", "Lower CI", "Upper CI", 
                  "Definition" )
