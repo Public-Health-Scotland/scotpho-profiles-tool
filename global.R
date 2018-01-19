@@ -19,6 +19,7 @@ library(reshape2) #for dygraph data modification
 library (rgdal) #for reading shapefiles
 library(ggiraph) #more interactive graphs -testing
 library(scales) #for scaling variables for spine chart
+library(plotly) #interactive graphs
 #library(rmapshaper) #for reducing size of shapefiles -not needed for app,just for modifying shp
 library(data.table) #for quick reading of csv files - Does not work with the actual version
 #library(gridExtra) #for combining graph and table (spine chart)
@@ -28,7 +29,7 @@ library(data.table) #for quick reading of csv files - Does not work with the act
 #library(highcharter) #more interactive graphs -testing, problem with license
 #library(rbokeh) #more interactive graphs -testing
 #library(taucharts) #more interactive graphs -testing Cannot use due to R version
-#library(plotly) #interactive graphs
+
 
 ###############################################.
 ## Data ----
@@ -36,15 +37,21 @@ library(data.table) #for quick reading of csv files - Does not work with the act
 optdata <- readRDS("./data/optdata_test.rds") 
 
 #Geographies names
-hb_name <- unique(optdata$areaname[optdata$areatype=="Health Board"])
-la_name <- unique(optdata$areaname[optdata$areatype=="Local Authority"])
-#intzone01 <- unique(optdata$areaname[optdata$areatype=="Intermediate Zone"])
-locality_name <- unique(optdata$areaname[optdata$areatype=="Locality"])
+hb_name <- unique(optdata$areaname[optdata$areatype=="Health board"]) %>% droplevels()
+la_name <- unique(optdata$areaname[optdata$areatype=="Council area"]) %>% droplevels()
+intzone_name <- unique(optdata$areaname[optdata$areatype=="Intermediate zone"]) %>% droplevels()
+partnership_name <- unique(optdata$areaname[optdata$areatype=="Partnership"]) %>% droplevels()
+locality_name <- unique(optdata$areaname[optdata$areatype=="Locality"]) %>% droplevels()
+
 
 indicator_list <- unique(optdata$indicator)
 area_list <- unique(optdata$areaname)
 topic_list <- c(unique(optdata$topic1), unique(optdata$topic2))
-areatype_list <- unique(optdata$areatype)
+areatype_list <- c("Scotland", "Health board", "Council area", "Partnership", 
+                   "Locality", "Intermediate zone")
+areatype_noscot_list <- c("Health board", "Council area", "Partnership", 
+                         "Locality", "Intermediate zone")
+
 ##########.
 #Map data
 CA_bound<-readOGR("./shapefiles","CA_simpl") #Reading file with council shapefiles
