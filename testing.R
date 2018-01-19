@@ -1,5 +1,64 @@
 ## Testing things ----
 ##################################################.
+
+###########################.
+## Other download way----
+
+# Use observeEvent to tell Shiny what action to take
+# when input$save is clicked.
+observeEvent(input$save, {
+  write.csv(df(), "data.csv")
+})
+
+###########################.
+## Plotly trend line----
+trend_pal <- c("#004785", "#4c7ea9", "#99b5ce", "#00a2e5", "#4cbeed", "#99daf5") 
+#Time trend data. Filtering based on user input values.
+trend_data_test <- optdata %>% filter(areaname %in% c("Scotland", "Ayrshire & Arran") 
+                                      & indicator == "Deaths all ages") %>% 
+  droplevels()
+
+trend_data_test <- trend_data_test[order(trend_data_test$year),]
+
+#This is needed not sure why
+trend_data_test <- as.data.frame(trend_data_test)
+
+#   | areaname %in% input$laname_trend
+#   | areaname %in% input$scotname_trend   
+
+#   | areaname %in% input$locname_trend)
+
+# Create time trend plot
+
+#   plot_plotly <- plot_ly(data=data, x=data[,xvar], y = round(data[,yvar],1),
+#                          type = 'scatter', mode = 'lines',
+#                          color=as.factor(data[,group]), colors = pal_chose[1:cat_length],
+#                          width = 650, height = 500) %>%
+#     #Layout
+#     layout(title = paste(title, "<br>", "<sup><i>Source: ", sourc, sep=""), #title
+#            titlefont = list(size=15), #title size
+#            annotations = list(), #It needs this because of a buggy behaviour
+#            yaxis = list(title = yaxtitle, rangemode="tozero"),
+#            xaxis = list(title = xaxtitle, tickangle = 270, tickfont =list(size=10)), #axis parameter
+#            margin=list( l = 70, r = 50, b = 150, t = 50, pad = 4 ), #margin-paddings
+#            hovermode = 'false', # to get hover compare mode as default
+#            images = scotpho_logo) %>%
+#     config(displaylogo = F, collaborate=F, editable =F) # taking out plotly logo and collaborate button
+
+#Plotting 
+      plot_ly(data=trend_data_test, x=~trend_axis,  y = ~measure, 
+              type = 'scatter', mode = 'lines',
+              color = ~code , colors = trend_pal) %>% 
+        #Layout
+        layout(annotations = list(), #It needs this because of a buggy behaviour
+               yaxis = list(title = "Measure", rangemode="tozero"), 
+               xaxis = list(title = "Time period"),  #axis parameter
+               hovermode = 'false') %>%  # to get hover compare mode as default
+        config(displaylogo = F, collaborate=F, editable =F) # taking out plotly logo and collaborate button
+
+
+
+##################################################.
 #Reading data quickly ---- 
 
 optdata_test<- fread("./data/locality_OPTdata.csv") # Cannot use it because of bug that only affects this version of R
