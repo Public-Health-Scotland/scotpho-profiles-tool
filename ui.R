@@ -102,7 +102,7 @@ fluidPage(theme = shinytheme("cerulean"), # shinythemes::themeSelector() to swap
                   div(style="height: 40px;", 
                     h4("Trend chart")
                   ),
-                  wellPanel( tags$style(".well {background-color:#d9e6f2; border: 1px solid #336699;}"), #color sidebars/well panels
+                  wellPanel(tags$style(".well {background-color:#ffffff; border: 0px solid #336699;}"), #color sidebars/well panels
                     fluidRow(
                       column(4,
                         selectInput("indic_trend", "Indicator", choices=indicator_list),
@@ -115,7 +115,7 @@ fluidPage(theme = shinytheme("cerulean"), # shinythemes::themeSelector() to swap
                                 multiple=TRUE, selectize=TRUE, selected = "")
                       ),
                       column(4, 
-                        selectInput("laname_trend", "Local Authority", choices = la_name,
+                        selectInput("laname_trend", "Council area", choices = la_name,
                                          multiple=TRUE, selectize=TRUE, selected = ""),
                         selectInput("izname_trend", "Locality", choices = locality_name,
                                     multiple=TRUE, selectize=TRUE, selected = "")
@@ -139,41 +139,34 @@ tabPanel("Rank chart", icon = icon("signal"),
                   wellPanel( 
                     fluidRow(
                       column(6,
-                        radioButtons("geotype_bar", label = "Geography level",
-                                    choices = areatype_list, selected = "Health Board"),
-                        downloadButton('download_bar', 'Download data')  #For downloading the data
+                        radioButtons("geotype_rank", label = "Geography level",
+                                    choices = areatype_noscot_list, selected = "Health board"),
+                        downloadButton('download_rank', 'Download data')  #For downloading the data
                       ),  
                       column(6,
-                        selectInput("indic_bar", "Indicator", choices=indicator_list),
-                        selectInput("year_bar", "Year", choices = unique(optdata$year) ),
-                        selectInput("geocomp_bar", "Comparator", choices = area_list,
+                        selectInput("indic_rank", "Indicator", choices=indicator_list),
+                        selectInput("year_rank", "Year", choices = unique(optdata$year) ),
+                        selectInput("geocomp_rank", "Comparator", choices = area_list,
                                 selectize=TRUE, selected = "Scotland")
                       )  
                     )
                   ),
-                  plotOutput("barPlot") 
+                  plotOutput("rank_plot") 
                 )
             ),
 ###############################################.
 ## Table ----
 ###############################################.
             tabPanel("Table", icon = icon("table"),
-              wellPanel(    
-                fluidRow(
-                  column(4,
-                    uiOutput("indic_ui_table"),  
-                    uiOutput("topic_ui_table")), 
-                  column(4,
-                    selectInput("geoname_table", "Area name", choices = area_list,
-                          multiple=TRUE, selectize=TRUE, selected = "Scotland")),
-                  column(4,
-                    sliderInput("year_table", "Time range", 
-                                min=2002, max = 2015, value = c(2002,2015)),
+                  column(9,
+                     p("This section allows you to view the data in table format. 
+                       You can use the filters to select the data you are interested in. 
+                       You can also download the data as a csv using the download button.")
+                     ),
+                  column(3,
                     downloadButton('download_table', 'Download data')  #For downloading the data
-                  )
-                )
-              ),  
-              DT::dataTableOutput('mytable')
+                  ),
+              DT::dataTableOutput('table_opt')
             ),
 ###############################################.
 ## Deprivation     ----
