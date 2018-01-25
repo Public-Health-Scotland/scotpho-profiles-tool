@@ -43,7 +43,7 @@ intzone_name <- unique(optdata$areaname[optdata$areatype=="Intermediate zone"]) 
 partnership_name <- unique(optdata$areaname[optdata$areatype=="Partnership"]) %>% droplevels()
 locality_name <- unique(optdata$areaname[optdata$areatype=="Locality"]) %>% droplevels()
 
-
+#Lists of names used in dropdowns
 indicator_list <- unique(optdata$indicator)
 area_list <- unique(optdata$areaname)
 topic_list <- c(unique(optdata$topic1), unique(optdata$topic2))
@@ -51,6 +51,9 @@ areatype_list <- c("Scotland", "Health board", "Council area", "Partnership",
                    "Locality", "Intermediate zone")
 areatype_noscot_list <- c("Health board", "Council area", "Partnership", 
                          "Locality", "Intermediate zone")
+
+#Palette for time trend.
+trend_pal <-  c('#08519c','#bdd7e7','#3182bd', '#6baed6', '#eff3ff')
 
 ##########.
 #Map data
