@@ -1,5 +1,73 @@
 ## Testing things ----
 ##################################################.
+###########################.
+## Dynamic time period selection rank----
+test <- as.factor(c(unique(subset(optdata, indicator == 'Deaths all ages', 
+                                  select= c("trend_axis")))))
+###########################.
+## Plotly rank chart----
+
+# Comparator data rank plot
+rank_compar_test <- optdata %>% filter(year == '2013' &
+                                  areaname == 'Scotland' & indicator == 'Deaths all ages')
+
+#Rank plot data
+rank_bar_data_test <- optdata %>% 
+  filter(areatype=='Locality' &  year == '2013' & indicator == 'Deaths all ages') %>% 
+  mutate(comparator = rank_compar_test$measure) %>% 
+  mutate(comp_name = rank_compar_test$areaname) %>% 
+  arrange(desc(measure)) # for ranking by value
+
+plot_ly(data = rank_bar_data_test, x = ~areaname) %>% 
+  #adding bar layer
+  add_bars(y = ~measure, name=~areaname, showlegend = FALSE) %>% #changing bar color
+  #Comparator line
+  add_trace(y = ~comparator, name = ~unique(comp_name), type = 'scatter', mode = 'lines',
+            line = list(color = '#FF0000')) %>% #changing line color
+  #Layout
+  layout(annotations = list(), #It needs this because of a buggy behaviour
+         yaxis = list(title = ~type_definition),
+         xaxis = list(title = ~def_period, tickangle = 270, tickfont =list(size=10), #axis parameters
+                      categoryorder="array", #order of plotting
+                      categoryarray = ~measure),
+         margin=list(b = 160),
+         hovermode = 'false') %>% # to get hover compare mode as default
+  config(displaylogo = F, collaborate=F, editable =F) 
+
+  -rank_bar_data_test[,measure]
+margin=list( l = 70, r = 50, b = 150, t = 50, pad = 4 ), #margin-paddings
+# Create Rank plot
+
+
+  ggplot(data=rank_bar_data(), aes(reorder(areaname, -measure), measure) ) +
+    geom_bar_interactive(stat = "identity", fill="steelblue", 
+                         aes(tooltip= paste("<font size=2><u>", areaname, "</u>", "<br>",  "Measure: ", "<b>", measure, "</b>",  "<br>",  "Numerator: ",  
+                                            "<b>", numerator, "</b>", "<br>",  "CI: ", "<b>", lowci, " - ", upci, "</b>", "</font>"), 
+                             data_id=areaname)) +
+    geom_errorbar(aes(ymax=upci, ymin=lowci), width=0.5)+
+    geom_hline(data = rank_compar(), aes(yintercept=measure,  col = areaname)) + #comparator
+    labs(title = paste(input$indic_rank),
+         subtitle = paste(unique(rank_bar_data()$def_period)),
+         y = "Measure") + #title and subtitle
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), #rotating labels
+          axis.title.x=element_blank(), #Taking out x axis title
+          axis.title.y=element_blank(), #Taking out y axis title
+          axis.line = element_line(colour = "black"), # Creating axis line
+          panel.background = element_blank(),#Blanking background
+          panel.grid.major = element_blank(), #taking out grid lines
+          panel.grid.minor = element_blank(),
+          legend.position="none" #taking out legends
+    )
+
+
+
+#Downloading data
+output$download_rank <- downloadHandler(
+  filename =  'rankplot_data.csv',
+  content = function(file) {
+    write.csv(rank_bar_data(), file) 
+  }
+)
 
 ###########################.
 ## Other download way----
@@ -12,7 +80,7 @@ observeEvent(input$save, {
 
 ###########################.
 ## Plotly trend line----
-trend_pal <- c("#004785", "#4c7ea9", "#99b5ce", "#00a2e5", "#4cbeed", "#99daf5") 
+trend_pal <-  c('#08519c','#bdd7e7','#3182bd', '#6baed6', '#eff3ff')
 #Time trend data. Filtering based on user input values.
 trend_data_test <- optdata %>% filter(areaname %in% c("Scotland", "Ayrshire & Arran") 
                                       & indicator == "Deaths all ages") %>% 
