@@ -15,7 +15,8 @@ fluidPage(theme = shinytheme("cerulean"), # shinythemes::themeSelector() to swap
       img(src='scotpho_logo.png', height=70, style="float: left; padding-right: 40px;"),
       href= "http://www.scotpho.org" #hyperlink
     ),
-    h3("ScotPHO Online Profile Tool v2.0 - DRAFT 0.2", style="vertical-align: bottom; padding-top:25px; ")
+    h3("ScotPHO Online Profile Tool v2.0 - DRAFT", 
+       style="vertical-align: bottom; padding-top:25px; ")
   ),
   navbarPage("", # Navigation bar
 ###############################################.             
@@ -65,16 +66,22 @@ fluidPage(theme = shinytheme("cerulean"), # shinythemes::themeSelector() to swap
 ###############################################.
 ## Spine chart ----
 ###############################################.
-            tabPanel("Spine chart", icon = icon("align-center"),
+            tabPanel("Spine", icon = icon("align-center"),
               sidebarLayout(      
                 sidebarPanel(width = 4, position = "right",
                   uiOutput("geotype_ui_spine"),  
+                  conditionalPanel(#Conditional panel for extra dropdown for localities & IZ
+                    condition = "input.geotype_spine== 'Locality' | input.geotype_spine == 'Intermediate zone' ",
+                    selectInput("loc_iz_spine", label = "Council area for localities/intermediate zones",
+                                choices = la_name)
+                  ),
                   uiOutput("geoname_ui_spine"),  
                   selectInput("geocomp_spine", "Comparator", choices = area_list,
                               selectize=TRUE, selected = "Scotland"),
                   selectInput("topic_spine", "Topic", choices = topic_list,
                               selectize=TRUE, selected = "Scotland"),
-                  selectInput("year_spine", "Year", choices = unique(optdata$year), selected=2012 ),
+                  selectInput("year_spine", "Year", choices = unique(optdata$year), 
+                              selected=2012 ),
                   downloadButton(outputId = "down_spineplot", label = "Save chart"),
                   #Legend
                   shiny::hr(),
@@ -96,7 +103,7 @@ fluidPage(theme = shinytheme("cerulean"), # shinythemes::themeSelector() to swap
 ###############################################.
 ## Time trend ---- 
 ###############################################.
-            tabPanel("Time trend", icon = icon("area-chart"),
+            tabPanel("Trend", icon = icon("area-chart"),
                 mainPanel(width = 12,
         #Time trend plot
                   div(style="height: 40px;", 
@@ -112,26 +119,27 @@ fluidPage(theme = shinytheme("cerulean"), # shinythemes::themeSelector() to swap
                         selectInput("scotname_trend", "Scotland", choices = c("", "Scotland"), 
                                     selectize=TRUE, selected = "Scotland"),
                         selectInput("hbname_trend", "Health Board", choices = hb_name,
-                                multiple=TRUE, selectize=TRUE, selected = "")
+                                multiple=TRUE, selectize=TRUE, selected = ""),
+                        selectInput("laname_trend", "Council area", choices = la_name,
+                                    multiple=TRUE, selectize=TRUE, selected = "")
                       ),
                       column(4, 
-                        selectInput("laname_trend", "Council area", choices = la_name,
-                                         multiple=TRUE, selectize=TRUE, selected = ""),
-                        selectInput("izname_trend", "Locality", choices = locality_name,
-                                    multiple=TRUE, selectize=TRUE, selected = "")
-#                         selectInput("izname_trend", "Intermediate Zone", choices = intzone01,
-#                                 multiple=TRUE, selectize=TRUE, selected = "")
+                        selectInput("partname_trend", "Partnership", choices = partnership_name,
+                                    multiple=TRUE, selectize=TRUE, selected = ""),                        
+                        selectInput("locname_trend", "Locality", choices = locality_name,
+                                    multiple=TRUE, selectize=TRUE, selected = ""),
+                        selectInput("izname_trend", "Intermediate Zone", choices = intzone_name,
+                                multiple=TRUE, selectize=TRUE, selected = "")
                       )
                     )  
                   ),
-                  dygraphOutput("trend_plot"),
-                  shiny::hr()
+                  plotlyOutput("trend_plot")
                 )
 ),
 ###############################################.
 ## Rank chart ---- 
 ###############################################.
-tabPanel("Rank chart", icon = icon("signal"),
+tabPanel("Rank", icon = icon("signal"),
          mainPanel(width = 12,
                   div(style="height: 40px;", 
                     h4("Rank chart")
@@ -139,34 +147,27 @@ tabPanel("Rank chart", icon = icon("signal"),
                   wellPanel( 
                     fluidRow(
                       column(6,
-                        radioButtons("geotype_rank", label = "Geography level",
-                                    choices = areatype_noscot_list, selected = "Health board"),
+                        selectInput("geotype_rank", label = "Geography level",
+                          choices = areatype_noscot_list, selected = "Health board"),
+                        conditionalPanel( #Conditional panel for extra dropdown for localities & IZ
+                          condition = "input.geotype_rank == 'Locality' | input.geotype_rank == 'Intermediate zone' ",
+                          selectInput("loc_iz_rank", label = "Council area for localities/intermediate zones",
+                                      choices = la_name)
+                        ),
                         downloadButton('download_rank', 'Download data')  #For downloading the data
                       ),  
                       column(6,
-                        selectInput("indic_rank", "Indicator", choices=indicator_list),
-                        selectInput("year_rank", "Year", choices = unique(optdata$year) ),
+                        #selectInput("indic_rank", "Indicator", choices=indicator_list),
+                        uiOutput("indic_ui_rank"),  
+                        uiOutput("year_ui_rank"),  
+                        #selectInput("year_rank", "Time period", choices = unique(optdata$trend_axis) ),
                         selectInput("geocomp_rank", "Comparator", choices = area_list,
                                 selectize=TRUE, selected = "Scotland")
                       )  
                     )
                   ),
-                  plotOutput("rank_plot") 
+                  plotlyOutput("rank_plot") 
                 )
-            ),
-###############################################.
-## Table ----
-###############################################.
-            tabPanel("Table", icon = icon("table"),
-                  column(9,
-                     p("This section allows you to view the data in table format. 
-                       You can use the filters to select the data you are interested in. 
-                       You can also download the data as a csv using the download button.")
-                     ),
-                  column(3,
-                    downloadButton('download_table', 'Download data')  #For downloading the data
-                  ),
-              DT::dataTableOutput('table_opt')
             ),
 ###############################################.
 ## Deprivation     ----
@@ -208,15 +209,28 @@ tabPanel("Deprivation", icon = icon("gbp"),
             selectInput("indic_map", "Indicator", choices=indicator_list)
           ),
           column(4,
-            selectInput("year_map", "Year", choices = unique(optdata$year),
-               selected = "2012"))
+            selectInput("year_map", "Time period", choices = unique(optdata$trend_axis))
+          )
         )
       ), 
       h4(textOutput("title_map")),
       leafletOutput("map")
-    )
+    ),
+###############################################.
+## Table ----
+###############################################.
+tabPanel("Table", icon = icon("table"),
+         column(9,
+                p("This section allows you to view the data in table format. 
+                  You can use the filters to select the data you are interested in. 
+                  You can also download the data as a csv using the download button.")
+                ),
+         column(3,
+                downloadButton('download_table', 'Download data')  #For downloading the data
+         ),
+         DT::dataTableOutput('table_opt')
+                )
   ),
-
 ###############################################.
 ## Copyright notice ----
 ###############################################.
