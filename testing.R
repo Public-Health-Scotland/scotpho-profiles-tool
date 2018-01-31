@@ -1,9 +1,122 @@
 ## Testing things ----
 ##################################################.
+###############################################.
+## How to play in the right way with lookups ----
+test <- "Scotland"
+test2 <- as.character(geo_lookup$code[geo_lookup$areaname == test])
+
+test3 <- optdata %>% filter(trend_axis == "2002-2004" & code == test2
+       & indicator == "Deaths all ages") %>% 
+  mutate(areaname = geo_lookup$areaname[geo_lookup$code == code])
+
+test4 <- as.character(geo_lookup$code[geo_lookup$areatype == "Health board"])
+test5 <-         optdata %>% 
+  filter(code %in% as.character(geo_lookup$code[geo_lookup$areatype == "HSC Locality"]) &
+           code %in% as.character(geo_lookup$code[geo_lookup$parent_area == "Aberdeen City"])
+)
+test55 <-  geo_lookup$areaname[geo_lookup$code %in% optdata$code]
+
+test6 <-         optdata %>% 
+  filter(code %in% as.character(geo_lookup$code[geo_lookup$areatype == "HSC Locality"]) &
+           code %in% as.character(geo_lookup$code[geo_lookup$parent_area == "Aberdeen City"]) &
+           trend_axis == "2012-2014" &
+           indicator == "Deaths all ages") 
+test7 <- test6 %>% 
+  mutate(areaname = geo_lookup$areaname[geo_lookup$code %in% test6$code]) %>%  #arename from lookup
+  mutate(comp_value = rank_compar()$measure) %>% #comparator value and name
+  mutate(comp_name = rank_compar()$areaname) %>% 
+  arrange(desc(measure)) 
+
+
+hb_chosen <- c("Shetland", "Orkney")
+la_chosen <- c("Aberdeen City", "Highlands", "Moray")
+areas_chosen <- c(hb_chosen, la_chosen)
+
+test8 <- optdata %>% 
+  subset(code %in% as.character(geo_lookup$code[geo_lookup$areaname %in% areas_chosen])) %>% 
+  droplevels()
+
+test9 <- optdata %>% 
+  filter((code %in% as.character(geo_lookup$code[geo_lookup$areaname %in% input$hbname_trend &
+                                                   geo_lookup$areatype == "Health board"]) |
+            code %in% as.character(geo_lookup$code[geo_lookup$areaname %in% input$laname_trend
+                                                   & geo_lookup$areatype == "Council area"]) |
+            code %in% as.character(geo_lookup$code[geo_lookup$areaname %in% input$scotname_trend
+                                                   & geo_lookup$areatype == "Scotland"])  |
+            code %in% as.character(geo_lookup$code[geo_lookup$areaname %in% input$locname_trend
+                                                   & geo_lookup$areatype == "HSC Locality"]) |
+            code %in% as.character(geo_lookup$code[geo_lookup$areaname %in% input$partname_trend
+                                                   & geo_lookup$areatype == "HSC Partnership"])   |
+            code %in% as.character(geo_lookup$code[geo_lookup$areaname %in% input$izname_trend
+                                                   & geo_lookup$areatype == "Intermediate zone"]) ) & 
+           indicator == input$indic_trend) %>% 
+  droplevels()
+
+part <- c("South Lanarkshire", "South Ayrshire")
+test10 <-  optdata %>% 
+  filter(code %in% as.character(geo_lookup$code[geo_lookup$areaname %in% part
+                                                             & geo_lookup$areatype == "HSC Partnership"]))
+#Cannot be done in the same pipe operation as it does not work with the areaname mutate
+test10 <- test10 %>% 
+  mutate(areaname = geo_lookup$areaname[geo_lookup$code %in% code]) #arename from lookup
+
+test10 <- merge(x=test10, y=geo_lookup, by="code", all.x = TRUE) 
+
+trend <- trend[order(trend$year),]
+
+test11 <- optdata %>% 
+  subset(code %in% as.character(geo_lookup$code[geo_lookup$areatype == "Health board"]) &
+           trend_axis=="2005-2007" & 
+           indicator=="Deaths all ages") %>% 
+  rename(HBCode = code) %>% 
+  droplevels() #dropping missing factor levels to allow merging
+
+test11 <- merge(CA_bound, test11, by='HBCode')
+
+test12 <- merge(x=optdata, y=geo_lookup, by="code", all.x = TRUE)
+
+test12 <- test12 %>% 
+  subset(select=c("code", "areaname", "areatype", "indicator", "year", 
+           "numerator", "measure", "lowci","upci", "def_period"))
+###############################################.
+## Old locality data ----
+###############################################.   
+
+optdata_old<- read_csv("./data/locality_OPTdata.csv") %>% 
+  rename(measure = rate) %>% 
+  mutate_at(.funs=funs(round(.,2)), .vars=vars(numerator, measure, lowci, upci)) %>% 
+  setNames(tolower(names(.))) #variables to lower case
+
+optdata$interpret <- ifelse(
+  optdata$indicator %in% c('Healthy birth weight','Babies exclusively breastfed at 6-8 weeks'),
+  'Highgood', 'Lowgood')
+
+#Scaling measures (0 to 1) in groups by year, area type and indicator. 
+#Does not work well for Scotland totals.
+optdata <- optdata %>% group_by(indicator, year, areatype) %>% 
+  mutate(measure_sc = ifelse(interpret=="Highgood", as.vector(rescale(measure, to=c(1,0))), 
+                             as.vector(rescale(measure, to=c(0,1)))))
+
+
+#Creating variables for topic/profile filters
+optdata$topic1 <- "All"
+optdata$topic2 <- ifelse(optdata$indicator %in% c("Child obesity in primary 1", "Healthy birth weight", 
+                                                  "Babies exclusively breastfed at 6-8 weeks"), 
+                         "Children", "Cancer")
+
+saveRDS(optdata, "./data/optdata_test.rds")
+optdata_old <- readRDS("./data/optdata_test.rds")
+
 ###########################.
 ## Dynamic time period selection rank----
 test <- as.factor(c(unique(subset(optdata, indicator == 'Deaths all ages', 
                                   select= c("trend_axis")))))
+
+test <- c(unique(subset(optdata, indicator == 'Deaths all ages', 
+                        select= c("trend_axis"))))
+
+test <- unique(optdata$trend_axis[optdata$indicator == 'Deaths all ages']) 
+
 ###########################.
 ## Plotly rank chart----
 
