@@ -2,7 +2,7 @@
 # This script includes the user-interface definition of the app.
 #
 #TODO:
-#see server syntax
+#see server syntax 
 
 ###############################################.
 ## Header ---- 
@@ -71,9 +71,9 @@ fluidPage(theme = shinytheme("cerulean"), # shinythemes::themeSelector() to swap
                 sidebarPanel(width = 4, position = "right",
                   uiOutput("geotype_ui_spine"),  
                   conditionalPanel(#Conditional panel for extra dropdown for localities & IZ
-                    condition = "input.geotype_spine== 'Locality' | input.geotype_spine == 'Intermediate zone' ",
-                    selectInput("loc_iz_spine", label = "Council area for localities/intermediate zones",
-                                choices = la_name)
+                    condition = "input.geotype_spine== 'HSC Locality' | input.geotype_spine == 'Intermediate zone' ",
+                    selectInput("loc_iz_spine", label = "Partnership for localities/intermediate zones",
+                                choices = partnership_name)
                   ),
                   uiOutput("geoname_ui_spine"),  
                   selectInput("geocomp_spine", "Comparator", choices = area_list,
@@ -100,9 +100,9 @@ fluidPage(theme = shinytheme("cerulean"), # shinythemes::themeSelector() to swap
                 )
               )
             ),
-###############################################.
-## Time trend ---- 
-###############################################.
+# ###############################################.
+# ## Time trend ---- 
+# ###############################################.
             tabPanel("Trend", icon = icon("area-chart"),
                 mainPanel(width = 12,
         #Time trend plot
@@ -124,16 +124,16 @@ fluidPage(theme = shinytheme("cerulean"), # shinythemes::themeSelector() to swap
                                     multiple=TRUE, selectize=TRUE, selected = "")
                       ),
                       column(4, 
-                        selectInput("partname_trend", "Partnership", choices = partnership_name,
+                        selectInput("partname_trend", "HSC Partnership", choices = partnership_name,
                                     multiple=TRUE, selectize=TRUE, selected = ""),                        
-                        selectInput("locname_trend", "Locality", choices = locality_name,
+                        selectInput("locname_trend", "HSC Locality", choices = locality_name,
                                     multiple=TRUE, selectize=TRUE, selected = ""),
                         selectInput("izname_trend", "Intermediate Zone", choices = intzone_name,
                                 multiple=TRUE, selectize=TRUE, selected = "")
                       )
                     )  
                   ),
-                  plotlyOutput("trend_plot")
+                 plotlyOutput("trend_plot")
                 )
 ),
 ###############################################.
@@ -150,17 +150,17 @@ tabPanel("Rank", icon = icon("signal"),
                         selectInput("geotype_rank", label = "Geography level",
                           choices = areatype_noscot_list, selected = "Health board"),
                         conditionalPanel( #Conditional panel for extra dropdown for localities & IZ
-                          condition = "input.geotype_rank == 'Locality' | input.geotype_rank == 'Intermediate zone' ",
-                          selectInput("loc_iz_rank", label = "Council area for localities/intermediate zones",
-                                      choices = la_name)
+                          condition = "input.geotype_rank == 'HSC Locality' | input.geotype_rank == 'Intermediate zone' ",
+                          selectInput("loc_iz_rank", label = "Partnership for localities/intermediate zones",
+                                      choices = partnership_name)
                         ),
                         downloadButton('download_rank', 'Download data')  #For downloading the data
                       ),  
                       column(6,
-                        #selectInput("indic_rank", "Indicator", choices=indicator_list),
-                        uiOutput("indic_ui_rank"),  
-                        uiOutput("year_ui_rank"),  
-                        #selectInput("year_rank", "Time period", choices = unique(optdata$trend_axis) ),
+                        selectInput("indic_rank", "Indicator", choices=indicator_list),
+                        #uiOutput("indic_ui_rank"), #breaks the app  
+                        #uiOutput("year_ui_rank"), #breaks the app   
+                        selectInput("year_rank", "Time period", choices = unique(optdata$trend_axis) ),
                         selectInput("geocomp_rank", "Comparator", choices = area_list,
                                 selectize=TRUE, selected = "Scotland")
                       )  
