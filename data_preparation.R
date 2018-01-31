@@ -156,6 +156,7 @@ geo_lookup <- geo_lookup %>%
 geo_lookup$parent_area <- as.factor(geo_lookup$parent_area )
 geo_lookup$areatype <- as.factor(geo_lookup$areatype )
 
+geo_lookup <- as.data.frame(geo_lookup)
 saveRDS(geo_lookup, "./data/geo_lookup.rds")
 geo_lookup <- readRDS("./data/geo_lookup.rds") 
 
