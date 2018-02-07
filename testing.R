@@ -1,6 +1,30 @@
 ## Testing things ----
 ##################################################.
 ###############################################.
+## Feedback ----
+###############################################.
+tags$script(HTML("var header = $('.navbar > .container');
+                 header.append('<div style=\"float:right\"><h3>Company name text here</h3></div>');
+                 console.log(header)"))
+),
+# tags$script(HTML("var header = $('.navbar > .container');
+#                        header.append('<div style=\"float:right\"><a href=\"mailto:ScotPHO@nhs.net\">Send Mail</a></div>');
+#                  console.log(header)"))
+
+# tags$a(href="mailto:ScotPHO@nhs.net", "ScotPHO@nhs.net")
+# tags$script(HTML("var header = $('.navbar > .container');
+#                        header.append('<div style=\"float:right\"><a href=\"mailto:ScotPHO@nhs.net\" class=\"button\" align=\"middle\" data-url=\"www.mywebsite.com\" data-text=\"Visit www.mywebsite.com\" data-size=\"large\">Feedback us</a></div>');
+#                        console.log(header)")),
+# tags$script(HTML("!function(d,s,id){
+#             var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';
+#             if(!d.getElementById(id)){
+#                     js=d.createElement(s);
+#                     js.id=id;
+#                     js.src=p+'://platform.twitter.com/widgets.js';
+#                     fjs.parentNode.insertBefore(js,fjs);
+#             }
+#     }(document, 'script', 'twitter-wjs');"))
+###############################################.
 ## How to play in the right way with lookups ----
 test <- "Scotland"
 test2 <- as.character(geo_lookup$code[geo_lookup$areaname == test])
