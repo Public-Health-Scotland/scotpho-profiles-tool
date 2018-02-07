@@ -6,6 +6,7 @@
 #   Lookups need to be checked/refined: names areas (consistency & and), indicator measures, etc.
 #   Figure out what to do with topic variables
 #   Indicator information in lookup as with geography
+#   Add domain to indicator lookup.
 #----------------.
 #General:
 #   See how to organize dropdown better, using lists, using conditional dropdowns 
@@ -13,14 +14,15 @@
 #   Mini map for selecting geographies? include appendix with locations? like pdf?
 #   Each tab should have a brief intro. Work on the text
 #   Selection and order of years/time periods needs to be improved.
-#   Fix bookmarking
+#   Fix bookmarking - check if server solution in .io ?enableBookmarking
 #   Take out row numbers and non-needed columns from download files
 #   Create function for downloading files (instead of repeating code)
 #   Do extensive testing of the app
 #   Add feedback button/tab
 #   Include reporting functionality -Rmarkdown?
 #   Create user guide
-#   add loading/progress bars
+#   Check/work on reactivity
+#   add loading/progress bars. Not sure if needed.
 #   Incorporate Google analytics - https://shiny.rstudio.com/articles/google-analytics.html
 #   Sanitize error messages - use tpp code
 #   I feel we should host in the website and link from here: shapefiles, lookups, etc
@@ -488,7 +490,7 @@ function(input, output) {
 #####################################    
 ## For allowing bookmarking ----
 #####################################.      
-  enableBookmarking(store = "url")
+  enableBookmarking(store = "server")
 }
 
 #########################  END ----
