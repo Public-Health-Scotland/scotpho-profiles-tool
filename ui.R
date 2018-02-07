@@ -15,8 +15,9 @@ fluidPage(theme = shinytheme("cerulean"), # shinythemes::themeSelector() to swap
       img(src='scotpho_logo.png', height=70, style="float: left; padding-right: 40px;"),
       href= "http://www.scotpho.org" #hyperlink
     ),
-    h3("ScotPHO Online Profile Tool v2.0 - DRAFT", 
-       style="vertical-align: bottom; padding-top:25px; ")
+    h3("Online Profile Tool - DRAFT", 
+       style="vertical-align: bottom; padding-top:25px; "),
+    h6(tags$a(href="mailto:ScotPHO@nhs.net", "Tell us what you think of our new !"))
   ),
   navbarPage("", # Navigation bar
 ###############################################.             
@@ -230,12 +231,12 @@ tabPanel("Table", icon = icon("table"),
          ),
          DT::dataTableOutput('table_opt')
                 )
-  ),
+),
 ###############################################.
 ## Copyright notice ----
 ###############################################.
   div(style="height: 40px; background: linear-gradient(#54b4eb, #2fa4e7 60%, #1d9ce5); display:inline-block; width:100%  ", 
-      tags$b("© Scottish Public Health Observatory 2017", style="color: white; padding-top: 14px; padding-left: 30px; 
+      tags$b("© Scottish Public Health Observatory v2.0 2018", style="color: white; padding-top: 14px; padding-left: 30px; 
            padding-right: 60%; line-height:40px; font-size:70%;"),
     bookmarkButton(style="height:25px; font-size:70%; vertical-align:middle; margin-bottom:3px ")
   )
