@@ -24,6 +24,7 @@ library(data.table) #for quick reading of csv files - Does not work with the act
 ## Data ----
 ###############################################.    
 optdata <- readRDS("./data/optdata_test.rds") 
+deprivation <- readRDS("./data/deprivation_OPT.rds")
 
 geo_lookup <- readRDS("./data/geo_lookup.rds") #geography lookup
 
@@ -36,6 +37,8 @@ locality_name <- unique(geo_lookup$areaname[geo_lookup$areatype=="HSC Locality"]
 
 #Lists of names used in dropdowns
 indicator_list <- unique(optdata$indicator)
+ind_depr_list <- unique(deprivation$indicator)
+
 area_list <- unique(geo_lookup$areaname)
 topic_list <- c(unique(as.character(optdata$topic1)), unique(as.character(optdata$topic2)))
 areatype_list <- c("Scotland", "Health board", "Council area", "HSC Partnership", 
@@ -43,9 +46,15 @@ areatype_list <- c("Scotland", "Health board", "Council area", "HSC Partnership"
 areatype_noscot_list <- c("Health board", "Council area", "HSC Partnership", 
                          "HSC Locality", "Intermediate zone")
 
-#Palette for time trend.
+#Palette for time trend (still experimenting).
 trend_pal <-  c('#2166ac','#4393c3', '#92c5de', '#d1e5f0', '#053061',
                 '#8c510a', '#bf812d', '#dfc27d', '#f6e8c3', '#543005')
+
+trend_pal2 <-  c('#a6cee3','#1f78b4', '#b2df8a', '#33a02c')
+
+#Palette for SIMD.
+pal_simd_bar <- c( '#e0f3f8', '#abd9e9', '#74add1', '#4575b4', '#313695')
+pal_simd_trend <- c( '#e0f3f8', '#abd9e9', '#74add1', '#4575b4', '#313695', '#FF0000')
 
 ##########.
 #Map data
