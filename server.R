@@ -7,6 +7,8 @@
 #   Figure out what to do with topic variables
 #   Indicator information in lookup as with geography
 #   Add domain to indicator lookup.
+#   Include deprivation indicators in lookup
+#   Deprivation needs PAR and rounding of numeric variables
 #----------------.
 #General:
 #   See how to organize dropdown better, using lists, using conditional dropdowns 
@@ -62,6 +64,7 @@
 #   Include error bars, maybe tick box
 #----------------.
 #Table:
+#   Add deprivation data to table (maybe with switch or just bounding everything)
 #----------------.
 #Map:
 #   Avoid redrawing of map:leafletProxy
@@ -70,9 +73,13 @@
 #   How to save map? Move away from Leaflet? Will likely be faster
 #   Years dependant on indicator chosen. Maybe not year but time period.
 #   For IZ's and localities maybe something like this: https://isresearchnc.shinyapps.io/CMaps/
+#   Save shapefiles as rds (quicker)
 #----------------.
 #Deprivation
-#   See how to deal with deprivation, same app?
+#   Do we want CI's? Error bars? polygon areas for trime trends?
+#   Include PAR information and charts (trend and bar)
+#   Add slope of SII to bar chart
+#   instead of time period dropdown do slider
 #----------------.
 #Projection
 #   Figure out what is best model for data projections
@@ -347,6 +354,153 @@ function(input, output) {
     filename =  'rankplot_data.csv',
     content = function(file) {
       write.csv(rank_bar_data(), file) 
+    }
+  )
+  
+  ###############################################.        
+  #### Deprivation ----
+  ###############################################.   
+  
+  #Controls for chart. Dynamic selection of area depending on area type.
+  output$geoname_ui_simd <- renderUI({
+    selectInput("geoname_simd", "Select the location", 
+                choices = unique(subset(geo_lookup$areaname, geo_lookup$areatype == input$geotype_simd)),
+                selected = "Scotland")
+  })
+  
+  
+  #Reactive datasets
+  #reactive dataset for the simd bar plot
+  simd_bar_data <- reactive({
+    deprivation %>% 
+      subset(code == as.character(geo_lookup$code[geo_lookup$areaname == input$geoname_simd]) & 
+               indicator == input$indic_simd &
+               trend_axis == input$year_simd) %>%
+      mutate(average = rate[quintile == "Total"]) %>% 
+      filter(quintile != "Total") %>% 
+      droplevels()
+  })
+  
+  simd_trend_data <- reactive({
+    deprivation %>% 
+      subset(code == as.character(geo_lookup$code[geo_lookup$areaname == input$geoname_simd]) & 
+               indicator == input$indic_simd) %>% 
+      droplevels()
+  })
+  
+  #Plotting 
+  output$simd_bar_plot <- renderPlotly({
+    #If no data available for that period then plot message saying data is missing
+    if (is.data.frame(simd_bar_data()) && nrow(simd_bar_data()) == 0)
+    {
+      #plotting empty plot just with text
+      text_na <- list(x = 5, y = 5, text = "No data available" ,
+                      xref = "x", yref = "y",  showarrow = FALSE)
+      
+      plot_ly() %>%
+        layout(annotations = text_na,
+               #empty layout
+               yaxis = list(showline = FALSE, showticklabels = FALSE, showgrid = FALSE),
+               xaxis = list(showline = FALSE, showticklabels = FALSE, showgrid = FALSE)) %>% 
+        config( displayModeBar = FALSE) # taking out plotly logo and collaborate button
+      
+    }
+    else {
+      
+      #Text for tooltip
+      #     tooltip_simd <- c(paste0("Quintile: ", simd_bar_data()$quintile, "<br>",
+      #                              "Value: ", abs(simd_bar_data()$rate)))
+      
+      plot_ly(data=simd_bar_data(), x=~quintile#,
+              # text=tooltip_simd, hoverinfo="text"
+      ) %>% 
+        add_bars(y=~rate, color = ~quintile , colors = pal_simd_bar) %>%
+        #Comparator line
+        add_trace(y = ~average, name = "Average", type = 'scatter', mode = 'lines',
+                  line = list(color = '#FF0000')) %>% #changing line color
+        layout(bargap = 0.1, 
+               margin=list(b = 160),
+               legend = list(orientation = 'h'),
+               yaxis = list(title = ~type_definition), 
+               xaxis = list(showline = TRUE, title = FALSE, showticklabels = FALSE)) %>% 
+        config(displaylogo = F, collaborate=F, editable =F) # taking out plotly logo and collaborate button
+    }
+  })
+  
+  #Plotting 
+  output$simd_trend_plot <- renderPlotly({
+    #If no data available for that period then plot message saying data is missing
+    if (is.data.frame(simd_trend_data()) && nrow(simd_trend_data()) == 0)
+    {
+      #plotting empty plot just with text
+      text_na <- list(x = 5, y = 5, text = "No data available" ,
+                      xref = "x", yref = "y",  showarrow = FALSE)
+      
+      plot_ly() %>%
+        layout(annotations = text_na,
+               #empty layout
+               yaxis = list(showline = FALSE, showticklabels = FALSE, showgrid = FALSE),
+               xaxis = list(showline = FALSE, showticklabels = FALSE, showgrid = FALSE)) %>% 
+        config( displayModeBar = FALSE) # taking out plotly logo and collaborate button
+      
+    }
+    else {
+      if (input$measure_simd == "Index of inequality") {
+        
+        simd_index <- simd_trend_data() %>% 
+          filter((quintile == "Total" & code == "S00000001")|
+                   (quintile == "2" & code != "S00000001"))
+        
+        plot_ly(data=simd_index, x=~trend_axis) %>% 
+          add_lines(y = ~slope_coef, name = "Slope index of inequality", type = 'scatter', mode = 'lines',
+                    line = list(color = '#74add1')) %>% #changing line color
+          add_lines(y = ~rii, name = "Relative index of inequality", type = 'scatter', mode = 'lines',
+                    line = list(color = '#313695'), yaxis = "y2") %>% #changing line color
+          #Layout
+          layout(annotations = list(), #It needs this because of a buggy behaviour
+                 margin = list(b = 160), #to avoid labels getting cut out
+                 yaxis = list(side = "left", rangemode="tozero", 
+                              title = "", tickfont = list(color = "#74add1")), 
+                 yaxis2 = list(side = "right", overlaying = "y", rangemode="tozero",
+                               title = FALSE, tickfont = list(color = "#313695")),
+                 xaxis = list(title = "Time period", tickfont =list(size=10), tickangle = 270),  #axis parameter
+                 margin=list(pad = 50, l = 160, r = 200, b = 160),
+                 legend = list(orientation = 'h', x = 20, y = 100),
+                 hovermode = 'false') %>%  # to get hover compare mode as default
+          config(displaylogo = F, collaborate=F, editable =F) # taking out plotly logo and collaborate button
+        
+      }
+      
+      else {
+        
+        #Text for tooltip
+        #       tooltip_simd <- c(paste0("Quintile: ", simd_bar_data()$quintile, "<br>",
+        #                                "Value: ", abs(simd_bar_data()$rate)))
+        #,
+        #text=tooltip_simd, hoverinfo="text"
+        plot_ly(data=simd_trend_data(), x=~trend_axis,  y = ~rate, 
+                type = 'scatter', mode = 'lines',
+                color = ~quintile , colors = pal_simd_trend) %>% 
+          #Layout
+          layout(annotations = list(), #It needs this because of a buggy behaviour
+                 margin = list(b = 160), #to avoid labels getting cut out
+                 yaxis = list(title = FALSE, rangemode="tozero", 
+                              size = 4, tickfont =list(size=10)), 
+                 xaxis = list(title = "Time period", tickfont =list(size=10), tickangle = 270),  #axis parameter
+                 margin=list(b = 160),
+                 showlegend = FALSE,
+                 hovermode = 'false') %>%  # to get hover compare mode as default
+          config(displaylogo = F, collaborate=F, editable =F) # taking out plotly logo and collaborate button
+        
+      }
+    }
+  })
+  
+  #Downloading data
+  output$download_simd <- downloadHandler(
+    filename =  'deprivation_data.csv',
+    content = function(file) {
+      write.csv(simd_trend_data(), file)
     }
   )
 
