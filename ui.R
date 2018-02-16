@@ -17,7 +17,7 @@ fluidPage(theme = shinytheme("cerulean"), # shinythemes::themeSelector() to swap
     ),
     h3("Online Profile Tool - DRAFT", 
        style="vertical-align: bottom; padding-top:25px; "),
-    h6(tags$a(href="mailto:ScotPHO@nhs.net", "Tell us what you think of our new !"))
+    h6(tags$a(href="mailto:ScotPHO@nhs.net", "Tell us what you think of our new tool!"))
   ),
   navbarPage("", # Navigation bar
 ###############################################.             
@@ -171,15 +171,32 @@ tabPanel("Rank", icon = icon("signal"),
                 )
             ),
 ###############################################.
-## Deprivation     ----
+## Deprivation ---- 
 ###############################################.
 tabPanel("Deprivation", icon = icon("gbp"),
-         sidebarLayout(
-           sidebarPanel(
-             p("Chart selections")
-           ),
-           mainPanel(h4("Deprivation by SIMD quintile"),
-                     p("Spaceholder"))
+         p("This section allows you to explore the data by different levels of ", 
+           tags$a(href="http://www.scotpho.org.uk/life-circumstances/deprivation/key-points/", "deprivation"), 
+           ". You can use the filters to select the data you are interested in. 
+           To download your data selection as a csv file use the ‘download data’ button. If you hover 
+           over the chart you will see a number of buttons which  will allow you to select 
+           parts of the chart, zoom in or out or save the chart as an image."),
+         wellPanel(tags$style(".well {background-color:#ffffff; border: 0px solid #336699;}"), #color sidebars/well panels
+                   column(6, selectInput("indic_simd", label = "Indicator", 
+                                         choices = ind_depr_list)),
+                   column(3, selectInput("geotype_simd", label = "Geography level", 
+                                         choices = areatype_depr_list, selected =  "Scotland")),  
+                   column(3, uiOutput("geoname_ui_simd")),
+                   column(5, selectInput("year_simd", label = "Time period", 
+                                         choices = unique(deprivation$trend_axis))), 
+                   column(2, downloadButton(outputId = 'download_simd')),
+                   column(5, selectInput("measure_simd", label = "Type of measure", 
+                                         choices = c("Rate/Percentage", "Index of inequality"))) 
+         ),
+         mainPanel(width = 12,
+                   column(6,
+                          plotlyOutput("simd_bar_plot")),
+                   column(6,
+                          plotlyOutput("simd_trend_plot"))
          )
 ),
 ###############################################.
