@@ -44,7 +44,13 @@
 #     * No box plot, just cloud of points and marking with color
 #----------------.
 #Heatmap: 
-#   Create
+#   Long labels of indicators are an issue (plotly_ind_name in lookup?)
+#   legend names not working in plotly
+#   Deal with tooltip:period, value
+#   axis position not working in plotly
+#   Domains, what to do with it.
+#   Figure out how to change size of geom_text
+#   Add functionaly to instead of comparing against an area, comparing against a baseline/past year
 #----------------.
 #Time trend: 
 #   Maximum number of series in plot? 5, 10? (maxOptions = 5) <- for an specific dropdown
@@ -65,15 +71,14 @@
 #----------------.
 #Table:
 #   Add deprivation data to table (maybe with switch or just bounding everything)
+#   Change placeholder text in filters (require javascript)
 #----------------.
 #Map:
 #   Avoid redrawing of map:leafletProxy
 #   Add intermediate zones to map, or is it going to be too big?
 #   What about partnerships?
 #   How to save map? Move away from Leaflet? Will likely be faster
-#   Years dependant on indicator chosen. Maybe not year but time period.
 #   For IZ's and localities maybe something like this: https://isresearchnc.shinyapps.io/CMaps/
-#   Save shapefiles as rds (quicker)
 #----------------.
 #Deprivation
 #   Do we want CI's? Error bars? polygon areas for trime trends?
@@ -90,6 +95,83 @@
 
 ## Define a server for the Shiny app
 function(input, output) {
+  
+  ###############################################.        
+  #### Heatmap ----
+  ###############################################.   
+  
+  #controls for heatmap:area name
+  output$geoname_ui_heat <- renderUI({
+    selectInput("geoname_heat", "Area", 
+                choices =list("Area" = c(unique(subset(geo_lookup, geo_lookup$areatype == input$geotype_heat, select= c("areaname"))))),
+                selectize=TRUE, selected = "")
+  })
+  
+  #Heatmap data. Filtering based on user input values.
+  heat_chosenarea <- reactive({ 
+    
+    heat_chosenarea <- optdata %>% 
+      filter(code == as.character(geo_lookup$code[geo_lookup$areaname == input$geoname_heat])) %>% 
+      select(c(year, indicator, measure, lowci, upci, interpret, def_period, type_definition)) %>% 
+      droplevels()
+    
+  })
+  
+  #Select comparator based on years available for area selected.
+  heat_chosencomp <- reactive({ 
+    
+    heat_chosencomp <- optdata %>% 
+      filter(code == as.character(geo_lookup$code[geo_lookup$areaname == input$geocomp_heat])) %>% 
+      select(c(year, indicator, measure)) %>% 
+      rename(comp_m=measure) %>% 
+      droplevels()
+    
+  })
+  
+  #Plotting 
+  output$heat_plot <- renderPlotly({
+    
+    heat <- merge(heat_chosenarea(), heat_chosencomp(), by=c("indicator", "year"))
+    
+    heat$color <- ifelse(heat$lowci < heat$comp_m & heat$upci > heat$comp_m,'white',
+                         ifelse(heat$lowci > heat$comp_m & heat$interpret == "H", 'blue',
+                                ifelse(heat$lowci > heat$comp_m & heat$interpret == "L", 'red',
+                                       ifelse(heat$upci < heat$comp_m & heat$interpret == "L", 'blue',
+                                              ifelse(heat$upci < heat$comp_m & heat$interpret == "H", 'red', 'white')))))
+    
+    ggplotly(
+      ggplot(heat, aes(x = year, y = indicator, fill = color,
+                       text= paste0(heat$indicator, "<br>", #Tooltip
+                                    heat$def_period, "<br>",
+                                    heat$type_definition, "<br>",
+                                    heat$measure))) + 
+        geom_tile(color = "black") +
+        geom_text(aes(label = round(measure, 0), size =0.8)) +
+        xlab("Less recent <- | Time period |-> More recent") + #x axis title
+        scale_fill_manual(name = "Legend", labels = c("Significantly better", "Not significantly different", "Significantly worse"),
+                          values = c(blue = "blue", white = "#ffffcc", red = "red")) + #tile color scale and legend
+        scale_x_discrete(position = "top", expand = c(0, 0)) + #moving the x axis title to the top
+        theme(axis.text.x=element_blank(), # taking out x axis labels
+              axis.ticks=element_blank(), # taking out axis tick marks
+              axis.title.y=element_blank(), #Taking out y axis title
+              panel.background = element_blank(),#Blanking background
+              legend.position="none", #taking out legend
+              text = element_text(size=10) # changing font size
+        ),
+      tooltip=c("text")
+    )
+    
+    
+  })
+  
+  #Downloading data
+  #   output$download_heat <- downloadHandler(
+  #     filename =  'overview_data.csv',
+  #     content = function(file) {
+  #       write.csv(heat_data(), file)
+  #     }
+  #   )
+  
   
 #####################################.    
 ##### Spine chart   ---- 
@@ -540,6 +622,14 @@ function(input, output) {
 #### Map ----
 #####################################.      
   
+  output$year_ui_map <- renderUI({
+    time_period <- sort(unique(optdata$trend_axis[optdata$indicator == input$indic_map]))
+    
+    selectInput("year_map", "Time period",
+                choices = time_period, selected = last(time_period))
+  })
+  
+  
   #Merging shapefile with dynamic selection of data
   #First for Local authority
   CA_pol <- reactive({
@@ -551,8 +641,8 @@ function(input, output) {
       droplevels() #dropping missing factor levels to allow merging
     
     ca_map <- merge(CA_bound, ca_map, by='GSS_COD')
-    }) 
-
+  }) 
+  
   #Second for Health Board
   
   HB_pol <- reactive({
@@ -573,9 +663,8 @@ function(input, output) {
   
   output$map <- renderLeaflet({
     leaflet() %>% 
-      #Maybe not needed
-      #setView(-4.6519999, 56.33148888, zoom = 8) %>% # setting initial view point
-      #fitBounds(-10, 60, 0, 54)  %>%
+      setView(-4.6519999, 56.33148888, zoom = 8) %>% # setting initial view point
+      fitBounds(-10, 60, 0, 54)  %>%
       addProviderTiles(providers$CartoDB.Positron) %>%
       #Adding polygons with HB
       addPolygons(data=HB_pol(), group="Health board",
@@ -611,6 +700,7 @@ function(input, output) {
       addLegend("bottomright", pal=colorQuantile(c('#2c7bb6','#abd9e9', '#ffffbf','#fdae61','#d7191c'), CA_pol()$measure_sc, n=5), values = CA_pol()$measure_sc, title = "Percentile")
   })
   
+  
   #####################################.      
   #### Table ----
   #####################################.      
@@ -628,7 +718,8 @@ function(input, output) {
   #Actual table.
   output$table_opt <- DT::renderDataTable({
     DT::datatable(table_data(), style = 'bootstrap', filter = 'top', rownames = FALSE,
-                  colnames = c("Code", "Area", "Type", "Indicator", "Year", "Numerator", "Measure", "Lower CI", "Upper CI", 
+                  colnames = c("Code", "Area", "Type", "Indicator", "Year", "Numerator", 
+                               "Measure", "Lower confidence interval", "Upper confidence interval", 
                                "Definition" )
     )
   })

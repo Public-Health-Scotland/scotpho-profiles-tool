@@ -63,7 +63,41 @@ fluidPage(theme = shinytheme("cerulean"), # shinythemes::themeSelector() to swap
         )
       )
     ),
-
+###############################################.
+## Overview/Heatmap ----
+###############################################.
+tabPanel("Overview", icon = icon("heartbeat"),
+         sidebarLayout(  
+           wellPanel(
+             column(8,
+                    selectInput("geotype_heat", "Geography level", 
+                                choices= areatype_noscot_list),
+                    conditionalPanel(#Conditional panel for extra dropdown for localities & IZ
+                      condition = "input.geotype_heat== 'HSC Locality' | input.geotype_heat == 'Intermediate zone' ",
+                      selectInput("loc_iz_heat", label = "Partnership for localities/intermediate zones",
+                                  choices = partnership_name)
+                    ),
+                    uiOutput("geoname_ui_heat"),
+                    selectInput("geocomp_heat", "Comparator", choices = area_list,
+                                selectize=TRUE, selected = "Scotland")
+             ),
+             column(4,
+                    h4("Legend", style="color: black;"),
+                    p(img(src='negative.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
+                      "Statistically significantly worse than comparator average."), 
+                    p(img(src='neutral.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
+                      "Statistically not significantly different from comparator average."),
+                    p(img(src='positive.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
+                      "Statistically significantly better than comparator average."),
+                    p(img(src='noable.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
+                      "No significance can be calculated.")
+             )
+           ),
+           mainPanel(width=12,
+                     plotlyOutput("heat_plot",  width = "100%") #Graph
+           )
+         )
+),
 ###############################################.
 ## Spine chart ----
 ###############################################.
@@ -219,20 +253,15 @@ tabPanel("Deprivation", icon = icon("gbp"),
 ###############################################.
 ###########Map ----
 ###############################################.
-# Map
-    tabPanel("Map", icon = icon("globe"),
-      wellPanel(    
-        fluidRow(
-          column(8,
-            selectInput("indic_map", "Indicator", choices=indicator_list)
-          ),
-          column(4,
-            selectInput("year_map", "Time period", choices = unique(optdata$trend_axis))
-          )
-        )
-      ), 
-      h4(textOutput("title_map")),
-      leafletOutput("map")
+tabPanel("Map", icon = icon("globe"),
+         sidebarPanel(    
+           selectInput("indic_map", "Indicator", choices=indicator_list),
+           uiOutput("year_ui_map")
+         ), 
+         mainPanel(
+           h4(textOutput("title_map")),
+           leafletOutput("map")
+         )
     ),
 ###############################################.
 ## Table ----
