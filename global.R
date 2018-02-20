@@ -15,7 +15,6 @@ library(stringr) # dealing with string variables
 library(mgcv) #modelling
 library(leaflet) #javascript maps
 library(reshape2) #for dygraph data modification
-library (rgdal) #for reading shapefiles
 library(plotly) #interactive graphs
 library(data.table) #for quick reading of csv files - Does not work with the actual version
 #library(gridExtra) #for combining graph and table (spine chart)
@@ -46,6 +45,9 @@ areatype_list <- c("Scotland", "Health board", "Council area", "HSC Partnership"
 areatype_noscot_list <- c("Health board", "Council area", "HSC Partnership", 
                          "HSC Locality", "Intermediate zone")
 
+areatype_depr_list <- c("Scotland", "Health board", "Council area") #for deprivation tab
+
+
 #Palette for time trend (still experimenting).
 trend_pal <-  c('#2166ac','#4393c3', '#92c5de', '#d1e5f0', '#053061',
                 '#8c510a', '#bf812d', '#dfc27d', '#f6e8c3', '#543005')
@@ -58,9 +60,8 @@ pal_simd_trend <- c( '#e0f3f8', '#abd9e9', '#74add1', '#4575b4', '#313695', '#FF
 
 ##########.
 #Map data
-CA_bound<-readOGR("./shapefiles","CA_simpl") #Reading file with council shapefiles
-HB_bound<-readOGR("./shapefiles","HB_simpl") #Reading file with health board shapefiles simplified
-
+CA_bound<-readRDS("./shapefiles/CA_boundary.rds") #Reading file with council shapefiles
+HB_bound<-readRDS("./shapefiles/HB_boundary.rds") #Reading file with health board shapefiles simplified
 
 # Identify which geographies have data for each indicator
 indic <- unique(optdata$indicator[!is.na(optdata$measure)])
