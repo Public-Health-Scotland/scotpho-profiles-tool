@@ -176,34 +176,35 @@ tabPanel("Overview", icon = icon("heartbeat"),
 ###############################################.
 tabPanel("Rank", icon = icon("signal"),
          mainPanel(width = 12,
-                  div(style="height: 40px;", 
-                    h4("Rank chart")
-                    ),
-                  wellPanel( 
-                    fluidRow(
-                      column(6,
-                        selectInput("geotype_rank", label = "Geography level",
-                          choices = areatype_noscot_list, selected = "Health board"),
-                        conditionalPanel( #Conditional panel for extra dropdown for localities & IZ
-                          condition = "input.geotype_rank == 'HSC Locality' | input.geotype_rank == 'Intermediate zone' ",
-                          selectInput("loc_iz_rank", label = "Partnership for localities/intermediate zones",
-                                      choices = partnership_name)
-                        ),
-                        downloadButton('download_rank', 'Download data')  #For downloading the data
-                      ),  
-                      column(6,
-                        selectInput("indic_rank", "Indicator", choices=indicator_list),
-                        #uiOutput("indic_ui_rank"), #breaks the app  
-                        #uiOutput("year_ui_rank"), #breaks the app   
-                        selectInput("year_rank", "Time period", choices = unique(optdata$trend_axis) ),
-                        selectInput("geocomp_rank", "Comparator", choices = area_list,
-                                selectize=TRUE, selected = "Scotland")
-                      )  
-                    )
-                  ),
-                  plotlyOutput("rank_plot") 
-                )
-            ),
+                   div(style="height: 40px;", 
+                       h4("Rank chart")
+                   ),
+                   wellPanel( 
+                     fluidRow(
+                       column(6,
+                              selectInput("geotype_rank", label = "Geography level",
+                                          choices = areatype_noscot_list, selected = "Health board"),
+                              conditionalPanel( #Conditional panel for extra dropdown for localities & IZ
+                                condition = "input.geotype_rank == 'HSC Locality' | input.geotype_rank == 'Intermediate zone' ",
+                                selectInput("loc_iz_rank", label = "Partnership for localities/intermediate zones",
+                                            choices = partnership_name)
+                              ),
+                              h5("Legend", style="color: black;"),
+                              img(src='legend_rank.png', height = 130), 
+                              fluidRow(
+                                downloadButton('download_rank', 'Download data'))  #For downloading the data
+                       ),  
+                       column(6,
+                              selectInput("indic_rank", "Indicator", choices=indicator_list),
+                              uiOutput("year_ui_rank"), 
+                              selectInput("geocomp_rank", "Comparator", choices = area_list,
+                                          selectize=TRUE, selected = "Scotland")
+                       )  
+                     )
+                   ),
+                   plotlyOutput("rank_plot") 
+         )
+      ),
 ###############################################.
 ## Deprivation ---- 
 ###############################################.

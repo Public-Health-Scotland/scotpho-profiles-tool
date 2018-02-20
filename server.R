@@ -11,7 +11,6 @@
 #   Deprivation needs PAR and rounding of numeric variables
 #----------------.
 #General:
-#   See how to organize dropdown better, using lists, using conditional dropdowns 
 #   Add saving buttons to all plots
 #   Mini map for selecting geographies? include appendix with locations? like pdf?
 #   Each tab should have a brief intro. Work on the text
@@ -60,12 +59,7 @@
 #   Y axis title size, make smaller, split in two or reduce size of labels
 #----------------.
 #Rank chart
-#   Make it work with all geo_types.
-#   Divide very long labels in two with <br>, try to do it automaticly
-#   Y axis title size, make smaller, split in two or reduce size of labels
-#   Years dependant on indicator chosen. Maybe not year but time period.
-#   Fix tooltip - include areaname
-#   Color coding to show significance?
+#   Divide very long area name labels in two lines with <br>, try to do it automaticly
 #   Vertical bars instead?
 #   Include error bars, maybe tick box
 #----------------.
@@ -336,19 +330,14 @@ function(input, output) {
 #####################################          
 #### Rank plot ----
 ###############################################.     
-  #Controls for rank chart #BREAKS the app, not sure why
-#For indicator selection
-#   output$indic_ui_rank <- renderUI({
-#     selectInput("indic_rank", "Indicator", choices=indicator_list)
-#   })
-  
+  #Controls for rank chart 
   #Dropdown for time period based on indicator selection  
-  #Maybe try using rank_bar_data instead of optdata, or %in%
-#   output$year_ui_rank <- renderUI({
-#     selectInput("year_rank", "Time period", 
-#                 choices = unique(optdata$trend_axis[optdata$indicator == input$indic_rank]),
-#                 selectize=TRUE)
-#   })
+  output$year_ui_rank <- renderUI({
+    time_period <- sort(unique(optdata$trend_axis[optdata$indicator == input$indic_rank]))
+    
+    selectInput("year_rank", "Time period",
+                choices = time_period, selected = last(time_period))
+  })
   
   
   # Comparator data rank plot. Could be moved inside rank_bar_data
@@ -358,42 +347,42 @@ function(input, output) {
              indicator == input$indic_rank) %>% 
       mutate(areaname = geo_lookup$areaname[geo_lookup$code == code]) #arename from lookup
     
-    })
+  })
   
   #Rank plot data
   rank_bar_data <- reactive({
     if (input$geotype_rank %in% c("Scotland", "Health board", "Council area", "HSC Partnership"))
     {
       rank_bar <-optdata %>% 
-      filter(code %in% as.character(geo_lookup$code[geo_lookup$areatype == input$geotype_rank]) &  
-             trend_axis == input$year_rank &
-             indicator == input$indic_rank) 
+        filter(code %in% as.character(geo_lookup$code[geo_lookup$areatype == input$geotype_rank]) &  
+                 trend_axis == input$year_rank &
+                 indicator == input$indic_rank) 
       
       #Cannot be done in the same pipe operation as it does not work with the areaname mutate
       rank_bar <- rank_bar %>% 
-      mutate(areaname = geo_lookup$areaname[geo_lookup$code %in% rank_bar$code]) %>%  #arename from lookup
-      mutate(comp_value = rank_compar()$measure) %>% #comparator value and name
-      mutate(comp_name = rank_compar()$areaname) %>% 
-      arrange(desc(measure)) # for ranking by value
+        mutate(areaname = geo_lookup$areaname[geo_lookup$code %in% rank_bar$code]) %>%  #arename from lookup
+        mutate(comp_value = rank_compar()$measure) %>% #comparator value and name
+        mutate(comp_name = rank_compar()$areaname) %>% 
+        arrange(desc(measure)) # for ranking by value
     }
-      else { #if locality or IZ it needs to filter based on the parent area and be the right area type.
-        rank_bar <-  optdata %>% 
-          filter(code %in% as.character(geo_lookup$code[geo_lookup$areatype == input$geotype_rank]) &
-                   code %in% as.character(geo_lookup$code[geo_lookup$parent_area == input$loc_iz_rank]) &
-                   trend_axis == input$year_rank &
-                   indicator == input$indic_rank) 
-          
-        #Cannot be done in the same pipe operation as it does not work with the areaname mutate
-          rank_bar <-rank_bar %>% 
-            mutate(areaname = geo_lookup$areaname[geo_lookup$code %in% rank_bar$code]) %>%  #arename from lookup
-            mutate(comp_value = rank_compar()$measure) %>% #comparator value and name
-            mutate(comp_name = rank_compar()$areaname) %>% 
-            arrange(desc(measure)) # for ranking by value
-      }
-    })
-
-# Create Rank plot
- output$rank_plot <- renderPlotly({
+    else { #if locality or IZ it needs to filter based on the parent area and be the right area type.
+      rank_bar <-  optdata %>% 
+        filter(code %in% as.character(geo_lookup$code[geo_lookup$areatype == input$geotype_rank]) &
+                 code %in% as.character(geo_lookup$code[geo_lookup$parent_area == input$loc_iz_rank]) &
+                 trend_axis == input$year_rank &
+                 indicator == input$indic_rank) 
+      
+      #Cannot be done in the same pipe operation as it does not work with the areaname mutate
+      rank_bar <-rank_bar %>% 
+        mutate(areaname = geo_lookup$areaname[geo_lookup$code %in% rank_bar$code]) %>%  #arename from lookup
+        mutate(comp_value = rank_compar()$measure) %>% #comparator value and name
+        mutate(comp_name = rank_compar()$areaname) %>% 
+        arrange(desc(measure)) # for ranking by value
+    }
+  })
+  
+  # Create Rank plot
+  output$rank_plot <- renderPlotly({
     
     #If no data available for that period then plot message saying data is missing
     if (is.data.frame(rank_bar_data()) && nrow(rank_bar_data()) == 0)
@@ -411,26 +400,40 @@ function(input, output) {
       
     }
     else {
-
-    plot_ly(data = rank_bar_data(), x = ~areaname) %>% 
-      #adding bar layer
-      add_bars(y = ~measure, name=~areaname, 
-        marker = list(color = '#08519c'), showlegend = FALSE) %>% 
-      #Comparator line
-      add_trace(y = ~comp_value, name = ~unique(comp_name), type = 'scatter', mode = 'lines',
-                line = list(color = '#FF0000')) %>% #changing line color
-      #Layout
-      layout(annotations = list(), #It needs this because of a buggy behaviour
-             yaxis = list(title = ~type_definition),
-             xaxis = list(title = ~def_period, tickangle = 270, tickfont =list(size=10), #axis parameters
-                          categoryorder="array", #order of plotting
-                          categoryarray = ~measure),
-             margin=list(b = 160),
-             hovermode = 'false') %>% # to get hover compare mode as default
-      config(displaylogo = F, collaborate=F, editable =F) 
+      
+      #Coloring based on if signicantly different from comparator
+      color_pal <- ifelse(rank_bar_data()$lowci < rank_bar_data()$comp_value & rank_bar_data()$upci > rank_bar_data()$comp_value,'#595959',
+                          ifelse(rank_bar_data()$lowci > rank_bar_data()$comp_value & rank_bar_data()$interpret == "H", '#08519c',
+                                 ifelse(rank_bar_data()$lowci > rank_bar_data()$comp_value & rank_bar_data()$interpret == "L", '#ff9933',
+                                        ifelse(rank_bar_data()$upci < rank_bar_data()$comp_value & rank_bar_data()$interpret == "L", '#08519c',
+                                               ifelse(rank_bar_data()$upci < rank_bar_data()$comp_value & rank_bar_data()$interpret == "H", '#ff9933', '#595959')))))
+      
+      #Text for tooltip
+      tooltip_rank <- c(paste0(rank_bar_data()$areaname, ": ", rank_bar_data()$measure, "<br>",
+                               input$geocomp_rank, ": ", rank_bar_data()$comp_value))
+      
+      
+      plot_ly(data = rank_bar_data(), x = ~areaname) %>% 
+        #adding bar layer
+        add_bars(y = ~ measure, text=tooltip_rank, hoverinfo="text",
+                 marker = list(color = color_pal)) %>% 
+        #Comparator line
+        add_trace(y = ~comp_value, name = ~unique(comp_name), type = 'scatter', mode = 'lines',
+                  line = list(color = '#FF0000'), showlegend = FALSE, hoverinfo="skip") %>% 
+        #Layout
+        layout(annotations = list(), #It needs this because of a buggy behaviour
+               yaxis = list(title = ~type_definition, titlefont =list(size=10), 
+                            tickfont =list(size=9)),
+               xaxis = list(title = ~def_period, tickangle = 270, 
+                            tickfont =list(size=9), #axis parameters
+                            categoryorder="array", #order of plotting
+                            categoryarray = ~measure),
+               margin=list(b = 160),
+               hovermode = 'false') %>% # to get hover compare mode as default
+        config(displaylogo = F, collaborate=F, editable =F) 
     }
   }) 
-
+  
   #Downloading data
   output$download_rank <- downloadHandler(
     filename =  'rankplot_data.csv',
