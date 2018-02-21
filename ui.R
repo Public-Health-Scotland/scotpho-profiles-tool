@@ -139,11 +139,12 @@ tabPanel("Overview", icon = icon("heartbeat"),
 # ## Time trend ---- 
 # ###############################################.
             tabPanel("Trend", icon = icon("area-chart"),
+                     p("This section allows you to see changes over time. You can use the filters 
+                       to select the data you are interested in. To download your data selection as a csv file use 
+                       the ‘download data’ button. If you hover over the chart you will see a number of 
+                       buttons which will allow you to select parts of the chart, zoom in or out or save the 
+                       chart as an image."),
                 mainPanel(width = 12,
-        #Time trend plot
-                  div(style="height: 40px;", 
-                    h4("Trend chart")
-                  ),
                   wellPanel(tags$style(".well {background-color:#ffffff; border: 0px solid #336699;}"), #color sidebars/well panels
                     fluidRow(
                       column(4,
@@ -175,33 +176,35 @@ tabPanel("Overview", icon = icon("heartbeat"),
 ## Rank chart ---- 
 ###############################################.
 tabPanel("Rank", icon = icon("signal"),
+         p("This section allows you to see a comparison between areas in a specific moment in time
+            and how they rate compared to an area of your interest. 
+          You can use the filters 
+           to select the data you are interested in. To download your data selection as a csv file use 
+           the ‘download data’ button. If you hover over the chart you will see a number of 
+           buttons which will allow you to select parts of the chart, zoom in or out or save the 
+           chart as an image."),
+         wellPanel( 
+           column(6,
+                  selectInput("geotype_rank", label = "Geography level",
+                              choices = areatype_noscot_list, selected = "Health board"),
+                  conditionalPanel( #Conditional panel for extra dropdown for localities & IZ
+                    condition = "input.geotype_rank == 'HSC Locality' | input.geotype_rank == 'Intermediate zone' ",
+                    selectInput("loc_iz_rank", label = "Partnership for localities/intermediate zones",
+                                choices = partnership_name)
+                  ),
+                  h5("Legend", style="color: black;"),
+                  img(src='legend_rank.png', height = 130), 
+                  fluidRow(
+                    downloadButton('download_rank', 'Download data'))  #For downloading the data
+           ),  
+           column(6,
+                  selectInput("indic_rank", "Indicator", choices=indicator_list),
+                  uiOutput("year_ui_rank"), 
+                  selectInput("geocomp_rank", "Comparator", choices = area_list,
+                              selectize=TRUE, selected = "Scotland")
+           )  
+         ),
          mainPanel(width = 12,
-                   div(style="height: 40px;", 
-                       h4("Rank chart")
-                   ),
-                   wellPanel( 
-                     fluidRow(
-                       column(6,
-                              selectInput("geotype_rank", label = "Geography level",
-                                          choices = areatype_noscot_list, selected = "Health board"),
-                              conditionalPanel( #Conditional panel for extra dropdown for localities & IZ
-                                condition = "input.geotype_rank == 'HSC Locality' | input.geotype_rank == 'Intermediate zone' ",
-                                selectInput("loc_iz_rank", label = "Partnership for localities/intermediate zones",
-                                            choices = partnership_name)
-                              ),
-                              h5("Legend", style="color: black;"),
-                              img(src='legend_rank.png', height = 130), 
-                              fluidRow(
-                                downloadButton('download_rank', 'Download data'))  #For downloading the data
-                       ),  
-                       column(6,
-                              selectInput("indic_rank", "Indicator", choices=indicator_list),
-                              uiOutput("year_ui_rank"), 
-                              selectInput("geocomp_rank", "Comparator", choices = area_list,
-                                          selectize=TRUE, selected = "Scotland")
-                       )  
-                     )
-                   ),
                    plotlyOutput("rank_plot") 
          )
       ),
