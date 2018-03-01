@@ -17,7 +17,6 @@ library(leaflet) #javascript maps
 library(reshape2) #for dygraph data modification
 library(plotly) #interactive graphs
 library(data.table) #for quick reading of csv files - Does not work with the actual version
-#library(gridExtra) #for combining graph and table (spine chart)
 
 ###############################################.
 ## Data ----
@@ -58,6 +57,8 @@ trend_pal2 <-  c('#a6cee3','#1f78b4', '#b2df8a', '#33a02c')
 pal_simd_bar <- c( '#e0f3f8', '#abd9e9', '#74add1', '#4575b4', '#313695')
 pal_simd_trend <- c( '#e0f3f8', '#abd9e9', '#74add1', '#4575b4', '#313695', '#FF0000')
 
+
+pal_map <- c('#2c7bb6','#abd9e9', '#ffffbf','#fdae61','#d7191c')
 ##########.
 #Map data
 CA_bound<-readRDS("./shapefiles/CA_boundary.rds") #Reading file with council shapefiles
