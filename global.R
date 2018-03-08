@@ -38,7 +38,16 @@ indicator_list <- unique(optdata$indicator)
 ind_depr_list <- unique(deprivation$indicator)
 
 area_list <- unique(geo_lookup$areaname)
-topic_list <- c(unique(as.character(optdata$topic1)), unique(as.character(optdata$topic2)))
+topic_list <- c('Alcohol', 'Behaviours',  'Cancer', 'Children and young people - Achieving ', 
+                'Children and young people - Active', 'Children and young people - Healthy', 
+                'Children and young people - Included', 'Children and young people - Nurtured', 
+                'Children and young people - Responsible', 'Children and young people - Safe', 
+                'Community safety', 'Crime', 'Deprivation', 'Drugs', 'Economy', 
+                'Education', 'Environment', 'Ill Health & Injury', 
+                'Immunisations and Screening', 'Life Expectancy & Mortality', 
+                'Mental health', 'Population', 'Smoking', 'Social Care & Housing', 
+                'Womens & Childrens Health')
+
 areatype_list <- c("Scotland", "Health board", "Council area", "HSC Partnership", 
                    "HSC Locality", "Intermediate zone")
 areatype_noscot_list <- c("Health board", "Council area", "HSC Partnership", 
@@ -64,11 +73,14 @@ pal_map <- c('#2c7bb6','#abd9e9', '#ffffbf','#fdae61','#d7191c')
 CA_bound<-readRDS("./shapefiles/CA_boundary.rds") #Reading file with council shapefiles
 HB_bound<-readRDS("./shapefiles/HB_boundary.rds") #Reading file with health board shapefiles simplified
 
+#######
+#Beta version warning/feedback
+beta_box <- div(style =  "background-color: #ffff99; padding: 5px; border: 1px solid #000000",
+    p(tags$b("Beta version:"), "this tool is under development. The current version 
+      is available on the main", tags$a(href="https://scotpho.nhsnss.scot.nhs.uk/scotpho/homeAction.do", "ScotPHO website"), 
+      ". We would welcome ", tags$a(href="mailto:ScotPHO@nhs.net", tags$b("any feedback")), " you have on this tool."))
 # Identify which geographies have data for each indicator
-indic <- unique(optdata$indicator[!is.na(optdata$measure)])
-indic_geog <- tapply(optdata$code[!is.na(optdata$measure)], optdata$indicator[!is.na(optdata$measure)], unique)
-#It seems I was not using it
-#indic_geog_type <- tapply(optdata$areatype[!is.na(optdata$measure)], optdata$indicator[!is.na(optdata$measure)], unique)
-
+# indic <- unique(optdata$indicator[!is.na(optdata$measure)])
+# indic_geog <- tapply(optdata$code[!is.na(optdata$measure)], optdata$indicator[!is.na(optdata$measure)], unique)
 
 ##END

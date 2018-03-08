@@ -7,15 +7,20 @@
 ###############################################.
 ## Header ---- 
 ###############################################.
-fluidPage(theme = shinytheme("cerulean"), # shinythemes::themeSelector() to swap while developing
-
+fluidPage(theme = shinytheme("cerulean"),
+          tags$head(
+            tags$style( #to avoid red text error messages in the whole app, take out for testing
+              type="text/css", ".shiny-output-error { visibility: hidden; }",
+              ".shiny-output-error:before { visibility: hidden; }"
+            )
+          ),
 #Title style and content, using html tags
   div(style="height: 80px;  ", 
     tags$a(
       img(src='scotpho_logo.png', height=70, style="float: left; padding-right: 40px;"),
       href= "http://www.scotpho.org" #hyperlink
     ),
-    h3("Online Profile Tool - DRAFT", 
+    h3("Online Profile Tool", 
        style="vertical-align: bottom; padding-top:25px; "),
     h6(tags$a(href="mailto:ScotPHO@nhs.net", "Tell us what you think of our new tool!"))
   ),
@@ -24,6 +29,7 @@ fluidPage(theme = shinytheme("cerulean"), # shinythemes::themeSelector() to swap
 ##############Introduction----    
 ###############################################.
     tabPanel("Intro", icon = icon("info-circle"),
+      beta_box,       
       p(tags$b("Welcome to the ScotPHO Online Profiles Tool (OPT)"), "designed to allow users 
         to view the various different profiles produced by the ScotPHO collaboration."),
       p("The profiles are intended to increase understanding of local health issues 
@@ -61,12 +67,18 @@ fluidPage(theme = shinytheme("cerulean"), # shinythemes::themeSelector() to swap
                        "Code"), #Link to Github repositories
                 "- Access the code used to produce the indicator data and this tool."
         )
+      ),
+      div(style="height: 40px; background: linear-gradient(#54b4eb, #2fa4e7 60%, #1d9ce5); display:inline-block; width:100%  ",
+          tags$b("© Scottish Public Health Observatory v2.0 2018", style="color: white; padding-top: 14px; padding-left: 30px;
+               padding-right: 60%; line-height:40px; font-size:70%;")#,
+        #bookmarkButton(style="height:25px; font-size:70%; vertical-align:middle; margin-bottom:3px ")
       )
     ),
 ###############################################.
 ## Overview/Heatmap ----
 ###############################################.
 tabPanel("Overview", icon = icon("heartbeat"),
+         beta_box,  
          sidebarLayout(  
            wellPanel(
              column(8,
@@ -82,105 +94,67 @@ tabPanel("Overview", icon = icon("heartbeat"),
                                 selectize=TRUE, selected = "Scotland")
              ),
              column(4,
-                    h4("Legend", style="color: black;"),
-                    p(img(src='negative.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
-                      "Statistically significantly worse than comparator average."), 
-                    p(img(src='neutral.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
-                      "Statistically not significantly different from comparator average."),
-                    p(img(src='positive.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
-                      "Statistically significantly better than comparator average."),
-                    p(img(src='noable.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
-                      "No significance can be calculated.")
+                    selectInput("topic_heat", "Topic", choices = topic_list,
+                                selectize=TRUE, selected = "Scotland"),
+                    downloadButton('download_heat', 'Download data'),
+                    h5(tags$b("Legend"), style="color: black;"),
+                    img(src='legend_rank.png', height = 130)
              )
            ),
            mainPanel(width=12,
-                     plotlyOutput("heat_plot",  width = "100%") #Graph
+                     plotlyOutput("heat_plot", width = "100%") #Graph
            )
          )
-),
-###############################################.
-## Spine chart ----
-###############################################.
-            tabPanel("Spine", icon = icon("align-center"),
-              sidebarLayout(      
-                sidebarPanel(width = 4, position = "right",
-                  uiOutput("geotype_ui_spine"),  
-                  conditionalPanel(#Conditional panel for extra dropdown for localities & IZ
-                    condition = "input.geotype_spine== 'HSC Locality' | input.geotype_spine == 'Intermediate zone' ",
-                    selectInput("loc_iz_spine", label = "Partnership for localities/intermediate zones",
-                                choices = partnership_name)
-                  ),
-                  uiOutput("geoname_ui_spine"),  
-                  selectInput("geocomp_spine", "Comparator", choices = area_list,
-                              selectize=TRUE, selected = "Scotland"),
-                  selectInput("topic_spine", "Topic", choices = topic_list,
-                              selectize=TRUE, selected = "Scotland"),
-                  selectInput("year_spine", "Year", choices = unique(optdata$year), 
-                              selected=2012 ),
-                  downloadButton(outputId = "down_spineplot", label = "Save chart"),
-                  #Legend
-                  shiny::hr(),
-                  h4("Legend", style="color: black;"),
-                  p(img(src='negative.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
-                    "Statistically significantly worse than comparator average."), 
-                  p(img(src='neutral.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
-                    "Statistically not significantly different from comparator average."),
-                  p(img(src='positive.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
-                    "Statistically significantly better than comparator average."),
-                  p(img(src='noable.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
-                    "No significance can be calculated.")
-                ),
-                mainPanel(
-                    plotOutput("dynamic_spine") #Graph
-                )
-              )
-            ),
+  ),
 # ###############################################.
 # ## Time trend ---- 
 # ###############################################.
-            tabPanel("Trend", icon = icon("area-chart"),
-                     p("This section allows you to see changes over time. You can use the filters 
-                       to select the data you are interested in. To download your data selection as a csv file use 
-                       the ‘download data’ button. If you hover over the chart you will see a number of 
-                       buttons which will allow you to select parts of the chart, zoom in or out or save the 
-                       chart as an image."),
-                mainPanel(width = 12,
-                  wellPanel(tags$style(".well {background-color:#ffffff; border: 0px solid #336699;}"), #color sidebars/well panels
-                    fluidRow(
-                      column(4,
-                        selectInput("indic_trend", "Indicator", choices=indicator_list),
-                        downloadButton('download_trend', 'Download data')  #For downloading the data
-                      ),
-                      column(4,    
-                        selectInput("scotname_trend", "Scotland", choices = c("", "Scotland"), 
-                                    selectize=TRUE, selected = "Scotland"),
-                        selectInput("hbname_trend", "Health Board", choices = hb_name,
-                                multiple=TRUE, selectize=TRUE, selected = ""),
-                        selectInput("laname_trend", "Council area", choices = la_name,
-                                    multiple=TRUE, selectize=TRUE, selected = "")
-                      ),
-                      column(4, 
-                        selectInput("partname_trend", "HSC Partnership", choices = partnership_name,
-                                    multiple=TRUE, selectize=TRUE, selected = ""),                        
-                        selectInput("locname_trend", "HSC Locality", choices = locality_name,
-                                    multiple=TRUE, selectize=TRUE, selected = ""),
-                        selectInput("izname_trend", "Intermediate Zone", choices = intzone_name,
-                                multiple=TRUE, selectize=TRUE, selected = "")
-                      )
-                    )  
-                  ),
-                 plotlyOutput("trend_plot")
-                )
+tabPanel("Trend", icon = icon("area-chart"),
+         beta_box,  
+         p("This section allows you to see changes over time. You can use the filters 
+           to select the data you are interested in.To download your data selection as a csv file 
+           use the ‘download data’ button. On top of the chart you will see a 
+           number of buttons which will allow you to select parts of the chart, zoom in 
+           or out or save the chart as an image."),
+         wellPanel(tags$style(".well {background-color:#ffffff; border: 0px solid #336699;}"), #color sidebars/well panels
+                   column(4,
+                          selectInput("indic_trend", "Indicator", choices=indicator_list),
+                          selectInput("hbname_trend", "Health board", choices = hb_name,
+                                      multiple=TRUE, selectize=TRUE, selected = ""),
+                          selectInput("loc_iz_trend", "Partnership for localities/intermediate zones", 
+                                      choices = partnership_name)  
+                   ),
+                   column(4,    
+                          selectInput("scotname_trend", "Scotland", choices = c("", "Scotland"), 
+                                      selectize=TRUE, selected = "Scotland"),
+                          selectInput("laname_trend", "Council area", choices = la_name,
+                                      multiple=TRUE, selectize=TRUE, selected = ""),
+                          uiOutput("loc_ui_trend")
+                   ),
+                   column(4, 
+                          br(),
+                          column(8, downloadButton('download_trend', 'Download data')),
+                          column(4, checkboxInput("colorblind_trend",  
+                                                  label = "Improved accesibility", value = FALSE)),
+                          selectInput("partname_trend", "HSC Partnership", choices = partnership_name,
+                                      multiple=TRUE, selectize=TRUE, selected = ""),
+                          uiOutput("iz_ui_trend")
+                   )
+         ),  
+         mainPanel(width = 12,
+          plotlyOutput("trend_plot")
+         )
 ),
 ###############################################.
 ## Rank chart ---- 
 ###############################################.
 tabPanel("Rank", icon = icon("signal"),
+         beta_box,  
          p("This section allows you to see a comparison between areas in a specific moment in time
-            and how they rate compared to an area of your interest. 
-          You can use the filters 
+           and how they rate compared to an area of your interest. 
+           You can use the filters 
            to select the data you are interested in. To download your data selection as a csv file use 
-           the ‘download data’ button. If you hover over the chart you will see a number of 
+           the ‘download data’ button. On the top of the chart you will see a number of 
            buttons which will allow you to select parts of the chart, zoom in or out or save the 
            chart as an image."),
          wellPanel( 
@@ -192,7 +166,9 @@ tabPanel("Rank", icon = icon("signal"),
                     selectInput("loc_iz_rank", label = "Partnership for localities/intermediate zones",
                                 choices = partnership_name)
                   ),
-                  h5("Legend", style="color: black;"),
+                  checkboxInput("ci_rank",  
+                                label = "Confidence intervals?", value = FALSE),
+                  h5(tags$b("Legend"), style="color: black;"),
                   img(src='legend_rank.png', height = 130), 
                   fluidRow(
                     downloadButton('download_rank', 'Download data'))  #For downloading the data
@@ -207,28 +183,29 @@ tabPanel("Rank", icon = icon("signal"),
          mainPanel(width = 12,
                    plotlyOutput("rank_plot") 
          )
-      ),
+),
 ###############################################.
 ## Deprivation ---- 
 ###############################################.
 tabPanel("Deprivation", icon = icon("gbp"),
-         p("This section allows you to explore the data by different levels of ", 
-           tags$a(href="http://www.scotpho.org.uk/life-circumstances/deprivation/key-points/", "deprivation"), 
-           ". You can use the filters to select the data you are interested in. 
-           To download your data selection as a csv file use the ‘download data’ button. If you hover 
-           over the chart you will see a number of buttons which  will allow you to select 
+         beta_box,  
+         p("This section allows you to explore the data by different levels of ",
+           tags$a(href="http://www.scotpho.org.uk/life-circumstances/deprivation/key-points/", "deprivation"),
+           ". You can use the filters to select the data you are interested in.
+           To download your data selection as a csv file use the ‘download data’ button. On top of the chart
+            you will see a number of buttons which  will allow you to select
            parts of the chart, zoom in or out or save the chart as an image."),
          wellPanel(tags$style(".well {background-color:#ffffff; border: 0px solid #336699;}"), #color sidebars/well panels
-                   column(6, selectInput("indic_simd", label = "Indicator", 
+                   column(6, selectInput("indic_simd", label = "Indicator",
                                          choices = ind_depr_list)),
-                   column(3, selectInput("geotype_simd", label = "Geography level", 
-                                         choices = areatype_depr_list, selected =  "Scotland")),  
+                   column(3, selectInput("geotype_simd", label = "Geography level",
+                                         choices = areatype_depr_list, selected =  "Scotland")),
                    column(3, uiOutput("geoname_ui_simd")),
-                   column(5, selectInput("year_simd", label = "Time period", 
-                                         choices = unique(deprivation$trend_axis))), 
+                   column(5, selectInput("year_simd", label = "Time period",
+                                         choices = unique(deprivation$trend_axis))),
                    column(2, downloadButton(outputId = 'download_simd')),
-                   column(5, selectInput("measure_simd", label = "Type of measure", 
-                                         choices = c("Rate/Percentage", "Index of inequality"))) 
+                   column(5, selectInput("measure_simd", label = "Type of measure",
+                                         choices = c("Rate/Percentage", "Index of inequality")))
          ),
          mainPanel(width = 12,
                    column(6,
@@ -238,29 +215,20 @@ tabPanel("Deprivation", icon = icon("gbp"),
          )
 ),
 ###############################################.
-## Projection   ----
-###############################################.
-            tabPanel("Projection", icon = icon("line-chart"),
-              sidebarLayout(
-                sidebarPanel(
-                  uiOutput("indic_pred1"),
-                  uiOutput("indic_pred2"),
-                  sliderInput("xaxis", "Years for prediction",
-                    min=2016, max = 2026, value = 2020, step = 1, sep = ""),
-                  actionButton("do_pred", "Create prediction")
-                ),
-                mainPanel(h4("Observed and predicted measure"),
-                  plotOutput("by_pred_plot", width = 600),
-                  p("The predictions above (to the right of the vertical black line) are based on a smoothed regression model. These should be treated with caution."))
-              )
-            ),
-###############################################.
 ###########Map ----
 ###############################################.
 tabPanel("Map", icon = icon("globe"),
+         beta_box,  
+         p("This section allows you to see the indicator information in a map. You can use the filters 
+          to select the indicator and time period you are interested in. Use the checkbox in the map to 
+          select the geography layer of your interest. To download your data selection as a csv file use 
+           the ‘download data’ button."),
          sidebarPanel(    
            selectInput("indic_map", "Indicator", choices=indicator_list),
-           uiOutput("year_ui_map")
+           uiOutput("year_ui_map"),
+           shiny::hr(),
+           h5(tags$b("Legend")),
+           img(src='legend_map.png', height=150, style = "align: right")
          ), 
          mainPanel(
            h4(textOutput("title_map")),
@@ -271,6 +239,7 @@ tabPanel("Map", icon = icon("globe"),
 ## Table ----
 ###############################################.
 tabPanel("Table", icon = icon("table"),
+         beta_box,  
          column(9,
                 p("This section allows you to view the data in table format. 
                   You can use the filters to select the data you are interested in. 
@@ -281,15 +250,7 @@ tabPanel("Table", icon = icon("table"),
          ),
          DT::dataTableOutput('table_opt')
                 )
-),
-###############################################.
-## Copyright notice ----
-###############################################.
-  div(style="height: 40px; background: linear-gradient(#54b4eb, #2fa4e7 60%, #1d9ce5); display:inline-block; width:100%  ", 
-      tags$b("© Scottish Public Health Observatory v2.0 2018", style="color: white; padding-top: 14px; padding-left: 30px; 
-           padding-right: 60%; line-height:40px; font-size:70%;"),
-    bookmarkButton(style="height:25px; font-size:70%; vertical-align:middle; margin-bottom:3px ")
-  )
-)
+  )#, #Bracket  navbarPage
+) # Bracket fluidPage
 
 ##END
