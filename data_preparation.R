@@ -3,6 +3,7 @@
 #the Shiny app needs.
 
 #TODO:
+
 #see server syntax
 
 ############################.
@@ -12,13 +13,18 @@ library(readr)
 library(dplyr) 
 library(scales)
 library(haven) #for SPPS file reading
-#library(rmapshaper) #for reducing size of shapefiles -not needed for app,just for modifying shp
-
+library(rmapshaper) #for reducing size of shapefiles
+library (rgdal) #for reading shapefiles
 ###############################################.
 ## Lookups ---- 
 ###############################################.
-# Lookup with geographical information.
-geo_lookup <-  read_spss('/conf/phip/Projects/Profiles/Locality profiles/Lookup files/code_dictionary.sav') %>% 
+
+
+# Lookup with all geography codes information.
+geo_lookup<- read_csv("./data/Geo Data for Shiny.csv")%>%
+  setNames(tolower(names(.))) %>% #variables to lower case
+  rename(code = geography_code)%>%
+  rename(areaname = geography_name)%>%
   mutate_all(factor) %>% # converting variables into factors
   #Creating geography type variable
   mutate(areatype = ifelse(substr(code, 1, 3) == "S00", "Scotland", 
@@ -28,67 +34,48 @@ geo_lookup <-  read_spss('/conf/phip/Projects/Profiles/Locality profiles/Lookup 
                                                 ifelse(substr(code, 1, 3) == "S98", "HSC Partnership",
                                                        ifelse(substr(code, 1, 3) == "S02", "Intermediate zone", "Error"))))))) 
 
+
 #Bringing parent geography information
-geo_parents <- read_spss('/conf/phip/Projects/Profiles/Locality profiles/Lookup files/DataZone11_All_Geographies_Lookup.sav') %>% 
+geo_parents <- read_spss('./data/IZtoPartnership_parent_lookup.sav') %>% 
   setNames(tolower(names(.))) %>% #variables to lower case
-  select(c(intzone2011, hscp_locality, partnership)) %>% 
+  select(c(intzone2011, hscp_locality, hscp_partnership)) %>% 
   distinct() # eliminating duplicates
 
 #Creating parent geography for IZ level.
 geo_par_iz <- geo_parents %>% 
-  select(c(intzone2011, partnership)) %>% 
-  rename(code = intzone2011, parent_area = partnership) %>% 
+  select(c(intzone2011, hscp_partnership)) %>% 
+  rename(code = intzone2011, parent_code = hscp_partnership) %>% 
   distinct() # eliminating duplicates
 
 #Creating parent geography for locality level.
 geo_par_loc <- geo_parents %>% 
-  select(c(hscp_locality, partnership)) %>% 
-  rename(code = hscp_locality, parent_area = partnership) %>% 
+  select(c(hscp_locality, hscp_partnership)) %>% 
+  rename(code = hscp_locality, parent_code = hscp_partnership) %>% 
   distinct() # eliminating duplicates
+
+#bringing area names for parent geographies
+geo_partnership <- geo_parents %>% 
+  select(c(hscp_partnership)) %>% 
+  rename(code = hscp_partnership) %>% 
+  distinct() # eliminating duplicates
+
+geo_partnership <- merge(x=geo_partnership, y=geo_lookup, by="code", all.x = TRUE) 
+geo_partnership <- geo_partnership %>% select(-c(areatype)) %>% 
+  rename(parent_code = code, parent_area = areaname)
 
 #Merging together
 geo_parents <- rbind(geo_par_iz, geo_par_loc)
+geo_parents <- merge(x=geo_parents, y=geo_partnership, by="parent_code", all.x = TRUE) 
 
 geo_lookup <- merge(x=geo_lookup, y=geo_parents, by="code", all.x = TRUE) 
-  
-# An evil IZ “S02001984” is assigned to “S98004227” (Highland) and “S98004767” (Moray). 
-#I am going to assign it to Highland for now, as most datazones fall into its partnership
-#If parent geography for IZ's is changed to CA or HB, remember checking for similar issues.
-geo_lookup <- geo_lookup %>% 
-  filter(!(code == 'S02001984' & parent_area == 'S98004767'))
 
+##No IZ seem to be assigned to more than one partnership in this file.
+  
+geo_lookup <- geo_lookup %>% 
+  mutate(parent_area2 = geo_lookup$areaname[geo_lookup$parent_area == geo_lookup$code])
 #Replacing parent_area NA for CA, HB, Scotland and partnership with area type,
 # as parent_area is only going to be used for locality and IZ.
 geo_lookup$parent_area[is.na(geo_lookup$parent_area)] <- as.character(geo_lookup$areatype[is.na(geo_lookup$parent_area)]) 
-
-#This part is to avoid areas having the same names, not used at the moment
-#very fiddly way of identifying and fixing duplicate names
-#First creating object with problematic names
-# conflictive_names <- data.frame(table(geo_lookup$areaname, geo_lookup$code))  %>% 
-#   subset(Freq != 0) %>% 
-#   count(Var1,Var1) %>% 
-#   subset(n >1) %>% 
-#   droplevels()
-
-#Then merging with original geography lookup
-# geo_lookup <- merge(x=geo_lookup, y=conflictive_names, by.x="areaname", by.y="Var1", all.x = TRUE) 
-# 
-# #Need to fill the NA's so the recoding behaves correctly
-# geo_lookup[is.na(geo_lookup)] <- 0
-# 
-# # Now that they have been identified, we need to rename them
-# geo_lookup <- geo_lookup %>% 
-#   mutate(areaname = ifelse(substr(code, 1, 3) == "S12" & n>=2, 
-#                            paste(areaname, " - Council area"), 
-#                     ifelse(substr(code, 1, 3) == "S08" & n>=2, 
-#                                   paste(areaname, " - Health board"), 
-#                     ifelse(substr(code, 1, 3) == "S98" & n>=2, 
-#                                   paste(areaname, " - Partnership"),   
-#                     ifelse(substr(code, 1, 3) == "S99" & n>=2, 
-#                                   paste(areaname, " - Locality"),  
-#                     ifelse(substr(code, 1, 3) == "S02" & n>=2, 
-#                                   paste(areaname, " - Intermediate zone"),
-#                            paste(areaname)))))))
 
 ###There are a number of IZ's with the same name, recoding.
 geo_lookup <- geo_lookup %>% 
@@ -114,7 +101,9 @@ geo_lookup <- geo_lookup %>%
                     ifelse(code == "S02002449", "City Centre - Stirling",
                     ifelse(code == "S02001307", "Blackburn - Aberdeenshire",
                     ifelse(code == "S02002496", "Blackburn - West Lothian",
-                    ifelse(code == "S02001534", "IZ01 - East Lothian",
+                           paste(areaname) #no argument
+                    ))))))))))))))))))))))) %>% 
+  mutate(areaname = ifelse(code == "S02001534", "IZ01 - East Lothian",
                     ifelse(code == "S02002460", "IZ01 - West Dunbartonshire",
                     ifelse(code == "S02001535", "IZ02 - East Lothian",
                     ifelse(code == "S02002461", "IZ02 - West Dunbartonshire",
@@ -151,38 +140,33 @@ geo_lookup <- geo_lookup %>%
                     ifelse(code == "S02001551", "IZ18 - East Lothian",
                     ifelse(code == "S02002477", "IZ18 - West Dunbartonshire",
                            paste(areaname) #no argument
-                       )))))))))))))))))))))))))))))))))))))))))))))))))))))))))))
+                    )))))))))))))))))))))))))))))))))))))
 
-geo_lookup$parent_area <- as.factor(geo_lookup$parent_area )
-geo_lookup$areatype <- as.factor(geo_lookup$areatype )
+geo_lookup <- geo_lookup %>%  mutate_if(is.character, factor) %>% #transforming into factors
+  select(-c(parent_code)) 
 
 geo_lookup <- as.data.frame(geo_lookup)
 saveRDS(geo_lookup, "./data/geo_lookup.rds")
 geo_lookup <- readRDS("./data/geo_lookup.rds") 
 
-
 ######
 #Indicator information lookup table 
-ind_lookup<- read_csv("./data/indicator_lookup.csv") %>% 
+
+ind_lookup<- read_csv("./data/indicator_lookup_modified.csv") %>% 
   setNames(tolower(names(.))) %>% #variables to lower case
-  select(c(ind_id, indicator, interpret, supression, supress_less_than, type_id, type_definition)) %>% #at the moment don't need most things
+  select(c(ind_id, indicator, interpret, supression, supress_less_than, 
+           type_id, type_definition, domain1, domain2, domain3)) %>% #at the moment don't need most things
   mutate_if(is.character, factor) # converting variables into factors
 
 ###############################################.
-## New locality data ----
+## Locality data ----
 ###############################################.   
-#Data that Vicky created with new macros.
-under75_chd<- read_csv("./data/under75_CHDdeaths_dz11_locality_OPTdata.csv")
-hosp_chd<- read_csv("./data/CHD_hosp_dz11_locality_OPTdata.csv")
-deaths_1544<- read_csv("./data/deaths_15to44_dz11_locality_OPTdata.csv")
-deaths_all<- read_csv("./data/deaths_allages_dz11_locality_OPTdata.csv")
+optdata <- read_csv("./data/All Data for Shiny.csv")
 
-#Joining together
-optdata <- rbind(under75_chd, hosp_chd, deaths_1544, deaths_all) %>% 
-  setNames(tolower(names(.))) %>% #variables to lower case
-  select(-c(uni_id)) %>% #taking out variables
-  mutate_if(is.character, factor) %>% #converting characters into factors
-  rename(measure = rate)
+optdata<- optdata %>%
+  setNames(tolower(names(.)))%>% #names to lower case
+  rename(ind_id = indicator_id, code = geography_code) %>% 
+  mutate_if(is.character,factor) #converting characters into factors
 
 #Merging with indicator and geography information
 optdata <- merge(x=optdata, y=ind_lookup, by="ind_id", all.x = TRUE) 
@@ -204,35 +188,33 @@ optdata$lowci[optdata$supression=="Y" & (substr(optdata$type_id,1,2)=='cr' | (su
 optdata$upci[optdata$supression=="Y" & (substr(optdata$type_id,1,2)=='cr' | (substr(optdata$type_id,1,1))=='%') 
                   & optdata$numerator<optdata$supress_less_than] <- NA
 
-
 # Scaling measures (0 to 1) in groups by year, area type and indicator. 
 #Does not work well for Scotland totals. TRUE?
 optdata <- optdata %>% group_by(ind_id, year, areatype) %>% 
   mutate(measure_sc = ifelse(interpret=="H", as.vector(rescale(measure, to=c(1,0))), 
-                             as.vector(rescale(measure, to=c(0,1))))) 
+                             ifelse(interpret=="L", as.vector(rescale(measure, to=c(0,1))),
+                                    0)))  %>%
+  ungroup()
 
 
 #Creating variables for topic/profile filters. 
-#This probably should be added to the indicator lookup.
+#This probably should be added to the indicator lookup - most indicators assigned to death topic for now.
 optdata <- optdata %>% 
-  mutate(topic1 = as.factor("All")) %>%
-  mutate(topic2 = as.factor(ifelse(ind_id %in% c("20105", "20303"), "CHD", "Deaths"))) %>% 
-  select(-c(supression, supress_less_than, type_id, areaname, parent_area, areatype)) %>%  #taking out some variables
+  select(-c(supression, supress_less_than, type_id)) %>%  #taking out some variables
   #rounding variables
   mutate(numerator = round(numerator, 1), measure = round(measure, 1),
          lowci = round(lowci, 1), upci = round(upci, 1)) %>% 
   droplevels() #to get rid of factor levels not present in data set.
 
+#Making the numerator the measure for pop all ages, so it plots correctly
+optdata$measure <- ifelse(optdata$indicator == 'Mid-year population estimate - all ages',
+                          optdata$numerator, optdata$measure)
+
 optdata <- as.data.frame(optdata)
 optdata$ind_id <- as.factor(optdata$ind_id )
 
-#To be able to upload it with no confidentiality issues to the tool
-optdata <- optdata %>% 
-  subset(!(indicator == "Patients hospitalised with coronary heart disease" &
-             year == 2015))
-
-saveRDS(optdata, "./data/optdata_test.rds")
-optdata <- readRDS("./data/optdata_test.rds") 
+saveRDS(optdata, "./data/optdata.rds")
+optdata <- readRDS("./data/optdata.rds") 
 
 ###############################################.
 ## Map shapefiles ----
@@ -250,6 +232,10 @@ CA_bound_orig <- spTransform(CA_bound_orig,  CRS("+ellps=WGS84 +proj=longlat +da
 #Saving the simplified shapefile to avoid the calculations.
 writeOGR(CA_bound_orig, dsn="./shapefiles", "CA_simpl", driver="ESRI Shapefile", overwrite_layer=TRUE)
 
+#Saving as rds as it is much faster to read
+CA_bound<-readOGR("./shapefiles","CA_simpl")
+saveRDS(CA_bound, "./shapefiles/CA_boundary.rds")
+
 ##########################.
 ###Health board
 #making it small 29mb to 2.5. Sometimes it fails, due to lack of memory (use memory.limits and close things).
@@ -263,5 +249,73 @@ HB_bound_orig <- spTransform(HB_bound_orig,  CRS("+ellps=WGS84 +proj=longlat +da
 
 #Saving the simplified shapefile to avoid the calculations.
 writeOGR(HB_bound_orig, dsn="./shapefiles", "HB_simpl", driver="ESRI Shapefile", overwrite_layer=TRUE)
+
+#Saving as rds as it is much faster to read
+HB_bound<-readOGR("./shapefiles","HB_simpl") 
+saveRDS(HB_bound, "./shapefiles/HB_boundary.rds")
+
+###############################################.
+## Deprivation data ----
+###############################################.  
+deaths_all_depr <- read_csv("./data/deaths_allages_deprivation_OPTdata.csv")
+deaths_all_depr_rii <- read_csv("./data/deaths_allages_deprivation_rii_OPTdata.csv") %>% 
+  select(-ind_id)
+deaths_all_depr_sii <- read_csv("./data/deaths_allages_deprivation_sii_OPTdata.csv")
+
+deaths_all_depr_merged <- merge(deaths_all_depr, deaths_all_depr_rii, 
+                                by = c("code", "year", "def_period", "trend_axis"),
+                                all.x = TRUE)
+
+deaths_all_depr_merged <- merge(deaths_all_depr_merged, deaths_all_depr_sii, 
+                               by = c("code", "year", "def_period", "trend_axis"),
+                               all.x = TRUE)
+
+
+deaths_15to44_depr <- read_csv("./data/deaths_15to44_deprivation_OPTdata.csv")
+deaths_15to44_depr_rii <- read_csv("./data/deaths_15to44_deprivation_rii_OPTdata.csv") %>% 
+  select(-ind_id)
+deaths_15to44_depr_sii <- read_csv("./data/deaths_15to44_deprivation_sii_OPTdata.csv")
+
+deaths_15to44_depr_merged <- merge(deaths_15to44_depr, deaths_15to44_depr_rii, 
+                                by = c("code", "year", "def_period", "trend_axis"),
+                                all.x = TRUE)
+
+deaths_15to44_depr_merged <- merge(deaths_15to44_depr_merged, deaths_15to44_depr_sii, 
+                                by = c("code", "year", "def_period", "trend_axis"),
+                                all.x = TRUE)
+
+#It has the same ind_id as the the other indicator.
+deaths_15to44_depr_merged$ind_id <- 10000
+
+deprivation_data <- rbind(deaths_15to44_depr_merged, deaths_all_depr_merged)
+
+deprivation_data <- deprivation_data %>% 
+  mutate(quintile = ifelse(substr(code, 4, 4)=="0", "Total",
+                           ifelse(substr(code, 4, 4)=="1", "1 - Most deprived",
+                                  ifelse(substr(code, 4, 4)=="2", "2",
+                                         ifelse(substr(code, 4, 4)=="3", "3",
+                                                ifelse(substr(code, 4, 4)=="4", "4",
+                                                       ifelse(substr(code, 4, 4)=="5", "5 - Least deprived", "Error"))))))) %>% 
+  mutate(code = paste(substr(code, 1, 3), "0", substr(code, 5, 9), sep = ""))
+table(deprivation_data$quintile)
+
+
+#Merging with lookup, at the moment lookup does not have this.
+#deprivation_data <- merge(x=deprivation_data, y=ind_lookup, by="ind_id", all.x = TRUE) 
+#Patch in the meantime.
+deprivation_data <- deprivation_data %>% 
+  mutate(indicator = ifelse(ind_id == "10000", "All-cause mortality among the 15-44 year olds",
+                            "Deaths all ages")) %>% 
+  mutate(type_definition = "Age-sex standardized rate per 100,000") %>% 
+  mutate(numerator = round(numerator, 1), rate = round(rate, 1),
+         lowci = round(lowci, 1), upci = round(upci, 1), rii  = round(rii, 1), 
+         slope_coef = round(slope_coef, 1), lowci_slope = round(lowci_slope, 1),
+         upci_slope = round(upci_slope, 1), lowci_rii = round(lowci_rii, 1), upci_rii = round(upci_rii, 1))
+
+saveRDS(deprivation_data, "./data/deprivation_OPT.rds")
+deprivation_data <- readRDS("./data/deprivation_OPT.rds")
+
+
+
 
 ##END
