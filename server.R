@@ -4,22 +4,23 @@
 # TODO:
 #Data manipulation: 
 #   Lookups need to be checked/refined: names areas (consistency & and), indicator measures, etc.
-#   Figure out what to do with topic variables
+#   Refine domains in indicator lookup
 #   Indicator information in lookup as with geography
 #   Add domain to indicator lookup.
 #   Include deprivation indicators in lookup
-#   Deprivation needs PAR and rounding of numeric variables
+#   Deprivation needs PAR 
+#   Add denominator?
 #----------------.
 #General:
-#   Add saving buttons to all plots
 #   Fix bookmarking - check if server solution in .io ?enableBookmarking
-#   Take out row numbers and non-needed columns from download files
-#   Create function for downloading files (instead of repeating code)
+#   Take out non-needed columns from download files and format names
 #   Include reporting functionality -Rmarkdown?
 #   Create user guide
 #   Check/work on responsiveness
 #   Incorporate Google analytics - https://shiny.rstudio.com/articles/google-analytics.html
+#   Help/intro tab need work on text and resources
 #   I feel we should host in the website and link from here: shapefiles, lookups, etc
+#   Underline hyperlinks for accesibility
 #----------------.
 #Spine chart:
 #   Barcode chart
@@ -32,23 +33,26 @@
 #   Adding numerator/rate tick box?
 #----------------.
 #Rank chart
-#   Issue with long label names, take them out? put them in the side?
+#   Issue with long label names, take them out? put them in the side? in the bars?
 #   Vertical bars instead?
+#   Want to make indicator list reactive?
 #----------------.
 #Table:
 #   Add deprivation data to table (maybe with switch or just merging everything)
 #   Change placeholder text in filters (require javascript)
 #----------------.
 #Map:
-#   Avoid redrawing of map:leafletProxy
+#   Avoid redrawing of map using leafletProxy
+#   Review what to include in tooltip
 #   Add intermediate zones to map, or is it going to be too big?
 #   How to save map? Move away from Leaflet? Will likely be faster
 #   For IZ's and localities maybe something like this: https://isresearchnc.shinyapps.io/CMaps/
 #----------------.
 #Deprivation
-#   Do we want CI's? Error bars? polygon areas for trime trends?
+#   Do we want CI's? Error bars? polygon areas for time trends?
 #   Include PAR information and charts (trend and bar)
 #   Add slope of SII to bar chart
+#   Maybe improve a bit the tooltip for RII and SII?
 #   instead of time period dropdown do slider
 #----------------.
 
@@ -67,25 +71,25 @@ function(input, output) {
     
     areas_heat <- if (input$geotype_heat %in% c("Health board", "Council area", "HSC Partnership"))
       {
-        unique(geo_lookup$areaname[geo_lookup$areatype == input$geotype_heat])
+      sort(geo_lookup$areaname[geo_lookup$areatype == input$geotype_heat])
       } else {
-        unique(geo_lookup$areaname[geo_lookup$areatype == input$geotype_heat
+        sort(geo_lookup$areaname[geo_lookup$areatype == input$geotype_heat
                                    & geo_lookup$parent_area == input$loc_iz_heat])
       }
 
     selectInput("geoname_heat", "Area", 
                 choices = areas_heat,
                 selectize=TRUE, selected = "")
+
   })
   
   #Heatmap data. Filtering based on user input values.
   heat_chosenarea <- reactive({ 
-    
-    heat_chosenarea <- optdata %>% 
+      optdata %>% 
       filter(areaname == input$geoname_heat &
               areatype == input$geotype_heat &
                (domain1 %in% input$topic_heat | domain2 %in% input$topic_heat |  domain3 %in% input$topic_heat)) %>% 
-      select(c(year, indicator, measure, lowci, upci, interpret, def_period, type_definition)) %>% 
+      select(c(indicator, numerator, measure, lowci, upci, interpret, year,  def_period, type_definition)) %>% 
       droplevels()
     
   })
@@ -95,6 +99,8 @@ function(input, output) {
     
     heat_chosencomp <- optdata %>% 
       filter(areaname == input$geocomp_heat &
+               indicator != "Mid-year population estimate - all ages" &
+               areatype %in% c("Health board", "Council area", "Scotland") &
                (domain1 %in% input$topic_heat | domain2 %in% input$topic_heat |  domain3 %in% input$topic_heat)) %>% 
       select(c(year, indicator, measure)) %>% 
       rename(comp_m=measure) %>% 
@@ -110,14 +116,15 @@ function(input, output) {
   #Plotting 
   output$heat_plot <- renderPlotly({
     
-    heat <- merge(heat_chosenarea(), heat_chosencomp(), by=c("indicator", "year")) %>% 
-      arrange(indicator, year) # for ranking by value
+    heat <- merge(heat_chosenarea(), heat_chosencomp(), by=c("indicator", "year")) 
     
-    heat$color <- ifelse(heat$lowci < heat$comp_m & heat$upci > heat$comp_m,'gray',
+    heat$color <- ifelse(heat$interpret == "O", 'white',
+                         ifelse(heat$lowci <= heat$comp_m & heat$upci >= heat$comp_m,'gray',
                          ifelse(heat$lowci > heat$comp_m & heat$interpret == "H", 'blue',
-                                ifelse(heat$lowci > heat$comp_m & heat$interpret == "L", 'red',
-                                       ifelse(heat$upci < heat$comp_m & heat$interpret == "L", 'blue',
-                                              ifelse(heat$upci < heat$comp_m & heat$interpret == "H", 'red', 'gray')))))
+                         ifelse(heat$lowci > heat$comp_m & heat$interpret == "L", 'red',
+                         ifelse(heat$upci < heat$comp_m & heat$interpret == "L", 'blue',
+                         ifelse(heat$upci < heat$comp_m & heat$interpret == "H", 'red', 'gray'))))))
+    
     plot_overview <- ggplot(heat, aes(x = year, y = indicator, fill = color,
                                       text= paste0(heat$indicator, "<br>", #Tooltip
                                                    heat$def_period, "<br>",
@@ -126,9 +133,9 @@ function(input, output) {
       geom_tile(color = "black") +
       geom_text(aes(label = round(measure, 0)), size =2.5) +
       #xlab("Less recent <- | Time period |-> More recent") + #x axis title
-      scale_fill_manual(name = "Legend", labels = c("Significantly better", "Not significantly different", "Significantly worse"),
-                        values = c(blue = "#3d99f5", gray = "#999999", red = "#ff9933")) + #tile color scale and legend
-      scale_x_discrete(position = "top", expand = c(0, 0)) + #moving the x axis title to the top
+      scale_fill_manual(name = "Legend", labels = c("Significantly better", "Not significantly different", "Significantly worse", "Significance is not calculated"),
+                        values = c(blue = "#3d99f5", gray = "#999999", red = "#ff9933", white = "#ffffff")) + #tile color scale and legend
+      scale_x_discrete(position = "top", expand = c(0, 0), limits = indicator_list) + #moving the x axis title to the top
       theme(axis.text.x=element_blank(), # taking out x axis labels
             axis.ticks=element_blank(), # taking out axis tick marks
             axis.title.x=element_text("Less recent <- Time period -> More recent"), #Taking out x axis title
@@ -140,17 +147,24 @@ function(input, output) {
     
     ggplotly(plot_overview, tooltip=c("text"), height=get_height_heat()) %>% 
       layout(margin = list(l = 400, t = 100),
-             xaxis = list(side = 'top', title = "Less recent <- Time period -> More recent"))  %>% 
+             xaxis = list(side = 'top', title = "Less recent <- Time period -> More recent")) %>% 
       config(displayModeBar = TRUE, displaylogo = F, collaborate=F, editable =F) # taking out plotly logo and collaborate button
     
   })
 
 
  # Downloading data
+  heat_csv <- reactive({
+    heat_chosenarea() %>% 
+      select(-c(interpret, year)) %>% 
+      rename(lower_confidence_interval=lowci, upper_confidence_interval=upci, 
+             period = def_period, definition = type_definition)
+  })
+  
     output$download_heat <- downloadHandler(
       filename =  'overview_data.csv',
       content = function(file) {
-        write.csv(heat_chosenarea(), file)
+        write.csv(heat_csv(), file, row.names=FALSE)
       }
     )
   
@@ -247,12 +261,18 @@ function(input, output) {
         trend_col <- colorblind_cols
       }
       
+      #Text for tooltip
+      tooltip_trend <- c(paste0(trend_data()$areaname, "<br>", trend_data()$year,
+                                "<br>", trend_data()$measure))
+      
+      #Plot
       plot_ly(data=trend_data(), x=~trend_axis,  y = ~measure, 
+              text=tooltip_trend, hoverinfo="text",
               type = 'scatter', mode = 'lines+markers',
               color = ~areaname, colors = trend_col) %>% 
         #Layout 
         layout(annotations = list(), #It needs this because of a buggy behaviour
-               margin = list(b = 160), #to avoid labels getting cut out
+               margin = list(b = 160, t=50), #to avoid labels getting cut out
                yaxis = list(title = ~type_definition, rangemode="tozero", 
                             size = 4, titlefont =list(size=10), tickfont =list(size=9)), 
                xaxis = list(title = FALSE, tickfont =list(size=10), tickangle = 270)  #axis parameter
@@ -266,7 +286,7 @@ function(input, output) {
   output$download_trend <- downloadHandler(
     filename =  'timetrend_data.csv',
     content = function(file) {
-      write.csv(trend_data(), file)
+      write.csv(trend_data(), file, row.names=FALSE)
     }
   )
   
@@ -285,9 +305,11 @@ function(input, output) {
   
   # Comparator data rank plot. Could be moved inside rank_bar_data
   rank_compar <- reactive({
-    filter(optdata, trend_axis == input$year_rank & 
+    subset(optdata, trend_axis == input$year_rank & 
+             areatype %in% c("Health board", "Council area", "Scotland") &
              areaname == input$geocomp_rank &
-             indicator == input$indic_rank)
+             indicator == input$indic_rank) %>% 
+      droplevels()
   })
   
   #Rank plot data
@@ -295,9 +317,10 @@ function(input, output) {
     if (input$geotype_rank %in% c("Scotland", "Health board", "Council area", "HSC Partnership"))
     {
       rank_bar <-optdata %>% 
-        filter(optdata$areatype == input$geotype_rank &  
+        subset(areatype == input$geotype_rank &  
                  trend_axis == input$year_rank &
-                 indicator == input$indic_rank) 
+                 indicator == input$indic_rank) %>% 
+        droplevels()
       
       #Cannot be done in the same pipe operation as it does not work with the areaname mutate
       rank_bar <- rank_bar %>% 
@@ -309,10 +332,11 @@ function(input, output) {
     }
     else { #if locality or IZ it needs to filter based on the parent area and be the right area type.
       rank_bar <-  optdata %>% 
-        filter(optdata$areatype == input$geotype_rank &
-                 optdata$parent_area == input$loc_iz_rank &
+        subset(areatype == input$geotype_rank &
+                 parent_area == input$loc_iz_rank &
                  trend_axis == input$year_rank &
-                 indicator == input$indic_rank) 
+                 indicator == input$indic_rank) %>% 
+        droplevels()
       
       #Cannot be done in the same pipe operation as it does not work with the areaname mutate
       rank_bar <-rank_bar %>% 
@@ -324,6 +348,7 @@ function(input, output) {
     }
   })
   
+  ############################.
   # Create Rank plot
   output$rank_plot <- renderPlotly({
     
@@ -344,78 +369,54 @@ function(input, output) {
     }
     else {
       
+      #Coloring based on if signicantly different from comparator
+      color_pal <- ifelse(rank_bar_data()$interpret == "O", '#ccccff',
+                   ifelse(is.na(rank_bar_data()$lowci) | is.na(rank_bar_data()$upci) | is.na(rank_bar_data()$comp_value) | is.na(rank_bar_data()$measure) |rank_bar_data()$measure == 0, '#ccccff',
+        ifelse(rank_bar_data()$lowci <= rank_bar_data()$comp_value & rank_bar_data()$upci >= rank_bar_data()$comp_value,'#999999',
+                     ifelse(rank_bar_data()$lowci > rank_bar_data()$comp_value & rank_bar_data()$interpret == "H", '#3d99f5',
+                           ifelse(rank_bar_data()$lowci > rank_bar_data()$comp_value & rank_bar_data()$interpret == "L", '#ff9933',
+                                   ifelse(rank_bar_data()$upci < rank_bar_data()$comp_value & rank_bar_data()$interpret == "L", '#3d99f5',
+                                         ifelse(rank_bar_data()$upci < rank_bar_data()$comp_value & rank_bar_data()$interpret == "H", '#ff9933', '#ccccff')))))))
+
+      # Text for tooltip
+      tooltip_rank <- c(paste0(rank_bar_data()$areaname, ": ", rank_bar_data()$measure, "<br>",
+                               input$geocomp_rank, ": ", rank_bar_data()$comp_value))
+      
+      #Creating a vector with the area names in the order they are going to be plotted
+      order_areas <- as.vector(rank_bar_data()$areaname)
+      
+      # General plot and layout, bars with or without error bars will be added after 
+      # user input
+      p <-   plot_ly(data = rank_bar_data(), x = ~areaname) %>% 
+        #Comparator line
+        add_trace(y = ~comp_value, name = ~unique(comp_name), type = 'scatter', mode = 'lines',
+                  line = list(color = '#FF0000'), showlegend = FALSE, hoverinfo="skip") %>% 
+        #Layout
+        layout(annotations = list(), #It needs this because of a buggy behaviour
+               title = ~def_period,
+               yaxis = list(title = ~type_definition, titlefont =list(size=10), 
+                            tickfont =list(size=9)),
+               xaxis = list(title = "", tickangle = 270, 
+                            tickfont =list(size=9), #axis parameters
+                            categoryorder="array", #order of plotting
+                            categoryarray = order_areas),
+               margin=list(b = 160, t=80),
+               hovermode = 'false') %>% # to get hover compare mode as default
+        config(displayModeBar = TRUE, displaylogo = F, collaborate=F, editable =F)
+      
       if (input$ci_rank == FALSE) {
-        #Coloring based on if signicantly different from comparator
-        color_pal <- ifelse(rank_bar_data()$lowci < rank_bar_data()$comp_value & rank_bar_data()$upci > rank_bar_data()$comp_value,'#999999',
-                            ifelse(rank_bar_data()$lowci > rank_bar_data()$comp_value & rank_bar_data()$interpret == "H", '#3d99f5',
-                                   ifelse(rank_bar_data()$lowci > rank_bar_data()$comp_value & rank_bar_data()$interpret == "L", '#ff9933',
-                                          ifelse(rank_bar_data()$upci < rank_bar_data()$comp_value & rank_bar_data()$interpret == "L", '#3d99f5',
-                                                 ifelse(rank_bar_data()$upci < rank_bar_data()$comp_value & rank_bar_data()$interpret == "H", '#ff9933', '#999999')))))
-        
-        #Text for tooltip
-        tooltip_rank <- c(paste0(rank_bar_data()$areaname, ": ", rank_bar_data()$measure, "<br>",
-                                 input$geocomp_rank, ": ", rank_bar_data()$comp_value))
-        
-        
-        plot_ly(data = rank_bar_data(), x = ~areaname) %>% 
-          #adding bar layer
-          add_bars(y = ~ measure, text=tooltip_rank, hoverinfo="text",
-                   marker = list(color = color_pal)) %>% 
-          #Comparator line
-          add_trace(y = ~comp_value, name = ~unique(comp_name), type = 'scatter', mode = 'lines',
-                    line = list(color = '#FF0000'), showlegend = FALSE, hoverinfo="skip") %>% 
-          #Layout
-          layout(annotations = list(), #It needs this because of a buggy behaviour
-                 title = ~def_period,
-                 yaxis = list(title = ~type_definition, titlefont =list(size=10), 
-                              tickfont =list(size=9)),
-                 xaxis = list(title = "", tickangle = 270, 
-                              tickfont =list(size=9), #axis parameters
-                              categoryorder="array", #order of plotting
-                              categoryarray = ~measure),
-                 margin=list(b = 160),
-                 hovermode = 'false') %>% # to get hover compare mode as default
-          config(displayModeBar = TRUE, displaylogo = F, collaborate=F, editable =F)
-        
+        #adding bar layer
+        p %>%  add_bars(y = ~ measure, text=tooltip_rank, hoverinfo="text",
+                        marker = list(color = color_pal))
+                   
       }
       else{
-        
-        #Coloring based on if signicantly different from comparator
-        color_pal <- ifelse(rank_bar_data()$lowci < rank_bar_data()$comp_value & rank_bar_data()$upci > rank_bar_data()$comp_value,'#999999',
-                            ifelse(rank_bar_data()$lowci > rank_bar_data()$comp_value & rank_bar_data()$interpret == "H", '#3d99f5',
-                                   ifelse(rank_bar_data()$lowci > rank_bar_data()$comp_value & rank_bar_data()$interpret == "L", '#ff9933',
-                                          ifelse(rank_bar_data()$upci < rank_bar_data()$comp_value & rank_bar_data()$interpret == "L", '#3d99f5',
-                                                 ifelse(rank_bar_data()$upci < rank_bar_data()$comp_value & rank_bar_data()$interpret == "H", '#ff9933', '#999999')))))
-        
-        #Text for tooltip
-        tooltip_rank <- c(paste0(rank_bar_data()$areaname, ": ", rank_bar_data()$measure, "<br>",
-                                 input$geocomp_rank, ": ", rank_bar_data()$comp_value))
-        
-        
-        plot_ly(data = rank_bar_data(), x = ~areaname) %>% 
-          #adding bar layer
-          add_bars(y = ~ measure, text=tooltip_rank, hoverinfo="text",
-                   marker = list(color = color_pal), error_y = list(
-                     type = "data",
-                     symmetric = FALSE,
-                     array = ~upci_diff,
-                     arrayminus = ~lowci_diff)) %>% 
-          #Comparator line
-          add_trace(y = ~comp_value, name = ~unique(comp_name), type = 'scatter', mode = 'lines',
-                    line = list(color = '#FF0000'), showlegend = FALSE, hoverinfo="skip") %>% 
-          #Layout
-          layout(annotations = list(), #It needs this because of a buggy behaviour
-                 title = ~def_period,
-                 yaxis = list(title = ~type_definition, titlefont =list(size=10), 
-                              tickfont =list(size=9)),
-                 xaxis = list(title = "", tickangle = 270, 
-                              tickfont =list(size=9), #axis parameters
-                              categoryorder="array", #order of plotting
-                              categoryarray = ~measure),
-                 margin=list(b = 160),
-                 hovermode = 'false') %>% # to get hover compare mode as default
-          config(displayModeBar = TRUE, displaylogo = F, collaborate=F, editable =F)
-        
+        #adding bar layer with error bars
+        p %>% add_bars(y = ~ measure, text=tooltip_rank, hoverinfo="text",
+                   marker = list(color = color_pal), 
+                   error_y = list(type = "data",color='#000000',
+                     symmetric = FALSE, array = ~upci_diff, arrayminus = ~lowci_diff)) 
+
       }
     }
   }) 
@@ -424,7 +425,7 @@ function(input, output) {
   output$download_rank <- downloadHandler(
     filename =  'rankplot_data.csv',
     content = function(file) {
-      write.csv(rank_bar_data(), file) 
+      write.csv(rank_bar_data(), file, row.names=FALSE) 
     }
   )
   
@@ -434,10 +435,21 @@ function(input, output) {
 
   #Controls for chart. Dynamic selection of area depending on area type.
   output$geoname_ui_simd <- renderUI({
+    
+    list_areas <- sort(as.vector(subset(geo_lookup$areaname, geo_lookup$areatype == input$geotype_simd)))
+    
   selectInput("geoname_simd", "Select the location", 
-              choices = unique(subset(geo_lookup$areaname, geo_lookup$areatype == input$geotype_simd)),
-              selected = "Scotland")
+              choices = list_areas, selected = "Scotland")
   })
+  
+  #Dynamic selection of year depending on what years are available for each indicator.
+  output$year_ui_simd <- renderUI({
+    time_period <- sort(unique(deprivation$trend_axis[deprivation$indicator == input$indic_simd]))
+    
+    selectInput("year_simd", "Time period",
+                choices = time_period, selected = last(time_period))
+  })
+  
 
 
   #Reactive datasets
@@ -479,22 +491,23 @@ function(input, output) {
     else {
 
       #Text for tooltip
-      #     tooltip_simd <- c(paste0("Quintile: ", simd_bar_data()$quintile, "<br>",
-      #                              "Value: ", abs(simd_bar_data()$rate)))
+          tooltip_simd <- c(paste0("Quintile ", simd_bar_data()$quintile, "<br>",
+                                   "Value: ", simd_bar_data()$rate))
 
-      plot_ly(data=simd_bar_data(), x=~quintile#,
-              # text=tooltip_simd, hoverinfo="text"
+      plot_ly(data=simd_bar_data(), x=~quintile,
+              text=tooltip_simd, hoverinfo="text"
       ) %>%
         add_bars(y=~rate, color = ~quintile , colors = pal_simd_bar) %>%
         #Comparator line
         add_trace(y = ~average, name = "Average", type = 'scatter', mode = 'lines',
-                  line = list(color = '#FF0000')) %>% #changing line color
+                  line = list(color = '#FF0000'), hoverinfo="skip") %>% 
         layout(bargap = 0.1,
                margin=list(b = 160),
                legend = list(orientation = 'h'),
-               yaxis = list(title = ~type_definition),
+               yaxis = list(title = ~type_definition, titlefont =list(size=10), 
+                            tickfont =list(size=9)),
                xaxis = list(showline = TRUE, title = FALSE, showticklabels = FALSE)) %>%
-        config(displaylogo = F, collaborate=F, editable =F) # taking out plotly logo and collaborate button
+        config(displayModeBar = TRUE, displaylogo = F, collaborate=F, editable =F) # taking out plotly logo and collaborate button
     }
   })
 
@@ -521,11 +534,18 @@ function(input, output) {
         simd_index <- simd_trend_data() %>%
           filter((quintile == "Total" & code == "S00000001")|
                    (quintile == "2" & code != "S00000001"))
+        
+        # #Text for tooltip
+        tooltip_simd <- c(paste0(simd_index$trend_axis, "<br>",
+                                 "Relative: ", simd_index$rii, "<br>",
+                                 "Absolute: ", simd_index$slope_coef))
 
-        plot_ly(data=simd_index, x=~trend_axis) %>%
-          add_lines(y = ~slope_coef, name = "Slope index of inequality", type = 'scatter', mode = 'lines',
+
+        plot_ly(data=simd_index, x=~trend_axis,
+                text=tooltip_simd, hoverinfo="text") %>%
+          add_lines(y = ~slope_coef, name = "Absolute level of inequality (SII)", type = 'scatter', mode = 'lines',
                     line = list(color = '#74add1')) %>% #changing line color
-          add_lines(y = ~rii, name = "Relative index of inequality", type = 'scatter', mode = 'lines',
+          add_lines(y = ~rii, name = "Relative level of inequality (RII)", type = 'scatter', mode = 'lines',
                     line = list(color = '#313695'), yaxis = "y2") %>% #changing line color
           #Layout
           layout(annotations = list(), #It needs this because of a buggy behaviour
@@ -534,34 +554,32 @@ function(input, output) {
                               title = "", tickfont = list(color = "#74add1")),
                  yaxis2 = list(side = "right", overlaying = "y", rangemode="tozero",
                                title = FALSE, tickfont = list(color = "#313695")),
-                 xaxis = list(title = "Time period", tickfont =list(size=10), tickangle = 270),  #axis parameter
+                 xaxis = list(title = " ", tickfont =list(size=10), tickangle = 270),  #axis parameter
                  margin=list(pad = 50, l = 160, r = 200, b = 160),
-                 legend = list(orientation = 'h', x = 20, y = 100),
-                 hovermode = 'false') %>%  # to get hover compare mode as default
-          config(displaylogo = F, collaborate=F, editable =F) # taking out plotly logo and collaborate button
+                 legend = list(orientation = 'h', x = 20, y = 100)) %>% 
+          config(displayModeBar = TRUE, displaylogo = F, collaborate=F, editable =F) # taking out plotly logo and collaborate button
 
       }
 
       else {
 
         #Text for tooltip
-        #       tooltip_simd <- c(paste0("Quintile: ", simd_bar_data()$quintile, "<br>",
-        #                                "Value: ", abs(simd_bar_data()$rate)))
-        #,
-        #text=tooltip_simd, hoverinfo="text"
+              tooltip_simd <- c(paste0(simd_trend_data()$quintile, "<br>",
+                                       simd_trend_data()$trend_axis, ": ", simd_trend_data()$rate))
+
         plot_ly(data=simd_trend_data(), x=~trend_axis,  y = ~rate,
                 type = 'scatter', mode = 'lines',
+                text=tooltip_simd, hoverinfo="text",
                 color = ~quintile , colors = pal_simd_trend) %>%
           #Layout
           layout(annotations = list(), #It needs this because of a buggy behaviour
                  margin = list(b = 160), #to avoid labels getting cut out
                  yaxis = list(title = FALSE, rangemode="tozero",
                               size = 4, tickfont =list(size=10)),
-                 xaxis = list(title = "Time period", tickfont =list(size=10), tickangle = 270),  #axis parameter
+                 xaxis = list(title = "", tickfont =list(size=10), tickangle = 270),  #axis parameter
                  margin=list(b = 160),
-                 showlegend = FALSE,
-                 hovermode = 'false') %>%  # to get hover compare mode as default
-          config(displaylogo = F, collaborate=F, editable =F) # taking out plotly logo and collaborate button
+                 showlegend = FALSE) %>%
+          config(displayModeBar = TRUE, displaylogo = F, collaborate=F, editable =F) # taking out plotly logo and collaborate button
 
       }
     }
@@ -571,7 +589,7 @@ function(input, output) {
   output$download_simd <- downloadHandler(
     filename =  'deprivation_data.csv',
     content = function(file) {
-      write.csv(simd_trend_data(), file)
+      write.csv(simd_trend_data(), file, row.names=FALSE)
     }
   )
 
@@ -589,7 +607,7 @@ function(input, output) {
   
   #Merging shapefile with dynamic selection of data
   #First for Local authority
-  CA_pol <- reactive({
+  ca_pol <- reactive({
     ca_map <- optdata %>% 
       subset(areatype == "Council area" &
                trend_axis==input$year_map & 
@@ -597,12 +615,12 @@ function(input, output) {
       rename(GSS_COD = code) %>% 
       droplevels() #dropping missing factor levels to allow merging
     
-    ca_map <- merge(CA_bound, ca_map, by='GSS_COD')
+    ca_map <- merge(ca_bound, ca_map, by='GSS_COD')
   }) 
   
   #Second for Health Board
   
-  HB_pol <- reactive({
+  hb_pol <- reactive({
     hb_map <- optdata %>% 
       subset(areatype == "Health board" &
                trend_axis==input$year_map & 
@@ -610,11 +628,11 @@ function(input, output) {
       rename(HBCode = code) %>% 
       droplevels() #dropping missing factor levels to allow merging
     
-    hb_map <- merge(HB_bound, hb_map, by='HBCode')
+    hb_map <- merge(hb_bound, hb_map, by='HBCode')
   })   
   
   #title
-  output$title_map <- renderText(paste(input$indic_map, " - ", unique(CA_pol()$def_period)))
+  output$title_map <- renderText(paste(input$indic_map, " - ", unique(ca_pol()$def_period)))
   
   #Plotting map
   
@@ -624,11 +642,11 @@ function(input, output) {
       fitBounds(-10, 60, 0, 54)  %>%
       addProviderTiles(providers$CartoDB.Positron) %>%
       #Adding polygons with HB
-      addPolygons(data=HB_pol(), group="Health board",
+      addPolygons(data=hb_pol(), group="Health board",
                   color = "#444444", weight = 2, smoothFactor = 0.5, 
                   label = (sprintf(
                     "<strong>%s</strong><br/>Total: %g<br/>Measure: %g",
-                    HB_pol()$HBName, HB_pol()$numerator, HB_pol()$measure) 
+                    hb_pol()$HBName, hb_pol()$numerator, hb_pol()$measure) 
                     %>% lapply(htmltools::HTML)),
                   opacity = 1.0, fillOpacity = 0.5,
                   fillColor = ~colorQuantile(pal_map, measure_sc, n=5)(measure_sc),
@@ -636,11 +654,11 @@ function(input, output) {
                                                       bringToFront = TRUE)
       ) %>% 
       #Adding polygons with CA
-      addPolygons(data=CA_pol(), group="Council area",
+      addPolygons(data=ca_pol(), group="Council area",
                   color = "#444444", weight = 1, smoothFactor = 0.5, 
                   label = (sprintf(
                     "<strong>%s</strong><br/>Total: %g<br/>Measure: %g",
-                    CA_pol()$NAME, CA_pol()$numerator, CA_pol()$measure) 
+                    ca_pol()$NAME, ca_pol()$numerator, ca_pol()$measure) 
                     %>% lapply(htmltools::HTML)),
                   opacity = 1.0, fillOpacity = 0.5,
                   fillColor = ~colorQuantile(pal_map, measure_sc, n=5)(measure_sc),
@@ -649,14 +667,28 @@ function(input, output) {
       ) %>% 
       #Adding layer control
       addLayersControl( 
-        overlayGroups = c("Health board", "Council area"),
+        baseGroups = c("Health board", "Council area"),
         options = layersControlOptions(collapsed = FALSE)
       ) %>% 
-      hideGroup(c("Council area")) #%>% 
-      #Adding legend
-      #addLegend("bottomright", pal=colorQuantile(pal_map, CA_pol()$measure_sc, n=5), values = CA_pol()$measure_sc, title = "Percentile")
+      hideGroup(c("Council area")) 
   })
+
   
+  #Downloading data
+  map_csv <- reactive({
+    optdata %>% 
+      subset(areatype %in% c("Health board", "Council area") &
+               trend_axis==input$year_map & 
+               indicator==input$indic_map) %>% 
+      droplevels() #dropping missing factor levels to allow merging
+  })  
+  
+  output$download_map <- downloadHandler(
+    filename =  'map_data.csv',
+    content = function(file) {
+      write.csv(map_table_down(), file, row.names=FALSE)
+    }
+  )
   
   #####################################.      
   #### Table ----
@@ -681,7 +713,7 @@ function(input, output) {
   output$download_table <- downloadHandler(
     filename =  'table_data.csv',
     content = function(file) {
-      write.csv(table_data()[input[["table_opt_rows_all"]], ], file) 
+      write.csv(table_data()[input[["table_opt_rows_all"]], ], file, row.names=FALSE) 
     }
   )
 
