@@ -20,9 +20,14 @@ rsconnect::setAccountInfo(name='scotland',
 ##################
 #Live app ----
 ##################
-#This one will require password/username to acces
 rsconnect::deployApp('//stats/phip/Projects/Profiles/R Shiny/ScotPHO_profiles',
                      appName="ScotPHO_profiles_tool")
+
+##################
+#Test app ----
+##################
+rsconnect::deployApp('//stats/phip/Projects/Profiles/R Shiny/ScotPHO_profiles',
+                     appName="ScotPHO_profiles_tool_test")
 
 
 ###########################################################
