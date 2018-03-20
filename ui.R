@@ -105,6 +105,7 @@ tabPanel("Trend", icon = icon("area-chart"),
                    )
          ),  
          mainPanel(width = 12,
+                   shiny::hr(),
           plotlyOutput("trend_plot")
          )
 ),
@@ -156,10 +157,11 @@ tabPanel("Deprivation", icon = icon("balance-scale"),
          p(tags$b("Explore the data by different levels of deprivation. ")),
          tags$ul( 
            tags$li("ScotPHO are working on new ways to display information related to", 
-                   tags$a(href="http://www.scotpho.org.uk/life-circumstances/deprivation/key-points/", "deprivation", target="_blank"), "."),
+                   tags$a(href="http://www.scotpho.org.uk/life-circumstances/deprivation/key-points/", "deprivation", 
+                          target="_blank", style = "text-decoration: underline;"), "."),
            tags$li("Use menus to select an indicator of interest and the geographies 
                    you wish to display."),
-           tags$li("The ‘Download data’ button will download and save the chart data 
+           tags$li("The ‘Download data’ button will download and save the charts data 
                    as a csv file.")),
          wellPanel(tags$style(".well {background-color:#ffffff; border: 0px solid #336699;}"), #color sidebars/well panels
                    column(6, selectInput("indic_simd", label = "Indicator",
@@ -188,7 +190,7 @@ tabPanel("Map", icon = icon("globe"),
          tags$ul( 
            tags$li("Use menus to select an indicator of interest, a time period, 
                     and the geographies you wish to display."),
-           tags$li("The ‘Download data’ button will download and save the chart data 
+           tags$li("The ‘Download data’ button will download and save the map data 
                    as a csv file.")),
          sidebarPanel(    
            selectInput("indic_map", "Indicator", choices=indicator_map_list),
@@ -212,7 +214,7 @@ tabPanel("Table", icon = icon("table"),
                 p(tags$b("Indicator data in a table formtat. ")),
                 tags$ul( 
                   tags$li("Use the filters to select the data you are interested in."),
-                  tags$li("The ‘Download data’ button will download and save the map data 
+                  tags$li("The ‘Download data’ button will download and save the table data 
                           as a csv file."))
                 ),
          column(3,
@@ -234,25 +236,29 @@ tabPanel("Help", icon = icon("question"),
            but local knowledge is needed to understand and interpret differences."),
          p("If you have any trouble accessing any information on this site or have
            any further questions relating to the data or the tool, then please contact us at: ",
-           tags$b(tags$a(href="mailto:ScotPHO@nhs.net", "ScotPHO@nhs.net")),
+           tags$b(tags$a(href="mailto:ScotPHO@nhs.net", "ScotPHO@nhs.net", style = "text-decoration: underline;")),
            "and we will be happy to help."),
          shiny::hr(), 
          h4("Resources", style="color: black;"), # Resources
          tags$ul( 
-           tags$li(tags$a(href="",
-                          "User guide",  target="_blank"), #Link to user guide
+           #Link to user guide
+           tags$li(tags$a(href="", "User guide",  target="_blank", 
+                          style = "text-decoration: underline;"), 
                    " (coming soon) - Learn how to use and get the most out of the tool."
-           ),
+           ), #Link to technical report
            tags$li(tags$a(href="http://www.scotpho.org.uk/comparative-health/profiles/resources/",
-                          "Technical reports",  target="_blank"), #Link to technical report
+                          "Technical reports",  target="_blank", style = "text-decoration: underline;"), 
                    " - Detailed description of the methodology, statistics and caveats of the data presented."
-           ),
+           ),#Link to timetable of updates
            tags$li(tags$a(href="https://docs.google.com/spreadsheets/d/e/2PACX-1vQUQMORMqe9RrMnS9WJSu51Q6ef0rubiF1M-QN3BYZIBueErtTvvbRe_kTZbWmnupiO_Uie80BoZCnK/pubhtml",
-                          "Timetable of updates",  target="_blank"), #Link to timetable of updates
-                   "- List of available indicators, date of last update and expected next update"
-           ),
-           tags$li(tags$a(href="https://github.com/Health-SocialCare-Scotland/",
-                          "Code",  target="_blank"), #Link to Github repositories
+                          "Timetable of updates",  target="_blank", style = "text-decoration: underline;"), 
+                   "- List of available indicators, date of last update and expected next update."
+           ),#Link to Github repositories
+           tags$li(tags$a(href="https://github.com/Health-SocialCare-Scotland/ScotPHO-profile-indicators",
+                          "Indicator production code",  target="_blank", style = "text-decoration: underline;"), 
+                   " and ",
+                   tags$a(href="https://github.com/Health-SocialCare-Scotland/ScotPHO-profile-tool",
+                          "Profile tool code",  target="_blank", style = "text-decoration: underline;"), 
                    "- Access the code used to produce the indicator data and this tool."
            )
          ),
