@@ -11,12 +11,21 @@ library(shiny)
 library(shinythemes) # layouts for shiny
 library(tidyverse) # data manipulation, ggplot
 library (DT) # for data tables
-library(stringr) # dealing with string variables
-library(mgcv) #modelling
 library(leaflet) #javascript maps
-library(reshape2) #for dygraph data modification
 library(plotly) #interactive graphs
-library(data.table) #for quick reading of csv files - Does not work with the actual version
+
+###############################################.
+## Functions ----
+###############################################.  
+# Selects the variables of interest and renames them so csv downloads are 
+# more user friendly
+format_csv <- function(reactive_dataset) {
+  reactive_dataset %>% 
+    select(c(indicator, areaname, def_period, numerator, measure, 
+             lowci, upci, type_definition)) %>% 
+    rename(lower_confidence_interval=lowci, upper_confidence_interval=upci, 
+           period = def_period, definition = type_definition)
+}
 
 ###############################################.
 ## Data ----
@@ -88,8 +97,11 @@ pal_map <- c('#2c7bb6','#abd9e9', '#ffffbf','#fdae61','#d7191c')
 #Beta version warning/feedback
 beta_box <- div(style =  "background-color: #ffffcc; padding: 5px; border: 1px solid #000000; margin-bottom: 15px;",
     p(tags$b("Beta version:"), "this tool is under development. The current version 
-      is available on the main", tags$a(href="https://scotpho.nhsnss.scot.nhs.uk/scotpho/homeAction.do", "ScotPHO website",  target="_blank"), 
-      ". We would welcome ", tags$a(href="mailto:ScotPHO@nhs.net", tags$b("any feedback")), " you have on this tool."))
+      is available on the main", tags$a(href="https://scotpho.nhsnss.scot.nhs.uk/scotpho/homeAction.do", 
+                                        "ScotPHO website",  target="_blank", style = "text-decoration: underline;"), 
+      ". We would welcome ", tags$a(href="mailto:ScotPHO@nhs.net", tags$b("any feedback"), 
+                                    style = "text-decoration: underline;"), " you have on this tool."))
+
 
 # Identify which geographies have data for each indicator
 # indic <- unique(optdata$indicator[!is.na(optdata$measure)])
