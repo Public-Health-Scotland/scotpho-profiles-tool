@@ -31,6 +31,7 @@
 #----------------.
 #Time trend: 
 #   Adding numerator/rate tick box?
+#   Take out legend, names next to line? package ggrepel
 #----------------.
 #Rank chart
 #   Issue with long label names, take them out? put them in the side? in the bars?
@@ -89,7 +90,7 @@ function(input, output) {
       filter(areaname == input$geoname_heat &
               areatype == input$geotype_heat &
                (domain1 %in% input$topic_heat | domain2 %in% input$topic_heat |  domain3 %in% input$topic_heat)) %>% 
-      select(c(indicator, numerator, measure, lowci, upci, interpret, year,  def_period, type_definition)) %>% 
+      select(c(indicator, areaname, numerator, measure, lowci, upci, interpret, year,  def_period, type_definition)) %>% 
       droplevels()
     
   })
@@ -154,12 +155,7 @@ function(input, output) {
 
 
  # Downloading data
-  heat_csv <- reactive({
-    heat_chosenarea() %>% 
-      select(-c(interpret, year)) %>% 
-      rename(lower_confidence_interval=lowci, upper_confidence_interval=upci, 
-             period = def_period, definition = type_definition)
-  })
+  heat_csv <- reactive({ format_csv(heat_chosenarea()) })
   
     output$download_heat <- downloadHandler(
       filename =  'overview_data.csv',
@@ -283,10 +279,12 @@ function(input, output) {
   }) 
   
   #Downloading data
+  trend_csv <- reactive({ format_csv(trend_data()) })
+  
   output$download_trend <- downloadHandler(
     filename =  'timetrend_data.csv',
     content = function(file) {
-      write.csv(trend_data(), file, row.names=FALSE)
+      write.csv(trend_csv(), file, row.names=FALSE)
     }
   )
   
@@ -422,10 +420,12 @@ function(input, output) {
   }) 
   
   #Downloading data
+  rank_csv <- reactive({ format_csv(rank_bar_data()) })
+
   output$download_rank <- downloadHandler(
-    filename =  'rankplot_data.csv',
+    filename =  'rank_data.csv',
     content = function(file) {
-      write.csv(rank_bar_data(), file, row.names=FALSE) 
+      write.csv(rank_csv(), file, row.names=FALSE) 
     }
   )
   
@@ -450,8 +450,6 @@ function(input, output) {
                 choices = time_period, selected = last(time_period))
   })
   
-
-
   #Reactive datasets
   #reactive dataset for the simd bar plot
   simd_bar_data <- reactive({
@@ -459,7 +457,7 @@ function(input, output) {
       subset(code == as.character(geo_lookup$code[geo_lookup$areaname == input$geoname_simd]) &
                indicator == input$indic_simd &
                trend_axis == input$year_simd) %>%
-      mutate(average = rate[quintile == "Total"]) %>%
+      mutate(average = measure[quintile == "Total"]) %>%
       filter(quintile != "Total") %>%
       droplevels()
   })
@@ -492,12 +490,12 @@ function(input, output) {
 
       #Text for tooltip
           tooltip_simd <- c(paste0("Quintile ", simd_bar_data()$quintile, "<br>",
-                                   "Value: ", simd_bar_data()$rate))
+                                   "Value: ", simd_bar_data()$measure))
 
       plot_ly(data=simd_bar_data(), x=~quintile,
               text=tooltip_simd, hoverinfo="text"
       ) %>%
-        add_bars(y=~rate, color = ~quintile , colors = pal_simd_bar) %>%
+        add_bars(y=~measure, color = ~quintile , colors = pal_simd_bar) %>%
         #Comparator line
         add_trace(y = ~average, name = "Average", type = 'scatter', mode = 'lines',
                   line = list(color = '#FF0000'), hoverinfo="skip") %>% 
@@ -565,9 +563,9 @@ function(input, output) {
 
         #Text for tooltip
               tooltip_simd <- c(paste0(simd_trend_data()$quintile, "<br>",
-                                       simd_trend_data()$trend_axis, ": ", simd_trend_data()$rate))
+                                       simd_trend_data()$trend_axis, ": ", simd_trend_data()$measure))
 
-        plot_ly(data=simd_trend_data(), x=~trend_axis,  y = ~rate,
+        plot_ly(data=simd_trend_data(), x=~trend_axis,  y = ~measure,
                 type = 'scatter', mode = 'lines',
                 text=tooltip_simd, hoverinfo="text",
                 color = ~quintile , colors = pal_simd_trend) %>%
@@ -586,10 +584,23 @@ function(input, output) {
   })
 
   #Downloading data
+  simd_csv <- reactive({
+    simd_trend_data() %>% 
+      select(c(indicator, code, quintile, def_period, numerator, measure, 
+               lowci, upci, type_definition, rii,	lowci_rii,	upci_rii,	
+               slope_coef,	lowci_slope,	upci_slope)) %>% 
+      rename(lower_confidence_interval=lowci, upper_confidence_interval=upci,
+             period = def_period, definition = type_definition, relative_inequality = rii,
+             lower_confidence_interval_relative = lowci_rii, upper_confidence_interval_relative = upci_rii,
+             absolute_inequality = slope_coef, lower_confidence_interval_absolute = lowci_slope,
+             upper_confidence_interval_absolute = upci_slope)
+  })	
+
+  
   output$download_simd <- downloadHandler(
     filename =  'deprivation_data.csv',
     content = function(file) {
-      write.csv(simd_trend_data(), file, row.names=FALSE)
+      write.csv(simd_csv(), file, row.names=FALSE)
     }
   )
 
@@ -680,13 +691,13 @@ function(input, output) {
       subset(areatype %in% c("Health board", "Council area") &
                trend_axis==input$year_map & 
                indicator==input$indic_map) %>% 
-      droplevels() #dropping missing factor levels to allow merging
+      format_csv()
   })  
   
   output$download_map <- downloadHandler(
     filename =  'map_data.csv',
     content = function(file) {
-      write.csv(map_table_down(), file, row.names=FALSE)
+      write.csv(map_csv(), file, row.names=FALSE)
     }
   )
   
