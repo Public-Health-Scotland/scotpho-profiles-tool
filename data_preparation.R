@@ -296,7 +296,8 @@ deprivation_data <- deprivation_data %>%
                                          ifelse(substr(code, 4, 4)=="3", "3",
                                                 ifelse(substr(code, 4, 4)=="4", "4",
                                                        ifelse(substr(code, 4, 4)=="5", "5 - Least deprived", "Error"))))))) %>% 
-  mutate(code = paste(substr(code, 1, 3), "0", substr(code, 5, 9), sep = ""))
+  mutate(code = paste(substr(code, 1, 3), "0", substr(code, 5, 9), sep = "")) %>% 
+  rename(measure=rate)
 table(deprivation_data$quintile)
 
 
@@ -307,10 +308,11 @@ deprivation_data <- deprivation_data %>%
   mutate(indicator = ifelse(ind_id == "10000", "All-cause mortality among the 15-44 year olds",
                             "Deaths all ages")) %>% 
   mutate(type_definition = "Age-sex standardized rate per 100,000") %>% 
-  mutate(numerator = round(numerator, 1), rate = round(rate, 1),
+  mutate(numerator = round(numerator, 1), measure = round(measure, 1),
          lowci = round(lowci, 1), upci = round(upci, 1), rii  = round(rii, 1), 
          slope_coef = round(slope_coef, 1), lowci_slope = round(lowci_slope, 1),
-         upci_slope = round(upci_slope, 1), lowci_rii = round(lowci_rii, 1), upci_rii = round(upci_rii, 1))
+         upci_slope = round(upci_slope, 1), lowci_rii = round(lowci_rii, 1), upci_rii = round(upci_rii, 1)) %>% 
+  select(-c(uni_id, ind_id, ind_id_sii))
 
 saveRDS(deprivation_data, "./data/deprivation_OPT.rds")
 deprivation_data <- readRDS("./data/deprivation_OPT.rds")
