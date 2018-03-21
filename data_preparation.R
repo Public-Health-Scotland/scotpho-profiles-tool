@@ -3,8 +3,7 @@
 #the Shiny app needs.
 
 #TODO:
-
-#see server syntax
+#see global syntax
 
 ############################.
 ##Packages ----
@@ -15,11 +14,10 @@ library(scales)
 library(haven) #for SPPS file reading
 library(rmapshaper) #for reducing size of shapefiles
 library (rgdal) #for reading shapefiles
+
 ###############################################.
 ## Lookups ---- 
 ###############################################.
-
-
 # Lookup with all geography codes information.
 geo_lookup<- read_csv("./data/Geo Data for Shiny.csv")%>%
   setNames(tolower(names(.))) %>% #variables to lower case
@@ -33,7 +31,6 @@ geo_lookup<- read_csv("./data/Geo Data for Shiny.csv")%>%
                                          ifelse(substr(code, 1, 3) == "S99", "HSC Locality", 
                                                 ifelse(substr(code, 1, 3) == "S98", "HSC Partnership",
                                                        ifelse(substr(code, 1, 3) == "S02", "Intermediate zone", "Error"))))))) 
-
 
 #Bringing parent geography information
 geo_parents <- read_spss('./data/IZtoPartnership_parent_lookup.sav') %>% 
@@ -70,12 +67,11 @@ geo_parents <- merge(x=geo_parents, y=geo_partnership, by="parent_code", all.x =
 geo_lookup <- merge(x=geo_lookup, y=geo_parents, by="code", all.x = TRUE) 
 
 ##No IZ seem to be assigned to more than one partnership in this file.
-  
-geo_lookup <- geo_lookup %>% 
-  mutate(parent_area2 = geo_lookup$areaname[geo_lookup$parent_area == geo_lookup$code])
+
 #Replacing parent_area NA for CA, HB, Scotland and partnership with area type,
-# as parent_area is only going to be used for locality and IZ.
-geo_lookup$parent_area[is.na(geo_lookup$parent_area)] <- as.character(geo_lookup$areatype[is.na(geo_lookup$parent_area)]) 
+# as parent_area is only going to be used for locality and IZ. Not really needed at the moment.
+# geo_lookup$parent_area <- ifelse(is.na(geo_lookup$parent_area), geo_lookup$areatype,
+#                                  paste(geo_lookup$areatype))
 
 ###There are a number of IZ's with the same name, recoding.
 geo_lookup <- geo_lookup %>% 
@@ -142,8 +138,20 @@ geo_lookup <- geo_lookup %>%
                            paste(areaname) #no argument
                     )))))))))))))))))))))))))))))))))))))
 
-geo_lookup <- geo_lookup %>%  mutate_if(is.character, factor) %>% #transforming into factors
+geo_lookup <- geo_lookup %>% 
+  #Creating variable that includeas area name and type for trend plotting
+  mutate(areaname_full = paste(areaname, " - ", areatype)) %>% 
+  mutate_if(is.character, factor) %>% #transforming into factors
   select(-c(parent_code)) 
+
+#Reducing length of the area type descriptor
+geo_lookup$areaname_full <- ifelse(geo_lookup$areaname == "Scotland", "Scotland",
+                                   paste(geo_lookup$areaname_full))
+geo_lookup$areaname_full <- gsub("Health board", "HB", geo_lookup$areaname_full)
+geo_lookup$areaname_full <- gsub("Council area", "CA", geo_lookup$areaname_full)
+geo_lookup$areaname_full <- gsub("HSC Partnership", "HSCP", geo_lookup$areaname_full)
+geo_lookup$areaname_full <- gsub("HSC Locality", "HSCL", geo_lookup$areaname_full)
+geo_lookup$areaname_full <- gsub("Intermediate zone", "IZ", geo_lookup$areaname_full)
 
 geo_lookup <- as.data.frame(geo_lookup)
 saveRDS(geo_lookup, "./data/geo_lookup.rds")
@@ -221,38 +229,38 @@ optdata <- readRDS("./data/optdata.rds")
 ###############################################.   
 #Reading file with council shapefiles
 #making it small 29mb to 2.5. Sometimes it fails, due to lack of memory (use memory.limits and close things).
-CA_bound_orig<-readOGR("./shapefiles","CA_2011_EoR_Scotland") %>% 
+ca_bound_orig<-readOGR("./shapefiles","CA_2011_EoR_Scotland") %>% 
   rmapshaper::ms_simplify(keep=0.0025)
 
-object.size(CA_bound_orig)
+object.size(ca_bound_orig)
 
 #Transforming coordinate system to the one leaflet needs
-CA_bound_orig <- spTransform(CA_bound_orig,  CRS("+ellps=WGS84 +proj=longlat +datum=WGS84 +no_defs"))
+ca_bound_orig <- spTransform(ca_bound_orig,  CRS("+ellps=WGS84 +proj=longlat +datum=WGS84 +no_defs"))
 
 #Saving the simplified shapefile to avoid the calculations.
-writeOGR(CA_bound_orig, dsn="./shapefiles", "CA_simpl", driver="ESRI Shapefile", overwrite_layer=TRUE)
+writeOGR(ca_bound_orig, dsn="./shapefiles", "CA_simpl", driver="ESRI Shapefile", overwrite_layer=TRUE)
 
 #Saving as rds as it is much faster to read
-CA_bound<-readOGR("./shapefiles","CA_simpl")
-saveRDS(CA_bound, "./shapefiles/CA_boundary.rds")
+ca_bound<-readOGR("./shapefiles","CA_simpl")
+saveRDS(ca_bound, "./shapefiles/CA_boundary.rds")
 
 ##########################.
 ###Health board
 #making it small 29mb to 2.5. Sometimes it fails, due to lack of memory (use memory.limits and close things).
-HB_bound_orig<-readOGR("./shapefiles","SG_NHS_HealthBoards_2014") %>% 
+hb_bound_orig<-readOGR("./shapefiles","SG_NHS_HealthBoards_2014") %>% 
   rmapshaper::ms_simplify(keep=0.0025)
 
-object.size(HB_bound_orig)
+object.size(hb_bound_orig)
 
 #Transforming coordinate system to the one leaflet needs
-HB_bound_orig <- spTransform(HB_bound_orig,  CRS("+ellps=WGS84 +proj=longlat +datum=WGS84 +no_defs"))
+hb_bound_orig <- spTransform(hb_bound_orig,  CRS("+ellps=WGS84 +proj=longlat +datum=WGS84 +no_defs"))
 
 #Saving the simplified shapefile to avoid the calculations.
-writeOGR(HB_bound_orig, dsn="./shapefiles", "HB_simpl", driver="ESRI Shapefile", overwrite_layer=TRUE)
+writeOGR(hb_bound_orig, dsn="./shapefiles", "HB_simpl", driver="ESRI Shapefile", overwrite_layer=TRUE)
 
 #Saving as rds as it is much faster to read
-HB_bound<-readOGR("./shapefiles","HB_simpl") 
-saveRDS(HB_bound, "./shapefiles/HB_boundary.rds")
+hb_bound<-readOGR("./shapefiles","HB_simpl") 
+saveRDS(hb_bound, "./shapefiles/HB_boundary.rds")
 
 ###############################################.
 ## Deprivation data ----
