@@ -1,8 +1,58 @@
 #Code to create ScotPHO's Shiny profile platform
-#In this script include packages, datasets and anyting that will be used both by UI and server
+#In this script include packages, functions, datasets and anyting that will be used both by UI and server
 
-#TODO:
-#see server syntax
+# TODO:
+#Data preparation: 
+#   Lookups need to be checked/refined: names areas (consistency & and), indicator measures, domains etc.
+#   Indicator and geographical info out of main file and use merge/lookups?
+#   Include deprivation indicators in lookup
+#   Format better the map shapefiles (lower case variable names)
+#   Deprivation needs PAR 
+#   Add denominator?
+#----------------.
+#General:
+#   Fix bookmarking - check if server solution in .io ?enableBookmarking
+#   Include reporting functionality -Rmarkdown?
+#   Create user guide
+#   Check/work on responsiveness (especially header)
+#   Incorporate Google analytics - https://shiny.rstudio.com/articles/google-analytics.html
+#   Host in the website and link from here: shapefiles, lookups, etc
+#----------------.
+#Barcode chart:
+#   Make reactive and incorporate
+#----------------.
+#Overview:  
+#   Long labels of indicators are an issue  https://github.com/plotly/plotly.js/issues/296#issuecomment-371780321
+#   Add functionaly to instead of comparing against an area, comparing against a baseline/past year
+#----------------.
+#Time trend: 
+#   Adding numerator/rate tick box?
+#   Take out legend, names next to line? package ggrepel https://plot.ly/r/line-charts/
+#   Add functionality to be able to add IZ/localities fromm different partnerships
+#----------------.
+#Rank chart
+#   Issue with long label names, take them out? put them in the side? in the bars?
+#   Vertical bars instead?
+#   Indicator list reactive to geography?
+#----------------.
+#Table:
+#   Add deprivation data to table (maybe with switch or just merging everything)
+#   Change placeholder text in filters (require javascript)
+#----------------.
+#Map:
+#   Avoid redrawing of map using leafletProxy
+#   Review what to include in tooltip
+#   Add intermediate zones to map, or is it going to be too big?
+#   How to save map as png? Move away from Leaflet? Will likely be faster (sp ggmap)
+#   For IZ's and localities maybe something like this: https://isresearchnc.shinyapps.io/CMaps/
+#----------------.
+#Deprivation
+#   Do we want CI's? Error bars? polygon areas for time trends?
+#   Include PAR information and charts (trend and bar)
+#   Add slope of SII to bar chart
+#   Maybe improve a bit the tooltip for RII and SII?
+#   instead of time period dropdown do slider
+#----------------.
 
 ############################.
 ##Packages ----
@@ -21,7 +71,7 @@ library(plotly) #interactive graphs
 # more user friendly
 format_csv <- function(reactive_dataset) {
   reactive_dataset %>% 
-    select(c(indicator, areaname, def_period, numerator, measure, 
+    select(c(indicator, areaname, areatype, def_period, numerator, measure, 
              lowci, upci, type_definition)) %>% 
     rename(lower_confidence_interval=lowci, upper_confidence_interval=upci, 
            period = def_period, definition = type_definition)
@@ -98,10 +148,9 @@ pal_map <- c('#2c7bb6','#abd9e9', '#ffffbf','#fdae61','#d7191c')
 beta_box <- div(style =  "background-color: #ffffcc; padding: 5px; border: 1px solid #000000; margin-bottom: 15px;",
     p(tags$b("Beta version:"), "this tool is under development. The current version 
       is available on the main", tags$a(href="https://scotpho.nhsnss.scot.nhs.uk/scotpho/homeAction.do", 
-                                        "ScotPHO website",  target="_blank", style = "text-decoration: underline;"), 
+                                        "ScotPHO website",  class="externallink"), 
       ". We would welcome ", tags$a(href="mailto:ScotPHO@nhs.net", tags$b("any feedback"), 
-                                    style = "text-decoration: underline;"), " you have on this tool."))
-
+                                    class="externallink"), " you have on this tool."))
 
 # Identify which geographies have data for each indicator
 # indic <- unique(optdata$indicator[!is.na(optdata$measure)])
