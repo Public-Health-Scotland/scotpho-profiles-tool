@@ -145,7 +145,7 @@ pal_map <- c('#2c7bb6','#abd9e9', '#ffffbf','#fdae61','#d7191c')
 ##########.
 #######
 #Beta version warning/feedback
-beta_box <- div(style =  "background-color: #ffffcc; padding: 5px; border: 1px solid #000000; margin-bottom: 15px;",
+beta_box <- div(style =  "background-color: #ffffcc; padding: 5px; border: 1px solid #000000; margin: 5px;",
     p(tags$b("Beta version:"), "this tool is under development. The current version 
       is available on the main", tags$a(href="https://scotpho.nhsnss.scot.nhs.uk/scotpho/homeAction.do", 
                                         "ScotPHO website",  class="externallink"), 
