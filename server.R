@@ -34,7 +34,7 @@ function(input, output) {
       subset(areaname == input$geoname_heat &
               areatype == input$geotype_heat &
                (domain1 %in% input$topic_heat | domain2 %in% input$topic_heat |  domain3 %in% input$topic_heat)) %>% 
-      select(c(indicator, areaname, numerator, measure, lowci, upci, interpret, 
+      select(c(indicator, areaname, areatype, numerator, measure, lowci, upci, interpret, 
                year, def_period, type_definition)) %>% 
       droplevels()
     
@@ -57,7 +57,7 @@ function(input, output) {
   # Calculates number of different indicators and then multiplies by pixels per row
   # it needs the sum at the end as otherwise small domains plots will be too small
   get_height_heat <- function() {
-    (nrow(heat_chosenarea() )*3)+150 
+    (nrow(heat_chosenarea() )*3)+130 
   }
   
   ###############.
@@ -645,21 +645,20 @@ function(input, output) {
   
   # Table data
   table_data <- reactive({
-    optdata %>%  subset(select=c("code", "areaname", "areatype", "indicator", "year", 
-               "numerator", "measure", "lowci","upci", "def_period"))
+    optdata %>%  subset(select=c("areaname", "areatype", "indicator", 
+                                 "def_period","numerator", "measure", "type_definition"))
   })
   
   #Actual table.
   output$table_opt <- DT::renderDataTable({
     
     DT::datatable(table_data(), style = 'bootstrap', filter = 'top', rownames = FALSE,
-                  colnames = c("Code", "Area", "Type", "Indicator", "Year", "Numerator", 
-                               "Measure", "Lower confidence interval", "Upper confidence interval", 
-                               "Definition" ))
+                  colnames = c("Area", "Type", "Indicator", "Period", "Numerator", 
+                               "Measure",  "Definition" ))
   })
   
   #Downloading data 
-  table_csv <- reactive({ format_csv(table_data()) })
+  table_csv <- reactive({ format_csv(optdata) })
   
   #The filters the user applies in the data table will determine what data they download
   output$download_table <- downloadHandler(
