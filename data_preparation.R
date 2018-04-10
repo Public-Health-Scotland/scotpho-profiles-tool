@@ -14,29 +14,27 @@ library(scales)
 library(haven) #for SPPS file reading
 library(rmapshaper) #for reducing size of shapefiles
 library (rgdal) #for reading shapefiles
+library(data.table) #new process
 
 ###############################################.
 ## Lookups ---- 
 ###############################################.
 # Lookup with all geography codes information.
-geo_lookup<- read_csv("./data/Geo Data for Shiny.csv")%>%
+geo_lookup<- read_spss("/conf/phip/Projects/Profiles/Data/Lookups/code_dictionary.sav") %>%
   setNames(tolower(names(.))) %>% #variables to lower case
-  rename(code = geography_code)%>%
-  rename(areaname = geography_name)%>%
   mutate_all(factor) %>% # converting variables into factors
   #Creating geography type variable
   mutate(areatype = ifelse(substr(code, 1, 3) == "S00", "Scotland", 
                            ifelse(substr(code, 1, 3) == "S08", "Health board", 
                                   ifelse(substr(code, 1, 3) == "S12", "Council area", 
                                          ifelse(substr(code, 1, 3) == "S99", "HSC Locality", 
-                                                ifelse(substr(code, 1, 3) == "S98", "HSC Partnership",
+                                                ifelse(substr(code, 1, 3) == "S37", "HSC Partnership",
                                                        ifelse(substr(code, 1, 3) == "S02", "Intermediate zone", "Error"))))))) 
 
 #Bringing parent geography information
-geo_parents <- read_spss('./data/IZtoPartnership_parent_lookup.sav') %>% 
+geo_parents <- read_spss('/conf/phip/Projects/Profiles/Data/Lookups/IZtoPartnership_parent_lookup.sav') %>% 
   setNames(tolower(names(.))) %>% #variables to lower case
-  select(c(intzone2011, hscp_locality, hscp_partnership)) %>% 
-  distinct() # eliminating duplicates
+  mutate_all(factor)
 
 #Creating parent geography for IZ level.
 geo_par_iz <- geo_parents %>% 
@@ -325,7 +323,69 @@ deprivation_data <- deprivation_data %>%
 saveRDS(deprivation_data, "./data/deprivation_OPT.rds")
 deprivation_data <- readRDS("./data/deprivation_OPT.rds")
 
+###############################################.
+## New process data ----
+###############################################.
+#Finds all the csvs in that folder reads them and combine them.
+path <- '/conf/phip/Projects/Profiles/Data/Indicators/Shiny Data/'
+files <-  list.files(path = path, pattern = "*.csv", full.names = TRUE)
+optdata <- as.data.frame(do.call(rbind, lapply(files, fread)))
+optdata2 <- as.data.frame(do.call(rbind, lapply(files, read_csv)))
+
+system.time(as.data.frame(do.call(rbind, lapply(files, fread))))
+system.time(as.data.frame(do.call(rbind, lapply(files, read_csv))))
+
+optdata<- optdata %>%
+  setNames(tolower(names(.)))%>% #names to lower case
+  rename(ind_id = indicator_id, code = geography_code) %>% 
+  mutate_if(is.character,factor) #converting characters into factors
+
+#Merging with indicator and geography information
+optdata <- merge(x=optdata, y=ind_lookup, by="ind_id", all.x = TRUE) 
+optdata <- merge(x=optdata, y=geo_lookup, by="code", all.x = TRUE) 
+
+#Apply supressions. NEEDS TO CHECK THAT IT WORKS FINE ONCE WE HAVE A REAL CASE
+# If indicator is presented as standardised rate and suppression required then suppress numerator where count is less than specified value.
+# standardised rates do not require suppression of rates or CI.
+optdata$numerator[optdata$supression=="Y" & substr(optdata$type_id,1,2)=='sr' 
+                  & optdata$numerator<optdata$supress_less_than] <- NA
+# If indicator is presented as crude rate or percentage and suppression required then suppress numerator where count is less than specified value.
+# crude rate and percentages DO require suppression of rates and CI as well as numerator.
+optdata$numerator[optdata$supression=="Y" & (substr(optdata$type_id,1,2)=='cr' | (substr(optdata$type_id,1,1))=='%') 
+                  & optdata$numerator<optdata$supress_less_than] <- NA
+optdata$measure[optdata$supression=="Y" & (substr(optdata$type_id,1,2)=='cr' | (substr(optdata$type_id,1,1))=='%') 
+                & optdata$numerator<optdata$supress_less_than] <- NA
+optdata$lowci[optdata$supression=="Y" & (substr(optdata$type_id,1,2)=='cr' | (substr(optdata$type_id,1,1))=='%') 
+              & optdata$numerator<optdata$supress_less_than] <- NA
+optdata$upci[optdata$supression=="Y" & (substr(optdata$type_id,1,2)=='cr' | (substr(optdata$type_id,1,1))=='%') 
+             & optdata$numerator<optdata$supress_less_than] <- NA
+
+# Scaling measures (0 to 1) in groups by year, area type and indicator. 
+#Does not work well for Scotland totals. TRUE?
+optdata <- optdata %>% group_by(ind_id, year, areatype) %>% 
+  mutate(measure_sc = ifelse(interpret=="H", as.vector(rescale(measure, to=c(1,0))), 
+                             ifelse(interpret=="L", as.vector(rescale(measure, to=c(0,1))),
+                                    0)))  %>%
+  ungroup()
 
 
+#Creating variables for topic/profile filters. 
+#This probably should be added to the indicator lookup - most indicators assigned to death topic for now.
+optdata <- optdata %>% 
+  select(-c(supression, supress_less_than, type_id)) %>%  #taking out some variables
+  #rounding variables
+  mutate(numerator = round(numerator, 1), measure = round(measure, 1),
+         lowci = round(lowci, 1), upci = round(upci, 1)) %>% 
+  droplevels() #to get rid of factor levels not present in data set.
+
+#Making the numerator the measure for pop all ages, so it plots correctly
+optdata$measure <- ifelse(optdata$indicator == 'Mid-year population estimate - all ages',
+                          optdata$numerator, optdata$measure)
+
+optdata <- as.data.frame(optdata)
+optdata$ind_id <- as.factor(optdata$ind_id )
+
+saveRDS(optdata, "./data/optdata.rds")
+optdata <- readRDS("./data/optdata.rds") 
 
 ##END
