@@ -6,6 +6,12 @@
 #see global syntax
 
 ############################.
+##Filepath ----
+############################.
+lookups <- "/conf/phip/Projects/Profiles/Data/Lookups/"
+basefiles <- "/conf/phip/Projects/Profiles/Data/Scotland Localities/"
+
+############################.
 ##Packages ----
 ############################.
 library(readr)
@@ -20,7 +26,7 @@ library(data.table) #new process
 ## Lookups ---- 
 ###############################################.
 # Lookup with all geography codes information.
-geo_lookup<- read_spss("/conf/phip/Projects/Profiles/Data/Lookups/code_dictionary.sav") %>%
+geo_lookup<- read_spss(paste(lookups, "code_dictionary.sav", sep="")) %>%
   setNames(tolower(names(.))) %>% #variables to lower case
   mutate_all(factor) %>% # converting variables into factors
   #Creating geography type variable
@@ -32,9 +38,8 @@ geo_lookup<- read_spss("/conf/phip/Projects/Profiles/Data/Lookups/code_dictionar
                                                        ifelse(substr(code, 1, 3) == "S02", "Intermediate zone", "Error"))))))) 
 
 #Bringing parent geography information
-geo_parents <- read_spss('/conf/phip/Projects/Profiles/Data/Lookups/IZtoPartnership_parent_lookup.sav') %>% 
-  setNames(tolower(names(.))) %>% #variables to lower case
-  mutate_all(factor)
+geo_parents <- read_spss(paste(lookups, "IZtoPartnership_parent_lookup.sav", sep="")) %>% 
+  setNames(tolower(names(.)))  #variables to lower case
 
 #Creating parent geography for IZ level.
 geo_par_iz <- geo_parents %>% 
@@ -158,7 +163,7 @@ geo_lookup <- readRDS("./data/geo_lookup.rds")
 ######
 #Indicator information lookup table 
 
-ind_lookup<- read_csv("./data/indicator_lookup_modified.csv") %>% 
+ind_lookup<- read_csv(paste(lookups, "indicator_lookup.csv", sep = "")) %>% 
   setNames(tolower(names(.))) %>% #variables to lower case
   select(c(ind_id, indicator, interpret, supression, supress_less_than, 
            type_id, type_definition, domain1, domain2, domain3)) %>% #at the moment don't need most things
@@ -167,7 +172,8 @@ ind_lookup<- read_csv("./data/indicator_lookup_modified.csv") %>%
 ###############################################.
 ## Locality data ----
 ###############################################.   
-optdata <- read_csv("./data/All Data for Shiny.csv")
+optdata <- read_csv(paste(basefiles, "All Data for Shiny.csv", sep = ""),
+                    col_types = cols(NUMERATOR = col_number()))
 
 optdata<- optdata %>%
   setNames(tolower(names(.)))%>% #names to lower case
@@ -326,14 +332,16 @@ deprivation_data <- readRDS("./data/deprivation_OPT.rds")
 ###############################################.
 ## New process data ----
 ###############################################.
+#NOT READY
 #Finds all the csvs in that folder reads them and combine them.
 path <- '/conf/phip/Projects/Profiles/Data/Indicators/Shiny Data/'
 files <-  list.files(path = path, pattern = "*.csv", full.names = TRUE)
 optdata <- as.data.frame(do.call(rbind, lapply(files, fread)))
-optdata2 <- as.data.frame(do.call(rbind, lapply(files, read_csv)))
+# optdata2 <- as.data.frame(do.call(rbind, lapply(files, read_csv)))
 
-system.time(as.data.frame(do.call(rbind, lapply(files, fread))))
-system.time(as.data.frame(do.call(rbind, lapply(files, read_csv))))
+# ldf <- lapply(files, read_csv)
+# system.time(as.data.frame(do.call(rbind, lapply(files, fread))))
+# system.time(as.data.frame(do.call(rbind, lapply(files, read_csv))))
 
 optdata<- optdata %>%
   setNames(tolower(names(.)))%>% #names to lower case
