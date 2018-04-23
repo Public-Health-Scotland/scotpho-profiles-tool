@@ -7,26 +7,19 @@
 ###############################################.
 ## Header ---- 
 ###############################################.
-# fluidPage(
-# #Header style and content, using html tags
-#   div(style="height: 80px;  ", 
-#     tags$a( #image that links to ScotPHO main page
-#       img(src='scotpho_logo.png', height=70, style="float: left; padding-right: 40px;"),
-#       href= "http://www.scotpho.org" 
-#     ),
-#     h3("ScotPHO Profiles", 
-#        style="vertical-align: bottom; padding-top:25px; "), 
-#     #asking for feedback TAKE OUT after beta period
-#     h6(tags$a(href="mailto:ScotPHO@nhs.net", "Tell us what you think of our new tool!"))
-#   ),
-  navbarPage(title = div(img(src="scotpho_reduced.png", height=40), 
+  navbarPage(
+    title = div(img(src="scotpho_reduced.png", height=40),
                          style = "position: relative; top: -5px;"), # Navigation bar
+             windowTitle = "ScotPHO profiles", #title for browser tab
              theme = shinytheme("cerulean"), #Theme of the app (blue navbar)
              collapsible = TRUE, #tab panels collapse into menu in small screens
              # shinythemes::themeSelector(),
              header =         
              tags$head( #CSS styles
                beta_box,  ##### Feedback box. TO TAKE OUT AFTER BETA PERIOD
+               tags$link(rel="shortcut icon", href="favicon_scotpho.ico"), #Icon for browser tab
+               #Including google analytics
+               includeScript("google-analytics.js"),
                #Style sidebars/well panels
                tags$style(".well {background-color:#ffffff; border: 0px solid #336699;}",
                #Style dropdown menus and labels
@@ -272,6 +265,4 @@ tabPanel("Help", icon = icon("question"),
              )
          ) #Tab panel bracket
   )#, #Bracket  navbarPage
-#) # Bracket fluidPage
-
 ##END
