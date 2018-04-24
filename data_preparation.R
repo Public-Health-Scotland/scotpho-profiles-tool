@@ -6,10 +6,11 @@
 #see global syntax
 
 ############################.
-##Filepath ----
+##Filepaths ----
 ############################.
 lookups <- "/conf/phip/Projects/Profiles/Data/Lookups/"
 basefiles <- "/conf/phip/Projects/Profiles/Data/Scotland Localities/"
+shapefiles <- "/conf/phip/Projects/Profiles/Data/Shapefiles/"
 
 ############################.
 ##Packages ----
@@ -229,11 +230,11 @@ saveRDS(optdata, "./data/optdata.rds")
 optdata <- readRDS("./data/optdata.rds") 
 
 ###############################################.
-## Map shapefiles ----
+## Shapefiles ----
 ###############################################.   
 #Reading file with council shapefiles
 #making it small 29mb to 2.5. Sometimes it fails, due to lack of memory (use memory.limits and close things).
-ca_bound_orig<-readOGR("./shapefiles","CA_2011_EoR_Scotland") %>% 
+ca_bound_orig<-readOGR(shapefiles, "CA_2011_EoR_Scotland") %>% 
   rmapshaper::ms_simplify(keep=0.0025)
 
 object.size(ca_bound_orig)
@@ -242,16 +243,16 @@ object.size(ca_bound_orig)
 ca_bound_orig <- spTransform(ca_bound_orig,  CRS("+ellps=WGS84 +proj=longlat +datum=WGS84 +no_defs"))
 
 #Saving the simplified shapefile to avoid the calculations.
-writeOGR(ca_bound_orig, dsn="./shapefiles", "CA_simpl", driver="ESRI Shapefile", overwrite_layer=TRUE)
+writeOGR(ca_bound_orig, dsn=shapefiles, "CA_simpl", driver="ESRI Shapefile", overwrite_layer=TRUE)
 
 #Saving as rds as it is much faster to read
-ca_bound<-readOGR("./shapefiles","CA_simpl")
+ca_bound<-readOGR(shapefiles, "CA_simpl")
 saveRDS(ca_bound, "./shapefiles/CA_boundary.rds")
 
 ##########################.
 ###Health board
 #making it small 29mb to 2.5. Sometimes it fails, due to lack of memory (use memory.limits and close things).
-hb_bound_orig<-readOGR("./shapefiles","SG_NHS_HealthBoards_2014") %>% 
+hb_bound_orig<-readOGR(shapefiles,"SG_NHS_HealthBoards_2014") %>% 
   rmapshaper::ms_simplify(keep=0.0025)
 
 object.size(hb_bound_orig)
@@ -260,10 +261,10 @@ object.size(hb_bound_orig)
 hb_bound_orig <- spTransform(hb_bound_orig,  CRS("+ellps=WGS84 +proj=longlat +datum=WGS84 +no_defs"))
 
 #Saving the simplified shapefile to avoid the calculations.
-writeOGR(hb_bound_orig, dsn="./shapefiles", "HB_simpl", driver="ESRI Shapefile", overwrite_layer=TRUE)
+writeOGR(hb_bound_orig, dsn=shapefiles, "HB_simpl", driver="ESRI Shapefile", overwrite_layer=TRUE)
 
 #Saving as rds as it is much faster to read
-hb_bound<-readOGR("./shapefiles","HB_simpl") 
+hb_bound<-readOGR(shapefiles,"HB_simpl") 
 saveRDS(hb_bound, "./shapefiles/HB_boundary.rds")
 
 ###############################################.
