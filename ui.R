@@ -18,21 +18,35 @@
              tags$head( #CSS styles
                beta_box,  ##### Feedback box. TO TAKE OUT AFTER BETA PERIOD
                tags$link(rel="shortcut icon", href="favicon_scotpho.ico"), #Icon for browser tab
-               #Including google analytics
+               #Including Google analytics
                includeScript("google-analytics.js"),
                #Style sidebars/well panels
-               tags$style(".well {background-color:#ffffff; border: 0px solid #336699;}",
-               #Style dropdown menus and labels
+               tags$style(".well {background-color:#ffffff; border: 0px solid #336699;
+                          padding: 5px}",
+               #Text size and line height
+               "body { font-size: 11px; line-height: 1.1}",
+               ".navbar { font-size: 12px}",
+               ".checkbox label, .radio label { line-height: 1.6 }",
+               #Padding and margins of filters and labels
                ".form-group {margin: 0px}",
-               #Text for the whole app and for navbar
-               "body { font-size: 12px}",
-               ".navbar { font-size: 14px}",
+               ".selectize-control { margin-bottom: 3px}",
+               ".selectize-input {padding: 3px 3px; min-height: 10px}",
+               ".control-label { margin-bottom: 1px}",
+               #Padding of columns
+               ".col-xs-1, .col-sm-1, .col-md-1, .col-lg-1, .col-xs-2, .col-sm-2, .col-md-2, 
+               .col-lg-2, .col-xs-3, .col-sm-3, .col-md-3, .col-lg-3, .col-xs-4, .col-sm-4, 
+               .col-md-4, .col-lg-4, .col-xs-5, .col-sm-5, .col-md-5, .col-lg-5, .col-xs-6, 
+               .col-sm-6, .col-md-6, .col-lg-6, .col-xs-7, .col-sm-7, .col-md-7, .col-lg-7, 
+               .col-xs-8, .col-sm-8, .col-md-8, .col-lg-8, .col-xs-9, .col-sm-9, .col-md-9, 
+               .col-lg-9, .col-xs-10, .col-sm-10, .col-md-10, .col-lg-10, .col-xs-11, .col-sm-11, 
+               .col-md-11, .col-lg-11, .col-xs-12, .col-sm-12, .col-md-12, .col-lg-12 {
+                 padding-left: 5px; padding-right: 5px;}",
                #Style for download buttons
                ".down{background-color:#4da6ff; color: white; background-image:none;
                font-size: 12px; padding: 5px 10px}",
                #to avoid red text error messages in the whole app, take out for testing
-               ".shiny-output-error { visibility: hidden; }",
-                          ".shiny-output-error:before { visibility: hidden; }",
+               # ".shiny-output-error { visibility: hidden; }",
+               #            ".shiny-output-error:before { visibility: hidden; }",
                #External links underlined an open a new tab
                ".externallink{text-decoration: underline;} "),
                HTML("<base target='_blank'>")
@@ -41,6 +55,9 @@
 ## Overview ----
 ###############################################.
 tabPanel("Overview", icon = icon("heartbeat"),
+         HTML("<button data-toggle='collapse' href='#overview' class='btn btn-primary'>
+                  <i class='fa fa-question-circle'></i><strong>  Help</strong></button>"),
+         HTML("<div id='overview' class='collapse'> "),
          p(tags$b("Explore how an area compares to Scotland (or a comparator of your choice) 
            over time.")), #Intro text
          tags$ul( 
@@ -48,8 +65,9 @@ tabPanel("Overview", icon = icon("heartbeat"),
            tags$li("Older indicator values appears on the left side of the grid, 
                    the most recent data on the right."),
            tags$li("Hover over each tile to see indicator definitions and time periods.")),
-           wellPanel( #Filter options
-             column(4,
+         HTML("</div>"), 
+         wellPanel( #Filter options
+             column(3,
                     selectInput("geotype_heat", "Geography level", choices= areatype_noscot_list),
                     conditionalPanel(#Conditional panel for extra dropdown for localities & IZ
                       condition = "input.geotype_heat== 'HSC Locality' | input.geotype_heat == 'Intermediate zone' ",
@@ -58,24 +76,31 @@ tabPanel("Overview", icon = icon("heartbeat"),
                     ),
                     uiOutput("geoname_ui_heat")
              ),
-             column(4,
+             column(3,
                     selectInput("topic_heat", "Topic", choices = topic_list,
                                 selectize=TRUE, selected = "Scotland"),
                     selectInput("geocomp_heat", "Comparator", choices = comparator_list,
                                 selectize=TRUE, selected = "Scotland")
              ),
+             column(2,
+                    h6(HTML("<a title='Explore how an area compares to Scotland (or a comparator of your choice) over time.
+                        &bull; Use the ‘Topic’ menu to adjust the suite of indicators on display. 
+                        &bull; Older indicator values appears on the left side of the grid, the most recent data on the right. 
+                        &bull; Hover over each tile to see indicator definitions and time periods. ' 
+                        href='#' data-html='true', data-toggle='tooltip' ><i class='fa fa-question-circle' height=20px ></i><b>  Help</b></a>")),
+                    downloadButton('download_heat', 'Download data', class = "down")
+             ),
              column(4,
                     #Legend
-                    h6(tags$b("Legend"), style="color: black;"),
-                    p(img(src='non_signif.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
+                    p(tags$b("Legend"), style="color: black;"),
+                    p(img(src='signif_better.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
+                          "Statistically significantly better than comparator average.", br(),
+                      img(src='non_signif.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
                       "Statistically not significantly different from comparator average.", br(),
                       img(src='signif_worse.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
                       "Statistically significantly worse than comparator average.", br(),
-                      img(src='signif_better.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
-                      "Statistically significantly better than comparator average.", br(),
                       img(src='signif_nocalc.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
-                      "No significance can be calculated."),
-                    downloadButton('download_heat', 'Download data', class = "down")
+                      "No significance can be calculated.")
              )
            ),
            mainPanel(width=12, #Main panel
@@ -86,34 +111,28 @@ tabPanel("Overview", icon = icon("heartbeat"),
 ## Time trend ----
 ###############################################.
 tabPanel("Trend", icon = icon("area-chart"),
-         wellPanel( #Filter options
-                   column(4,
+                   sidebarPanel(width=3,
                           selectInput("indic_trend", "Indicator", choices=indicator_list),
+                          shiny::hr(),
+                          p(tags$b("Select the geographies you want to plot")),
                           selectInput("hbname_trend", "Health board", choices = hb_name,
                                       multiple=TRUE, selectize=TRUE, selected = ""),
-                          downloadButton('download_trend', 'Download data', class = "down"),
-                          checkboxInput("colorblind_trend",  
-                                        label = "Improved accessibility", value = FALSE)
-                   ),
-                   column(4,    
                           selectInput("scotname_trend", "Scotland", choices = c("", "Scotland"), 
                                       selectize=TRUE, selected = "Scotland"),
                           selectInput("laname_trend", "Council area", choices = la_name,
                                       multiple=TRUE, selectize=TRUE, selected = ""),
                           selectInput("partname_trend", "HSC Partnership", choices = partnership_name,
-                                      multiple=TRUE, selectize=TRUE, selected = "")
-
-                   ),
-                   column(4, style ="border: 1px dashed #404040",
+                                      multiple=TRUE, selectize=TRUE, selected = ""),
                           selectInput("loc_iz_trend", "Select a partnership to limit
                                       the options of localities/intermediate zones", 
                                       choices = partnership_name),
                           uiOutput("loc_ui_trend"),
-                          uiOutput("iz_ui_trend")
-                   )
-         ),  
-         mainPanel(width = 12, #Main panel
-                   shiny::hr(),
+                          uiOutput("iz_ui_trend"),
+                          downloadButton('download_trend', 'Download data', class = "down"),
+                          checkboxInput("colorblind_trend",  
+                                 label = "Improved accessibility", value = FALSE)
+                   ),
+         mainPanel(width = 9, #Main panel
           plotlyOutput("trend_plot")
          )
 ), #Tab panel bracket
@@ -121,38 +140,62 @@ tabPanel("Trend", icon = icon("area-chart"),
 ## Rank chart ---- 
 ###############################################.
 tabPanel("Rank", icon = icon("signal"),
-         wellPanel( #Filter options
-           column(4,
+         # wellPanel( #Filter options
+         #   column(4,
+         #          selectInput("indic_rank", "Indicator", choices=indicator_list),
+         #          selectInput("geotype_rank", label = "Geography level",
+         #                      choices = areatype_noscot_list, selected = "Health board"),
+         #          conditionalPanel( #Conditional panel for extra dropdown for localities & IZ
+         #            condition = "input.geotype_rank == 'HSC Locality' | input.geotype_rank == 'Intermediate zone' ",
+         #            selectInput("loc_iz_rank", label = "Partnership for localities/intermediate zones",
+         #                        choices = partnership_name)
+         #          )
+         #        ),
+         #   column(3,
+         #          uiOutput("year_ui_rank"), 
+         #          selectInput("geocomp_rank", "Comparator", choices = comparator_list,
+         #                      selectize=TRUE, selected = "Scotland"),
+         #          checkboxInput("ci_rank",label = "95% confidence intervals", value = FALSE)
+         #   ), 
+         #    column(5,
+         #          #Legend
+         #          h6(tags$b("Legend"), style="color: black;"),
+         #          p(img(src='signif_better.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
+         #            "Statistically significantly better than comparator average.", br(),
+         #            img(src='non_signif.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
+         #            "Statistically not significantly different from comparator average.", br(),
+         #            img(src='signif_worse.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
+         #            "Statistically significantly worse than comparator average.", br(),
+         #            img(src='signif_nocalc2.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
+         #            "No significance can be calculated."),
+         #          downloadButton('download_rank', 'Download data', class = "down")
+         #          )
+         #  ),
+         sidebarPanel(width=4, #Filter options
                   selectInput("indic_rank", "Indicator", choices=indicator_list),
                   selectInput("geotype_rank", label = "Geography level",
                               choices = areatype_noscot_list, selected = "Health board"),
                   conditionalPanel( #Conditional panel for extra dropdown for localities & IZ
                     condition = "input.geotype_rank == 'HSC Locality' | input.geotype_rank == 'Intermediate zone' ",
                     selectInput("loc_iz_rank", label = "Partnership for localities/intermediate zones",
-                                choices = partnership_name)
-                  )
-                ),
-           column(3,
+                                choices = partnership_name)),
                   uiOutput("year_ui_rank"), 
                   selectInput("geocomp_rank", "Comparator", choices = comparator_list,
                               selectize=TRUE, selected = "Scotland"),
-                  checkboxInput("ci_rank",label = "95% confidence intervals", value = FALSE)
-           ), 
-            column(5,
+                  checkboxInput("ci_rank",label = "95% confidence intervals", value = FALSE),
                   #Legend
-                  h6(tags$b("Legend"), style="color: black;"),
-                  p(img(src='non_signif.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
+                  p(tags$b("Legend"), style="color: black;"),
+                  p(img(src='signif_better.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
+                    "Statistically significantly better than comparator average.", br(),
+                    img(src='non_signif.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
                     "Statistically not significantly different from comparator average.", br(),
                     img(src='signif_worse.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
                     "Statistically significantly worse than comparator average.", br(),
-                    img(src='signif_better.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
-                    "Statistically significantly better than comparator average.", br(),
                     img(src='signif_nocalc2.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
                     "No significance can be calculated."),
                   downloadButton('download_rank', 'Download data', class = "down")
-                  )
-          ),
-         mainPanel(width = 12, #Main panel
+         ),
+         mainPanel(width = 8, #Main panel
                    plotlyOutput("rank_plot") 
          )
 ), #Tab panel bracket
@@ -195,7 +238,7 @@ tabPanel("Map", icon = icon("globe"),
            uiOutput("year_ui_map"),
            downloadButton('download_map', 'Download data', class = "down"),
            shiny::hr(),
-           h6(tags$b("Legend"), style="color: black;"),
+           p(tags$b("Legend"), style="color: black;"),
            img(src='legend_map.png', height=150, style = "align: right")
          ), 
          mainPanel( #Main panel
@@ -221,7 +264,7 @@ tabPanel("Table", icon = icon("table"),
 ###############################################.             
 ##############Help----    
 ###############################################.
-tabPanel("Help", icon = icon("question"),
+tabPanel("Info", icon = icon("info-circle"),
          p(tags$b("Welcome to the ScotPHO Profiles Tool "), "designed to allow users 
            to view the various different profiles produced by the ScotPHO collaboration."),
          p("The profiles are intended to increase understanding of local health issues 
