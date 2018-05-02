@@ -38,6 +38,9 @@
 #Table:
 #   Add deprivation data to table (maybe with switch or just merging everything)
 #   Change placeholder text in filters (require javascript)
+#   Move from DT filter to Shiny ones
+#   Include year variable
+#   Include filter to select all IZ/locs for a specific partnerhsip
 #----------------.
 #Map:
 #   Avoid redrawing of map using leafletProxy
@@ -86,8 +89,8 @@ deprivation <- readRDS("./data/deprivation_OPT.rds")
 geo_lookup <- readRDS("./data/geo_lookup.rds") #geography lookup
 
 #Map data
-ca_bound<-readRDS("./shapefiles/CA_boundary.rds") #Reading file with council shapefiles
-hb_bound<-readRDS("./shapefiles/HB_boundary.rds") #Reading file with health board shapefiles simplified
+ca_bound<-readRDS("./data/CA_boundary.rds") #Reading file with council shapefiles
+hb_bound<-readRDS("./data/HB_boundary.rds") #Reading file with health board shapefiles simplified
 
 ###############################################.
 ## Names ----
