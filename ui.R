@@ -22,7 +22,7 @@
                includeScript("google-analytics.js"),
                #Style sidebars/well panels
                tags$style(".well {background-color:#ffffff; border: 0px solid #336699;
-                          padding: 5px}",
+                          padding: 5px; box-shadow: none; }",
                #Text size and line height
                "body { font-size: 11px; line-height: 1.1}",
                ".navbar { font-size: 12px}",
@@ -82,14 +82,6 @@ tabPanel("Overview", icon = icon("heartbeat"),
                     selectInput("geocomp_heat", "Comparator", choices = comparator_list,
                                 selectize=TRUE, selected = "Scotland")
              ),
-             column(2,
-                    h6(HTML("<a title='Explore how an area compares to Scotland (or a comparator of your choice) over time.
-                        &bull; Use the ‘Topic’ menu to adjust the suite of indicators on display. 
-                        &bull; Older indicator values appears on the left side of the grid, the most recent data on the right. 
-                        &bull; Hover over each tile to see indicator definitions and time periods. ' 
-                        href='#' data-html='true', data-toggle='tooltip' ><i class='fa fa-question-circle' height=20px ></i><b>  Help</b></a>")),
-                    downloadButton('download_heat', 'Download data', class = "down")
-             ),
              column(4,
                     #Legend
                     p(tags$b("Legend"), style="color: black;"),
@@ -101,7 +93,15 @@ tabPanel("Overview", icon = icon("heartbeat"),
                       "Statistically significantly worse than comparator average.", br(),
                       img(src='signif_nocalc.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
                       "No significance can be calculated.")
-             )
+             ),
+             column(2,
+                    h6(HTML("<a title='Explore how an area compares to Scotland (or a comparator of your choice) over time.
+    &bull; Use the ‘Topic’ menu to adjust the suite of indicators on display. 
+    &bull; Older indicator values appears on the left side of the grid, the most recent data on the right. 
+    &bull; Hover over each tile to see indicator definitions and time periods. ' 
+                            href='#' data-html='true', data-toggle='tooltip' ><i class='fa fa-question-circle' height=20px ></i><b>  Help</b></a>")),
+                    downloadButton('download_heat', 'Download data', class = "down")
+                    )
            ),
            mainPanel(width=12, #Main panel
                      plotlyOutput("heat_plot", width = "100%") 
@@ -140,37 +140,6 @@ tabPanel("Trend", icon = icon("area-chart"),
 ## Rank chart ---- 
 ###############################################.
 tabPanel("Rank", icon = icon("signal"),
-         # wellPanel( #Filter options
-         #   column(4,
-         #          selectInput("indic_rank", "Indicator", choices=indicator_list),
-         #          selectInput("geotype_rank", label = "Geography level",
-         #                      choices = areatype_noscot_list, selected = "Health board"),
-         #          conditionalPanel( #Conditional panel for extra dropdown for localities & IZ
-         #            condition = "input.geotype_rank == 'HSC Locality' | input.geotype_rank == 'Intermediate zone' ",
-         #            selectInput("loc_iz_rank", label = "Partnership for localities/intermediate zones",
-         #                        choices = partnership_name)
-         #          )
-         #        ),
-         #   column(3,
-         #          uiOutput("year_ui_rank"), 
-         #          selectInput("geocomp_rank", "Comparator", choices = comparator_list,
-         #                      selectize=TRUE, selected = "Scotland"),
-         #          checkboxInput("ci_rank",label = "95% confidence intervals", value = FALSE)
-         #   ), 
-         #    column(5,
-         #          #Legend
-         #          h6(tags$b("Legend"), style="color: black;"),
-         #          p(img(src='signif_better.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
-         #            "Statistically significantly better than comparator average.", br(),
-         #            img(src='non_signif.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
-         #            "Statistically not significantly different from comparator average.", br(),
-         #            img(src='signif_worse.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
-         #            "Statistically significantly worse than comparator average.", br(),
-         #            img(src='signif_nocalc2.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
-         #            "No significance can be calculated."),
-         #          downloadButton('download_rank', 'Download data', class = "down")
-         #          )
-         #  ),
          sidebarPanel(width=4, #Filter options
                   selectInput("indic_rank", "Indicator", choices=indicator_list),
                   selectInput("geotype_rank", label = "Geography level",
@@ -202,7 +171,7 @@ tabPanel("Rank", icon = icon("signal"),
 ###############################################.
 ## Deprivation ---- 
 ###############################################.
-tabPanel("Deprivation", icon = icon("balance-scale"),
+tabPanel("Inequalities", icon = icon("balance-scale"),
          #Intro text
          p(tags$b("This section is under development and a limited number of indicators are available."), style = "color: red "),
          p(tags$b("Explore the data by different levels of deprivation. ")),
