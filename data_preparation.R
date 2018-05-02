@@ -247,7 +247,7 @@ writeOGR(ca_bound_orig, dsn=shapefiles, "CA_simpl", driver="ESRI Shapefile", ove
 
 #Saving as rds as it is much faster to read
 ca_bound<-readOGR(shapefiles, "CA_simpl")
-saveRDS(ca_bound, "./shapefiles/CA_boundary.rds")
+saveRDS(ca_bound, "./data/CA_boundary.rds")
 
 ##########################.
 ###Health board
@@ -265,7 +265,7 @@ writeOGR(hb_bound_orig, dsn=shapefiles, "HB_simpl", driver="ESRI Shapefile", ove
 
 #Saving as rds as it is much faster to read
 hb_bound<-readOGR(shapefiles,"HB_simpl") 
-saveRDS(hb_bound, "./shapefiles/HB_boundary.rds")
+saveRDS(hb_bound, "./data/HB_boundary.rds")
 
 ###############################################.
 ## Deprivation data ----
