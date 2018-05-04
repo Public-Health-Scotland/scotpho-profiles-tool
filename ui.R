@@ -26,6 +26,7 @@
                #Text size and line height
                "body { font-size: 11px; line-height: 1.1}",
                ".navbar { font-size: 12px}",
+               "dcc.Graph(id='chart-graph', style={'margin-top': '0', 'height': 920} )",
                ".checkbox label, .radio label { line-height: 1.6 }",
                #Padding and margins of filters and labels
                ".form-group {margin: 0px}",
@@ -55,17 +56,17 @@
 ## Overview ----
 ###############################################.
 tabPanel("Overview", icon = icon("heartbeat"),
-         HTML("<button data-toggle='collapse' href='#overview' class='btn btn-primary'>
-                  <i class='fa fa-question-circle'></i><strong>  Help</strong></button>"),
-         HTML("<div id='overview' class='collapse'> "),
-         p(tags$b("Explore how an area compares to Scotland (or a comparator of your choice) 
-           over time.")), #Intro text
-         tags$ul( 
-           tags$li("Use the ‘Topic’ menu to adjust the suite of indicators on display."),
-           tags$li("Older indicator values appears on the left side of the grid, 
-                   the most recent data on the right."),
-           tags$li("Hover over each tile to see indicator definitions and time periods.")),
-         HTML("</div>"), 
+         conditionalPanel(condition = "output.help_overview == 'TRUE' ",  
+           p("Explore how an area compares to Scotland (or a comparator of your choice)
+           over time."),
+           tags$ul(
+             tags$li("Use the ‘Topic’ menu to adjust the suite of indicators on display."),
+             tags$li("Older indicator values appears on the left side of the grid,
+                      the most recent data on the right."),
+             tags$li("Hover over each tile to see indicator definitions and time periods."))
+           ), 
+         #Need to have the output in the ui to get the conditional Panel working
+         span(textOutput("help_overview"), style="color:white; font-size:1px"), 
          wellPanel( #Filter options
              column(3,
                     selectInput("geotype_heat", "Geography level", choices= areatype_noscot_list),
@@ -95,17 +96,14 @@ tabPanel("Overview", icon = icon("heartbeat"),
                       "No significance can be calculated.")
              ),
              column(2,
-                    h6(HTML("<a title='Explore how an area compares to Scotland (or a comparator of your choice) over time.
-    &bull; Use the ‘Topic’ menu to adjust the suite of indicators on display. 
-    &bull; Older indicator values appears on the left side of the grid, the most recent data on the right. 
-    &bull; Hover over each tile to see indicator definitions and time periods. ' 
-                            href='#' data-html='true', data-toggle='tooltip' ><i class='fa fa-question-circle' height=20px ></i><b>  Help</b></a>")),
+                    actionLink("help_overview", label = tags$b("Help"), icon= icon('question-circle')),
+                    br(),
                     downloadButton('download_heat', 'Download data', class = "down")
                     )
            ),
-           mainPanel(width=12, #Main panel
-                     plotlyOutput("heat_plot", width = "100%") 
-           )
+         mainPanel(width = 12,
+                   plotlyOutput("heat_plot") 
+        )
   ), #Tab panel bracket
 ###############################################.
 ## Time trend ----
@@ -123,8 +121,8 @@ tabPanel("Trend", icon = icon("area-chart"),
                                       multiple=TRUE, selectize=TRUE, selected = ""),
                           selectInput("partname_trend", "HSC Partnership", choices = partnership_name,
                                       multiple=TRUE, selectize=TRUE, selected = ""),
-                          selectInput("loc_iz_trend", "Select a partnership to limit
-                                      the options of localities/intermediate zones", 
+                          selectInput("loc_iz_trend", "To choose a locality or intermediate zone first 
+                                      select an HSC partnership", 
                                       choices = partnership_name),
                           uiOutput("loc_ui_trend"),
                           uiOutput("iz_ui_trend"),
