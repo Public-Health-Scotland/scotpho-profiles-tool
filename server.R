@@ -11,6 +11,8 @@ function(input, output) {
   ###############################################.        
   #### Overview ----
   ###############################################.   
+  #Small output to make the help conditional panel work
+  output$help_overview <- renderText(input$help_overview %% 2 != 0)
   
   # Reactive controls for heatmap:area name depending on areatype selected
   output$geoname_ui_heat <- renderUI({
@@ -57,16 +59,20 @@ function(input, output) {
   # Calculates number of different indicators and then multiplies by pixels per row
   # it needs the sum at the end as otherwise small domains plots will be too small
   get_height_heat <- function() {
-    (nrow(heat_chosenarea() )*3)+130 
+    
+    #Obtaining number of indicators
+    no_ind <- unique(heat_chosenarea()$indicator)
+    length <- length(no_ind) * 28 + 125
+  
   }
   
   ###############.
   #Overview plot
   output$heat_plot <- renderPlotly({
-    
+
     #Merging comparator and chosen area
-    heat <- merge(heat_chosenarea(), heat_chosencomp(), by=c("indicator", "year")) 
-    
+    heat <- merge(heat_chosenarea(), heat_chosencomp(), by=c("indicator", "year"))
+
     #Creating a palette of colours based on statistical significance
     heat$color <- ifelse(heat$interpret == "O", 'white',
                          ifelse(heat$lowci <= heat$comp_m & heat$upci >= heat$comp_m,'gray',
@@ -74,14 +80,14 @@ function(input, output) {
                          ifelse(heat$lowci > heat$comp_m & heat$interpret == "L", 'red',
                          ifelse(heat$upci < heat$comp_m & heat$interpret == "L", 'blue',
                          ifelse(heat$upci < heat$comp_m & heat$interpret == "H", 'red', 'gray'))))))
-    
+
     #Tooltip
     heat_tooltip <- paste0(heat$indicator, "<br>", heat$def_period, "<br>",
                            heat$type_definition, "<br>", heat$measure)
-    
+
     # Plotting data
     plot_overview <- ggplot(heat, aes(x = year, y = indicator, fill = color,
-                                      text= heat_tooltip)) + 
+                                      text= heat_tooltip)) +
       geom_tile(color = "black") +
       geom_text(aes(label = round(measure, 0)), size =2.5) +
       #Another step needed to make the palette of colours for the tile work
@@ -98,17 +104,19 @@ function(input, output) {
         legend.position="none", #taking out legend
         text = element_text(size=11) # changing font size
       )
-    
+
     #Converting ggplot into a Plotly object
-    ggplotly(plot_overview, tooltip=c("text"), height=get_height_heat()) %>%
+    ggplotly(plot_overview, tooltip=c("text"), height = get_height_heat()) %>%
       # margins needed as long labels don't work well with Plotly
-      layout(margin = list(l = 400, t = 80),
+      layout(
+             margin = list(l = 400, t = 80),
              xaxis = list(side = 'top'),
              font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif')
              ) %>%
       config(displayModeBar = TRUE, displaylogo = F, collaborate=F, editable =F) # taking out plotly logo and collaborate button
 
   })
+  
 
  # Downloading data
     heat_csv <- reactive({ format_csv(heat_chosenarea()) })
