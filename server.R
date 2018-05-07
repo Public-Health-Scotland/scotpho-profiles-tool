@@ -89,7 +89,11 @@ function(input, output) {
   output$heat_plot <- renderPlotly({
 
     #Merging comparator and chosen area
-    heat <- merge(heat_chosenarea(), heat_chosencomp(), by=c("indicator", "year"))
+    if (input$comp_heat == 1){
+      heat <- merge(heat_chosenarea(), heat_chosencomp(), by=c("indicator", "year"))
+    } else if (input$comp_heat == 2) {
+      heat <- merge(heat_chosenarea(), heat_chosencomp(), by=c("indicator"), all.x = TRUE)
+    }
 
     #Creating a palette of colours based on statistical significance
     heat$color <- ifelse(heat$interpret == "O", 'white',
