@@ -26,8 +26,8 @@
                #Text size and line height
                "body { font-size: 11px; line-height: 1.1}",
                ".navbar { font-size: 12px}",
-               "dcc.Graph(id='chart-graph', style={'margin-top': '0', 'height': 920} )",
                ".checkbox label, .radio label { line-height: 1.6 }",
+               ".radio-inline {line-height: 2}",
                #Padding and margins of filters and labels
                ".form-group {margin: 0px}",
                ".selectize-control { margin-bottom: 3px}",
@@ -80,8 +80,16 @@ tabPanel("Overview", icon = icon("heartbeat"),
              column(3,
                     selectInput("topic_heat", "Topic", choices = topic_list,
                                 selectize=TRUE, selected = "Scotland"),
-                    selectInput("geocomp_heat", "Comparator", choices = comparator_list,
-                                selectize=TRUE, selected = "Scotland")
+                    radioButtons("comp_heat", label = "Compare against:",
+                                 choices = list("Area" = 1, "Time" = 2), 
+                                 selected = 1, inline=TRUE),
+                    conditionalPanel(condition = "input.comp_heat == 1 ",  
+                                     selectInput("geocomp_heat", "Comparator", choices = comparator_list,
+                                                 selectize=TRUE, selected = "Scotland")
+                    ),
+                    conditionalPanel(condition = "input.comp_heat == 2 ", 
+                                     uiOutput("yearcomp_ui_heat")
+                    ) 
              ),
              column(4,
                     #Legend
@@ -213,6 +221,54 @@ tabPanel("Map", icon = icon("globe"),
            leafletOutput("map")
          )
     ), #Tab panel bracket
+##########################################################.
+## Barcode 1  ----
+## Version uses measure values for bars
+##########################################################.
+tabPanel("Barcode1", icon = icon("barcode"),
+         # beta_box,  ##looks better with text as title for chart?
+         # p(tags$b("Barcode plot take a few seconds to load")),
+         # tags$ul( 
+         #  tags$li("This chart gives an indication of variation")),
+         sidebarPanel(width=3,
+                      selectInput("geotype_bar", "Geography level", choices= areatype_noscot_list),
+                      conditionalPanel(#Conditional panel for extra dropdown for localities & IZ
+                        condition = "input.geotype_bar== 'HSC Locality' | input.geotype_bar == 'Intermediate zone' ",
+                        selectInput("loc_iz_bar", label = "Partnership for localities/intermediate zones", choices = partnership_name)),
+                      uiOutput("geoname_ui_bar"),   
+                      selectInput("geocomp_bar", "Comparator", choices = comparator_list, selectize=TRUE, selected = "Scotland"),
+                      selectInput("topic_bar", "Topic", choices = topic_list,selectize=TRUE, selected = "Scotland"),
+                      downloadButton('download_bar', 'Download data', class = "down")
+         ),
+         mainPanel(width=9,
+                   p(tags$b("The chart below shows how indicator values for different geographical areas compare. "), style= "font-size:12px;"),
+                   uiOutput("ui_plot")
+         )
+),
+#####################################################################.
+## Barcode 2 ----
+## Version using % difference from comparator for bars
+#####################################################################.
+tabPanel("Barcode2", icon = icon("barcode"),
+         # beta_box,  ##looks better with text as title for chart?
+         # p(tags$b("Barcode plot take a few seconds to load")),
+         # tags$ul(
+         #  tags$li("This chart gives an indication of variation")),
+         sidebarPanel(width=3,
+                      selectInput("geotype_bar2", "Geography level", choices= areatype_noscot_list),
+                      conditionalPanel(#Conditional panel for extra dropdown for localities & IZ
+                        condition = "input.geotype_bar2== 'HSC Locality' | input.geotype_bar2 == 'Intermediate zone' ",
+                        selectInput("loc_iz_bar2", label = "Partnership for localities/intermediate zones", choices = partnership_name)),
+                      uiOutput("geoname_ui_bar2"),
+                      selectInput("geocomp_bar2", "Comparator", choices = comparator_list, selectize=TRUE, selected = "Scotland"),
+                      selectInput("topic_bar2", "Topic", choices = topic_list,selectize=TRUE, selected = "Scotland"),
+                      downloadButton('download_bar2', 'Download data', class = "down")
+         ),
+         mainPanel(width=9,
+                   p(tags$b("The chart below shows how indicator values for different geographical areas compare. "), style= "font-size:12px;"),
+                   uiOutput("ui_bar_plot")
+       )
+),
 ###############################################.
 ## Table ----
 ###############################################.
