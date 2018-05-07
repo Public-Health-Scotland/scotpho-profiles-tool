@@ -38,6 +38,11 @@ geo_lookup<- read_spss(paste(lookups, "code_dictionary.sav", sep="")) %>%
                                                 ifelse(substr(code, 1, 3) == "S37", "HSC Partnership",
                                                        ifelse(substr(code, 1, 3) == "S02", "Intermediate zone", "Error"))))))) 
 
+#Changing ands for & to reduce issues with long labels
+#and " - " for "-"
+geo_lookup$areaname <- gsub(" and ", " & ", geo_lookup$areaname)
+geo_lookup$areaname <- gsub(" - ", "-", geo_lookup$areaname)
+
 #Bringing parent geography information
 geo_parents <- read_spss(paste(lookups, "IZtoPartnership_parent_lookup.sav", sep="")) %>% 
   setNames(tolower(names(.)))  #variables to lower case
@@ -79,72 +84,73 @@ geo_lookup <- merge(x=geo_lookup, y=geo_parents, by="code", all.x = TRUE)
 
 ###There are a number of IZ's with the same name, recoding.
 geo_lookup <- geo_lookup %>% 
-  mutate(areaname = ifelse(code == "S02001938", "Woodside - Glasgow City",
-                    ifelse(code == "S02001267", "Woodside - Abeerdeen City",
-                    ifelse(code == "S02002233", "Western Edge - Perth and Kinross",
-                    ifelse(code == "S02001475", "Western Edge - Dundee City",
-                    ifelse(code == "S02001620", "Tollcross - City of Edinburgh",
-                    ifelse(code == "S02001911", "Tollcross - Glasgow City",
-                    ifelse(code == "S02001671", "Muirhouse - City of Edinburgh",
-                    ifelse(code == "S02002137", "Muirhouse - North Lanarkshire",
-                    ifelse(code == "S02002358", "Law - South Lanarkshire",
-                    ifelse(code == "S02001469", "Law - Dundee City",
-                    ifelse(code == "S02002490", "Ladywell - West Lothian",
-                    ifelse(code == "S02002156", "Ladywell - North Lanarkshire",
-                    ifelse(code == "S02001528", "Hillhead - East Dunbartonshire",
-                    ifelse(code == "S02001953", "Hillhead - Glasgow City",
-                    ifelse(code == "S02001249", "City Centre West - Aberdeen City",
-                    ifelse(code == "S02001933", "City Centre West - Glasgow City",
-                    ifelse(code == "S02001250", "City Centre East - Aberdeen City",
-                    ifelse(code == "S02001932", "City Centre East - Glasgow City",
-                    ifelse(code == "S02001448", "City Centre - Dundee City",
-                    ifelse(code == "S02002449", "City Centre - Stirling",
-                    ifelse(code == "S02001307", "Blackburn - Aberdeenshire",
-                    ifelse(code == "S02002496", "Blackburn - West Lothian",
+  mutate(areaname = ifelse(code == "S02001938", "Woodside-Glasgow City",
+                    ifelse(code == "S02001267", "Woodside-Abeerdeen City",
+                    ifelse(code == "S02002233", "Western Edge-Perth & Kinross",
+                    ifelse(code == "S02001475", "Western Edge-Dundee City",
+                    ifelse(code == "S02001620", "Tollcross-City of Edinburgh",
+                    ifelse(code == "S02001911", "Tollcross-Glasgow City",
+                    ifelse(code == "S02001671", "Muirhouse-City of Edinburgh",
+                    ifelse(code == "S02002137", "Muirhouse-North Lanarkshire",
+                    ifelse(code == "S02002358", "Law-South Lanarkshire",
+                    ifelse(code == "S02001469", "Law-Dundee City",
+                    ifelse(code == "S02002490", "Ladywell-West Lothian",
+                    ifelse(code == "S02002156", "Ladywell-North Lanarkshire",
+                    ifelse(code == "S02001528", "Hillhead-East Dunbartonshire",
+                    ifelse(code == "S02001953", "Hillhead-Glasgow City",
+                    ifelse(code == "S02001249", "City Centre West-Aberdeen City",
+                    ifelse(code == "S02001933", "City Centre West-Glasgow City",
+                    ifelse(code == "S02001250", "City Centre East-Aberdeen City",
+                    ifelse(code == "S02001932", "City Centre East-Glasgow City",
+                    ifelse(code == "S02001448", "City Centre-Dundee City",
+                    ifelse(code == "S02002449", "City Centre-Stirling",
+                    ifelse(code == "S02001307", "Blackburn-Aberdeenshire",
+                    ifelse(code == "S02002496", "Blackburn-West Lothian",
                            paste(areaname) #no argument
                     ))))))))))))))))))))))) %>% 
-  mutate(areaname = ifelse(code == "S02001534", "IZ01 - East Lothian",
-                    ifelse(code == "S02002460", "IZ01 - West Dunbartonshire",
-                    ifelse(code == "S02001535", "IZ02 - East Lothian",
-                    ifelse(code == "S02002461", "IZ02 - West Dunbartonshire",
-                    ifelse(code == "S02001536", "IZ03 - East Lothian",
-                    ifelse(code == "S02002462", "IZ03 - West Dunbartonshire",
-                    ifelse(code == "S02001537", "IZ04 - East Lothian",
-                    ifelse(code == "S02002463", "IZ04 - West Dunbartonshire",
-                    ifelse(code == "S02001538", "IZ05 - East Lothian",
-                    ifelse(code == "S02002464", "IZ05 - West Dunbartonshire",
-                    ifelse(code == "S02001539", "IZ06 - East Lothian",
-                    ifelse(code == "S02002465", "IZ06 - West Dunbartonshire",
-                    ifelse(code == "S02001540", "IZ07 - East Lothian",
-                    ifelse(code == "S02002466", "IZ07 - West Dunbartonshire",
-                    ifelse(code == "S02001541", "IZ08 - East Lothian",
-                    ifelse(code == "S02002467", "IZ08 - West Dunbartonshire",
-                    ifelse(code == "S02001542", "IZ09 - East Lothian",
-                    ifelse(code == "S02002468", "IZ09 - West Dunbartonshire",
-                    ifelse(code == "S02001543", "IZ10 - East Lothian",
-                    ifelse(code == "S02002469", "IZ10 - West Dunbartonshire",
-                    ifelse(code == "S02001544", "IZ11 - East Lothian",
-                    ifelse(code == "S02002470", "IZ11 - West Dunbartonshire",
-                    ifelse(code == "S02001545", "IZ12 - East Lothian",
-                    ifelse(code == "S02002471", "IZ12 - West Dunbartonshire",
-                    ifelse(code == "S02001546", "IZ13 - East Lothian",
-                    ifelse(code == "S02002472", "IZ13 - West Dunbartonshire",
-                    ifelse(code == "S02001547", "IZ14 - East Lothian",
-                    ifelse(code == "S02002473", "IZ14 - West Dunbartonshire",
-                    ifelse(code == "S02001548", "IZ15 - East Lothian",
-                    ifelse(code == "S02002474", "IZ15 - West Dunbartonshire",
-                    ifelse(code == "S02001549", "IZ16 - East Lothian",
-                    ifelse(code == "S02002475", "IZ16 - West Dunbartonshire",
-                    ifelse(code == "S02001550", "IZ17 - East Lothian",
-                    ifelse(code == "S02002476", "IZ17 - West Dunbartonshire",
-                    ifelse(code == "S02001551", "IZ18 - East Lothian",
-                    ifelse(code == "S02002477", "IZ18 - West Dunbartonshire",
+  mutate(areaname = ifelse(code == "S02001534", "IZ01-East Lothian",
+                    ifelse(code == "S02002460", "IZ01-West Dunbartonshire",
+                    ifelse(code == "S02001535", "IZ02-East Lothian",
+                    ifelse(code == "S02002461", "IZ02-West Dunbartonshire",
+                    ifelse(code == "S02001536", "IZ03-East Lothian",
+                    ifelse(code == "S02002462", "IZ03-West Dunbartonshire",
+                    ifelse(code == "S02001537", "IZ04-East Lothian",
+                    ifelse(code == "S02002463", "IZ04-West Dunbartonshire",
+                    ifelse(code == "S02001538", "IZ05-East Lothian",
+                    ifelse(code == "S02002464", "IZ05-West Dunbartonshire",
+                    ifelse(code == "S02001539", "IZ06-East Lothian",
+                    ifelse(code == "S02002465", "IZ06-West Dunbartonshire",
+                    ifelse(code == "S02001540", "IZ07-East Lothian",
+                    ifelse(code == "S02002466", "IZ07-West Dunbartonshire",
+                    ifelse(code == "S02001541", "IZ08-East Lothian",
+                    ifelse(code == "S02002467", "IZ08-West Dunbartonshire",
+                    ifelse(code == "S02001542", "IZ09-East Lothian",
+                    ifelse(code == "S02002468", "IZ09-West Dunbartonshire",
+                    ifelse(code == "S02001543", "IZ10-East Lothian",
+                    ifelse(code == "S02002469", "IZ10-West Dunbartonshire",
+                    ifelse(code == "S02001544", "IZ11-East Lothian",
+                    ifelse(code == "S02002470", "IZ11-West Dunbartonshire",
+                    ifelse(code == "S02001545", "IZ12-East Lothian",
+                    ifelse(code == "S02002471", "IZ12-West Dunbartonshire",
+                    ifelse(code == "S02001546", "IZ13-East Lothian",
+                    ifelse(code == "S02002472", "IZ13-West Dunbartonshire",
+                    ifelse(code == "S02001547", "IZ14-East Lothian",
+                    ifelse(code == "S02002473", "IZ14-West Dunbartonshire",
+                    ifelse(code == "S02001548", "IZ15-East Lothian",
+                    ifelse(code == "S02002474", "IZ15-West Dunbartonshire",
+                    ifelse(code == "S02001549", "IZ16-East Lothian",
+                    ifelse(code == "S02002475", "IZ16-West Dunbartonshire",
+                    ifelse(code == "S02001550", "IZ17-East Lothian",
+                    ifelse(code == "S02002476", "IZ17-West Dunbartonshire",
+                    ifelse(code == "S02001551", "IZ18-East Lothian",
+                    ifelse(code == "S02002477", "IZ18-West Dunbartonshire",
                            paste(areaname) #no argument
                     )))))))))))))))))))))))))))))))))))))
 
+
 geo_lookup <- geo_lookup %>% 
   #Creating variable that includeas area name and type for trend plotting
-  mutate(areaname_full = paste(areaname, " - ", areatype)) %>% 
+  mutate(areaname_full = paste(areaname, "-", areatype)) %>% 
   mutate_if(is.character, factor) %>% #transforming into factors
   select(-c(parent_code)) 
 
@@ -160,6 +166,8 @@ geo_lookup$areaname_full <- gsub("Intermediate zone", "IZ", geo_lookup$areaname_
 geo_lookup <- as.data.frame(geo_lookup)
 saveRDS(geo_lookup, "./data/geo_lookup.rds")
 geo_lookup <- readRDS("./data/geo_lookup.rds") 
+
+#geo_lookup$length <- nchar(geo_lookup$areaname_full)
 
 ######
 #Indicator information lookup table 
