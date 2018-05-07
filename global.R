@@ -3,19 +3,18 @@
 
 # TODO:
 #Data preparation: 
-#   Lookups need to be checked/refined: names areas (consistency & and), indicator measures, domains etc.
+#   Lookups need to be checked/refined: indicator measures, domains etc.
 #   Indicator and geographical info out of main file and use merge/lookups?
 #   Include deprivation indicators in lookup
 #   Format better the map shapefiles (lower case variable names)
 #   Deprivation needs PAR 
 #   Add denominator?
+#   Take out Plotly toolbox and produce plots with a button?
 #----------------.
 #General:
 #   Fix bookmarking - check if server solution in .io ?enableBookmarking
-#   Include reporting functionality -Rmarkdown?
+#   Include reporting functionality
 #   Create user guide
-#   Check/work on responsiveness (especially header)
-#   Incorporate Google analytics - https://shiny.rstudio.com/articles/google-analytics.html
 #   Host in the website and link from here: shapefiles, lookups, etc
 #----------------.
 #Barcode chart:
@@ -27,8 +26,9 @@
 #----------------.
 #Time trend: 
 #   Adding numerator/rate tick box?
-#   Take out legend, names next to line? package ggrepel https://plot.ly/r/line-charts/
 #   Add functionality to be able to add IZ/localities fromm different partnerships
+#   To fix long label issue move to have legend as a different chart? 
+#   Or inside same chart try to move legend below chart
 #----------------.
 #Rank chart
 #   Issue with long label names, take them out? put them in the side? in the bars?
