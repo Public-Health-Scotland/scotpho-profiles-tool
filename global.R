@@ -6,7 +6,6 @@
 #   Lookups need to be checked/refined: indicator measures, domains etc.
 #   Indicator and geographical info out of main file and use merge/lookups?
 #   Include deprivation indicators in lookup
-#   Format better the map shapefiles (lower case variable names)
 #   Deprivation needs PAR 
 #   Add denominator?
 #   Take out Plotly toolbox and produce plots with a button?
@@ -22,7 +21,6 @@
 #----------------.
 #Overview:  
 #   Long labels of indicators are an issue  https://github.com/plotly/plotly.js/issues/296#issuecomment-371780321
-#   Add functionaly to instead of comparing against an area, comparing against a baseline/past year
 #----------------.
 #Time trend: 
 #   Adding numerator/rate tick box?
@@ -37,9 +35,6 @@
 #----------------.
 #Table:
 #   Add deprivation data to table (maybe with switch or just merging everything)
-#   Change placeholder text in filters (require javascript)
-#   Move from DT filter to Shiny ones
-#   Include year variable
 #   Include filter to select all IZ/locs for a specific partnerhsip
 #----------------.
 #Map:
@@ -66,6 +61,7 @@ library(tidyverse) # data manipulation, ggplot
 library (DT) # for data tables
 library(leaflet) #javascript maps
 library(plotly) #interactive graphs
+#library(XLConnect) #downloading data into excel file format
 
 ###############################################.
 ## Functions ----
@@ -78,6 +74,12 @@ format_csv <- function(reactive_dataset) {
              lowci, upci, type_definition)) %>% 
     rename(lower_confidence_interval=lowci, upper_confidence_interval=upci, 
            period = def_period, definition = type_definition)
+}
+
+#Download button for charts, just changing the icon
+savechart_button <- function(outputId, label = "Save chart", class=NULL){
+  tags$a(id = outputId, class = paste("btn btn-default shiny-download-link", class), 
+         href = "", target = "_blank", download = NA, icon("image"), label)
 }
 
 ###############################################.
@@ -99,11 +101,16 @@ hb_bound<-readRDS("./data/HB_boundary.rds") #Reading file with health board shap
 area_list <- sort(geo_lookup$areaname)
 comparator_list <- sort(geo_lookup$areaname[geo_lookup$areatype %in% 
                                     c("Health board", "Council area", "Scotland")]) 
+code_list <- unique(optdata$code)
 hb_name <- sort(geo_lookup$areaname[geo_lookup$areatype=="Health board"]) 
 la_name <- sort(geo_lookup$areaname[geo_lookup$areatype=="Council area"]) 
 intzone_name <- sort(geo_lookup$areaname[geo_lookup$areatype=="Intermediate zone"]) 
 partnership_name <- sort(geo_lookup$areaname[geo_lookup$areatype=="HSC Partnership"]) 
 locality_name <- sort(geo_lookup$areaname[geo_lookup$areatype=="HSC Locality"]) 
+
+#year of indicators
+min_year <- min(optdata$year)
+max_year <- max(optdata$year)
 
 #Area type names
 areatype_list <- c("Scotland", "Health board", "Council area", "HSC Partnership", 
