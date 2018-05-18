@@ -234,6 +234,32 @@ optdata$measure <- ifelse(optdata$indicator == 'Mid-year population estimate - a
 optdata <- as.data.frame(optdata)
 optdata$ind_id <- as.factor(optdata$ind_id )
 
+###TEMPORARY FIXES HOPEFULLY
+#Dealing with lack of data for certain years and hb for Healthy weight at P1.
+#Excluding those under 5 as most are lack of data and also avoids excess of variation from non-representative years
+optdata <- optdata %>% 
+  subset(!(ind_id == "21106" & (numerator<5 |
+            (((code %in% c('S37000001', 'S37000002', "S12000033", "S12000034", 'S12000020', 
+                         'S37000019', 'S08000020') | 
+                parent_area %in% c("Aberdeen City", 'Aberdeenshire', 'Moray')) 
+              & year <2009) |
+            ((code %in% c('S12000035', 'S37000004', 'S12000017', 'S37000016', "S12000027", 'S37000026', 
+                         'S12000040', 'S37000030', 'S08000022', 'S08000026')  |
+                parent_area %in% c("Argyll & Bute", 'Shetland Islands', 'West Lothian', 'Highland'))
+              & year %in% c('2007') ) |
+            ((code %in% c('S12000039', 'S37000029', 'S12000011', 'S37000011', 'S12000046', 'S37000015') |
+                parent_area %in% c("East Renfrewshire", 'Glasgow City', 'West Dunbartonshire')) 
+          & year %in% c('2007', "2008", "2010")) |
+            ((code %in% c('S12000045', 'S37000009') | parent_area %in% c("East Dunbartonshire")
+              ) & year %in% c('2007', "2008", "2010", "2016")) |
+            ((code %in% c('S12000018', 'S37000017') | parent_area %in% c("Inverclyde")
+              ) & year %in% c('2007', "2008", "2009", "2010")) |
+            ((code %in% c('S12000023', 'S37000022', 'S08000025') | 
+                parent_area %in% c("Orkney Islands") ) & year %in% c('2007', "2008", "2009")))
+          )#numerator plus code conditions
+        ) #negation
+      )#subset
+
 saveRDS(optdata, "./data/optdata.rds")
 optdata <- readRDS("./data/optdata.rds") 
 
