@@ -6,7 +6,7 @@
 ###############################################.
 
 ## Define a server for the Shiny app
-function(input, output) {
+function(input, output, session) {
   
   ###############################################.        
   #### Overview ----
@@ -86,32 +86,35 @@ function(input, output) {
   
   ###############.
   #Overview plot
-  output$heat_plot <- renderPlotly({
-
+  
+  #Function to create ggplot, then used in renderPlot and ggsave
+  plot_overview <- function(){
+    
     #Merging comparator and chosen area
     if (input$comp_heat == 1){
       heat <- merge(heat_chosenarea(), heat_chosencomp(), by=c("indicator", "year"))
     } else if (input$comp_heat == 2) {
       heat <- merge(heat_chosenarea(), heat_chosencomp(), by=c("indicator"), all.x = TRUE)
     }
-
+    
     #Creating a palette of colours based on statistical significance
     heat$color <- ifelse(heat$interpret == "O", 'white',
                          ifelse(heat$lowci <= heat$comp_m & heat$upci >= heat$comp_m,'gray',
-                         ifelse(heat$lowci > heat$comp_m & heat$interpret == "H", 'blue',
-                         ifelse(heat$lowci > heat$comp_m & heat$interpret == "L", 'red',
-                         ifelse(heat$upci < heat$comp_m & heat$interpret == "L", 'blue',
-                         ifelse(heat$upci < heat$comp_m & heat$interpret == "H", 'red', 'gray'))))))
-
+                                ifelse(heat$lowci > heat$comp_m & heat$interpret == "H", 'blue',
+                                       ifelse(heat$lowci > heat$comp_m & heat$interpret == "L", 'red',
+                                              ifelse(heat$upci < heat$comp_m & heat$interpret == "L", 'blue',
+                                                     ifelse(heat$upci < heat$comp_m & heat$interpret == "H", 'red', 'gray'))))))
+    
     #Tooltip
     heat_tooltip <- paste0(heat$indicator, "<br>", heat$def_period, "<br>",
                            heat$type_definition, "<br>", heat$measure)
-
+    
     # Plotting data
-    plot_overview <- ggplot(heat, aes(x = year, y = indicator, fill = color,
-                                      text= heat_tooltip)) +
+    ggplot(heat, aes(x = year, y = indicator, fill = color,
+                     text= heat_tooltip)) +
       geom_tile(color = "black") +
       geom_text(aes(label = round(measure, 0)), size =2.5) +
+      ggtitle(paste0(input$geoname_heat, " - ", input$topic_heat)) +
       #Another step needed to make the palette of colours for the tile work
       scale_fill_manual(name = "Legend", labels = c("Significantly better", "Not significantly different", "Significantly worse", "Significance is not calculated"),
                         values = c(blue = "#3d99f5", gray = "#999999", red = "#ff9933", white = "#ffffff")) +
@@ -119,24 +122,27 @@ function(input, output) {
       scale_x_continuous(position = "top", breaks=seq(from = min(heat$year), to = max(heat$year), by =1)) +
       #Layout
       theme(axis.text.x = element_text(angle=90),
-        axis.ticks.y=element_blank(), # taking out axis tick marks
-        axis.title.x=element_blank(), #Taking out y axis title
-        axis.title.y=element_blank(), #Taking out y axis title
-        panel.background = element_blank(),#Blanking background
-        legend.position="none", #taking out legend
-        text = element_text(size=11) # changing font size
+            axis.ticks.y=element_blank(), # taking out axis tick marks
+            axis.title.x=element_blank(), #Taking out y axis title
+            axis.title.y=element_blank(), #Taking out y axis title
+            panel.background = element_blank(),#Blanking background
+            legend.position="none", #taking out legend
+            text = element_text(size=11) # changing font size
       )
+  }
+  
+  output$heat_plot <- renderPlotly({
 
     #Converting ggplot into a Plotly object
-    ggplotly(plot_overview, tooltip=c("text"), height = get_height_heat()) %>%
+    ggplotly(plot_overview(), tooltip=c("text"), height = get_height_heat()) %>%
       # margins needed as long labels don't work well with Plotly
-      layout(
-             margin = list(l = 400, t = 80),
+      layout(title = paste0(input$geoname_heat, " - ", input$topic_heat),
+             margin = list(l = 400, t = 120),
              xaxis = list(side = 'top'),
              font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif')
-             ) %>%
-      config(displayModeBar = TRUE, displaylogo = F, collaborate=F, editable =F) # taking out plotly logo and collaborate button
-
+      ) %>%
+      config(displayModeBar = FALSE, displaylogo = F, collaborate=F, editable =F) # taking out plotly logo and collaborate button
+    
   })
   
 
@@ -145,7 +151,13 @@ function(input, output) {
   
     output$download_heat <- downloadHandler( filename =  'overview_data.csv',
       content = function(file) { write.csv(heat_csv(), file, row.names=FALSE) })
-  
+    
+ # Downloading chart  
+    output$download_overviewplot <- downloadHandler(
+      filename = 'overview.png',
+      content = function(file){
+        ggsave(file, plot = plot_overview(), device = "png", scale=4, limitsize=FALSE)
+      })
 
 ###############################################.        
 #### Time trend plot ----
@@ -181,8 +193,49 @@ function(input, output) {
                indicator == input$indic_trend) %>% 
       droplevels() 
     
+    trend$areaname_full <- as.factor(trend$areaname_full)
     trend <- trend[order(trend$year),] #Needs to be sorted by year for Plotly
   })
+  
+  ################
+  #Function to create palette for trend plot
+  create_trendpalette <- function(){
+    #Creating palette of colors with a tone for each geography type
+    #First obtaining length of each geography type
+    hb_length <- length(input$hbname_trend)
+    ca_length <- length(input$laname_trend)
+    scot_length <- length(input$scotname_trend)
+    part_length <- length(input$partname_trend)
+    loc_length <- length(input$locname_trend)
+    iz_length <- length(input$izname_trend)
+    colorblind_length <- hb_length+ca_length+scot_length+part_length+loc_length+iz_length
+    
+    #Then creating a gradient scale for each geography type based on its length
+    hb_scale <- scales::seq_gradient_pal("#08519c", "#9ecae1", "Lab")(seq(0,1,length.out=hb_length))
+    ca_scale <- scales::seq_gradient_pal("#006d2c", "#a1d99b", "Lab")(seq(0,1,length.out=ca_length))
+    scot_scale <- scales::seq_gradient_pal("#000000", "#000000", "Lab")(seq(0,1,length.out=scot_length))
+    part_scale <- scales::seq_gradient_pal("#FF0000", "#ffd6cc", "Lab")(seq(0,1,length.out=part_length))
+    loc_scale <- scales::seq_gradient_pal("#dadaeb", "#54278f", "Lab")(seq(0,1,length.out=loc_length))
+    iz_scale <- scales::seq_gradient_pal("#ffff66", "#4d4d00", "Lab")(seq(0,1,length.out=iz_length))
+    colorblind_scale <- scales::seq_gradient_pal("#08306b", "#deebf7", "Lab")(seq(0,1,length.out=colorblind_length))
+    
+    #Then creating vector for each geography type with area names and color
+    scot_cols <- setNames(scot_scale, unique(trend_data()$areaname_full[trend_data()$areatype == "Scotland"]))
+    hb_cols <- setNames(hb_scale, unique(trend_data()$areaname_full[trend_data()$areatype == "Health board"]))
+    ca_cols <- setNames(ca_scale, unique(trend_data()$areaname_full[trend_data()$areatype == "Council area"]))
+    part_cols <- setNames(part_scale, unique(trend_data()$areaname_full[trend_data()$areatype == "HSC Partnership"]))
+    loc_cols <- setNames(loc_scale, unique(trend_data()$areaname_full[trend_data()$areatype == "HSC Locality"]))
+    iz_cols <- setNames(iz_scale, unique(trend_data()$areaname_full[trend_data()$areatype == "Intermediate zone"]))
+    colorblind_cols <- c(setNames(colorblind_scale, unique(trend_data()$areaname_full)))
+    
+    #Combining them all in the final palette. Using different palette if colour bling option checked
+    if(input$colorblind_trend == FALSE){
+      trend_col <- c(scot_cols, hb_cols, ca_cols, part_cols, loc_cols, iz_cols)
+    }
+    else{
+      trend_col <- colorblind_cols
+    }
+  }
   
   #################
   #Creating plot
@@ -251,22 +304,59 @@ function(input, output) {
                 type = 'scatter', mode = 'lines+markers',
                 color = ~areaname_full, colors = trend_col) %>% 
         #Layout 
-        layout(annotations = list(), #It needs this because of a buggy behaviour of Plotly
-               margin = list(b = 160, t=50), #to avoid labels getting cut out
+        layout(title = ~indicator,
+               annotations = list(), #It needs this because of a buggy behaviour of Plotly
+               margin = list(b = 160, t=20), #to avoid labels getting cut out
                yaxis = list(title = ~type_definition, rangemode="tozero", 
                             size = 4, titlefont =list(size=12), tickfont =list(size=11)), 
                xaxis = list(title = FALSE, tickfont =list(size=10), tickangle = 270),
                font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif')) %>%  
-        config(displayModeBar = TRUE, displaylogo = F, collaborate=F, editable =F) # taking out plotly logo and collaborate button
+        config(displayModeBar = FALSE, displaylogo = F, collaborate=F, editable =F) # taking out plotly logo and collaborate button
       
     }
   }) 
+  
+  #################
+  #Function in ggplot to be able to save chart
+  plot_trend_ggplot <- function(){
+    
+    trend_col <- create_trendpalette() #palette
+    
+    #Creating time trend plot
+    ggplot(data=trend_data(), aes(y = measure,  x = trend_axis, group = areaname_full))+
+      geom_line(aes(color=areaname_full))+
+      geom_point(aes(color=areaname_full))+
+      labs(title=unique(trend_data()$indicator), y = unique(trend_data()$type_definition))+
+      scale_color_manual(values=trend_col, name = "")+
+      scale_y_continuous(expand = c(0, 2), limits=c(0, max(trend_data()$measure)+ (max(trend_data()$measure)/100)))+
+      #Layout
+      theme(text = element_text(size=11, family="Helvetica Neue,Helvetica,Arial,sans-serif"),
+            axis.text.x = element_text(angle=90),
+            axis.line.x = element_line(),
+            axis.ticks = element_blank(),
+            aspect.ratio=0.3,
+            plot.title = element_text(hjust = 0.5), #centering title
+            axis.title.x = element_blank(), #taking out y axis title
+            legend.key=element_blank(), #taking out background from legend
+            panel.grid.major = element_line(colour="#F0F0F0"),#grid lines
+            panel.background = element_blank() #Blanking background
+      )
+  } 
+  
   
   #Downloading data
   trend_csv <- reactive({ format_csv(trend_data()) })
   
   output$download_trend <- downloadHandler(filename =  'timetrend_data.csv',
     content = function(file) {write.csv(trend_csv(), file, row.names=FALSE)})
+  
+  # Downloading chart  
+  output$download_trendplot <- downloadHandler(
+    filename = 'trend.png',
+    content = function(file){
+      ggsave(file, plot = plot_trend_ggplot(), device = "png", scale=4, limitsize=FALSE)
+    })
+  
   
   #####################################          
   #### Rank plot ----
@@ -364,6 +454,9 @@ function(input, output) {
       #Creating a vector with the area names in the order they are going to be plotted
       order_areas <- as.vector(rank_bar_data()$areaname)
       
+      #title for rank
+      title_rank <- paste0(input$indic_rank, " - ", input$year_rank)
+      
       # General plot and layout, bars with or without error bars will be added after user input
       p <-   plot_ly(data = rank_bar_data(), x = ~areaname) %>% 
         #Comparator line
@@ -371,7 +464,7 @@ function(input, output) {
                   line = list(color = '#FF0000'), showlegend = FALSE, hoverinfo="skip") %>% 
         #Layout
         layout(annotations = list(), #It needs this because of a buggy behaviour
-               title = ~def_period,
+               title = title_rank,
                yaxis = list(title = ~type_definition, titlefont =list(size=11), 
                             tickfont =list(size=11)),
                xaxis = list(title = "", tickangle = 270, 
@@ -379,9 +472,9 @@ function(input, output) {
                             categoryorder="array", #order of plotting
                             categoryarray = order_areas),
                font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif'),
-               margin=list(b = 160), # to prevent labels getting cut out
+               margin=list(b = 160, t = 20), # to prevent labels getting cut out
                hovermode = 'false') %>% # to get hover compare mode as default
-        config(displayModeBar = TRUE, displaylogo = F, collaborate=F, editable =F)
+        config(displayModeBar = FALSE, displaylogo = F, collaborate=F, editable =F)
       
       #Respond to user input regarding confidence intervals
       if (input$ci_rank == FALSE) {  
@@ -400,11 +493,70 @@ function(input, output) {
     }
   }) 
   
+  ############################.
+  # Function to save plot
+  plot_rank_ggplot <- function(){
+    #Coloring based on if signicantly different from comparator
+    color_pal <- ifelse(rank_bar_data()$interpret == "O", '#ccccff',
+                        ifelse(is.na(rank_bar_data()$lowci) | is.na(rank_bar_data()$upci) | is.na(rank_bar_data()$comp_value) | is.na(rank_bar_data()$measure) |rank_bar_data()$measure == 0, '#ccccff',
+                               ifelse(rank_bar_data()$lowci <= rank_bar_data()$comp_value & rank_bar_data()$upci >= rank_bar_data()$comp_value,'#999999',
+                                      ifelse(rank_bar_data()$lowci > rank_bar_data()$comp_value & rank_bar_data()$interpret == "H", '#3d99f5',
+                                             ifelse(rank_bar_data()$lowci > rank_bar_data()$comp_value & rank_bar_data()$interpret == "L", '#ff9933',
+                                                    ifelse(rank_bar_data()$upci < rank_bar_data()$comp_value & rank_bar_data()$interpret == "L", '#3d99f5',
+                                                           ifelse(rank_bar_data()$upci < rank_bar_data()$comp_value & rank_bar_data()$interpret == "H", '#ff9933', '#ccccff')))))))
+    
+    
+    #Creating a vector with the area names in the order they are going to be plotted
+    color_pal <- setNames(color_pal, rank_bar_data()$areaname)
+    
+    #title for rank
+    title_rank <- paste0(input$indic_rank, " - ", input$year_rank)
+    
+    # General plot and layout, bars with or without error bars will be added after user input
+    p <- ggplot(data=rank_bar_data(), aes(y = measure,  x = reorder(areaname, -measure)))+
+      geom_bar(aes(fill=areaname), stat = "identity")+
+      geom_hline(aes(yintercept=comp_value, color="red"))+
+      labs(title=title_rank, y=unique(rank_bar_data()$type_definition))+
+      scale_fill_manual(values=color_pal, name = "")+
+      scale_y_continuous(expand = c(0, 0), limits=c(0, max(rank_bar_data()$upci)))+
+      #Layout
+      theme(text = element_text(size=11, family="Helvetica Neue,Helvetica,Arial,sans-serif"),
+            axis.text.x = element_text(angle=90, hjust=1), 
+            axis.line.x = element_line(), 
+            axis.ticks = element_blank(),
+            aspect.ratio=0.3,
+            plot.title = element_text(hjust = 0.5), #centering title
+            axis.title.x = element_blank(), #taking out x axis title
+            legend.position = "none", #taking out background from legend
+            panel.grid.major.y = element_line(colour="#F0F0F0"),
+            panel.background = element_blank() #Blanking background
+      )
+    
+    #Respond to user input regarding confidence intervals
+    if (input$ci_rank == FALSE) {  
+      p <- p 
+      
+    } else{ 
+      #adding bar layer with error bars
+      p <-  p +   geom_errorbar(aes(ymin=lowci, ymax=upci), width=.2,
+                                position=position_dodge(.9))
+      
+    }
+  }
+  
   #Downloading data
   rank_csv <- reactive({ format_csv(rank_bar_data()) })
 
   output$download_rank <- downloadHandler(filename =  'rank_data.csv',
     content = function(file) {write.csv(rank_csv(), file, row.names=FALSE) })
+  
+  #Downloading chart
+  output$download_rankplot <- downloadHandler(
+    filename = 'rank.png',
+    content = function(file){
+      ggsave(file, plot = plot_rank_ggplot(), device = "png", scale=4, limitsize=FALSE)
+    })
+  
   
   ###############################################.        
   #### Deprivation ----
@@ -653,7 +805,7 @@ function(input, output) {
   
   #Dynamically set height of bars
   bar_plot_height<- function(){
-    (nrow(bar_chosenarea() )*70)
+    (nrow(bar_chosenarea())*70)
   }
   
   ###############.
@@ -666,6 +818,13 @@ function(input, output) {
     #Merging comparator and chosen area
     bar <- merge(bar_allareas(), bar_chosencomp(), by=c("indicator"))
     bar <- merge(bar, bar_chosenarea(), by=c("indicator"))
+    
+    #generate labels for comp and chosen bars
+    data_labels <- bar %>%
+      select(indicator, measure_comp, measure_chosen, type_definition,trend_axis, code) %>%
+      group_by(indicator, type_definition, trend_axis, code) %>%
+      summarise(comp_lab=measure_comp[1], chosen_lab=measure_chosen[1]) %>%
+      droplevels()
     
     bar_data <- bind_rows(bar %>% mutate(y=0),
                           bar %>% mutate(y=1))
@@ -684,17 +843,19 @@ function(input, output) {
       geom_line(alpha=0.2)+
       geom_line(aes(x = measure_chosen, colour=chosenarea_name),size=1) + #picked area
       geom_line(aes(x = measure_comp, colour=comparea_name),size=1) + #comparator
-      geom_text(data=bar_data,aes(x=measure_comp,y=-0.2,label=round(measure_comp,digits=0)), family="Helvetica Neue,Helvetica,Arial,sans-serif", colour = "goldenrod1",vjust=0, hjust=0)+
-      geom_text(data=bar_data,aes(x=measure_chosen,y=1.2,label=round(measure,digits=0)), family="Helvetica Neue,Helvetica,Arial,sans-serif", colour = "lightseagreen",vjust=1, hjust=1)+
+      geom_text(data=data_labels, aes(x=chosen_lab,y=1.5,label=round(chosen_lab,digits=1)),
+                size=5,colour = "lightseagreen",vjust=1, hjust=1) + #label for chosenarea
+      geom_text(data=data_labels, aes(x=comp_lab,y=-0.6,label=round(comp_lab,digits=1)),
+                size=5,colour = "goldenrod1",vjust=0, hjust=0) + #label for comparator
       ggtitle("Topic:", subtitle = topic_name)+
       colour_template+
-      theme(axis.title.x=element_blank(), #Taking out x axis title
-            axis.title.y=element_blank(), #Taking out y axis title
-            plot.title = element_text(family="Helvetica Neue,Helvetica,Arial,sans-serif", size=13, hjust=-0),
-            plot.subtitle = element_text(family="Helvetica Neue,Helvetica,Arial,sans-serif", size=13),
+      theme(axis.title=element_blank(), #Taking out x axis title
+            plot.title = element_text(colour ='#555555',size=13, hjust=-0),
+            plot.subtitle = element_text(size=13,colour ='#555555'),
+            text = element_text(family="Helvetica Neue,Helvetica,Arial,sans-serif"),
             legend.position="top",
             legend.key = element_rect(colour = NA, fill = NA),
-            legend.text = element_text(family="Helvetica Neue,Helvetica,Arial,sans-serif",colour ='#555555', size=11, hjust=0),
+            legend.text = element_text(colour ='#555555', size=11, hjust=0),
             axis.text.x=element_blank(), # taking out x axis labels
             axis.text.y=element_blank(), # taking out y axis labels
             axis.ticks.x=element_blank(), # taking out x axis tick marks
@@ -702,8 +863,8 @@ function(input, output) {
             panel.background = element_blank(),#Blanking background
             panel.border = element_blank())+ #frame of pl
       facet_wrap(~indicator + trend_axis, nrow=ind_count,ncol=1,scales="free_x",labeller = label_wrap_gen(multi_line = TRUE),strip.position="left")+
-      theme(strip.text.y = element_text(family="Helvetica Neue,Helvetica,Arial,sans-serif",colour ='#555555', size=12,angle = 180, hjust = 0))+
-      theme(strip.background =element_rect(fill="grey94"))
+      theme(strip.text.y = element_text(colour ='#555555', size=12,angle = 180, hjust = 0))+
+      theme(strip.background =element_rect(fill="grey96"))
   })
   
   output$ui_plot <-renderUI({
@@ -793,7 +954,7 @@ function(input, output) {
   
   #Dynamically set height of bars
   bar2_plot_height<- function(){
-    (nrow(bar_chosenarea2() )*70)
+    (nrow(bar_chosenarea2())*70)
   }
   
   ## Generate barcode2 plot
@@ -808,12 +969,12 @@ function(input, output) {
     
     #add variable denoting if sign diff between comparator
     bar2<-bar2 %>%
-      mutate(flag=ifelse(bar2$interpret == "O",'NA',
-                         ifelse(bar2$lowci_chosen<=bar2$measure_comp & bar2$upci_chosen>=bar2$measure_comp,'NS',
-                                ifelse(bar2$lowci_chosen > bar2$measure_comp & bar2$interpret == "H", 'Better',
-                                       ifelse(bar2$lowci_chosen > bar2$measure_comp & bar2$interpret == "L", 'Worse',
-                                              ifelse(bar2$upci_chosen < bar2$measure_comp & bar2$interpret == "L", 'Better',
-                                                     ifelse(bar2$upci_chosen < bar2$measure_comp & bar2$interpret == "H", 'Worse','NS')))))))
+      mutate(flag=ifelse(bar2$interpret == "O",'No significance can be calculated',
+                         ifelse(bar2$lowci_chosen<=bar2$measure_comp & bar2$upci_chosen>=bar2$measure_comp,'Statistically not significantly different from comparator average',
+                                ifelse(bar2$lowci_chosen > bar2$measure_comp & bar2$interpret == "H", 'Statistically significantly better than comparator average',
+                                       ifelse(bar2$lowci_chosen > bar2$measure_comp & bar2$interpret == "L", 'Statistically significantly worse than comparator average',
+                                              ifelse(bar2$upci_chosen < bar2$measure_comp & bar2$interpret == "L", 'Statistically significantly better than comparator average',
+                                                     ifelse(bar2$upci_chosen < bar2$measure_comp & bar2$interpret == "H", 'Statistically significantly worse than comparator average','Statistically not significantly different from comparator average')))))))
     
     #Transposing data so that better is always to the right of plot
     bar2 <- bar2 %>%
@@ -826,6 +987,16 @@ function(input, output) {
                             ifelse(bar2$interpret=='L' & bar2$measure_chosen<=bar2$measure_comp, (1-chosen),-(1-chosen)))) %>%
       mutate(comp=0)
     
+    #define x axis value to assign as intercept for significance
+    minx <- min(bar2$all2)-0.05    
+    
+    #generate labels for comp and chosen bars
+    data_labels <- bar2 %>%
+      select(indicator, measure_comp, measure_chosen, chosen2, comp, type_definition,trend_axis, code) %>%
+      group_by(indicator, type_definition, trend_axis, code) %>%
+      summarise(comp_lab=measure_comp[1], chosen_lab=measure_chosen[1],
+                x_chosen=chosen2[1], x_comp = comp[1])%>%
+      droplevels()
     
     bar2_data <- bind_rows(bar2 %>% mutate(y=0),
                            bar2 %>% mutate(y=1))
@@ -841,8 +1012,8 @@ function(input, output) {
     colour_lines <-  scale_colour_manual(" ",values= setNames(c("black", "lightseagreen", "goldenrod1"), c(areatype_name, chosenarea_name, comparea_name)))
     
     #Create fill colour scheme for significance.
-    fill_df <- data.frame(flag = c('NA', 'NS', 'Better','Worse'),stringsAsFactors = TRUE)
-    fillcolours <- c("blue", "white", "gray", "red")
+    fill_df <- data.frame(flag = c('No significance can be calculated', 'Statistically not significantly different from comparator average', 'Statistically significantly better than comparator average','Statistically significantly worse than comparator average'),stringsAsFactors = TRUE)
+    fillcolours <- c("DodgerBlue", "white", "#999999", "#ff9933")
     names(fillcolours) <- levels(fill_df$flag)
     colour_points <- scale_fill_manual(name = "flag",values = fillcolours)
     
@@ -850,23 +1021,27 @@ function(input, output) {
       geom_line(alpha=0.4)+
       geom_line(aes(x = chosen2, colour=chosenarea_name), size=1) + #line for picked area
       geom_line(aes(x = comp, colour=comparea_name), size=1) + #line for comparator
-      geom_point(aes(fill=flag, shape=flag, x= -1.5, y=0.5),size=4,colour="grey40") +
-      geom_text(data=bar2_data,aes(x=comp,y=-0.4,label=round((measure_comp),digits=0)),family="Helvetica Neue,Helvetica,Arial,sans-serif",colour = "goldenrod1",vjust=0, hjust=0)+ #label for comparator
-      geom_text(data=bar2_data,aes(x=chosen2,y=1.4,label=round(measure_chosen,digits=0)),family="Helvetica Neue,Helvetica,Arial,sans-serif",colour = "lightseagreen",vjust=1, hjust=1)+ #label for picked area
-      labs(subtitle = bar2_subtitle)+
+      geom_point(aes(fill=flag, shape=flag, x= minx, y=0.5),size=4,colour="grey40") +
+      geom_text(data=data_labels, aes(x=x_chosen,y=1.5,label=round(chosen_lab,digits=0)),
+                check_overlap = TRUE,size=5,colour = "lightseagreen",vjust=1, hjust=1) + #label for chosenarea
+      geom_text(data=data_labels, aes(x=x_comp,y=-0.6,label=round(comp_lab,digits=0)),
+                check_overlap = TRUE,size=5,colour = "goldenrod1",vjust=0, hjust=0) + #label for comparator
+      xlab("Worse  <-------------------->  Better")+
+      scale_x_discrete(position = "top") +
       colour_lines+
       colour_points+
       scale_shape_manual(values=21:24) +
       guides(color = guide_legend(order = 1),fill = guide_legend(order = 0))+
-      theme(axis.title.x=element_blank(), #Taking out x axis title
-            axis.title.y=element_blank(), #Taking out y axis title
-            plot.title = element_text(family="Helvetica Neue,Helvetica,Arial,sans-serif",hjust=0), #format title
-            plot.subtitle = element_text(family="Helvetica Neue,Helvetica,Arial,sans-serif",size=12,colour ='#555555'), #format substitle
-            plot.caption = element_text(family="Helvetica Neue,Helvetica,Arial,sans-serif",colour ='#555555',hjust=0),
+      theme(axis.title.y=element_blank(), #Taking out y axis title
+            axis.title.x=element_text(size=12, colour ='#555555',hjust=0.6), #x axis title contains better/worse
+            #plot.title = element_text(hjust=0), #?
+            #plot.subtitle = element_text(size=12,colour ='#555555'), #format substitle
+            #plot.caption = element_text(colour ='#555555',hjust=0),
+            text = element_text(family="Helvetica Neue,Helvetica,Arial,sans-serif"),
             legend.direction = "vertical",
             legend.position="top",
             legend.key = element_rect(colour = NA, fill = NA),
-            legend.text = element_text(family="Helvetica Neue,Helvetica,Arial,sans-serif",size=12,colour ='#555555', hjust=-1),
+            legend.text = element_text(size=12,colour ='#555555', hjust=-1),
             legend.title = element_blank(),
             axis.text.x=element_blank(), # taking out x axis labels
             axis.text.y=element_blank(), # taking out y axis labels
@@ -875,14 +1050,19 @@ function(input, output) {
             panel.background = element_blank(),#Blanking background
             panel.border = element_blank())+ #remove frame round plot plot
       facet_wrap(~indicator + type_definition + trend_axis, nrow=ind_count,ncol=1,scales="fixed",labeller = label_wrap_gen(multi_line = TRUE), strip.position="left")+ #facet wrap on indicator description to allow full description of indicator in strip text
-      theme(strip.text.y = element_text(family="Helvetica Neue,Helvetica,Arial,sans-serif",size=14,colour ='#555555', angle = 180, hjust = 0))+
-      theme(strip.background =element_rect(fill="grey98"))
+      theme(strip.text.y = element_text(size=14,colour ='#555555', angle = 180, hjust = 0))+
+      theme(strip.background =element_rect(fill="grey96"))
     
   })
   
   ## Resize plot height 
   output$ui_bar_plot <-renderUI({
     plotOutput("bar2_plot", height=bar2_plot_height(), width="100%")
+  })
+  
+  # Topic select title
+  output$topic_selected<- renderText({ 
+    c("<b>Topic: ",input$topic_bar2,"</br>")
   })
   
   # Downloading data
@@ -1011,33 +1191,136 @@ function(input, output) {
   #####################################.      
   #### Table ----
   #####################################.      
-  
-  # Table data
-  table_data <- reactive({
-    optdata %>%  subset(select=c("areaname", "areatype", "indicator", 
-                                 "def_period","numerator", "measure", "type_definition"))
-  })
-  
-  #Actual table.
-  output$table_opt <- DT::renderDataTable({
+  # Display data that has been filtered by user - reactive so that changes as soon as user input changes
+  #Data filtered on indicator tab
+  filter_indicator_table <- reactive({  
+    if (!is.null(input$indicator_selected)) {filtered_geo <- optdata %>% filter((areaname %in% input$iz_true & areatype == "Intermediate zone")|
+                                                                                  (areaname %in% input$la_true & areatype == "Council area")|
+                                                                                  (areaname %in% input$hb_true & areatype == "Health board")|
+                                                                                  (areaname %in% input$hscl_true & areatype == "HSC Locality")|
+                                                                                  (areaname %in% input$hscp_true & areatype == "HSC Partnership")|
+                                                                                  (code %in% input$code)
+    ) %>% filter(year>input$date_from[1] & year<input$date_from[2]) %>%
+      filter(indicator %in% input$indicator_selected)
+    filtered_geo2 <- if (input$scotland == TRUE) {
+      optdata %>% filter(areaname == "Scotland") %>% filter(year>input$date_from[1] & year<input$date_from[2]) %>%
+        filter(indicator %in% input$indicator_selected)}
+    filtered_geos <- rbind(filtered_geo,filtered_geo2)
+    if (input$all_data == TRUE) {
+      filtered_geos <- optdata %>% filter(year>input$date_from[1] & year<input$date_from[2]) %>%
+        filter(indicator %in% input$indicator_selected)}
+    } else {
+      filtered_geo <- optdata %>% filter((areaname %in% input$iz_true & areatype == "Intermediate zone")|
+                                           (areaname %in% input$la_true & areatype == "Council area")|
+                                           (areaname %in% input$hb_true & areatype == "Health board")|
+                                           (areaname %in% input$hscl_true & areatype == "HSC Locality")|
+                                           (areaname %in% input$hscp_true & areatype == "HSC Partnership")|
+                                           (code %in% input$code)
+      ) %>% filter(year>input$date_from[1] & year<input$date_from[2])
+      filtered_geo2 <- if (input$scotland == TRUE) {
+        optdata %>% filter(areaname == "Scotland") %>% filter(year>input$date_from[1] & year<input$date_from[2]) }
+      filtered_geos <- rbind(filtered_geo,filtered_geo2)
+      if (input$all_data == TRUE) {
+        filtered_geos <- optdata %>% filter(year>input$date_from[1] & year<input$date_from[2])}
+    }
     
-    DT::datatable(table_data(), style = 'bootstrap', filter = 'top', rownames = FALSE,
-                  colnames = c("Area", "Type", "Indicator", "Period", "Numerator", 
-                               "Measure",  "Definition" ))
+    table <- filtered_geos %>% subset(select=c("code", "areaname", "areatype", "indicator", 
+                                               "def_period","numerator", "measure", "type_definition"))
+    
   })
-  
-  #Downloading data 
+  #display table based on selection made by user on indicator tab
+  output$table_opt_indicator <- DT::renderDataTable({
+    
+    DT::datatable(filter_indicator_table(), style = 'bootstrap', rownames = FALSE,
+                  colnames = c("Area Code", "Area", "Type", "Indicator", "Period", "Numerator", 
+                               "Measure",  "Definition" ), options = list(dom = 'tp')
+    )
+  })
+  #Data filtered on profile tab
+  filter_profile_table <- reactive({ 
+    if (!is.null(input$profile_selected)) {pfiltered_geo <- optdata %>% filter((areaname %in% input$iz_true & areatype == "Intermediate zone")|
+                                                                                 (areaname %in% input$la_true & areatype == "Council area")|
+                                                                                 (areaname %in% input$hb_true & areatype == "Health board")|
+                                                                                 (areaname %in% input$hscl_true & areatype == "HSC Locality")|
+                                                                                 (areaname %in% input$hscp_true & areatype == "HSC Partnership")|
+                                                                                 (code %in% input$code)
+    ) %>% filter(year>input$date_from[1] & year<input$date_from[2]) %>%
+      filter((domain1 %in% input$profile_selected)|(domain2 %in% input$profile_selected)|(domain3 %in% input$profile_selected))
+    pfiltered_geo2 <- if (input$scotland == TRUE) {
+      optdata %>% filter(areaname == "Scotland") %>% filter(year>input$date_from[1] & year<input$date_from[2]) %>%
+        filter((domain1 %in% input$profile_selected)|(domain2 %in% input$profile_selected)|(domain3 %in% input$profile_selected))}
+    pfiltered_geos <- rbind(pfiltered_geo,pfiltered_geo2)
+    if (input$all_data == TRUE) {
+      pfiltered_geos <- optdata %>% filter(year>input$date_from[1] & year<input$date_from[2]) %>%
+        filter((domain1 %in% input$profile_selected)|(domain2 %in% input$profile_selected)|(domain3 %in% input$profile_selected))}
+    } else {
+      pfiltered_geo <- optdata %>% filter((areaname %in% input$iz_true & areatype == "Intermediate zone")|
+                                            (areaname %in% input$la_true & areatype == "Council area")|
+                                            (areaname %in% input$hb_true & areatype == "Health board")|
+                                            (areaname %in% input$hscl_true & areatype == "HSC Locality")|
+                                            (areaname %in% input$hscp_true & areatype == "HSC Partnership")|
+                                            (code %in% input$code)
+      ) %>% filter(year>input$date_from[1] & year<input$date_from[2])
+      pfiltered_geo2 <- if (input$scotland == TRUE) {
+        optdata %>% filter(areaname == "Scotland") %>% filter(year>input$date_from[1] & year<input$date_from[2]) }
+      pfiltered_geos <- rbind(pfiltered_geo,pfiltered_geo2)
+      if (input$all_data == TRUE) {
+        pfiltered_geos <- optdata %>% filter(year>input$date_from[1] & year<input$date_from[2])}
+    }
+    table <- pfiltered_geos %>% subset(select=c("code", "areaname", "areatype", "indicator", 
+                                                "def_period","numerator", "measure", "type_definition"))
+  })
+  #display table based on selection made by user on profile tab
+  output$table_opt_profile <- DT::renderDataTable({
+    DT::datatable(filter_profile_table(), style = 'bootstrap', rownames = FALSE,
+                  colnames = c("Area Code", "Area", "Type", "Indicator", "Period", "Numerator", 
+                               "Measure",  "Definition" ), options = list(dom = 'tp')
+    )
+  })
+  #Clearing all user inputs to default
+  observeEvent(input$clear, {
+    updateCheckboxInput(session, "iz", label = NULL, value = FALSE)
+    updateSelectInput(session, "iz_true", label = NULL,
+                      choices = intzone_name, selected = character(0))
+    updateCheckboxInput(session, "la", label = NULL, value = FALSE)
+    updateSelectInput(session, "la_true", label = NULL,
+                      choices = la_name, selected = character(0))
+    updateCheckboxInput(session, "hb", label = NULL, value = FALSE)
+    updateSelectInput(session, "hb_true", label = NULL,
+                      choices = hb_name, selected = character(0))
+    updateCheckboxInput(session, "hscl", label = NULL, value = FALSE)
+    updateSelectInput(session, "hscl_true", label = NULL,
+                      choices = locality_name, selected = character(0))
+    updateCheckboxInput(session, "hscp", label = NULL, value = FALSE)
+    updateSelectInput(session, "hscp_true", label = NULL,
+                      choices = partnership_name, selected = character(0))
+    updateCheckboxInput(session, "scotland", label = NULL, value = FALSE)
+    updateCheckboxInput(session, "all_data", label = NULL, value = FALSE)
+    updateSelectInput(session, "code", label = NULL,
+                      choices = code_list, selected = character(0))
+    updateSliderInput(session, "date_from", label = "From", value = c(min_year,max_year),
+                      min = min_year, max = max_year, step = 1)
+    #updateSliderInput(session, "date_toinstal", label = "To", value = max_year,
+     #                 min = min_year, max = max_year, step = 1)
+  })
+  #Downloading data in csv format
   table_csv <- reactive({ format_csv(optdata) })
   
-  #The filters the user applies in the data table will determine what data they download
-  output$download_table <- downloadHandler(
-    filename =  'table_data.csv',
+  #The filters the user applies in the data table will determine what data they download - indicator tab table
+  output$download_table_i_csv <- downloadHandler(
+    filename ="scotpho_data_extract.csv",
     content = function(file) {
-      write.csv(table_csv()[input[["table_opt_rows_all"]], ], 
+      write.csv(table_csv()[input[["table_opt_indicator_rows_all"]], ], 
                 file, row.names=FALSE) } 
-    )
-
-}
+  )
+  #The filters the user applies in the data table will determine what data they download - profile tab table
+  output$download_table_p_csv <- downloadHandler(
+    filename ="scotpho_data_extract.csv",
+    content = function(file) {
+      write.csv(table_csv()[input[["table_opt_profile_rows_all"]], ], 
+                file, row.names=FALSE) } 
+  )
+} #server closing bracket
 
 #########################  END ----
 
