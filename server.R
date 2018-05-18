@@ -306,7 +306,7 @@ function(input, output, session) {
         #Layout 
         layout(title = ~indicator,
                annotations = list(), #It needs this because of a buggy behaviour of Plotly
-               margin = list(b = 160, t=20), #to avoid labels getting cut out
+               margin = list(b = 160, t=40), #to avoid labels getting cut out
                yaxis = list(title = ~type_definition, rangemode="tozero", 
                             size = 4, titlefont =list(size=12), tickfont =list(size=11)), 
                xaxis = list(title = FALSE, tickfont =list(size=10), tickangle = 270),
@@ -354,7 +354,7 @@ function(input, output, session) {
   output$download_trendplot <- downloadHandler(
     filename = 'trend.png',
     content = function(file){
-      ggsave(file, plot = plot_trend_ggplot(), device = "png", scale=4, limitsize=FALSE)
+      ggsave(file, plot = plot_trend_ggplot(), device = "png", scale=3, limitsize=FALSE)
     })
   
   
@@ -472,7 +472,7 @@ function(input, output, session) {
                             categoryorder="array", #order of plotting
                             categoryarray = order_areas),
                font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif'),
-               margin=list(b = 160, t = 20), # to prevent labels getting cut out
+               margin=list(b = 160, t = 40), # to prevent labels getting cut out
                hovermode = 'false') %>% # to get hover compare mode as default
         config(displayModeBar = FALSE, displaylogo = F, collaborate=F, editable =F)
       
@@ -554,7 +554,7 @@ function(input, output, session) {
   output$download_rankplot <- downloadHandler(
     filename = 'rank.png',
     content = function(file){
-      ggsave(file, plot = plot_rank_ggplot(), device = "png", scale=4, limitsize=FALSE)
+      ggsave(file, plot = plot_rank_ggplot(), device = "png", scale=3, limitsize=FALSE)
     })
   
   
@@ -738,13 +738,13 @@ function(input, output, session) {
   output$download_simd <- downloadHandler(filename =  'deprivation_data.csv',
     content = function(file) {write.csv(simd_csv(), file, row.names=FALSE)})
 
-  ###############################################.        
+  ###############################################.
   #### barcode ----
   ###############################################
   # Reactive controls for heatmap:area name depending on areatype selected
   # Reactive controls for heatmap:area name depending on areatype selected
   output$geoname_ui_bar <- renderUI({
-    
+
     areas_bar <- if (input$geotype_bar %in% c("Health board", "Council area", "HSC Partnership"))
     {
       sort(geo_lookup$areaname[geo_lookup$areatype == input$geotype_bar])
@@ -752,25 +752,25 @@ function(input, output, session) {
       sort(geo_lookup$areaname[geo_lookup$areatype == input$geotype_bar
                                & geo_lookup$parent_area == input$loc_iz_bar])
     }
-    
+
     selectInput("geoname_bar", "Area", choices = areas_bar, selectize=TRUE, selected = "")
-    
+
   })
-  
+
   #Barcode all area data
-  bar_allareas <- reactive({ 
-    
+  bar_allareas <- reactive({
+
     optdata %>%
       group_by (indicator) %>%
       mutate(max_year = max(year))%>%
       subset (year == max_year &
                 (domain1 %in% input$topic_bar | domain2 %in% input$topic_bar |  domain3 %in% input$topic_bar) &
-                (areatype  == input$geotype_bar) & 
-                indicator != "Mid-year population estimate - all ages")  
+                (areatype  == input$geotype_bar) &
+                indicator != "Mid-year population estimate - all ages")
   })
-  
+
   #Barcode data for the chosen area. Filtering based on user input values.
-  bar_chosenarea <- reactive({ 
+  bar_chosenarea <- reactive({
     optdata %>%
       group_by (indicator) %>%
       mutate(max_year=max(year))%>%
@@ -778,16 +778,16 @@ function(input, output, session) {
                 areaname == input$geoname_bar &
                 indicator != "Mid-year population estimate - all ages" &
                 areatype == input$geotype_bar &
-                (domain1 %in% input$topic_bar | domain2 %in% input$topic_bar |  domain3 %in% input$topic_bar)) %>% 
-      select(c(indicator, measure)) %>% 
+                (domain1 %in% input$topic_bar | domain2 %in% input$topic_bar |  domain3 %in% input$topic_bar)) %>%
+      select(c(indicator, measure)) %>%
       rename(measure_chosen = measure) %>%
       droplevels()
-    
+
   })
-  
+
   #Select comparator based on years available for area selected.
-  bar_chosencomp <- reactive({ 
-    
+  bar_chosencomp <- reactive({
+
     optdata %>%
       group_by (indicator) %>%
       mutate(max_year=max(year))%>%
@@ -795,50 +795,50 @@ function(input, output, session) {
                 areaname == input$geocomp_bar &
                 indicator != "Mid-year population estimate - all ages" &
                 areatype %in% c("Health board", "Council area", "Scotland") &
-                (domain1 %in% input$topic_bar | domain2 %in% input$topic_bar |  domain3 %in% input$topic_bar)) %>% 
-      select(c(indicator, measure)) %>% 
-      rename(measure_comp =measure) %>% 
+                (domain1 %in% input$topic_bar | domain2 %in% input$topic_bar |  domain3 %in% input$topic_bar)) %>%
+      select(c(indicator, measure)) %>%
+      rename(measure_comp =measure) %>%
       droplevels()
-    
+
   })
-  
-  
+
+
   #Dynamically set height of bars
   bar_plot_height<- function(){
     (nrow(bar_chosenarea())*70)
   }
-  
+
   ###############.
   #barcode plot
-  
+
   output$bar_plot <- renderPlot({
-    
+
     ind_count <- length(unique(bar_allareas()$ind_id)) #facet_wrap requires how many chart rows to render
-    
+
     #Merging comparator and chosen area
     bar <- merge(bar_allareas(), bar_chosencomp(), by=c("indicator"))
     bar <- merge(bar, bar_chosenarea(), by=c("indicator"))
-    
+
     #generate labels for comp and chosen bars
     data_labels <- bar %>%
       select(indicator, measure_comp, measure_chosen, type_definition,trend_axis, code) %>%
       group_by(indicator, type_definition, trend_axis, code) %>%
       summarise(comp_lab=measure_comp[1], chosen_lab=measure_chosen[1]) %>%
       droplevels()
-    
+
     bar_data <- bind_rows(bar %>% mutate(y=0),
                           bar %>% mutate(y=1))
-    
+
     ##Chart title text
     areatype_name <- input$geotype_bar
     chosenarea_name <- input$geoname_bar
     comparea_name <- input$geocomp_bar
     topic_name <- input$topic_bar
     barcode_title <- paste("Distribution of values for",topic_name)
-    
+
     #Create colour scale for lines & legend key.
     colour_template <-  scale_colour_manual(" ",values= setNames(c("black", "lightseagreen", "goldenrod1"), c(areatype_name, chosenarea_name, comparea_name)))
-    
+
     ggplot(bar_data, aes(x = measure, y = y, group=code, colour=areatype_name))+
       geom_line(alpha=0.2)+
       geom_line(aes(x = measure_chosen, colour=chosenarea_name),size=1) + #picked area
@@ -866,16 +866,16 @@ function(input, output, session) {
       theme(strip.text.y = element_text(colour ='#555555', size=12,angle = 180, hjust = 0))+
       theme(strip.background =element_rect(fill="grey96"))
   })
-  
+
   output$ui_plot <-renderUI({
     plotOutput("bar_plot", height=bar_plot_height(), width="100%")
-    
+
   })
-  
+
   # Downloading data
   # Build dataset for download
   bar_csv <- reactive({
-    
+
     #Merging comparator and chosen area
     bar <- merge(bar_allareas(), bar_chosencomp(), by=c("indicator"))
     bar <- merge(bar, bar_chosenarea(), by=c("indicator"))
@@ -887,15 +887,15 @@ function(input, output, session) {
       rename(lower_confidence_interval=lowci, upper_confidence_interval=upci,
              latest_period = def_period, definition = type_definition, comparator_measure = measure_comp)
   })
-  
+
   output$download_bar <- downloadHandler( filename =  'barcode_data.csv',
                                           content = function(file) { write.csv(bar_csv(), file, row.names=FALSE) })
-  ##############################################.        
+  ##############################################.
   ## barcode2 ----
   ###############################################
   # Reactive controls for barcode:area name depending on areatype selected
   output$geoname_ui_bar2 <- renderUI({
-    
+
     areas_bar2 <- if (input$geotype_bar2 %in% c("Health board", "Council area", "HSC Partnership"))
     {
       sort(geo_lookup$areaname[geo_lookup$areatype == input$geotype_bar2])
@@ -903,14 +903,14 @@ function(input, output, session) {
       sort(geo_lookup$areaname[geo_lookup$areatype == input$geotype_bar2
                                & geo_lookup$parent_area == input$loc_iz_bar2])
     }
-    
+
     selectInput("geoname_bar2", "Area", choices = areas_bar2, selectize=TRUE, selected = "")
-    
+
   })
-  
+
   #Barcode all area data
   bar_allareas2 <- reactive({
-    
+
     optdata %>%
       group_by (indicator) %>%
       mutate(max_year = max(year))%>%
@@ -919,7 +919,7 @@ function(input, output, session) {
                 (areatype  == input$geotype_bar2) &
                 indicator != "Mid-year population estimate - all ages")
   })
-  
+
   #Barcode data for the chosen area. Filtering based on user input values.
   bar_chosenarea2 <- reactive({
     optdata %>%
@@ -934,10 +934,10 @@ function(input, output, session) {
       rename(measure_chosen= measure, lowci_chosen=lowci, upci_chosen= upci) %>%
       droplevels()
   })
-  
+
   #Select comparator based on years available for area selected.
   bar_chosencomp2 <- reactive({
-    
+
     optdata %>%
       group_by (indicator) %>%
       mutate(max_year=max(year))%>%
@@ -949,24 +949,24 @@ function(input, output, session) {
       select(c(indicator, measure)) %>%
       rename(measure_comp =measure) %>%
       droplevels()
-    
+
   })
-  
+
   #Dynamically set height of bars
   bar2_plot_height<- function(){
     (nrow(bar_chosenarea2())*70)
   }
-  
+
   ## Generate barcode2 plot
-  
+
   output$bar2_plot <- renderPlot({
-    
+
     ind_count <- length(unique(bar_allareas2()$ind_id)) #facet_wrap requires how many chart rows to render
-    
+
     #Merging comparator and chosen area
     bar2 <- merge(bar_allareas2(), bar_chosencomp2(), by=c("indicator"))
     bar2 <- merge(bar2, bar_chosenarea2(), by=c("indicator"))
-    
+
     #add variable denoting if sign diff between comparator
     bar2<-bar2 %>%
       mutate(flag=ifelse(bar2$interpret == "O",'No significance can be calculated',
@@ -975,21 +975,21 @@ function(input, output, session) {
                                        ifelse(bar2$lowci_chosen > bar2$measure_comp & bar2$interpret == "L", 'Statistically significantly worse than comparator average',
                                               ifelse(bar2$upci_chosen < bar2$measure_comp & bar2$interpret == "L", 'Statistically significantly better than comparator average',
                                                      ifelse(bar2$upci_chosen < bar2$measure_comp & bar2$interpret == "H", 'Statistically significantly worse than comparator average','Statistically not significantly different from comparator average')))))))
-    
+
     #Transposing data so that better is always to the right of plot
     bar2 <- bar2 %>%
       mutate(comp=1)%>%
       mutate(all=bar2$measure/bar2$measure_comp) %>%
       mutate(chosen=bar2$measure_chosen/bar2$measure_comp) %>%
-      mutate(all2=ifelse(bar2$interpret=='L' & bar2$measure>bar2$measure_comp, -(all-1), 
+      mutate(all2=ifelse(bar2$interpret=='L' & bar2$measure>bar2$measure_comp, -(all-1),
                          ifelse(bar2$interpret=='L' & bar2$measure<=bar2$measure_comp, (1-all),-(1-all)))) %>%
-      mutate(chosen2=ifelse(bar2$interpret=='L' & bar2$measure_chosen>bar2$measure_comp, -(chosen-1), 
+      mutate(chosen2=ifelse(bar2$interpret=='L' & bar2$measure_chosen>bar2$measure_comp, -(chosen-1),
                             ifelse(bar2$interpret=='L' & bar2$measure_chosen<=bar2$measure_comp, (1-chosen),-(1-chosen)))) %>%
       mutate(comp=0)
-    
+
     #define x axis value to assign as intercept for significance
-    minx <- min(bar2$all2)-0.05    
-    
+    minx <- min(bar2$all2)-0.05
+
     #generate labels for comp and chosen bars
     data_labels <- bar2 %>%
       select(indicator, measure_comp, measure_chosen, chosen2, comp, type_definition,trend_axis, code) %>%
@@ -997,26 +997,26 @@ function(input, output, session) {
       summarise(comp_lab=measure_comp[1], chosen_lab=measure_chosen[1],
                 x_chosen=chosen2[1], x_comp = comp[1])%>%
       droplevels()
-    
+
     bar2_data <- bind_rows(bar2 %>% mutate(y=0),
                            bar2 %>% mutate(y=1))
-    
+
     #Chart title text & subtitle
     areatype_name <- input$geotype_bar2
     chosenarea_name <- input$geoname_bar2
     comparea_name <- input$geocomp_bar2
     topic_name <- input$topic_bar2
     bar2_subtitle <- paste("Topic:",input$topic_bar2,sep=" ")
-    
+
     #Create colour scale for lines & legend key.
     colour_lines <-  scale_colour_manual(" ",values= setNames(c("black", "lightseagreen", "goldenrod1"), c(areatype_name, chosenarea_name, comparea_name)))
-    
+
     #Create fill colour scheme for significance.
     fill_df <- data.frame(flag = c('No significance can be calculated', 'Statistically not significantly different from comparator average', 'Statistically significantly better than comparator average','Statistically significantly worse than comparator average'),stringsAsFactors = TRUE)
     fillcolours <- c("DodgerBlue", "white", "#999999", "#ff9933")
     names(fillcolours) <- levels(fill_df$flag)
     colour_points <- scale_fill_manual(name = "flag",values = fillcolours)
-    
+
     ggplot(bar2_data, aes(x = all2, y = y, group=code, colour=areatype))+
       geom_line(alpha=0.4)+
       geom_line(aes(x = chosen2, colour=chosenarea_name), size=1) + #line for picked area
@@ -1052,28 +1052,28 @@ function(input, output, session) {
       facet_wrap(~indicator + type_definition + trend_axis, nrow=ind_count,ncol=1,scales="fixed",labeller = label_wrap_gen(multi_line = TRUE), strip.position="left")+ #facet wrap on indicator description to allow full description of indicator in strip text
       theme(strip.text.y = element_text(size=14,colour ='#555555', angle = 180, hjust = 0))+
       theme(strip.background =element_rect(fill="grey96"))
-    
+
   })
-  
-  ## Resize plot height 
+
+  ## Resize plot height
   output$ui_bar_plot <-renderUI({
     plotOutput("bar2_plot", height=bar2_plot_height(), width="100%")
   })
-  
+
   # Topic select title
-  output$topic_selected<- renderText({ 
+  output$topic_selected<- renderText({
     c("<b>Topic: ",input$topic_bar2,"</br>")
   })
-  
+
   # Downloading data
   bar2_csv <- reactive({
-    
+
     #Merging comparator and chosen area
     bar2 <- merge(bar_allareas2(), bar_chosencomp2(), by=c("indicator"))
     bar2 <- merge(bar2, bar_chosenarea2(), by=c("indicator"))
     bar2 <- bind_cols(bar2 %>% mutate(topic=input$topic_bar))
     bar2 <- bind_cols(bar2 %>% mutate(comparator=input$geocomp_bar))
-    
+
     bar2<-bar2 %>%
       mutate(flag=ifelse(bar2$interpret == "O",'NA',
                          ifelse(bar2$lowci_chosen<=bar2$measure_comp & bar2$upci_chosen>=bar2$measure_comp,'NS',
@@ -1081,21 +1081,21 @@ function(input, output, session) {
                                        ifelse(bar2$lowci_chosen > bar2$measure_comp & bar2$interpret == "L", 'Worse',
                                               ifelse(bar2$upci_chosen < bar2$measure_comp & bar2$interpret == "L", 'Better',
                                                      ifelse(bar2$upci_chosen < bar2$measure_comp & bar2$interpret == "H", 'Worse','NS')))))))
-    
-    bar2 %>% 
+
+    bar2 %>%
       select(c(indicator, areaname, areatype, def_period, numerator, measure,
                lowci, upci, type_definition, topic, measure_comp, comparator, flag)) %>%
       rename(lower_confidence_interval=lowci, upper_confidence_interval=upci,
              latest_period = def_period, definition = type_definition, comparator_measure = measure_comp, difference=flag)
-    
+
   })
-  
+
   output$download_bar2 <- downloadHandler( filename =  'barcode2_data.csv',
                                            content = function(file) { write.csv(bar2_csv(), file, row.names=FALSE) })
 
 
 #####################################.    
-#### Map ----
+### Map ----
 #####################################.      
   #Dynamic selection of the last period available based on indicator selected
   output$year_ui_map <- renderUI({
