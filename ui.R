@@ -23,9 +23,11 @@
                #Style sidebars/well panels
                tags$style(".well {background-color:#ffffff; border: 0px solid #336699;
                           padding: 5px; box-shadow: none; }",
+               #Background colour of header navBar
+               ".navbar-brand {background-color: white}",
+               ".navbar {font-size: 12px; border: 0}", #font size and border
                #Text size and line height
-               "body { font-size: 11px; line-height: 1.1}",
-               ".navbar { font-size: 12px}",
+                "body { font-size: 11px; line-height: 1.1}",
                ".checkbox label, .radio label { line-height: 1.6 }",
                ".radio-inline {line-height: 2}",
                #Padding and margins of filters and labels
@@ -44,10 +46,10 @@
                  padding-left: 5px; padding-right: 5px;}",
                #Style for download buttons
                ".down{background-color:#4da6ff; color: white; background-image:none;
-               font-size: 12px; padding: 5px 10px}",
+               font-size: 11px; padding: 5px 10px; margin-bottom: 5px; margin-top: 5px}",
                #to avoid red text error messages in the whole app, take out for testing
-               # ".shiny-output-error { visibility: hidden; }",
-               #            ".shiny-output-error:before { visibility: hidden; }",
+               ".shiny-output-error { visibility: hidden; }",
+               ".shiny-output-error:before { visibility: hidden; }",
                #External links underlined an open a new tab
                ".externallink{text-decoration: underline;} "),
                HTML("<base target='_blank'>")
@@ -106,7 +108,8 @@ tabPanel("Overview", icon = icon("heartbeat"),
              column(2,
                     actionLink("help_overview", label = tags$b("Help"), icon= icon('question-circle')),
                     br(),
-                    downloadButton('download_heat', 'Download data', class = "down")
+                    downloadButton('download_heat', 'Download data', class = "down"),
+                    savechart_button('download_overviewplot', 'Save chart',  class = "down")
                     )
            ),
          mainPanel(width = 12,
@@ -135,6 +138,7 @@ tabPanel("Trend", icon = icon("area-chart"),
                           uiOutput("loc_ui_trend"),
                           uiOutput("iz_ui_trend"),
                           downloadButton('download_trend', 'Download data', class = "down"),
+                          savechart_button('download_trendplot', 'Save chart',  class = "down"),
                           checkboxInput("colorblind_trend",  
                                  label = "Improved accessibility", value = FALSE)
                    ),
@@ -168,7 +172,8 @@ tabPanel("Rank", icon = icon("signal"),
                     "Statistically significantly worse than comparator average.", br(),
                     img(src='signif_nocalc2.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
                     "No significance can be calculated."),
-                  downloadButton('download_rank', 'Download data', class = "down")
+                  downloadButton('download_rank', 'Download data', class = "down"),
+                  savechart_button('download_rankplot', 'Save chart', class = "down")
          ),
          mainPanel(width = 8, #Main panel
                    plotlyOutput("rank_plot") 
@@ -262,10 +267,13 @@ tabPanel("Barcode2", icon = icon("barcode"),
                       uiOutput("geoname_ui_bar2"),
                       selectInput("geocomp_bar2", "Comparator", choices = comparator_list, selectize=TRUE, selected = "Scotland"),
                       selectInput("topic_bar2", "Topic", choices = topic_list,selectize=TRUE, selected = "Scotland"),
-                      downloadButton('download_bar2', 'Download data', class = "down")
+                      downloadButton('download_bar2', 'Download data', class = "down"),
+                      br(),
+                      actionLink("help_bar", label = tags$b("Help"), icon= icon('question-circle'))
          ),
          mainPanel(width=9,
                    p(tags$b("The chart below shows how indicator values for different geographical areas compare. "), style= "font-size:12px;"),
+                   htmlOutput("topic_selected"),
                    uiOutput("ui_bar_plot")
        )
 ),
@@ -273,17 +281,95 @@ tabPanel("Barcode2", icon = icon("barcode"),
 ## Table ----
 ###############################################.
 tabPanel("Table", icon = icon("table"),
-         #Intro text
-         column(9,
-                p(tags$b("Indicator data in a table format. ")),
-                tags$ul( 
-                  tags$li("Use the filters to select the data you are interested in."))
-                ),
-         column(3,
-                downloadButton('download_table', 'Download data', class = "down")  #For downloading the data
+         #Sidepanel for filtering data
+         sidebarPanel(
+           tags$h4("Filter ScotPHO Data by", style = "font-weight: bold; color: #4d3a7d;"),
+           tags$div(tags$i("Select appropriate conditions to filter data"), 
+                    tags$br(),
+                    tags$i("To delete choices use RETURN or select item and DELETE")),
+           tags$br(),
+           tags$br(),
+           actionButton("clear", label = "Clear All Filters", icon ("eraser"), style='font-size:99%'),
+           tags$h2("Geography", style = "font-weight: bold; color: #4d3a7d;"),
+           checkboxInput("iz",label = "Intermediate zone", value = FALSE),
+           conditionalPanel(
+             condition = "input.iz == true",
+             selectInput("iz_true", label = NULL,
+                         width = "200px", choices = intzone_name, selected = NULL, multiple=TRUE)),
+          checkboxInput("la",label = "Local Authority", value = FALSE),
+           conditionalPanel(
+             condition = "input.la == true",
+             selectInput("la_true", label = NULL,
+                         width = "200px", choices = la_name, selected = NULL, multiple=TRUE)),
+           checkboxInput("hb",label = "Healthboard", value = FALSE),
+           conditionalPanel(
+             condition = "input.hb == true",
+             selectInput("hb_true", label = NULL,
+                         width = "200px", choices = hb_name, selected = NULL, multiple=TRUE)),
+           checkboxInput("hscl",label = "Health and Social Care Locality", value = FALSE),
+           conditionalPanel(
+             condition = "input.hscl == true",
+             selectInput("hscl_true", label = NULL,
+                         width = "200px", choices = locality_name, selected = NULL, multiple=TRUE)),
+           checkboxInput("hscp",label = "Health and Social Care Partnership", value = FALSE),
+           conditionalPanel(
+             condition = "input.hscp == true",
+             selectInput("hscp_true", label = NULL,
+                         width = "200px", choices = partnership_name, selected = NULL, multiple=TRUE)),
+           checkboxInput("scotland",label = "Scotland", value = FALSE),
+           checkboxInput("all_data",label = "All Available Geographies", value = FALSE),
+           hr(),
+           p(tags$h5("Find geography by  area code", style = "font-weight: bold; color: #4d3a7d;")),
+           selectInput("code", label = NULL, #"Type in the box to search for area code" 
+                       width = "200px", choices = code_list, multiple=TRUE, selectize=TRUE, selected = ""),
+           hr(),
+           p(tags$h2("Time Period", style = "font-weight: bold; color: #4d3a7d;")),
+           #p(tags$h4("Display data for the date range", style = "font-weight: bold; color: #4d3a7d;")),
+           sliderInput("date_from",label = NULL, min = min_year, max = max_year, value = c(min_year,max_year), 
+                       width = "200px", step = 1, sep="", round = TRUE, ticks = TRUE, dragRange = FALSE)
+           #sliderInput("date_to",label = "To", min = min_year, max = max_year, value = max_year, 
+           #  width = "200px", step = 1, sep="", round = TRUE, ticks = TRUE, dragRange = FALSE)
+           
          ),
-         div(DT::dataTableOutput("table_opt"), style = "font-size:90%") #table
-  ), #Tab panel bracket
+         
+         #splitting up the main panel to include a header that filters for indicator of interest and lower one to display the table
+         mainPanel(
+           tabsetPanel(type = "tabs",
+                       tabPanel("Select Data by Indicators", 
+                                tags$br(),
+                                tags$br(),
+                                column(width=8,
+                                       selectInput("indicator_selected", label = "Type in the box to search",
+                                                   width = "400px", choices = indicator_list, selected = NULL, multiple=TRUE),
+                                       tags$br(),
+                                       tags$br()), 
+                                column(width=4,
+                                       tags$br(),
+                                       downloadButton("download_table_i_csv", 'Download data (csv)', class = "down"),
+                                       tags$br(),
+                                       tags$br()),  #For downloading the data
+                                #downloadButton("download_xlsx", 'Download data (xlsx)', class = "down"),  #For downloading the data
+                                column(11, DT::dataTableOutput("table_opt_indicator")),
+                                column(1)),
+                       tabPanel("Select Data by Topic", 
+                                tags$br(),
+                                tags$br(),
+                                column(width=8,
+                                       selectInput("profile_selected", label = "Type in the box to search",
+                                                   width = "400px", choices = topic_list, selected = NULL, multiple=TRUE),
+                                       tags$br(),
+                                       tags$br()), 
+                                column(width=4,
+                                       tags$br(),
+                                       downloadButton("download_table_p_csv", 'Download data (csv)', class = "down"), #For downloading the data
+                                       tags$br(),
+                                       tags$br()), 
+                                # downloadButton("download_table_p_xlsx", 'Download data (xlsx)', class = "down"),  #For downloading the data
+                                column(11, DT::dataTableOutput("table_opt_profile")),
+                                column(1))
+           )
+         )
+),
 ###############################################.             
 ##############Help----    
 ###############################################.
