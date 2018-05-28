@@ -61,7 +61,6 @@ library(tidyverse) # data manipulation, ggplot
 library (DT) # for data tables
 library(leaflet) #javascript maps
 library(plotly) #interactive graphs
-#library(XLConnect) #downloading data into excel file format
 
 ###############################################.
 ## Functions ----
@@ -70,16 +69,22 @@ library(plotly) #interactive graphs
 # more user friendly
 format_csv <- function(reactive_dataset) {
   reactive_dataset %>% 
-    select(c(indicator, areaname, areatype, def_period, numerator, measure, 
+    select(c(indicator, areaname, code, areatype, year, def_period, numerator, measure, 
              lowci, upci, type_definition)) %>% 
     rename(lower_confidence_interval=lowci, upper_confidence_interval=upci, 
-           period = def_period, definition = type_definition)
+           period = def_period, definition = type_definition, area_code=code, area_name=areaname,area_type=areatype)
 }
 
 #Download button for charts, just changing the icon
 savechart_button <- function(outputId, label = "Save chart", class=NULL){
   tags$a(id = outputId, class = paste("btn btn-default shiny-download-link", class), 
          href = "", target = "_blank", download = NA, icon("image"), label)
+}
+
+#Function to wrap titles, so they show completely when saving plot in ggplot
+title_wrapper <- function(x, ...) 
+{
+  paste(strwrap(x, ...), collapse = "\n")
 }
 
 ###############################################.
@@ -102,6 +107,8 @@ area_list <- sort(geo_lookup$areaname)
 comparator_list <- sort(geo_lookup$areaname[geo_lookup$areatype %in% 
                                     c("Health board", "Council area", "Scotland")]) 
 code_list <- unique(optdata$code)
+parent_geo_list <- c("Show All", as.character((unique(optdata$parent_area))[-1]))
+parent_iz_list <- geo_lookup %>% filter(areatype=="Intermediate zone") %>% select(areaname,parent_area)
 hb_name <- sort(geo_lookup$areaname[geo_lookup$areatype=="Health board"]) 
 la_name <- sort(geo_lookup$areaname[geo_lookup$areatype=="Council area"]) 
 intzone_name <- sort(geo_lookup$areaname[geo_lookup$areatype=="Intermediate zone"]) 
