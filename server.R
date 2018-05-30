@@ -767,88 +767,76 @@ function(input, output, session) {
   })
   
   #Merging shapefile with dynamic selection of data
-  #Council area
-  ca_pol <- reactive({
-    ca_map <- optdata %>% 
-      subset(areatype == "Council area" &
+  poly_map <- reactive({
+    map_pol <- optdata %>% 
+      subset(areatype == input$geotype_map &
                trend_axis==input$year_map & 
                indicator==input$indic_map) %>% 
-      rename(GSS_COD = code) %>% 
       droplevels() #dropping missing factor levels to allow merging
+    if (input$geotype_map == "Council area"){
+      map_pol <- merge(ca_bound, map_pol, by='code')
+    } else if(input$geotype_map == "Health board"){
+      map_pol <- merge(hb_bound, map_pol, by='code')
+    } else if(input$geotype_map == "HSC Partnership"){
+      map_pol <- merge(hscp_bound, map_pol, by='code')
+    }
     
-    ca_map <- merge(ca_bound, ca_map, by='GSS_COD')
   }) 
   
-  #Health Board
-  
-  hb_pol <- reactive({
-    hb_map <- optdata %>% 
-      subset(areatype == "Health board" &
-               trend_axis==input$year_map & 
-               indicator==input$indic_map) %>% 
-      rename(HBCode = code) %>% 
-      droplevels() #dropping missing factor levels to allow merging
-    
-    hb_map <- merge(hb_bound, hb_map, by='HBCode')
-  })   
-  
   #title of the map
-  output$title_map <- renderText(paste0(input$indic_map, " - ", unique(ca_pol()$def_period)))
+  output$title_map <- renderText(paste0(input$indic_map, " - ", unique(poly_map()$def_period)))
   
   #Plotting map
   output$map <- renderLeaflet({
     leaflet() %>% 
-      setView(-4.6519999, 56.33148888, zoom = 8) %>% # setting initial view point
-      fitBounds(-10, 60, 0, 54)  %>%
+      setView(-4, 56.33148888, zoom = 9) %>% # setting initial view point
+      fitBounds(-8, 61, 0, 54)  %>%
       addProviderTiles(providers$CartoDB.Positron) %>%
-      #Adding health board polygons 
-      addPolygons(data=hb_pol(), group="Health board",
+      addPolygons(data=poly_map(), 
                   color = "#444444", weight = 2, smoothFactor = 0.5, 
                   #tooltip
                   label = (sprintf(
                     "<strong>%s</strong><br/>Total: %g<br/>Measure: %g",
-                    hb_pol()$HBName, hb_pol()$numerator, hb_pol()$measure) 
+                    poly_map()$area_name, poly_map()$numerator, poly_map()$measure) 
                     %>% lapply(htmltools::HTML)),
                   opacity = 1.0, fillOpacity = 0.5,
                   #Colours
                   fillColor = ~colorQuantile(pal_map, measure_sc, n=5)(measure_sc),
                   highlightOptions = highlightOptions(color = "white", weight = 2,
                                                       bringToFront = TRUE)
-      ) %>% 
-      #Adding council area polygons
-      addPolygons(data=ca_pol(), group="Council area",
-                  color = "#444444", weight = 1, smoothFactor = 0.5, 
-                  #tooltip
-                  label = (sprintf(
-                    "<strong>%s</strong><br/>Total: %g<br/>Measure: %g",
-                    ca_pol()$NAME, ca_pol()$numerator, ca_pol()$measure) 
-                    %>% lapply(htmltools::HTML)),
-                  opacity = 1.0, fillOpacity = 0.5,
-                  #Colours
-                  fillColor = ~colorQuantile(pal_map, measure_sc, n=5)(measure_sc),
-                  highlightOptions = highlightOptions(color = "white", weight = 2,
-                                                      bringToFront = TRUE)
-      ) %>% 
-      #Adding layer control: layer selected, shown and how they are switched
-      addLayersControl( 
-        baseGroups = c("Health board", "Council area"), #Radios buttons
-        options = layersControlOptions(collapsed = FALSE)
-      ) %>% 
-      hideGroup(c("Council area")) 
+      ) 
   })
   
+  #Function to create map that can be downloaded
+  plot_map_download <- function(){
+    # Attribute on shade to each area
+    class_area <-  cut(poly_map()@data$measure_sc, 5)
+    pal_map <- pal_map[as.numeric(class_area)] 
+    
+    plot(poly_map(), col=pal_map, ylim=c(54,61))
+    
+  }
   
   #Downloading data
-  map_csv <- reactive({
+  map_csv <- function(){
     optdata %>% 
-      subset(areatype %in% c("Health board", "Council area") &
+      subset(areatype == input$geotype_map &
                trend_axis==input$year_map & indicator==input$indic_map) %>% 
       format_csv()
-  })  
+  }  
   
+  #Downloading map data
   output$download_map <- downloadHandler(filename =  'map_data.csv',
                                          content = function(file) { write.csv(map_csv(), file, row.names=FALSE)})
   
+  #Donwloading map chart
+  output$download_mapplot <- downloadHandler(
+    filename = 'map.png',
+    content = function(file){
+      png(file, width = 3000, height = 3000, units = "px")
+      plot_map_download()
+      dev.off()
+    })
   
   ###############################################.        
   #### Deprivation ----
