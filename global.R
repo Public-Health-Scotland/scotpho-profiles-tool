@@ -8,7 +8,6 @@
 #   Include deprivation indicators in lookup
 #   Deprivation needs PAR 
 #   Add denominator?
-#   Take out Plotly toolbox and produce plots with a button?
 #----------------.
 #General:
 #   Fix bookmarking - check if server solution in .io ?enableBookmarking
@@ -17,14 +16,14 @@
 #   Host in the website and link from here: shapefiles, lookups, etc
 #----------------.
 #Barcode chart:
-#   Make reactive and incorporate
+#   
 #----------------.
 #Overview:  
 #   Long labels of indicators are an issue  https://github.com/plotly/plotly.js/issues/296#issuecomment-371780321
 #----------------.
 #Time trend: 
 #   Adding numerator/rate tick box?
-#   Add functionality to be able to add IZ/localities fromm different partnerships
+#   Add functionality to be able to add IZ/localities from different partnerships
 #   To fix long label issue move to have legend as a different chart? 
 #   Or inside same chart try to move legend below chart
 #----------------.
@@ -35,14 +34,14 @@
 #----------------.
 #Table:
 #   Add deprivation data to table (maybe with switch or just merging everything)
-#   Include filter to select all IZ/locs for a specific partnerhsip
 #----------------.
 #Map:
 #   Avoid redrawing of map using leafletProxy
 #   Review what to include in tooltip
-#   Add intermediate zones to map, or is it going to be too big?
-#   How to save map as png? Move away from Leaflet? Will likely be faster (sp ggmap)
-#   For IZ's and localities maybe something like this: https://isresearchnc.shinyapps.io/CMaps/
+#   Show significance against comparator in palette 9? (as in rank?)
+#   Explore pop up graphics when clicking an area (mapview package)
+#   Add intermediate zones to map - issues with size of shp and with simplification
+#   For IZ's maybe something like this: https://isresearchnc.shinyapps.io/CMaps/
 #----------------.
 #Deprivation
 #   Do we want CI's? Error bars? polygon areas for time trends?

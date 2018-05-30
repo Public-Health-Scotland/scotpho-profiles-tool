@@ -32,7 +32,7 @@
                 { line-height: 1.6 }",
                ".radio-inline {line-height: 2}",
                #Padding and margins of filters and labels
-               ".form-group {margin: 5px}",
+               ".form-group {margin: 3px}",
                ".shiny-options-group { margin-top: 3px; }",
                ".selectize-control { margin-bottom: 3px}",
                ".selectize-input {padding: 3px 3px; min-height: 10px}",
@@ -48,7 +48,7 @@
                  padding-left: 5px; padding-right: 5px;}",
                #Style for download buttons
                ".down{background-color:#4da6ff; color: white; background-image:none;
-               font-size: 11px; padding: 5px 10px; margin-bottom: 5px; margin-top: 5px; margin-left: 5px}",
+               font-size: 11px; padding: 5px 10px; margin-bottom: 5px; margin-top: 5px; margin-left: 3px}",
                #to avoid red text error messages in the whole app, take out for testing
                ".shiny-output-error { visibility: hidden; }",
                ".shiny-output-error:before { visibility: hidden; }",
@@ -159,13 +159,13 @@ tabPanel("Trend", icon = icon("area-chart"),
                           selectInput("indic_trend", "Indicator", choices=indicator_list),
                           shiny::hr(),
                           p(tags$b("Select the geographies you want to plot")),
-                          selectInput("hbname_trend", "Health board", choices = hb_name,
+                          selectInput("hbname_trend", "Health board", choices = c("Select health boards" = "", paste(hb_name)),
                                       multiple=TRUE, selectize=TRUE, selected = ""),
                           selectInput("scotname_trend", "Scotland", choices = c("", "Scotland"), 
                                       selectize=TRUE, selected = "Scotland"),
-                          selectInput("laname_trend", "Council area", choices = la_name,
+                          selectInput("laname_trend", "Council area", choices =  c("Select council areas" = "", paste(la_name)),
                                       multiple=TRUE, selectize=TRUE, selected = ""),
-                          selectInput("partname_trend", "HSC Partnership", choices = partnership_name,
+                          selectInput("partname_trend", "HSC Partnership", choices =  c("Select partnerships" = "", paste(partnership_name)),
                                       multiple=TRUE, selectize=TRUE, selected = ""),
                           selectInput("loc_iz_trend", "To choose a locality or intermediate zone first 
                                       select an HSC partnership", 
@@ -291,7 +291,7 @@ tabPanel("Table", icon = icon("table"),
              selectInput("iz_parent", label = "Filter list by parent geography",
                          width = "200px", choices = parent_geo_list, selected = NULL, multiple=FALSE),
              conditionalPanel(
-               condition = "input.iz_parent != 'Show All'",
+               condition = "input.iz_parent != 'Show all'",
                awesomeCheckbox("iz_parent_all",label = "Select all intermediate zones in this area", value = FALSE)),
              uiOutput("iz_filtered")
            )
@@ -339,7 +339,7 @@ tabPanel("Table", icon = icon("table"),
          #splitting up the main panel to include a header that filters for indicator of interest and lower one to display the table
          mainPanel(
            tabsetPanel(type = "tabs",
-                       tabPanel("Select Data by Indicators", 
+                       tabPanel("Select data by indicators", 
                                 tags$br(),
                                 tags$br(),
                                 column(width=8,
@@ -357,7 +357,7 @@ tabPanel("Table", icon = icon("table"),
                                 column(1)),
                        #}),
                        
-                       tabPanel("Select Data by Topic", 
+                       tabPanel("Select data by topic", 
                                 tags$br(),
                                 tags$br(),
                                 column(width=8,

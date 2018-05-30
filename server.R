@@ -393,17 +393,18 @@ function(input, output, session) {
   #Controls for chart. Dynamic selection of locality and iz.
   output$loc_ui_trend <- renderUI({
     selectInput("locname_trend", "HSC Locality", 
-                choices = unique(geo_lookup$areaname[
+                choices = c("Select localities" = "", paste(unique(geo_lookup$areaname[
                   geo_lookup$parent_area == input$loc_iz_trend &
-                    geo_lookup$areatype == 'HSC Locality' ]),
+                    geo_lookup$areatype == 'HSC Locality' ]))),
                 multiple=TRUE, selectize=TRUE, selected = "")
   })
-  
+
   output$iz_ui_trend <- renderUI({
     selectInput("izname_trend", "Intermediate zone", 
-                choices = unique(geo_lookup$areaname[
+                choices = c("Select intermediate zones" = "", 
+                            paste(unique(geo_lookup$areaname[
                   geo_lookup$parent_area == input$loc_iz_trend &
-                    geo_lookup$areatype == 'Intermediate zone' ]),
+                    geo_lookup$areatype == 'Intermediate zone' ]))),
                 multiple=TRUE, selectize=TRUE, selected = "")
   })
   
@@ -833,7 +834,7 @@ function(input, output, session) {
   output$download_mapplot <- downloadHandler(
     filename = 'map.png',
     content = function(file){
-      png(file, width = 3000, height = 3000, units = "px")
+      png(file, width = 2000, height = 2000, units = "px")
       plot_map_download()
       dev.off()
     })
