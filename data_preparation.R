@@ -8,9 +8,15 @@
 ############################.
 ##Filepaths ----
 ############################.
+#server
 lookups <- "/conf/phip/Projects/Profiles/Data/Lookups/"
 basefiles <- "/conf/phip/Projects/Profiles/Data/Scotland Localities/"
 shapefiles <- "/conf/phip/Projects/Profiles/Data/Shapefiles/"
+
+#desktop
+lookups <- "//stats/phip/Projects/Profiles/Data/Lookups/"
+basefiles <- "//stats/phip/Projects/Profiles/Data/Scotland Localities/"
+shapefiles <- "//stats/phip/Projects/Profiles/Data/Shapefiles"
 
 ############################.
 ##Packages ----
@@ -19,9 +25,10 @@ library(readr)
 library(dplyr) 
 library(scales)
 library(haven) #for SPPS file reading
-library(rmapshaper) #for reducing size of shapefiles
-library (rgdal) #for reading shapefiles
 library(data.table) #new process
+library (rgdal) #for reading shapefiles
+library(rgeos) #for reducing size of shapefiles
+library(rmapshaper) #for reducing size of shapefiles
 
 ###############################################.
 ## Lookups ---- 
@@ -280,7 +287,10 @@ ca_bound_orig <- spTransform(ca_bound_orig,  CRS("+ellps=WGS84 +proj=longlat +da
 writeOGR(ca_bound_orig, dsn=shapefiles, "CA_simpl", driver="ESRI Shapefile", overwrite_layer=TRUE)
 
 #Saving as rds as it is much faster to read
-ca_bound<-readOGR(shapefiles, "CA_simpl")
+ca_bound<-readOGR(shapefiles, "CA_simpl") %>% 
+  setNames(tolower(names(.))) #variables to lower case
+names(ca_bound@data)[names(ca_bound@data)=="gss_cod"] <- "code"
+names(ca_bound@data)[names(ca_bound@data)=="name"] <- "area_name"
 saveRDS(ca_bound, "./data/CA_boundary.rds")
 
 ##########################.
@@ -298,8 +308,75 @@ hb_bound_orig <- spTransform(hb_bound_orig,  CRS("+ellps=WGS84 +proj=longlat +da
 writeOGR(hb_bound_orig, dsn=shapefiles, "HB_simpl", driver="ESRI Shapefile", overwrite_layer=TRUE)
 
 #Saving as rds as it is much faster to read
-hb_bound<-readOGR(shapefiles,"HB_simpl") 
+hb_bound<-readOGR(shapefiles,"HB_simpl") %>% 
+  setNames(tolower(names(.))) #variables to lower case
+names(hb_bound@data)[names(hb_bound@data)=="hbcode"] <- "code"
+names(hb_bound@data)[names(hb_bound@data)=="hbname"] <- "area_name"
 saveRDS(hb_bound, "./data/HB_boundary.rds")
+
+##########################.
+###HSC Partnership
+#making it small 29mb to 2.5. Sometimes it fails, due to lack of memory (use memory.limits and close things).
+hscp_bound_orig <- readOGR(shapefiles,"SG_NHS_IntegrationAuthority_2018") %>% 
+  rmapshaper::ms_simplify(keep=0.0025) %>% 
+  setNames(tolower(names(.))) #variables to lower case
+
+object.size(hscp_bound_orig)
+
+#Substituing codes to old ones. New ones still not in use.
+hscp_bound_orig@data$hiacode <- as.factor(ifelse(hscp_bound_orig@data$hiacode == "S37000032", "S37000014", 
+                                                 ifelse(hscp_bound_orig@data$hiacode == "S37000033", "S37000023",
+                                                        paste0(hscp_bound_orig@data$hiacode))))
+
+#Changing the projection to WSG84, the ones leaflet needs.
+proj4string(hscp_bound_orig) #Checking projection
+hscp_bound_orig <- spTransform(hscp_bound_orig, CRS("+ellps=WGS84 +proj=longlat +datum=WGS84 +no_defs"))
+
+#Saving the simplified shapefile.
+writeOGR(hscp_bound_orig, dsn=shapefiles, "HSCP_simpl", 
+         driver="ESRI Shapefile", overwrite_layer=TRUE, verbose=TRUE,
+         morphToESRI=TRUE)
+
+hscp_bound <- readOGR(shapefiles,"HSCP_simpl")
+names(hscp_bound@data)[names(hscp_bound@data)=="hiacode"] <- "code"
+names(hscp_bound@data)[names(hscp_bound@data)=="hianame"] <- "area_name"
+saveRDS(hscp_bound, "./data/HSCP_boundary.rds")
+hscp_bound <- readRDS("./data/HSCP_boundary.rds")
+
+##########################.
+###Intermediate zone - STILL NOT WORKING AS IT SHOULD BE
+#Reading and simplifying shapefile
+#Two stages as memory allocation will prevempt from doing it in one.
+iz_bound_orig <- readOGR(shapefiles, "SG_IntermediateZone_Bdry_2011") 
+#Saving data frame to be able to convert shapefile back into SpatialPolygonsDataFrame
+iz_bound_df <- data.frame(iz_bound_orig)
+
+#First simplifying step, using this function, less powerful, but less memory intensive.
+iz_bound_orig <- gSimplify(iz_bound_orig, tol = 0.05, topologyPreserve=TRUE)
+
+#Returning back to SpatialPolygonsDataFrame
+iz_bound_orig <- SpatialPolygonsDataFrame(iz_bound_orig, iz_bound_df)
+
+#Second simplifying step
+iz_bound_orig2 <- iz_bound_orig %>% 
+  rmapshaper::ms_simplify(keep=0.001, keep_shapes= TRUE)
+
+object.size(iz_bound_orig2)
+
+#Changing the projection to WSG84, the ones leaflet needs.
+proj4string(iz_bound_orig)
+iz_bound_orig2 <- spTransform(iz_bound_orig, CRS("+ellps=WGS84 +proj=longlat +datum=WGS84 +no_defs"))
+
+#Saving the simplified shapefile to avoid the calculations.
+writeOGR(iz_bound_orig2, dsn=shapefiles, "IZ_simpl", 
+         driver="ESRI Shapefile", overwrite_layer=TRUE, verbose=TRUE,
+         morphToESRI=TRUE)
+# test <- as(iz_bound_orig2, "SpatialPolygonsDataFrame")
+
+iz_bound <- readOGR(shapefiles,"IZ_simpl") %>% 
+  setNames(tolower(names(.))) #variables to lower case
+saveRDS(iz_bound, "./data/IZ_boundary.rds")
+iz_bound <- readRDS("./data/IZ_boundary.rds")
 
 ###############################################.
 ## Deprivation data ----
