@@ -61,6 +61,7 @@ library(tidyverse) # data manipulation, ggplot
 library (DT) # for data tables
 library(leaflet) #javascript maps
 library(plotly) #interactive graphs
+library(shinyWidgets) # for extra widgets
 
 ###############################################.
 ## Functions ----
@@ -95,9 +96,10 @@ deprivation <- readRDS("./data/deprivation_OPT.rds")
 
 geo_lookup <- readRDS("./data/geo_lookup.rds") #geography lookup
 
-#Map data
-ca_bound<-readRDS("./data/CA_boundary.rds") #Reading file with council shapefiles
-hb_bound<-readRDS("./data/HB_boundary.rds") #Reading file with health board shapefiles simplified
+#Map-shapefile data
+ca_bound<-readRDS("./data/CA_boundary.rds") #Council area 
+hb_bound<-readRDS("./data/HB_boundary.rds") #Health board
+hscp_bound <- readRDS("./data/HSCP_boundary.rds") #HSC Partnerships
 
 ###############################################.
 ## Names ----
