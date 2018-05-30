@@ -28,10 +28,12 @@
                ".navbar {font-size: 12px; border: 0}", #font size and border
                #Text size and line height
                 "body { font-size: 11px; line-height: 1.1}",
-               ".checkbox label, .radio label { line-height: 1.6 }",
+               ".checkbox label, .radio label, .checkbox-bs label, .radio-bs label
+                { line-height: 1.6 }",
                ".radio-inline {line-height: 2}",
                #Padding and margins of filters and labels
-               ".form-group {margin: 0px}",
+               ".form-group {margin: 5px}",
+               ".shiny-options-group { margin-top: 3px; }",
                ".selectize-control { margin-bottom: 3px}",
                ".selectize-input {padding: 3px 3px; min-height: 10px}",
                ".control-label { margin-bottom: 1px}",
@@ -46,7 +48,7 @@
                  padding-left: 5px; padding-right: 5px;}",
                #Style for download buttons
                ".down{background-color:#4da6ff; color: white; background-image:none;
-               font-size: 11px; padding: 5px 10px; margin-bottom: 5px; margin-top: 5px}",
+               font-size: 11px; padding: 5px 10px; margin-bottom: 5px; margin-top: 5px; margin-left: 5px}",
                #to avoid red text error messages in the whole app, take out for testing
                ".shiny-output-error { visibility: hidden; }",
                ".shiny-output-error:before { visibility: hidden; }",
@@ -83,7 +85,7 @@ tabPanel("Overview", icon = icon("heartbeat"),
              column(3,
                     selectInput("topic_heat", "Topic", choices = topic_list,
                                 selectize=TRUE, selected = "Scotland"),
-                    radioButtons("comp_heat", label = "Compare against:",
+                    awesomeRadio("comp_heat", label = "Compare against:",
                                  choices = list("Area" = 1, "Time" = 2), 
                                  selected = 1, inline=TRUE),
                     conditionalPanel(condition = "input.comp_heat == 1 ",  
@@ -119,7 +121,7 @@ tabPanel("Overview", icon = icon("heartbeat"),
         )
   ), #Tab panel bracket
 #####################################################################.
-## Barcode 2 ----
+## Barcode ----
 ## Version using % difference from comparator for bars
 #####################################################################.
 tabPanel("Barcode", icon = icon("barcode"),
@@ -172,7 +174,7 @@ tabPanel("Trend", icon = icon("area-chart"),
                           uiOutput("iz_ui_trend"),
                           downloadButton('download_trend', 'Download data', class = "down"),
                           savechart_button('download_trendplot', 'Save chart',  class = "down"),
-                          checkboxInput("colorblind_trend",  
+                          awesomeCheckbox("colorblind_trend",  
                                  label = "Improved accessibility", value = FALSE)
                    ),
          mainPanel(width = 9, #Main panel
@@ -195,7 +197,7 @@ tabPanel("Rank", icon = icon("signal"),
                   uiOutput("year_ui_rank"), 
                   selectInput("geocomp_rank", "Comparator", choices = comparator_list,
                               selectize=TRUE, selected = "Scotland"),
-                  checkboxInput("ci_rank",label = "95% confidence intervals", value = FALSE),
+                  awesomeCheckbox("ci_rank", label = "95% confidence intervals", value = FALSE),
                   #Legend
                   p(tags$b("Legend"), style="color: black;"),
                   p(img(src='signif_better.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
@@ -220,16 +222,20 @@ tabPanel("Rank", icon = icon("signal"),
 tabPanel("Map", icon = icon("globe"),
          sidebarPanel(    
            selectInput("indic_map", "Indicator", choices=indicator_map_list),
+           selectInput("geotype_map", label = "Geography level",
+                       choices = c("Health board", "Council area", "HSC Partnership"), 
+                       selected = "Health board"),
            uiOutput("year_ui_map"),
            downloadButton('download_map', 'Download data', class = "down"),
+           savechart_button('download_mapplot', 'Save map', class = "down"),
            shiny::hr(),
            p(tags$b("Legend"), style="color: black;"),
            img(src='legend_map.png', height=150, style = "align: right")
          ), 
          mainPanel( #Main panel
            h5(textOutput("title_map"), style="color: black; text-align: center"),
-           leafletOutput("map")
-         )
+           leafletOutput("map", width="100%",height="600px")
+           )
 ), #Tab panel bracket
 ###############################################.
 ## Deprivation ---- 
@@ -275,47 +281,47 @@ tabPanel("Table", icon = icon("table"),
                     tags$i("To delete choices use RETURN or select item and DELETE")),
            tags$br(),
            tags$br(),
-           actionButton("clear", label = "Clear All Filters", icon ("eraser"), style='background: #3399FF; color: #FFF; font-size:100%'),
+           actionButton("clear", label = "Clear all filters", icon ("eraser"), style='background: #3399FF; color: #FFF; font-size:100%'),
            tags$h4("Geography", style = "font-weight: bold; color: #4d3a7d;"),
            
            tags$style(type='text/css', ".selectize-input { font-size: 12px; line-height: 18px;} .selectize-dropdown { font-size: 12px; line-height: 18px; }"),
-           checkboxInput("iz",label = "Intermediate zone", value = FALSE),
+           awesomeCheckbox("iz",label = "Intermediate zone", value = FALSE),
            conditionalPanel(
              condition = "input.iz == true",
              selectInput("iz_parent", label = "Filter list by parent geography",
                          width = "200px", choices = parent_geo_list, selected = NULL, multiple=FALSE),
              conditionalPanel(
                condition = "input.iz_parent != 'Show All'",
-               checkboxInput("iz_parent_all",label = "Select all intermediate zones in this area", value = FALSE)),
+               awesomeCheckbox("iz_parent_all",label = "Select all intermediate zones in this area", value = FALSE)),
              uiOutput("iz_filtered")
            )
            ,
-           checkboxInput("la",label = "Local Authority", value = FALSE),
+           awesomeCheckbox("la",label = "Council area", value = FALSE),
            conditionalPanel(
              condition = "input.la == true",
              selectInput("la_true", label = NULL,
                          width = "200px", choices = la_name, selected = NULL, multiple=TRUE)),
            
-           checkboxInput("hb",label = "Healthboard", value = FALSE),
+           awesomeCheckbox("hb",label = "Health board", value = FALSE),
            conditionalPanel(
              condition = "input.hb == true",
              selectInput("hb_true", label = NULL,
                          width = "200px", choices = hb_name, selected = NULL, multiple=TRUE)),
            
-           checkboxInput("hscl",label = "Health and Social Care Locality", value = FALSE),
+           awesomeCheckbox("hscl",label = "Health and Social Care Locality", value = FALSE),
            conditionalPanel(
              condition = "input.hscl == true",
              selectInput("hscl_true", label = NULL,
                          width = "200px", choices = locality_name, selected = NULL, multiple=TRUE)),
            
-           checkboxInput("hscp",label = "Health and Social Care Partnership", value = FALSE),
+           awesomeCheckbox("hscp",label = "Health and Social Care Partnership", value = FALSE),
            conditionalPanel(
              condition = "input.hscp == true",
              selectInput("hscp_true", label = NULL,
                          width = "200px", choices = partnership_name, selected = NULL, multiple=TRUE)),
            
-           checkboxInput("scotland",label = "Scotland", value = FALSE),
-           checkboxInput("all_data",label = "All Available Geographies", value = FALSE),
+           awesomeCheckbox("scotland",label = "Scotland", value = FALSE),
+           awesomeCheckbox("all_data",label = "All available geographies", value = FALSE),
            
            hr(),
            p(tags$h5("Find geography by  area code", style = "font-weight: bold; color: #4d3a7d;")),
@@ -323,7 +329,7 @@ tabPanel("Table", icon = icon("table"),
                        width = "200px", choices = code_list, multiple=TRUE, selectize=TRUE, selected = ""),
            
            hr(),
-           p(tags$h4("Time Period", style = "font-weight: bold; color: #4d3a7d;")),
+           p(tags$h4("Time period", style = "font-weight: bold; color: #4d3a7d;")),
            #p(tags$h4("Display data for the date range", style = "font-weight: bold; color: #4d3a7d;")),
            sliderInput("date_from",label = NULL, min = min_year, max = max_year, value = c(min_year,max_year), 
                        width = "200px", step = 1, sep="", round = TRUE, ticks = TRUE, dragRange = FALSE)
