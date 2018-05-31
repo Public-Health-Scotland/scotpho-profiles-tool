@@ -164,7 +164,7 @@ function(input, output, session) {
     
     ##############################################.
     ## Barcode ----
-    ###############################################
+    ###############################################.
     
     # Barcode help pop-up
     observeEvent(input$help_bar, {
@@ -426,7 +426,7 @@ function(input, output, session) {
     trend <- trend[order(trend$year),] #Needs to be sorted by year for Plotly
   })
   
-  ################
+  ################.
   #Function to create palette for trend plot
   create_trendpalette <- function(){
     #Creating palette of colors with a tone for each geography type
@@ -469,7 +469,7 @@ function(input, output, session) {
   #Title of plot
   output$title_trend <- renderText(paste0(input$indic_trend))
   
-  #################
+  #################.
   #Creating plot
   output$trend_plot <- renderPlotly({
     #If no data available for that period then plot message saying data is missing
@@ -514,7 +514,7 @@ function(input, output, session) {
     }
   }) 
   
-  #################
+  #################.
   #Function in ggplot to be able to save chart
   plot_trend_ggplot <- function(){
     
@@ -557,7 +557,7 @@ function(input, output, session) {
     })
   
   
-  #####################################          
+  #####################################.       
   #### Rank plot ----
   ###############################################.     
   #Dropdown for time period based on indicator selection  
@@ -783,9 +783,14 @@ function(input, output, session) {
     }
     
   }) 
-  
-  #title of the map
-  output$title_map <- renderText(paste0(input$indic_map, " - ", unique(poly_map()$def_period)))
+
+  #title of the map. if no data available then print "No data available"
+  output$title_map <- renderText(
+    if(is.data.frame(map_csv()) && nrow(map_csv()) == 0) {
+      "No data available"
+    } else {
+      paste0(input$indic_map, " - ", unique(poly_map()$def_period))
+    })
   
   #Plotting map
   output$map <- renderLeaflet({
@@ -818,13 +823,22 @@ function(input, output, session) {
     
   }
   
-  #Downloading data
+  #Function to filter the data needed for downloading data 
   map_csv <- function(){
     optdata %>% 
       subset(areatype == input$geotype_map &
                trend_axis==input$year_map & indicator==input$indic_map) %>% 
       format_csv()
   }  
+  
+  #Dynamic UI for map, if no data available then don't print anythint
+  output$map_ui <- renderUI({
+    if(is.data.frame(map_csv()) && nrow(map_csv()) == 0) {
+      br()
+    } else {
+      leafletOutput("map", width="100%",height="600px")
+    }
+  })
   
   #Downloading map data
   output$download_map <- downloadHandler(filename =  'map_data.csv',
