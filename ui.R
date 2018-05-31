@@ -13,7 +13,6 @@
              windowTitle = "ScotPHO profiles", #title for browser tab
              theme = shinytheme("cerulean"), #Theme of the app (blue navbar)
              collapsible = TRUE, #tab panels collapse into menu in small screens
-             # shinythemes::themeSelector(),
              header =         
              tags$head( #CSS styles
                beta_box,  ##### Feedback box. TO TAKE OUT AFTER BETA PERIOD
@@ -26,6 +25,7 @@
                #Background colour of header navBar
                ".navbar-brand {background-color: white}",
                ".navbar {font-size: 12px; border: 0}", #font size and border
+               ".dropdown-menu { font-size: 12px;}", #dropdown menu within navBar
                #Text size and line height
                 "body { font-size: 11px; line-height: 1.1}",
                ".checkbox label, .radio label, .checkbox-bs label, .radio-bs label
@@ -33,6 +33,7 @@
                ".radio-inline {line-height: 2}",
                #Padding and margins of filters and labels
                ".form-group {margin: 3px}",
+               ".li-custom {margin-bottom: 10px;}", #bullet point list items
                ".shiny-options-group { margin-top: 3px; }",
                ".selectize-control { margin-bottom: 3px}",
                ".selectize-input {padding: 3px 3px; min-height: 10px}",
@@ -117,7 +118,8 @@ tabPanel("Overview", icon = icon("heartbeat"),
            ),
          mainPanel(width = 12,
                    h5(textOutput("title_heat"), style="color: black; text-align: center"),
-                   plotlyOutput("heat_plot") 
+                   plotlyOutput("heat_plot")
+                   #The chart goes over the footer, seems to be a bug of Plotly.
         )
   ), #Tab panel bracket
 #####################################################################.
@@ -234,7 +236,7 @@ tabPanel("Map", icon = icon("globe"),
          ), 
          mainPanel( #Main panel
            h5(textOutput("title_map"), style="color: black; text-align: center"),
-           leafletOutput("map", width="100%",height="600px")
+           uiOutput("map_ui")
            )
 ), #Tab panel bracket
 ###############################################.
@@ -380,50 +382,162 @@ tabPanel("Table", icon = icon("table"),
          
 ), #Tab panel bracket   
 ###############################################.             
-##############Help----    
+##############About----    
 ###############################################.
-tabPanel("Info", icon = icon("info-circle"),
-         p(tags$b("Welcome to the ScotPHO Profiles Tool "), "designed to allow users 
-           to view the various different profiles produced by the ScotPHO collaboration."),
-         p("The profiles are intended to increase understanding of local health issues 
-           and to prompt further investigation, rather than to be used as a performance 
-           management tool. The information needs to be interpreted within a local 
-           framework; an indicator may be higher or lower in one area compared to another, 
-           but local knowledge is needed to understand and interpret differences."),
-         p("If you have any trouble accessing any information on this site or have
-           any further questions relating to the data or the tool, then please contact us at: ",
-           tags$b(tags$a(href="mailto:ScotPHO@nhs.net", "ScotPHO@nhs.net", class="externallink")),
-           "and we will be happy to help."),
-         shiny::hr(), 
-         # Resources
-         h4("Resources", style="color: black;"), 
-         tags$ul( 
-           #Link to user guide
-           tags$li(tags$a(href="", "User guide",  class="externallink"), 
-                   " (coming soon) - Learn how to use and get the most out of the tool."
-           ), #Link to technical report
-           tags$li(tags$a(href="http://www.scotpho.org.uk/comparative-health/profiles/resources/",
-                          "Technical reports",  class="externallink"), 
-                   " - Detailed description of the methodology, statistics and caveats of the data presented."
-           ),#Link to timetable of updates
-           tags$li(tags$a(href="https://docs.google.com/spreadsheets/d/e/2PACX-1vQUQMORMqe9RrMnS9WJSu51Q6ef0rubiF1M-QN3BYZIBueErtTvvbRe_kTZbWmnupiO_Uie80BoZCnK/pubhtml",
-                          "Timetable of updates", class="externallink"), 
-                   "- List of available indicators, date of last update and expected next update."
-           ),#Link to Github repositories
-           tags$li(tags$a(href="https://github.com/Health-SocialCare-Scotland/ScotPHO-profile-indicators",
-                          "Indicator production code", class="externallink"), 
-                   " and ",
-                   tags$a(href="https://github.com/Health-SocialCare-Scotland/ScotPHO-profile-tool",
-                          "Profile tool code", class="externallink"), 
-                   "- Access the code used to produce the indicator data and this tool."
-           )
-         ),
-         #Copyright warning
-         div(style="height: 40px; background: linear-gradient(#54b4eb, #2fa4e7 60%, #1d9ce5); display:inline-block; width:100%  ",
-             tags$b("© Scottish Public Health Observatory v2.0 2018", style="color: white; padding-top: 14px; padding-left: 30px;
-                    padding-right: 60%; line-height:40px; font-size:70%;")#,
-             #bookmarkButton(style="height:25px; font-size:70%; vertical-align:middle; margin-bottom:3px ")
-             )
-         ) #Tab panel bracket
-  )#, #Bracket  navbarPage
+#Starting navbarMenu to have tab with dropdown list
+navbarMenu("Info", icon = icon("info-circle"),
+           tabPanel("About",
+                    sidebarPanel(width=1),
+                    mainPanel(width=8,
+                              h4("Welcome to the ScotPHO Profiles Tool", style = "color:black;"),
+                              p("The tool is designed to allow users to explore the various different profiles 
+                                produced by the ", tags$a(href="http://www.scotpho.org.uk/", "ScotPHO collaboration.", 
+                                                          class="externallink")),
+                              p("The profiles are intended to increase understanding of local health issues 
+                                and to prompt further investigation, rather than to be used as a performance 
+                                management tool. The information needs to be interpreted within a local 
+                                framework; an indicator may be higher or lower in one area compared to another, 
+                                but local knowledge is needed to understand and interpret differences."),
+                              p("If you have any trouble accessing any information on this site or have
+                                any further questions or feedback relating to the data or the tool, then please contact us at: ",
+                                tags$b(tags$a(href="mailto:ScotPHO@nhs.net", "ScotPHO@nhs.net", class="externallink")),
+                                "and we will be happy to help.")),
+                    br()
+           ),#Tab panel
+###############################################.             
+##############Resources----    
+###############################################.      
+           tabPanel("Resources",
+                    sidebarPanel(width=1),
+                    mainPanel(
+                      h4("Resources", style = "color:black;"),
+                      p("We list a number of resources that help you to understand better the profiles or to
+                        carry out similar analysis to ours"),
+                      tags$ul( 
+                        #Link to user guide
+                        tags$li(class= "li-custom", tags$a(href="", "User guide",  class="externallink"), 
+                                tags$b(" (coming soon)"), " - Learn how to use and get the most out of the tool."),
+                        #Link to technical report
+                        tags$li(class= "li-custom", tags$a(href="http://www.scotpho.org.uk/comparative-health/profiles/resources/",
+                                                           "Technical reports",  class="externallink"), 
+                                " - Detailed description of the methodology, statistics and caveats of the data presented."),
+                        #Link to overview reports
+                        tags$li(class= "li-custom", tags$a(href="http://www.scotpho.org.uk/comparative-health/profiles/resources/",
+                                                           "Overview reports",  class="externallink"), 
+                                " - These provide context, narrative and analysis for each profile."),
+                        #Link to user guide
+                        tags$li(class= "li-custom", tags$a(href="http://www.scotpho.org.uk/media/1026/explanation-of-statistics-used-in-profiles-v2.pptx", 
+                                                           "Statistics of the profiles",  class="externallink"), 
+                                " - A guide and explanation of the statistics used in the profiles."),
+                        #Link to timetable of updates
+                        tags$li(class= "li-custom", tags$a(href="https://docs.google.com/spreadsheets/d/e/2PACX-1vQUQMORMqe9RrMnS9WJSu51Q6ef0rubiF1M-QN3BYZIBueErtTvvbRe_kTZbWmnupiO_Uie80BoZCnK/pubhtml",
+                                                           "Timetable of updates", class="externallink"), 
+                                "- List of available indicators, date of last update and expected next update."),
+                        #Link to Github repositories
+                        tags$li(class= "li-custom", tags$a(href="https://github.com/Health-SocialCare-Scotland/ScotPHO-profile-indicators",
+                                                           "Indicator production code", class="externallink"), 
+                                " and ",
+                                tags$a(href="https://github.com/Health-SocialCare-Scotland/ScotPHO-profile-tool",
+                                       "Profile tool code", class="externallink"), 
+                                "- Access the code used to produce the indicator data and this tool."),
+                        #Link to population lookups
+                        tags$li(class= "li-custom", tags$a(href="https://www.opendata.nhs.scot/dataset/population-estimates",
+                                                           "Population estimate", class="externallink"),  " and ",
+                                tags$a(href="                   https://www.opendata.nhs.scot/dataset/geography-codes-and-labels",
+                                       "geography names and codes", class="externallink"), 
+                                "- Where you can find the files with the populations and geographies
+                                used for the analysis."),
+                        #Link to shapefiles
+                        tags$li(class= "li-custom", tags$a(href="https://data.gov.uk/publisher/scottish-government-spatial-data-infrastructure",
+                                                           "Shapefiles", class="externallink"), 
+                                "- Where you can find the shapefiles used for the map.")
+                        ), #Bullet point list bracket
+                      br()
+                      ) # mainPanel bracket
+), #Tab panel bracket
+###############################################.             
+##############Evidence for action----    
+###############################################.      
+tabPanel("Evidence for action",
+         sidebarPanel(width=1),
+         mainPanel(
+           h4("Evidence for action", style = "color:black;"),
+           p("What to do with all this data? What is a sucessful strategy to tackle a 
+             public health issue? We have listed some resources from various organizations 
+             which can help you to develop succesful strategies in the public health context."),
+           tags$ul( 
+             #Link to HS
+             tags$li(class= "li-custom", tags$a(href="http://www.healthscotland.scot/improve-policy-and-practice", 
+                                                "NHS Health Scotland",  class="externallink")),
+             #Link to HPHS
+             tags$li(class= "li-custom", tags$a(href="http://www.knowledge.scot.nhs.uk/home/portals-and-topics/health-improvement/hphs/evidence-briefings.aspx", 
+                                                "Health Promotion Health Service - Evidence briefings",  class="externallink")),
+             #Link to What Works Scotland
+             tags$li(class= "li-custom", tags$a(href="http://whatworksscotland.ac.uk/", 
+                                                "What Works Scotland",  class="externallink")),
+             #Link to NICE - Evidence UK
+             tags$li(class= "li-custom", tags$a(href="https://www.evidence.nhs.uk/", 
+                                                "NICE - Evidence UK",  class="externallink")),
+             #NICE - guidance
+             tags$li(class= "li-custom", tags$a(href="https://www.nice.org.uk/guidance", 
+                                                "NICE - guidance",  class="externallink")),
+             #Link to SIGN
+             tags$li(class= "li-custom", tags$a(href="http://www.sign.ac.uk/", 
+                                                "Scottish Intercollegiate Guidelines Network (SIGN)",  class="externallink")),
+             #Link to Centre for Reviews and Dissemination
+             tags$li(class= "li-custom", tags$a(href="https://www.york.ac.uk/crd/", 
+                                                "Centre for Reviews and Dissemination",  class="externallink")),
+             #Link to Cochrane Library
+             tags$li(class= "li-custom", tags$a(href="http://www.cochranelibrary.com/home/topic-and-review-group-list.html?page=topic", 
+                                                "Cochrane Library",  class="externallink")),
+             #Link to EPPI-Centre
+             tags$li(class= "li-custom", tags$a(href="http://eppi.ioe.ac.uk/cms/Default.aspx?tabid=56&language=en-US", 
+                                                "EPPI-Centre - Evidence library",  class="externallink"))
+           ), #Bullet point list bracket
+           br()
+           ) # mainPanel bracket
+), #tabPanel bracket
+###############################################.             
+##############Other profiles----    
+###############################################.
+tabPanel("Other profiles",
+         sidebarPanel(width=1),
+         mainPanel(
+           h4("Other profiles", style = "color:black;"),
+           p("Other Scottish public sector organizations produce profiles with different
+             focuses. "),
+           tags$ul( 
+             #Link to old tool
+             tags$li(class= "li-custom", tags$a(href="https://scotpho.nhsnss.scot.nhs.uk/scotpho/homeAction.do", 
+                                                "ScotPHO profiles",  class="externallink"), 
+                     " - Some of the profiles (e.g. Alcohol) are still not in this new tool."),
+             #Link to GCPH
+             tags$li(class= "li-custom", tags$a(href="http://www.understandingglasgow.com/",
+                                                "Glasgow profiles",  class="externallink"), 
+                     " - Glasgow Centre for Population Health."),
+             #Link to IS
+             tags$li(class= "li-custom", tags$a(href="http://www.improvementservice.org.uk/community-planning-outcomes-profile.html",
+                                                "Community planning outcomes profile",  class="externallink"), 
+                     " - Improvement Service."),
+             #Link to NRS
+             tags$li(class= "li-custom", tags$a(href="https://www.nrscotland.gov.uk/statistics-and-data/statistics/stats-at-a-glance/council-area-profiles", 
+                                                "Council area profiles",  class="externallink"), 
+                     " - National Records of Scotland."),
+             #Link to NRS
+             tags$li(class= "li-custom", tags$a(href="http://statistics.gov.scot/home", 
+                                                "Open data and area profiles for Scotland",  class="externallink"), 
+                     " - Statistics.gov.scot -  Scotland's official statistics site.")
+           ), #Bullet point list bracket
+           br()
+           ) # mainPanel bracket
+           ) #tabPanel bracket
+), # NavbarMenu bracket
+###############################################.             
+##############Footer----    
+###############################################.
+#Copyright warning
+footer =tags$footer(style="height: 40px; background: linear-gradient(#54b4eb, #2fa4e7 60%, #1d9ce5); display:inline-block; width:100%  ",
+                    tags$b("© Scottish Public Health Observatory v2.0 2018", style="color: white; padding-top: 14px; padding-left: 30px;
+           padding-right: 60%; line-height:40px; font-size:70%;"))
+  ) #Bracket  navbarPage
 ##END
