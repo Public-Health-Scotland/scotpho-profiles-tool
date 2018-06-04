@@ -15,7 +15,7 @@
              collapsible = TRUE, #tab panels collapse into menu in small screens
              header =         
              tags$head( #CSS styles
-               beta_box,  ##### Feedback box. TO TAKE OUT AFTER BETA PERIOD
+               beta_box,  ##### Feedback box. TAKE OUT AFTER BETA PERIOD
                tags$link(rel="shortcut icon", href="favicon_scotpho.ico"), #Icon for browser tab
                #Including Google analytics
                includeScript("google-analytics.js"),
@@ -26,8 +26,8 @@
                ".navbar-brand {background-color: white}",
                ".navbar {font-size: 12px; border: 0}", #font size and border
                ".dropdown-menu { font-size: 12px;}", #dropdown menu within navBar
-               #Text size and line height
-                "body { font-size: 11px; line-height: 1.1}",
+               #Text size and line height. 
+               "body { font-size: 11px; line-height: 1.1; }",
                ".checkbox label, .radio label, .checkbox-bs label, .radio-bs label
                 { line-height: 1.6 }",
                ".radio-inline {line-height: 2}",
@@ -47,6 +47,8 @@
                .col-lg-9, .col-xs-10, .col-sm-10, .col-md-10, .col-lg-10, .col-xs-11, .col-sm-11, 
                .col-md-11, .col-lg-11, .col-xs-12, .col-sm-12, .col-md-12, .col-lg-12 {
                  padding-left: 5px; padding-right: 5px;}",
+               #To get a sticky footer at the end of the page
+               ".tab-content{overflow: hidden; padding-bottom: 20vh; min-height: 75vh;}",
                #Style for download buttons
                ".down{background-color:#4da6ff; color: white; background-image:none;
                font-size: 11px; padding: 5px 10px; margin-bottom: 5px; margin-top: 5px; margin-left: 3px}",
@@ -536,8 +538,10 @@ tabPanel("Other profiles",
 ##############Footer----    
 ###############################################.
 #Copyright warning
-footer =tags$footer(style="height: 40px; background: linear-gradient(#54b4eb, #2fa4e7 60%, #1d9ce5); display:inline-block; width:100%  ",
-                    tags$b("© Scottish Public Health Observatory v2.0 2018", style="color: white; padding-top: 14px; padding-left: 30px;
-           padding-right: 60%; line-height:40px; font-size:70%;"))
+footer = tags$footer("© Scottish Public Health Observatory v2.0 2018", style = "
+  position:sticky; text-align:center; min-height: 6vh; line-height: 3vh;
+  color: white; padding: 10px; font-weight: bold;
+  background-color: #1995dc;box-shadow: 0 -1px 6px rgba(0,0,0,0.5);")
   ) #Bracket  navbarPage
-##END
+
+###END
