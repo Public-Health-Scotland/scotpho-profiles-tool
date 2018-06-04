@@ -45,6 +45,7 @@ function(input, output, session) {
       optdata %>% 
       subset(areaname == input$geoname_heat &
               areatype == input$geotype_heat &
+               indicator != "Mid-year population estimate - all ages" &
                (domain1 %in% input$topic_heat | domain2 %in% input$topic_heat |  domain3 %in% input$topic_heat)) %>% 
       select(c(indicator, areaname, areatype, numerator, measure, lowci, upci, interpret, 
                year, def_period, type_definition)) %>% 
