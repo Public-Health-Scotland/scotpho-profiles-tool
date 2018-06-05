@@ -538,10 +538,19 @@ tabPanel("Other profiles",
 ##############Footer----    
 ###############################################.
 #Copyright warning
-footer = tags$footer("© Scottish Public Health Observatory v2.0 2018", style = "
-  position:sticky; text-align:center; min-height: 6vh; line-height: 3vh;
-  color: white; padding: 10px; font-weight: bold;
-  background-color: #1995dc;box-shadow: 0 -1px 6px rgba(0,0,0,0.5);")
-  ) #Bracket  navbarPage
+tags$footer("Â© Scottish Public Health Observatory v2.0 2018", style = "
+   position:fixed;
+   text-align:center;
+   left: 0;
+   bottom:0;
+   width:100%;
+   height:30px; /* Height of the footer */
+   color: white;
+   padding: 10px;
+   font-weight: bold;
+   background-color: #1995dc"
+    ) 
+################################################.
+) #Bracket  navbarPage
 
 ###END
