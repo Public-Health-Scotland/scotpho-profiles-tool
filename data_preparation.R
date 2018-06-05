@@ -3,7 +3,7 @@
 #the Shiny app needs.
 
 #TODO:
-#see global syntax
+#see global syntax 
 
 ############################.
 ##Filepaths ----
@@ -191,7 +191,7 @@ ind_lookup<- read_csv(paste(lookups, "indicator_lookup.csv", sep = "")) %>%
 optdata <- read_csv(paste(basefiles, "All Data for Shiny.csv", sep = ""),
                     col_types = cols(NUMERATOR = col_number()))
 
-optdata<- optdata %>%
+optdata <- optdata %>%
   setNames(tolower(names(.)))%>% #names to lower case
   rename(ind_id = indicator_id, code = geography_code) %>% 
   mutate_if(is.character,factor) #converting characters into factors
