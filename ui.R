@@ -8,8 +8,8 @@
 ## Header ---- 
 ###############################################.
   navbarPage(
-    title = div(img(src="scotpho_reduced.png", height=40),
-                         style = "position: relative; top: -5px;"), # Navigation bar
+    title = div(tags$a(img(src="scotpho_reduced.png", height=40), href= "http://www.scotpho.org.uk/"),
+                style = "position: relative; top: -5px;"), # Navigation bar
              windowTitle = "ScotPHO profiles", #title for browser tab
              theme = shinytheme("cerulean"), #Theme of the app (blue navbar)
              collapsible = TRUE, #tab panels collapse into menu in small screens
@@ -26,8 +26,8 @@
                ".navbar-brand {background-color: white}",
                ".navbar {font-size: 12px; border: 0}", #font size and border
                ".dropdown-menu { font-size: 12px;}", #dropdown menu within navBar
-               #Text size and line height. 
-               "body { font-size: 11px; line-height: 1.1; }",
+               #Text size and line height. Padding needed for footer
+               "body { font-size: 11px; line-height: 1.1; padding-bottom:30px}",
                ".checkbox label, .radio label, .checkbox-bs label, .radio-bs label
                 { line-height: 1.6 }",
                ".radio-inline {line-height: 2}",
@@ -47,11 +47,9 @@
                .col-lg-9, .col-xs-10, .col-sm-10, .col-md-10, .col-lg-10, .col-xs-11, .col-sm-11, 
                .col-md-11, .col-lg-11, .col-xs-12, .col-sm-12, .col-md-12, .col-lg-12 {
                  padding-left: 5px; padding-right: 5px;}",
-               #To get a sticky footer at the end of the page
-               ".tab-content{overflow: hidden; padding-bottom: 20vh; min-height: 75vh;}",
                #Style for download buttons
-               ".down{background-color:#4da6ff; color: white; background-image:none;
-               font-size: 11px; padding: 5px 10px; margin-bottom: 5px; margin-top: 5px; margin-left: 3px}",
+               ".down{background-color:#4da6ff; color: white; background-image:none; min-width: 20vh;
+               font-size: 11px; padding: 5px 10px; margin-top: 5px; margin-left: 3px}",
                #to avoid red text error messages in the whole app, take out for testing
                ".shiny-output-error { visibility: hidden; }",
                ".shiny-output-error:before { visibility: hidden; }",
@@ -63,65 +61,55 @@
 ## Overview ----
 ###############################################.
 tabPanel("Overview", icon = icon("heartbeat"),
-         conditionalPanel(condition = "output.help_overview == 'TRUE' ",  
-           p("Explore how an area compares to Scotland (or a comparator of your choice)
-           over time."),
-           tags$ul(
-             tags$li("Use the ‘Topic’ menu to adjust the suite of indicators on display."),
-             tags$li("Older indicator values appears on the left side of the grid,
-                      the most recent data on the right."),
-             tags$li("Hover over each tile to see indicator definitions and time periods."))
-           ), 
-         #Need to have the output in the ui to get the conditional Panel working
-         span(textOutput("help_overview"), style="color:white; font-size:1px"), 
          wellPanel( #Filter options
-             column(3,
-                    selectInput("geotype_heat", "Geography level", choices= areatype_list,
-                                selected = "Health board"),
-                    conditionalPanel(#Conditional panel for extra dropdown for localities & IZ
-                      condition = "input.geotype_heat== 'HSC Locality' | input.geotype_heat == 'Intermediate zone' ",
-                      selectInput("loc_iz_heat", label = "Partnership for localities/intermediate zones",
-                                  choices = partnership_name)
-                    ),
-                    uiOutput("geoname_ui_heat")
-             ),
-             column(3,
-                    selectInput("topic_heat", "Topic", choices = topic_list,
-                                selectize=TRUE, selected = "Scotland"),
-                    awesomeRadio("comp_heat", label = "Compare against:",
-                                 choices = list("Area" = 1, "Time" = 2), 
-                                 selected = 1, inline=TRUE),
-                    conditionalPanel(condition = "input.comp_heat == 1 ",  
-                                     selectInput("geocomp_heat", "Comparator", choices = comparator_list,
-                                                 selectize=TRUE, selected = "Scotland")
-                    ),
-                    conditionalPanel(condition = "input.comp_heat == 2 ", 
-                                     uiOutput("yearcomp_ui_heat")
-                    ) 
-             ),
-             column(4,
-                    #Legend
-                    p(tags$b("Legend"), style="color: black;"),
-                    p(img(src='signif_better.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
-                          "Statistically significantly better than comparator average.", br(),
-                      img(src='non_signif.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
-                      "Statistically not significantly different from comparator average.", br(),
-                      img(src='signif_worse.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
-                      "Statistically significantly worse than comparator average.", br(),
-                      img(src='signif_nocalc.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
-                      "No significance can be calculated.")
-             ),
-             column(2,
-                    actionLink("help_overview", label = tags$b("Help"), icon= icon('question-circle')),
-                    br(),
-                    downloadButton('download_heat', 'Download data', class = "down"),
-                    savechart_button('download_overviewplot', 'Save chart',  class = "down")
-                    )
+           column(3,
+                  selectInput("geotype_heat", "Geography level", choices= areatype_list,
+                              selected = "Health board"),
+                  conditionalPanel(#Conditional panel for extra dropdown for localities & IZ
+                    condition = "input.geotype_heat== 'HSC Locality' | input.geotype_heat == 'Intermediate zone' ",
+                    selectInput("loc_iz_heat", label = "Partnership for localities/intermediate zones",
+                                choices = partnership_name)
+                  ),
+                  uiOutput("geoname_ui_heat")
            ),
+           column(3,
+                  selectInput("profile_heat", "Profile", choices = profile_list),
+                  selectInput("topic_heat", "Domain", choices = topic_list,
+                              selectize=TRUE, selected = "Scotland")
+           ),
+           column(2,
+                  awesomeRadio("comp_heat", label = "Compare against:",
+                               choices = list("Area" = 1, "Time" = 2), 
+                               selected = 1, inline=TRUE),
+                  conditionalPanel(condition = "input.comp_heat == 1 ",  
+                                   selectInput("geocomp_heat", "Comparator", choices = comparator_list,
+                                               selectize=TRUE, selected = "Scotland")
+                  ),
+                  conditionalPanel(condition = "input.comp_heat == 2 ", 
+                                   uiOutput("yearcomp_ui_heat")
+                  ) 
+           ),
+           column(2,
+                  #Legend
+                  p(tags$b("Legend"), style="color: black;"),
+                  p(img(src='signif_better.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
+                    "Better than comparator.", br(),
+                    img(src='non_signif.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
+                    "Not different from comparator.", br(),
+                    img(src='signif_worse.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
+                    "Worse than comparator.", br(),
+                    img(src='signif_nocalc.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
+                    "No differences can be calculated.")
+           ),
+           column(2,
+                  actionButton("help_heat",label="Help", icon= icon('question-circle'), class ="down"),
+                  downloadButton('download_heat', 'Download data', class = "down"),
+                  savechart_button('download_overviewplot', 'Save chart',  class = "down")
+           )
+         ),
          mainPanel(width = 12,
                    h5(textOutput("title_heat"), style="color: black; text-align: center"),
                    plotlyOutput("heat_plot")
-                   #The chart goes over the footer, seems to be a bug of Plotly.
         )
   ), #Tab panel bracket
 #####################################################################.
@@ -162,7 +150,8 @@ tabPanel("Trend", icon = icon("area-chart"),
                    sidebarPanel(width=3,
                           selectInput("indic_trend", "Indicator", choices=indicator_list),
                           shiny::hr(),
-                          p(tags$b("Select the geographies you want to plot")),
+                          p(tags$b("Select the geographies you want to plot.
+                                   You can select multiple areas per geography level")),
                           selectInput("hbname_trend", "Health board", choices = c("Select health boards" = "", paste(hb_name)),
                                       multiple=TRUE, selectize=TRUE, selected = ""),
                           selectInput("scotname_trend", "Scotland", choices = c("", "Scotland"), 
@@ -205,13 +194,13 @@ tabPanel("Rank", icon = icon("signal"),
                   #Legend
                   p(tags$b("Legend"), style="color: black;"),
                   p(img(src='signif_better.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
-                    "Statistically significantly better than comparator average.", br(),
+                    "Better than comparator.", br(),
                     img(src='non_signif.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
-                    "Statistically not significantly different from comparator average.", br(),
+                    "Not different from comparator.", br(),
                     img(src='signif_worse.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
-                    "Statistically significantly worse than comparator average.", br(),
+                    "Worse than comparator.", br(),
                     img(src='signif_nocalc2.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
-                    "No significance can be calculated."),
+                    "No differences can be calculated."),
                   downloadButton('download_rank', 'Download data', class = "down"),
                   savechart_button('download_rankplot', 'Save chart', class = "down")
          ),
@@ -538,12 +527,13 @@ tabPanel("Other profiles",
 ##############Footer----    
 ###############################################.
 #Copyright warning
-tags$footer("Â© Scottish Public Health Observatory v2.0 2018", style = "
+tags$footer("© Scottish Public Health Observatory v2.0 2018", style = "
    position:fixed;
    text-align:center;
    left: 0;
    bottom:0;
    width:100%;
+   z-index:1000;  
    height:30px; /* Height of the footer */
    color: white;
    padding: 10px;
