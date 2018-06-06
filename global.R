@@ -142,6 +142,9 @@ ind_depr_list <- unique(deprivation$indicator)
 #                 'Immunisations and Screening', 'Life Expectancy & Mortality', 
 #                 'Mental health', 'Population', 'Smoking', 'Social Care & Housing'))
 
+profile_list <- c("Health & wellbeing", "Children and young people", "Alcohol", 
+                  "Drugs", "Tobacco control")
+
 topic_list <- sort(c('Behaviours', 'Children and young people - Healthy', 
                      'Children and young people - Included', 'Children and young people - Nurtured', 
                      'Children and young people - Responsible', 'Children and young people - Safe', 
