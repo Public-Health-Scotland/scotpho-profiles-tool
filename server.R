@@ -11,8 +11,14 @@ function(input, output, session) {
   ###############################################.        
   #### Overview ----
   ###############################################.   
-  #Small output to make the help conditional panel work
-  output$help_overview <- renderText(input$help_overview %% 2 != 0)
+  # Heatmap help pop-up
+  observeEvent(input$help_heat, {
+    showModal(modalDialog(
+      title = "What does the overview plot show...",
+      p(img(src="help_overview.png"), height=500),  size = "l",
+      easyClose = TRUE, fade=FALSE
+    ))
+  })
   
   # Reactive controls for heatmap:area name depending on areatype selected
   output$geoname_ui_heat <- renderUI({
