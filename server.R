@@ -243,7 +243,7 @@ function(input, output, session) {
     
     #Dynamically set height of bars
     bar2_plot_height<- function(){
-      (nrow(bar_chosenarea2())*70)
+      (nrow(bar_chosenarea2())*70+120)
     }
     
     # Create barcode2 plot function
@@ -301,7 +301,7 @@ function(input, output, session) {
       
       #Create fill colour scheme for significance.
       fill_df <- data.frame(flag = c('No significance can be calculated', 'Statistically not significantly different from comparator average', 'Statistically significantly better than comparator average','Statistically significantly worse than comparator average'),stringsAsFactors = TRUE)
-      fillcolours <- c("DodgerBlue", "white", "#999999", "#ff9933")
+      fillcolours <- c("white", "#999999","DodgerBlue","#ff9933")
       names(fillcolours) <- levels(fill_df$flag)
       colour_points <- scale_fill_manual(name = "flag",values = fillcolours)
       
@@ -391,7 +391,7 @@ function(input, output, session) {
     output$download_bar2plot <- downloadHandler(
       filename = 'barcode.png',
       content = function(file){
-        ggsave(file, plot = plot_barcode(), device = "png", width=15, limitsize=FALSE)
+        ggsave(file, plot = plot_barcode(), device = "png",width=15, limitsize=FALSE)
       })
 
 ###############################################.        
