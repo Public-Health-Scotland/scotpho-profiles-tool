@@ -7,6 +7,56 @@
 
 ## Define a server for the Shiny app
 function(input, output, session) {
+  ###############################################.
+  ## Landing page ----
+  ###############################################.
+  observeEvent(input$jump_to_ring, {
+    updateTabsetPanel(session, "intabset", selected = "ring")
+  })
+  
+  observeEvent(input$jump_to_heat, {
+    updateTabsetPanel(session, "intabset", selected = "heat")
+  })
+  
+  observeEvent(input$jump_to_barcode, {
+    updateTabsetPanel(session, "intabset", selected = "barcode")
+  })
+  
+  observeEvent(input$jump_to_trend, {
+    updateTabsetPanel(session, "intabset", selected = "trend")
+  })
+  
+  observeEvent(input$jump_to_rank, {
+    updateTabsetPanel(session, "intabset", selected = "rank")
+  })
+  
+  observeEvent(input$jump_to_map, {
+    updateTabsetPanel(session, "intabset", selected = "map")
+  })
+  
+  observeEvent(input$jump_to_simd, {
+    updateTabsetPanel(session, "intabset", selected = "simd")
+  })
+  
+  observeEvent(input$jump_to_table, {
+    updateTabsetPanel(session, "intabset", selected = "table")
+  })
+  
+  observeEvent(input$jump_to_about, {
+    updateTabsetPanel(session, "intabset", selected = "abour")
+  })
+  
+  observeEvent(input$jump_to_evidence, {
+    updateTabsetPanel(session, "intabset", selected = "evidence")
+  })
+  
+  observeEvent(input$jump_to_resources, {
+    updateTabsetPanel(session, "intabset", selected = "resources")
+  })
+  
+  observeEvent(input$jump_to_about, {
+    updateTabsetPanel(session, "intabset", selected = "about")
+  })
   
   ###############################################.        
   #### Overview ----

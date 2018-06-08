@@ -50,6 +50,28 @@ navbarPage(
                #Style for download buttons
                ".down{background-color:#4da6ff; color: white; background-image:none; min-width: 20vh;
                font-size: 11px; padding: 5px 10px; margin-top: 5px; margin-left: 3px}",
+               #landing page boxes
+               ".landing-page-box {width:100%; height:100%; min-height:18vh; background-color:AliceBlue;
+        border: 1px solid #AAAAAA; margin-bottom: 5px; float: left; transition: 1s ease;}",
+               ".landing-page-box-about {width:100%; height:100%; min-height:9vh; background-color:AliceBlue;
+        border: 1px solid #AAAAAA; margin-bottom: 0.5vh; float: left; transition: 1s ease; max-height: 2.25vh;}",
+               ".landing-page-box:hover, .landing-page-box-about:hover {-webkit-transform: scale(1.05); 
+        -ms-transform: scale(1.05); transform: scale(1.05);}", #hover effect on boxes
+               #landing-page titles for boxes
+               ".landing-page-box-title {font-size: 14px; text-align:center; color:white;
+        font-weight: bold; background-color: rgba(2, 97, 160, 1); width:100%; max-height: 2.25vh;}",
+               #landing page buttons
+               ".landing-page-button {background-color: rgba(0, 116, 192, 0.5); text-align:left;
+        background-image:none; color: white; white-space: normal; border-radius: 0;
+        font-size: 12px; position: static; min-height: 8vh; width: 100%;}",
+               ".landing-page-button-about {background-color: rgba(0, 116, 192, 0.5); text-align:left;
+        background-image:none; color: white; white-space: normal; border-radius: 0;
+        font-size: 12px; position: static; min-height: 6.5vh; width: 100%;}",
+               #landing-page column 
+               ".landing-page-column {padding-right:3vh}",
+               #landing-page icons
+               ".icon-lp{font-size: 1.3em; padding-right: 4px;}",
+               ".home-icon {font-size: 1.3em; width: 0.7em;}",
                #to avoid red text error messages in the whole app, take out for testing
                ".shiny-output-error { visibility: hidden; }",
                ".shiny-output-error:before { visibility: hidden; }",
@@ -58,9 +80,124 @@ navbarPage(
                HTML("<base target='_blank'>")
                ),
 ###############################################.
-## Overview ----
+## Landing page ----
 ###############################################.
-tabPanel("Overview", icon = icon("heartbeat"),
+tabPanel(
+  title = " ", icon = icon("home", "home-icon"),
+  mainPanel(
+    width = 11, style="margin-left:4%; margin-right:4%",
+    fluidRow(h4("Welcome to the ScotPHO profiles", style="margin-top:0px;")),
+    fluidRow(h5("Explore data by profile or topic area", style="margin-top:0px;")),
+    fluidRow(
+      #Ring plot box
+      column(4, class="landing-page-column",
+             div(class="landing-page-box", style="background-image: url(ring_lp.png);
+                 background-repeat: no-repeat; background-size: 100%;",
+                 div("Summary", class = "landing-page-box-title"),
+                 actionButton('jump_to_ring', 'A high level view of how an area is doing for a profile of indicators', 
+                              class="landing-page-button", 
+                              icon = icon("arrow-circle-right", "icon-lp")))),
+      #Heat map box
+      column(4, class="landing-page-column",
+             div(class="landing-page-box", style="background-image: url(heat_lp.png);
+                 background-repeat: no-repeat; background-size: 100% ",
+                 div("Heat map", class = "landing-page-box-title"),
+                 actionButton('jump_to_heat', 'Investigate the change over time of smaller sets of indicators', 
+                              class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp")))),
+      #Barcode plot box
+      column(4, class="landing-page-column",
+             div(class="landing-page-box", style="background-image: url(barcode_lp.png);
+                 background-repeat: no-repeat; background-size: 100% ",
+                 div("Barcode", class = "landing-page-box-title"),
+                 actionButton('jump_to_barcode', 'Explore how an area compares to other similar ones and the dispersion of the data',
+                              class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp"))))
+    ),
+    fluidRow(h5("Investigate the data for an specific indicator")),
+    #2nd row of boxes
+    fluidRow(
+      #Trend plot box
+      column(3, class="landing-page-column",
+             div(class="landing-page-box", style="background-image: url(trend_lp.png);
+                 background-repeat: no-repeat; background-size: 100% ",
+                 div("Trend", class = "landing-page-box-title"),
+                 actionButton('jump_to_trend', 'Explore the evolution of an indicator over time.',
+                              class="landing-page-button", 
+                              icon = icon("arrow-circle-right", "icon-lp")))),
+      #Rank plot box
+      column(3, class="landing-page-column",
+             div(class="landing-page-box", style="background-image: url(rank_lp.png);
+                 background-repeat: no-repeat; background-size: 100% ",
+                 div("Rank", class = "landing-page-box-title"),
+                 actionButton('jump_to_rank', 'Compare different geography levels through a bar chart', 
+                              class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp")))),
+      #Map plot box
+      column(3, class="landing-page-column",
+             div(class="landing-page-box", style="background-image: url(map_lp.png);
+                 background-repeat: no-repeat; background-size: 100% ",
+                 div("Map", class = "landing-page-box-title"),
+                 actionButton('jump_to_map', 'Explore the geographical patterns of specific indicators', 
+                              class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp")))),
+      #Inequalities plots box
+      column(3, class="landing-page-column",
+             div(class="landing-page-box", style="background-image: url(simd_lp.png);
+                 background-repeat: no-repeat; background-size: 100% ",
+                 div("Inequalities", class = "landing-page-box-title"),
+                 actionButton('jump_to_simd', 'Explore the effects of deprivation on public health inequalities', 
+                              class="landing-page-button", 
+                              icon = icon("arrow-circle-right", "icon-lp"))))
+    ),
+    fluidRow(h5("Access all the data behind the tool and check other useful resources")),
+    fluidRow(
+      #Table box 
+      column(4, class="landing-page-column",
+             div(class="landing-page-box", style="background-image: url(table_lp.png);
+                 background-repeat: no-repeat; background-size: 100% ", 
+                 div("Table", class = "landing-page-box-title"),
+                 actionButton('jump_to_table', 'Access and download the data behind the tool', 
+                              class="landing-page-button", 
+                              icon = icon("arrow-circle-right", "icon-lp"))
+             )),
+      #About box
+      column(4, class="landing-page-column",
+             div(class="landing-page-box-about", 
+                 div("About", class = "landing-page-box-title"),
+                 actionButton('jump_to_about', 'What are the profiles about?', 
+                              class="landing-page-button-about", 
+                              icon = icon("arrow-circle-right", "icon-lp"))
+             ),
+             #Evidence box
+             div(class="landing-page-box-about",
+                 div("Evidence for action", class = "landing-page-box-title"),
+                 actionButton('jump_to_evidence', 'How to tackle public health issues?', 
+                              class="landing-page-button-about", 
+                              icon = icon("arrow-circle-right", "icon-lp")))
+      ),
+      #Resources box
+      column(4, class="landing-page-column",
+             div(class="landing-page-box-about", 
+                 div("Resources", class = "landing-page-box-title"),
+                 actionButton('jump_to_resources', 'Find out more information about the profiles', 
+                              class="landing-page-button-about", 
+                              icon = icon("arrow-circle-right", "icon-lp"))
+             ),
+             #Other profiles
+             div(class="landing-page-box-about", 
+                 div("Other profiles", class = "landing-page-box-title"),
+                 actionButton('jump_to_others', 'Check out other related products', 
+                              class="landing-page-button-about", 
+                              icon = icon("arrow-circle-right", "icon-lp")))
+      )
+    )#Fluidrow bracket
+) #main Panel bracket
+),# tab panel bracket
+###############################################.
+## Ring plot ----
+###############################################.
+tabPanel(title = "Summary", value = "ring"),
+###############################################.
+## Heat map ----
+###############################################.
+tabPanel("Overview", icon = icon("heartbeat"), value = "heat",
          wellPanel( #Filter options
            column(3,
                   selectInput("geotype_heat", "Geography level", choices= areatype_list,
@@ -116,7 +253,7 @@ tabPanel("Overview", icon = icon("heartbeat"),
 ## Barcode ----
 ## Version using % difference from comparator for bars
 #####################################################################.
-tabPanel("Barcode", icon = icon("barcode"),
+tabPanel("Barcode", icon = icon("barcode"), value = "barcode",
          # beta_box,  ##looks better with text as title for chart?
          # p(tags$b("Barcode plot take a few seconds to load")),
          # tags$ul(
@@ -146,7 +283,7 @@ tabPanel("Barcode", icon = icon("barcode"),
 ###############################################.
 ## Time trend ----
 ###############################################.
-tabPanel("Trend", icon = icon("area-chart"),
+tabPanel("Trend", icon = icon("area-chart"), value = "trend",
                    sidebarPanel(width=3,
                           selectInput("indic_trend", "Indicator", choices=indicator_list),
                           shiny::hr(),
@@ -178,7 +315,7 @@ tabPanel("Trend", icon = icon("area-chart"),
 ###############################################.
 ## Rank chart ---- 
 ###############################################.
-tabPanel("Rank", icon = icon("signal"),
+tabPanel("Rank", icon = icon("signal"), value = "rank",
          sidebarPanel(width=4, #Filter options
                   selectInput("indic_rank", "Indicator", choices=indicator_list),
                   selectInput("geotype_rank", label = "Geography level",
@@ -212,7 +349,7 @@ tabPanel("Rank", icon = icon("signal"),
 ###############################################.
 ###########Map ----
 ###############################################.
-tabPanel("Map", icon = icon("globe"),
+tabPanel("Map", icon = icon("globe"), value = "map",
          sidebarPanel(    
            selectInput("indic_map", "Indicator", choices=indicator_map_list),
            selectInput("geotype_map", label = "Geography level",
@@ -233,7 +370,7 @@ tabPanel("Map", icon = icon("globe"),
 ###############################################.
 ## Deprivation ---- 
 ###############################################.
-tabPanel("Inequalities", icon = icon("balance-scale"),
+tabPanel("Inequalities", icon = icon("balance-scale"), value = "simd",
          #Intro text
          p(tags$b("This section is under development and a limited number of indicators are available."), style = "color: red "),
          p(tags$b("Explore the data by different levels of deprivation. ")),
@@ -263,7 +400,7 @@ tabPanel("Inequalities", icon = icon("balance-scale"),
 ###############################################.
 ## Table ----
 ###############################################.
-tabPanel("Table", icon = icon("table"),
+tabPanel("Table", icon = icon("table"), value = "table",
          #Sidepanel for filtering data
          sidebarPanel(
            
@@ -376,8 +513,8 @@ tabPanel("Table", icon = icon("table"),
 ##############About----    
 ###############################################.
 #Starting navbarMenu to have tab with dropdown list
-navbarMenu("Info", icon = icon("info-circle"),
-           tabPanel("About",
+navbarMenu("Info", icon = icon("info-circle"), 
+           tabPanel("About", value = "about",
                     sidebarPanel(width=1),
                     mainPanel(width=8,
                               h4("Welcome to the ScotPHO Profiles Tool", style = "color:black;"),
@@ -398,7 +535,7 @@ navbarMenu("Info", icon = icon("info-circle"),
 ###############################################.             
 ##############Resources----    
 ###############################################.      
-           tabPanel("Resources",
+           tabPanel("Resources", value = "resources",
                     sidebarPanel(width=1),
                     mainPanel(
                       h4("Resources", style = "color:black;"),
@@ -449,7 +586,7 @@ navbarMenu("Info", icon = icon("info-circle"),
 ###############################################.             
 ##############Evidence for action----    
 ###############################################.      
-tabPanel("Evidence for action",
+tabPanel("Evidence for action", value = "evidence",
          sidebarPanel(width=1),
          mainPanel(
            h4("Evidence for action", style = "color:black;"),
@@ -491,7 +628,7 @@ tabPanel("Evidence for action",
 ###############################################.             
 ##############Other profiles----    
 ###############################################.
-tabPanel("Other profiles",
+tabPanel("Other profiles", value = "others",
          sidebarPanel(width=1),
          mainPanel(
            h4("Other profiles", style = "color:black;"),
@@ -506,6 +643,10 @@ tabPanel("Other profiles",
              tags$li(class= "li-custom", tags$a(href="http://www.understandingglasgow.com/",
                                                 "Glasgow profiles",  class="externallink"), 
                      " - Glasgow Centre for Population Health."),
+             #Link to Fife
+             tags$li(class= "li-custom", tags$a(href="https://knowfife.fife.gov.uk/",
+                                                "Fife profiles",  class="externallink"), 
+                     " - Fife Council."),
              #Link to IS
              tags$li(class= "li-custom", tags$a(href="http://www.improvementservice.org.uk/community-planning-outcomes-profile.html",
                                                 "Community planning outcomes profile",  class="externallink"), 
