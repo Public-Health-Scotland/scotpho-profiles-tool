@@ -7,7 +7,7 @@
 ###############################################.
 ## Header ---- 
 ###############################################.
-navbarPage(
+navbarPage(id = "intabset", #needed for landing page
     title = div(tags$a(img(src="scotpho_reduced.png", height=40), href= "http://www.scotpho.org.uk/"),
                 style = "position: relative; top: -5px;"), # Navigation bar
              windowTitle = "ScotPHO profiles", #title for browser tab
@@ -59,14 +59,14 @@ navbarPage(
         -ms-transform: scale(1.05); transform: scale(1.05);}", #hover effect on boxes
                #landing-page titles for boxes
                ".landing-page-box-title {font-size: 14px; text-align:center; color:white;
-        font-weight: bold; background-color: rgba(2, 97, 160, 1); width:100%; max-height: 2.25vh;}",
+        font-weight: bold; background-color: rgba(2, 97, 160, 1); width:100%; max-height: 20px;}",
                #landing page buttons
                ".landing-page-button {background-color: rgba(0, 116, 192, 0.5); text-align:left;
         background-image:none; color: white; white-space: normal; border-radius: 0;
         font-size: 12px; position: static; min-height: 8vh; width: 100%;}",
                ".landing-page-button-about {background-color: rgba(0, 116, 192, 0.5); text-align:left;
         background-image:none; color: white; white-space: normal; border-radius: 0;
-        font-size: 12px; position: static; min-height: 6.5vh; width: 100%;}",
+        font-size: 12px; position: static; height: 6vh; width: 100%;}",
                #landing-page column 
                ".landing-page-column {padding-right:3vh}",
                #landing-page icons
