@@ -7,7 +7,7 @@
 ###############################################.
 ## Header ---- 
 ###############################################.
-  navbarPage(
+navbarPage(
     title = div(tags$a(img(src="scotpho_reduced.png", height=40), href= "http://www.scotpho.org.uk/"),
                 style = "position: relative; top: -5px;"), # Navigation bar
              windowTitle = "ScotPHO profiles", #title for browser tab
@@ -75,7 +75,7 @@ tabPanel("Overview", icon = icon("heartbeat"),
            column(3,
                   selectInput("profile_heat", "Profile", choices = profile_list),
                   selectInput("topic_heat", "Domain", choices = topic_list,
-                              selectize=TRUE, selected = "Scotland")
+                                selectize=TRUE, selected = "Scotland")
            ),
            column(2,
                   awesomeRadio("comp_heat", label = "Compare against:",
