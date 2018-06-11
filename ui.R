@@ -92,7 +92,7 @@ tabPanel(
       #Ring plot box
       column(4, class="landing-page-column",
              div(class="landing-page-box", style="background-image: url(ring_lp.png);
-                 background-repeat: no-repeat; background-size: 100%;",
+                 background-repeat: no-repeat; background-size: cover;",
                  div("Summary", class = "landing-page-box-title"),
                  actionButton('jump_to_ring', 'A high level view of how an area is doing for a profile of indicators', 
                               class="landing-page-button", 
@@ -100,14 +100,14 @@ tabPanel(
       #Heat map box
       column(4, class="landing-page-column",
              div(class="landing-page-box", style="background-image: url(heat_lp.png);
-                 background-repeat: no-repeat; background-size: 100% ",
+                 background-repeat: no-repeat; background-size: cover ",
                  div("Heat map", class = "landing-page-box-title"),
                  actionButton('jump_to_heat', 'Investigate the change over time of smaller sets of indicators', 
                               class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp")))),
       #Barcode plot box
       column(4, class="landing-page-column",
              div(class="landing-page-box", style="background-image: url(barcode_lp.png);
-                 background-repeat: no-repeat; background-size: 100% ",
+                 background-repeat: no-repeat; background-size: cover ",
                  div("Barcode", class = "landing-page-box-title"),
                  actionButton('jump_to_barcode', 'Explore how an area compares to other similar ones and the dispersion of the data',
                               class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp"))))
@@ -118,7 +118,7 @@ tabPanel(
       #Trend plot box
       column(3, class="landing-page-column",
              div(class="landing-page-box", style="background-image: url(trend_lp.png);
-                 background-repeat: no-repeat; background-size: 100% ",
+                 background-repeat: no-repeat; background-size: cover ",
                  div("Trend", class = "landing-page-box-title"),
                  actionButton('jump_to_trend', 'Explore the evolution of an indicator over time.',
                               class="landing-page-button", 
@@ -126,21 +126,21 @@ tabPanel(
       #Rank plot box
       column(3, class="landing-page-column",
              div(class="landing-page-box", style="background-image: url(rank_lp.png);
-                 background-repeat: no-repeat; background-size: 100% ",
+                 background-repeat: no-repeat; background-size: cover ",
                  div("Rank", class = "landing-page-box-title"),
                  actionButton('jump_to_rank', 'Compare different geography levels through a bar chart', 
                               class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp")))),
       #Map plot box
       column(3, class="landing-page-column",
              div(class="landing-page-box", style="background-image: url(map_lp.png);
-                 background-repeat: no-repeat; background-size: 100% ",
+                 background-repeat: no-repeat; background-size: cover ",
                  div("Map", class = "landing-page-box-title"),
                  actionButton('jump_to_map', 'Explore the geographical patterns of specific indicators', 
                               class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp")))),
       #Inequalities plots box
       column(3, class="landing-page-column",
              div(class="landing-page-box", style="background-image: url(simd_lp.png);
-                 background-repeat: no-repeat; background-size: 100% ",
+                 background-repeat: no-repeat; background-size: cover ",
                  div("Inequalities", class = "landing-page-box-title"),
                  actionButton('jump_to_simd', 'Explore the effects of deprivation on public health inequalities', 
                               class="landing-page-button", 
@@ -151,7 +151,7 @@ tabPanel(
       #Table box 
       column(4, class="landing-page-column",
              div(class="landing-page-box", style="background-image: url(table_lp.png);
-                 background-repeat: no-repeat; background-size: 100% ", 
+                 background-repeat: no-repeat; background-size: cover ", 
                  div("Table", class = "landing-page-box-title"),
                  actionButton('jump_to_table', 'Access and download the data behind the tool', 
                               class="landing-page-button", 
