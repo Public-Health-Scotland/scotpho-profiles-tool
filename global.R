@@ -112,6 +112,7 @@ parent_geo_list <- c("Show All", as.character((unique(optdata$parent_area))[-1])
 parent_iz_list <- geo_lookup %>% filter(areatype=="Intermediate zone") %>% select(areaname,parent_area)
 hb_name <- sort(geo_lookup$areaname[geo_lookup$areatype=="Health board"]) 
 la_name <- sort(geo_lookup$areaname[geo_lookup$areatype=="Council area"]) 
+adp_name <- sort(geo_lookup$areaname[geo_lookup$areatype=="Alcohol & drug partnership"]) 
 intzone_name <- sort(geo_lookup$areaname[geo_lookup$areatype=="Intermediate zone"]) 
 partnership_name <- sort(geo_lookup$areaname[geo_lookup$areatype=="HSC Partnership"]) 
 locality_name <- sort(geo_lookup$areaname[geo_lookup$areatype=="HSC Locality"]) 
@@ -121,10 +122,10 @@ min_year <- min(optdata$year)
 max_year <- max(optdata$year)
 
 #Area type names
-areatype_list <- c("Scotland", "Health board", "Council area", "HSC Partnership", 
-                   "HSC Locality", "Intermediate zone")
-areatype_noscot_list <- c("Health board", "Council area", "HSC Partnership", 
-                          "HSC Locality", "Intermediate zone")
+areatype_list <- c("Alcohol & drug partnership", "Council area", "Health board",  
+                   "HSC Locality", "HSC Partnership",  "Intermediate zone", "Scotland")
+areatype_noscot_list <- c("Alcohol & drug partnership", "Council area", "Health board",  
+                          "HSC Locality", "HSC Partnership",  "Intermediate zone")
 areatype_depr_list <- c("Scotland", "Health board", "Council area") #for deprivation tab
 
 #Indicator names
@@ -133,25 +134,25 @@ indicator_map_list <- sort(unique(optdata$indicator[optdata$interpret != 'O']))
 ind_depr_list <- unique(deprivation$indicator)
 
 #Topic names
-# topic_list <- sort(c('Alcohol', 'Behaviours',  'Cancer', 'Children and young people - Achieving ', 
-#                 'Children and young people - Active', 'Children and young people - Healthy', 
-#                 'Children and young people - Included', 'Children and young people - Nurtured', 
-#                 'Children and young people - Responsible', 'Children and young people - Safe', 
-#                 'Community safety', 'Crime', 'Deprivation', 'Drugs', 'Economy', 
-#                 'Education', 'Environment', 'Ill Health & Injury', 
-#                 'Immunisations and Screening', 'Life Expectancy & Mortality', 
-#                 'Mental health', 'Population', 'Smoking', 'Social Care & Housing'))
+topic_list <- sort(c('Alcohol', 'Behaviours',  'Cancer', 'Children and young people - Achieving ',
+                'Children and young people - Active', 'Children and young people - Healthy',
+                'Children and young people - Included', 'Children and young people - Nurtured',
+                'Children and young people - Responsible', 'Children and young people - Safe',
+                'Community safety', 'Crime', 'Deprivation', 'Drugs', 'Economy',
+                'Education', 'Environment', 'Ill Health & Injury',
+                'Immunisations and Screening', 'Life Expectancy & Mortality',
+                'Mental health', 'Population', 'Smoking', 'Social Care & Housing'))
 
 profile_list <- c("Health & wellbeing", "Children and young people", "Alcohol", 
-                  "Drugs", "Tobacco control")
+                  "Drugs", "Mental health", "Tobacco control")
 
-topic_list <- sort(c('Behaviours', 'Children and young people - Healthy', 
-                     'Children and young people - Included', 'Children and young people - Nurtured', 
-                     'Children and young people - Responsible', 'Children and young people - Safe', 
-                     'Community safety', 'Crime', 'Deprivation', 'Economy', 
-                     'Education', 'Environment', 'Ill Health & Injury', 
-                     'Immunisations and Screening', 'Life Expectancy & Mortality', 
-                     'Mental health', 'Population', 'Social Care & Housing'))
+# topic_list <- sort(c('Behaviours', 'Children and young people - Healthy', 
+#                      'Children and young people - Included', 'Children and young people - Nurtured', 
+#                      'Children and young people - Responsible', 'Children and young people - Safe', 
+#                      'Community safety', 'Crime', 'Deprivation', 'Economy', 
+#                      'Education', 'Environment', 'Ill Health & Injury', 
+#                      'Immunisations and Screening', 'Life Expectancy & Mortality', 
+#                      'Mental health', 'Population', 'Social Care & Housing'))
 
 ###############################################.
 ## Palettes ----
