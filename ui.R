@@ -259,7 +259,8 @@ tabPanel("Barcode", icon = icon("barcode"), value = "barcode",
          # tags$ul(
          #  tags$li("This chart gives an indication of variation")),
          sidebarPanel(width=3,
-                      selectInput("geotype_bar2", "Geography level", choices= areatype_noscot_list),
+                      selectInput("geotype_bar2", "Geography level", 
+                                  choices= areatype_noscot_list, selected = "Health board"),
                       conditionalPanel(#Conditional panel for extra dropdown for localities & IZ
                         condition = "input.geotype_bar2== 'HSC Locality' | input.geotype_bar2 == 'Intermediate zone' ",
                         selectInput("loc_iz_bar2", label = "Partnership for localities/intermediate zones", choices = partnership_name)),

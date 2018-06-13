@@ -74,7 +74,7 @@ function(input, output, session) {
   output$geoname_ui_heat <- renderUI({
     
     areas_heat <- if (input$geotype_heat %in% c("Health board", "Council area", 
-                                                "HSC Partnership", "Scotland"))
+                                                "HSC Partnership", "Scotland", "Alcohol & drug partnership"))
       {
       sort(geo_lookup$areaname[geo_lookup$areatype == input$geotype_heat])
       } else {
@@ -101,7 +101,7 @@ function(input, output, session) {
       optdata %>% 
       subset(areaname == input$geoname_heat &
               areatype == input$geotype_heat &
-               indicator != "Mid-year population estimate - all ages" &
+               !(indicator %in% c("Mid-year population estimate - all ages", "Quit attempts")) &
                (domain1 %in% input$topic_heat | domain2 %in% input$topic_heat |  domain3 %in% input$topic_heat)) %>% 
       select(c(indicator, areaname, areatype, numerator, measure, lowci, upci, interpret, 
                year, def_period, type_definition)) %>% 
@@ -235,7 +235,8 @@ function(input, output, session) {
     # Reactive controls for barcode:area name depending on areatype selected
     output$geoname_ui_bar2 <- renderUI({
       
-      areas_bar2 <- if (input$geotype_bar2 %in% c("Health board", "Council area", "HSC Partnership"))
+      areas_bar2 <- if (input$geotype_bar2 %in% c("Health board", "Council area", 
+                                                  "Alcohol & drug partnership", "HSC Partnership"))
       {
         sort(geo_lookup$areaname[geo_lookup$areatype == input$geotype_bar2])
       } else {
@@ -647,7 +648,8 @@ function(input, output, session) {
   #Rank plot data based on user input
   rank_bar_data <- reactive({
     #Makes different subsets depending on the geography type selected by the user
-    if (input$geotype_rank %in% c("Scotland", "Health board", "Council area", "HSC Partnership"))
+    if (input$geotype_rank %in% c("Scotland", "Health board", "Council area", 
+                                  "Alcohol & drug partnership", "HSC Partnership"))
     {
       rank_bar <-optdata %>% 
         subset(areatype == input$geotype_rank &  
@@ -837,7 +839,8 @@ function(input, output, session) {
   output$geotype_ui_map <- renderUI({
     areas <- sort(unique(optdata$areatype[optdata$indicator == input$indic_map]))
     #taking out areas without shapefiles
-    areas <- areas [! areas %in% c("Scotland", "Intermediate zone", "HSC Locality")]
+    areas <- areas [! areas %in% c("Scotland", "Intermediate zone", 
+                                   "HSC Locality", "Alcohol & drug partnership")]
     selectInput("geotype_map", label = "Geography level",
                 choices = areas, selected = "Health board")
   })
