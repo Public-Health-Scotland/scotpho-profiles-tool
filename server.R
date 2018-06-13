@@ -626,6 +626,15 @@ function(input, output, session) {
   })
   
   
+  #Dropdown for geotype based on what data is available for that indicator
+  output$geotype_ui_rank <- renderUI({
+    areas <- sort(unique(optdata$areatype[optdata$indicator == input$indic_rank]))
+    areas <- areas [! areas %in% c("Scotland")] #taking out Scotland
+    selectInput("geotype_rank", label = "Geography level",
+                choices = areas, selected = "Health board")
+  })
+  
+  
   # Comparator data rank plot. Could be moved inside rank_bar_data
   rank_compar <- reactive({
     subset(optdata, trend_axis == input$year_rank & 
@@ -822,6 +831,15 @@ function(input, output, session) {
     
     selectInput("year_map", "Time period",
                 choices = time_period, selected = last(time_period))
+  })
+  
+  #Dropdown for geotype based on what data is available for that indicator
+  output$geotype_ui_map <- renderUI({
+    areas <- sort(unique(optdata$areatype[optdata$indicator == input$indic_map]))
+    #taking out areas without shapefiles
+    areas <- areas [! areas %in% c("Scotland", "Intermediate zone", "HSC Locality")]
+    selectInput("geotype_map", label = "Geography level",
+                choices = areas, selected = "Health board")
   })
   
   #Merging shapefile with dynamic selection of data
