@@ -41,9 +41,10 @@ geo_lookup<- read_spss(paste(lookups, "code_dictionary.sav", sep="")) %>%
   mutate(areatype = ifelse(substr(code, 1, 3) == "S00", "Scotland", 
                            ifelse(substr(code, 1, 3) == "S08", "Health board", 
                                   ifelse(substr(code, 1, 3) == "S12", "Council area", 
-                                         ifelse(substr(code, 1, 3) == "S99", "HSC Locality", 
+                                         ifelse(substr(code, 1, 3) == "S11", "Alcohol & drug partnership", 
+                                            ifelse(substr(code, 1, 3) == "S99", "HSC Locality", 
                                                 ifelse(substr(code, 1, 3) == "S37", "HSC Partnership",
-                                                       ifelse(substr(code, 1, 3) == "S02", "Intermediate zone", "Error"))))))) 
+                                                       ifelse(substr(code, 1, 3) == "S02", "Intermediate zone", "Error")))))))) 
 
 #Changing ands for & to reduce issues with long labels
 #and " - " for "-"
@@ -166,6 +167,7 @@ geo_lookup$areaname_full <- ifelse(geo_lookup$areaname == "Scotland", "Scotland"
                                    paste(geo_lookup$areaname_full))
 geo_lookup$areaname_full <- gsub("Health board", "HB", geo_lookup$areaname_full)
 geo_lookup$areaname_full <- gsub("Council area", "CA", geo_lookup$areaname_full)
+geo_lookup$areaname_full <- gsub("Alcohol & drug partnership", "ADP", geo_lookup$areaname_full)
 geo_lookup$areaname_full <- gsub("HSC Partnership", "HSCP", geo_lookup$areaname_full)
 geo_lookup$areaname_full <- gsub("HSC Locality", "HSCL", geo_lookup$areaname_full)
 geo_lookup$areaname_full <- gsub("Intermediate zone", "IZ", geo_lookup$areaname_full)
@@ -174,15 +176,14 @@ geo_lookup <- as.data.frame(geo_lookup)
 saveRDS(geo_lookup, "./data/geo_lookup.rds")
 geo_lookup <- readRDS("./data/geo_lookup.rds") 
 
-#geo_lookup$length <- nchar(geo_lookup$areaname_full)
-
 ######
 #Indicator information lookup table 
-
+#Many variables might not be needed
 ind_lookup<- read_csv(paste(lookups, "indicator_lookup.csv", sep = "")) %>% 
   setNames(tolower(names(.))) %>% #variables to lower case
   select(c(ind_id, indicator, interpret, supression, supress_less_than, 
-           type_id, type_definition, domain1, domain2, domain3)) %>% #at the moment don't need most things
+           type_id, type_definition, domain1, domain2, domain3, 
+           profile_domain1, profile_domain2)) %>% 
   mutate_if(is.character, factor) # converting variables into factors
 
 ###############################################.
