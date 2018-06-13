@@ -197,7 +197,7 @@ function(input, output, session) {
     ggplotly(plot_overview(), tooltip=c("text"), height = get_height_heat()) %>%
       # margins needed as long labels don't work well with Plotly
       layout(margin = list(l = 400, t = 50),
-             xaxis = list(side = 'top'),
+             xaxis = list(side = 'top', fixedrange=TRUE), yaxis= list(fixedrange=TRUE),
              font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif')
       ) %>%
       config(displayModeBar = FALSE, displaylogo = F, collaborate=F, editable =F) # taking out plotly logo and collaborate button
@@ -539,8 +539,8 @@ function(input, output, session) {
       plot_ly() %>%
         layout(annotations = text_na,
                #empty layout
-               yaxis = list(showline = FALSE, showticklabels = FALSE, showgrid = FALSE),
-               xaxis = list(showline = FALSE, showticklabels = FALSE, showgrid = FALSE),
+               yaxis = list(showline = FALSE, showticklabels = FALSE, showgrid = FALSE, fixedrange=TRUE),
+               xaxis = list(showline = FALSE, showticklabels = FALSE, showgrid = FALSE, fixedrange=TRUE),
                font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif')) %>% 
         config( displayModeBar = FALSE) # taking out plotly logo and collaborate button
       
@@ -562,9 +562,9 @@ function(input, output, session) {
         #Layout 
         layout(annotations = list(), #It needs this because of a buggy behaviour of Plotly
                margin = list(b = 160, t=5), #to avoid labels getting cut out
-               yaxis = list(title = ~type_definition, rangemode="tozero", 
+               yaxis = list(title = ~type_definition, rangemode="tozero", fixedrange=TRUE,
                             size = 4, titlefont =list(size=12), tickfont =list(size=11)), 
-               xaxis = list(title = FALSE, tickfont =list(size=10), tickangle = 270),
+               xaxis = list(title = FALSE, tickfont =list(size=10), tickangle = 270, fixedrange=TRUE),
                font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif')) %>%  
         config(displayModeBar = FALSE, displaylogo = F, collaborate=F, editable =F) # taking out plotly logo and collaborate button
       
@@ -690,8 +690,8 @@ function(input, output, session) {
       plot_ly() %>%
         layout(annotations = text_na,
                #empty layout
-               yaxis = list(showline = FALSE, showticklabels = FALSE, showgrid = FALSE),
-               xaxis = list(showline = FALSE, showticklabels = FALSE, showgrid = FALSE),
+               yaxis = list(showline = FALSE, showticklabels = FALSE, showgrid = FALSE, fixedrange=TRUE),
+               xaxis = list(showline = FALSE, showticklabels = FALSE, showgrid = FALSE, fixedrange=TRUE),
                font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif')) %>% 
         config( displayModeBar = FALSE) # taking out plotly logo and collaborate button
       
@@ -722,8 +722,8 @@ function(input, output, session) {
         #Layout
         layout(annotations = list(), #It needs this because of a buggy behaviour
                yaxis = list(title = ~type_definition, titlefont =list(size=11), 
-                            tickfont =list(size=11)),
-               xaxis = list(title = "", tickangle = 270, 
+                            tickfont =list(size=11), fixedrange=TRUE),
+               xaxis = list(title = "", tickangle = 270, fixedrange=TRUE,
                             tickfont =list(size=11), #axis parameters
                             categoryorder="array", #order of plotting
                             categoryarray = order_areas),
@@ -963,8 +963,8 @@ function(input, output, session) {
       plot_ly() %>%
         layout(annotations = text_na,
                #empty layout
-               yaxis = list(showline = FALSE, showticklabels = FALSE, showgrid = FALSE),
-               xaxis = list(showline = FALSE, showticklabels = FALSE, showgrid = FALSE),
+               yaxis = list(showline = FALSE, showticklabels = FALSE, showgrid = FALSE, fixedrange=TRUE),
+               xaxis = list(showline = FALSE, showticklabels = FALSE, showgrid = FALSE, fixedrange=TRUE),
                font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif')) %>%
         config( displayModeBar = FALSE) # taking out plotly logo and collaborate button
 
@@ -988,8 +988,8 @@ function(input, output, session) {
                legend = list(orientation = 'h'),
                font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif'),
                yaxis = list(title = ~type_definition, titlefont =list(size=10), 
-                            tickfont =list(size=11)),
-               xaxis = list(showline = TRUE, title = FALSE, showticklabels = FALSE)) %>%
+                            tickfont =list(size=11), fixedrange=TRUE),
+               xaxis = list(showline = TRUE, title = FALSE, showticklabels = FALSE), fixedrange=TRUE) %>%
         config(displayModeBar = TRUE, displaylogo = F, collaborate=F, editable =F) # taking out plotly logo and collaborate button
     }
   })
@@ -1006,8 +1006,8 @@ function(input, output, session) {
       plot_ly() %>%
         layout(annotations = text_na,
                #empty layout
-               yaxis = list(showline = FALSE, showticklabels = FALSE, showgrid = FALSE),
-               xaxis = list(showline = FALSE, showticklabels = FALSE, showgrid = FALSE),
+               yaxis = list(showline = FALSE, showticklabels = FALSE, showgrid = FALSE, fixedrange=TRUE),
+               xaxis = list(showline = FALSE, showticklabels = FALSE, showgrid = FALSE, fixedrange=TRUE),
                font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif')) %>%
         config( displayModeBar = FALSE) # taking out plotly logo and collaborate button
 
@@ -1061,9 +1061,9 @@ function(input, output, session) {
           #Layout
           layout(annotations = list(), #It needs this because of a buggy behaviour
                  margin = list(b = 160), #to avoid labels getting cut out
-                 yaxis = list(title = FALSE, rangemode="tozero",
+                 yaxis = list(title = FALSE, rangemode="tozero", fixedrange=TRUE,
                               size = 4, tickfont =list(size=11)),
-                 xaxis = list(title = "", tickfont =list(size=11), tickangle = 270),  #axis parameter
+                 xaxis = list(title = "", tickfont =list(size=11), tickangle = 270, fixedrange=TRUE),  #axis parameter
                  font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif'),
                  margin=list(b = 160),
                  showlegend = FALSE) %>%
