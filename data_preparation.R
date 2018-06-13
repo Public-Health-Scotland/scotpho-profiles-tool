@@ -235,8 +235,10 @@ optdata <- optdata %>%
          lowci = round(lowci, 1), upci = round(upci, 1)) %>% 
   droplevels() #to get rid of factor levels not present in data set.
 
-#Making the numerator the measure for pop all ages, so it plots correctly
-optdata$measure <- ifelse(optdata$indicator == 'Mid-year population estimate - all ages',
+#Making the numerator the measure for a few indicators, so it plots correctly
+optdata$measure <- ifelse(optdata$indicator %in% c('Mid-year population estimate - all ages',
+                                                   'S2 pupils - SALSUS', 'S4 pupils - SALSUS',
+                                                   "Quit attempts"),
                           optdata$numerator, optdata$measure)
 
 optdata <- as.data.frame(optdata)
