@@ -249,34 +249,25 @@ tabPanel("Heatmap", icon = icon("heartbeat"), value = "heat",
   ), #Tab panel bracket
 #####################################################################.
 ## Barcode ----
-## Version using % difference from comparator for bars
 #####################################################################.
 tabPanel("Barcode", icon = icon("barcode"), value = "barcode",
-         # beta_box,  ##looks better with text as title for chart?
-         # p(tags$b("Barcode plot take a few seconds to load")),
-         # tags$ul(
-         #  tags$li("This chart gives an indication of variation")),
          sidebarPanel(width=3,
-                      selectInput("geotype_bar2", "Geography level", 
-                                  choices= areatype_noscot_list, selected = "Health board"),
+                      selectInput("profile_bar", "Profile", choices = profile_list),
+                      uiOutput("topic_ui_bar"),
+                      uiOutput("geotype_ui_bar"),
                       conditionalPanel(#Conditional panel for extra dropdown for localities & IZ
-                        condition = "input.geotype_bar2== 'HSC Locality' | input.geotype_bar2 == 'Intermediate zone' ",
-                        selectInput("loc_iz_bar2", label = "Partnership for localities/intermediate zones", choices = partnership_name)),
-                      uiOutput("geoname_ui_bar2"),
-                      selectInput("geocomp_bar2", "Comparator", choices = comparator_list, selectize=TRUE, selected = "Scotland"),
-                      selectInput("topic_bar2", "Topic", choices = topic_list,selectize=TRUE, selected = "Scotland"),
-                      downloadButton('download_bar2', 'Download data', class = "down"),
-                      br(),
-                      br(),
-                      savechart_button('download_bar2plot', 'Save chart',  class = "down"),
-                      br(),
-                      br(),
+                        condition = "input.geotype_bar== 'HSC Locality' | input.geotype_bar == 'Intermediate zone' ",
+                        selectInput("loc_iz_bar", label = "Partnership for localities/intermediate zones", choices = partnership_name)),
+                      uiOutput("geoname_ui_bar"),
+                      selectInput("geocomp_bar", "Comparator", choices = comparator_list, selectize=TRUE, selected = "Scotland"),
+                      downloadButton('download_bar', 'Download data', class = "down"),
+                      savechart_button('download_barplot', 'Save chart',  class = "down"),
                       actionButton("help_bar",label="How to interpret this chart",icon= icon('question-circle'), class ="down")
          ),
          mainPanel(width=9,
                    p(tags$b("The chart below shows how indicator values for different geographical areas compare. "), style= "font-size:12px;"),
                    htmlOutput("topic_selected"),
-                   uiOutput("ui_bar2_plot")
+                   uiOutput("ui_bar_plot")
          )
 ),
 ###############################################.
@@ -400,7 +391,7 @@ tabPanel("Table", icon = icon("table"), value = "table",
          #Sidepanel for filtering data
          sidebarPanel(
            
-           tags$h4("Filter ScotPHO Data by", style = "font-weight: bold; color: #4d3a7d;"),
+           tags$h4("Filter ScotPHO Data by", style = "font-weight: bold; color: black;"),
            
            tags$div(tags$i("Select appropriate conditions to filter data"), 
                     tags$br(),
@@ -408,13 +399,13 @@ tabPanel("Table", icon = icon("table"), value = "table",
            tags$br(),
            tags$br(),
            actionButton("clear", label = "Clear all filters", icon ("eraser"), style='background: #3399FF; color: #FFF; font-size:100%'),
-           tags$h4("Geography", style = "font-weight: bold; color: #4d3a7d;"),
+           tags$h4("Geography", style = "font-weight: bold; color: black;"),
            
            tags$style(type='text/css', ".selectize-input { font-size: 12px; line-height: 18px;} .selectize-dropdown { font-size: 12px; line-height: 18px; }"),
            awesomeCheckbox("iz",label = "Intermediate zone", value = FALSE),
            conditionalPanel(
              condition = "input.iz == true",
-             selectInput("iz_parent", label = "Filter list by parent geography",
+             selectInput("iz_parent", label = "Filter list by HSC Partnership",
                          width = "200px", choices = parent_geo_list, selected = NULL, multiple=FALSE),
              conditionalPanel(
                condition = "input.iz_parent != 'Show all'",
@@ -450,13 +441,13 @@ tabPanel("Table", icon = icon("table"), value = "table",
            awesomeCheckbox("all_data",label = "All available geographies", value = FALSE),
            
            hr(),
-           p(tags$h5("Find geography by  area code", style = "font-weight: bold; color: #4d3a7d;")),
+           p(tags$h5("Find geography by area code", style = "font-weight: bold; color: black;")),
            selectInput("code", label = NULL, #"Type in the box to search for area code" 
                        width = "200px", choices = code_list, multiple=TRUE, selectize=TRUE, selected = ""),
            
            hr(),
-           p(tags$h4("Time period", style = "font-weight: bold; color: #4d3a7d;")),
-           #p(tags$h4("Display data for the date range", style = "font-weight: bold; color: #4d3a7d;")),
+           p(tags$h4("Time period", style = "font-weight: bold; color: black;")),
+           #p(tags$h4("Display data for the date range", style = "font-weight: bold; color: black;")),
            sliderInput("date_from",label = NULL, min = min_year, max = max_year, value = c(min_year,max_year), 
                        width = "200px", step = 1, sep="", round = TRUE, ticks = TRUE, dragRange = FALSE)
            #sliderInput("date_to",label = "To", min = min_year, max = max_year, value = max_year, 
