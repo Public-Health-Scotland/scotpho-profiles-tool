@@ -86,6 +86,17 @@ function(input, output, session) {
                 selectize=TRUE, selected = "")
 
   })
+  
+  # Reactive controls for domain depending on profile
+  output$topic_ui_heat <- renderUI({
+    
+    domain_list <- sort(profile_lookup$domain[profile_lookup$profile == input$profile_heat])
+    
+    selectInput("topic_heat", "Domain", choices = domain_list)
+    
+  })
+  
+
   # Years to compare with depending on what data is available
   output$yearcomp_ui_heat <- renderUI({
     
@@ -102,7 +113,9 @@ function(input, output, session) {
       subset(areaname == input$geoname_heat &
               areatype == input$geotype_heat &
                !(indicator %in% c("Mid-year population estimate - all ages", "Quit attempts")) &
-               (domain1 %in% input$topic_heat | domain2 %in% input$topic_heat |  domain3 %in% input$topic_heat)) %>% 
+               (substr(profile_domain1, 5, nchar(as.vector(profile_domain1))) == input$topic_heat |
+                  substr(profile_domain2, 5, nchar(as.vector(profile_domain2))) == input$topic_heat)) %>% 
+               #(domain1 %in% input$topic_heat | domain2 %in% input$topic_heat |  domain3 %in% input$topic_heat)) %>% 
       select(c(indicator, areaname, areatype, numerator, measure, lowci, upci, interpret, 
                year, def_period, type_definition)) %>% 
       droplevels()
@@ -117,7 +130,9 @@ function(input, output, session) {
         subset(areaname == input$geocomp_heat &
                  indicator != "Mid-year population estimate - all ages" &
                  areatype %in% c("Health board", "Council area", "Scotland") &
-                 (domain1 %in% input$topic_heat | domain2 %in% input$topic_heat |  domain3 %in% input$topic_heat)) %>% 
+                 (substr(profile_domain1, 5, nchar(as.vector(profile_domain1))) == input$topic_heat |
+                    substr(profile_domain2, 5, nchar(as.vector(profile_domain2))) == input$topic_heat)) %>% 
+                 # (domain1 %in% input$topic_heat | domain2 %in% input$topic_heat |  domain3 %in% input$topic_heat)) %>% 
         select(c(year, indicator, measure)) %>% 
         rename(comp_m=measure) %>% 
         droplevels()

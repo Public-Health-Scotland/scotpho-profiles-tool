@@ -211,8 +211,8 @@ tabPanel("Overview", icon = icon("heartbeat"), value = "heat",
            ),
            column(3,
                   selectInput("profile_heat", "Profile", choices = profile_list),
-                  selectInput("topic_heat", "Domain", choices = topic_list,
-                                selectize=TRUE, selected = "Scotland")
+                  uiOutput("topic_ui_heat")
+                  # selectInput("topic_heat", "Domain", choices = topic_list, selectize=TRUE)
            ),
            column(2,
                   awesomeRadio("comp_heat", label = "Compare against:",
@@ -236,7 +236,7 @@ tabPanel("Overview", icon = icon("heartbeat"), value = "heat",
                     img(src='signif_worse.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
                     "Worse than comparator.", br(),
                     img(src='signif_nocalc.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
-                    "No differences can be calculated.")
+                    "No differences are calculated.")
            ),
            column(2,
                   actionButton("help_heat",label="Help", icon= icon('question-circle'), class ="down"),
@@ -337,7 +337,7 @@ tabPanel("Rank", icon = icon("signal"), value = "rank",
                     img(src='signif_worse.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
                     "Worse than comparator.", br(),
                     img(src='signif_nocalc2.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
-                    "No differences can be calculated."),
+                    "No differences are calculated."),
                   downloadButton('download_rank', 'Download data', class = "down"),
                   savechart_button('download_rankplot', 'Save chart', class = "down")
          ),
