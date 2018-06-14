@@ -26,6 +26,7 @@ navbarPage(id = "intabset", #needed for landing page
                ".navbar-brand {background-color: white}",
                ".navbar {font-size: 12px; border: 0}", #font size and border
                ".dropdown-menu { font-size: 12px;}", #dropdown menu within navBar
+               ".container-fluid {padding-right: 0px}",
                #Text size and line height. Padding needed for footer
                "body { font-size: 11px; line-height: 1.1; padding-bottom:30px}",
                ".checkbox label, .radio label, .checkbox-bs label, .radio-bs label
@@ -52,9 +53,9 @@ navbarPage(id = "intabset", #needed for landing page
                font-size: 11px; padding: 5px 10px; margin-top: 5px; margin-left: 3px}",
                #landing page boxes
                ".landing-page-box {width:100%; height:100%; min-height:18vh; background-color:AliceBlue;
-        border: 1px solid #AAAAAA; margin-bottom: 5px; float: left; transition: 1s ease;}",
+        border: 1px solid #AAAAAA; margin-bottom: 5px; float: left; transition: 0.5s ease;}",
                ".landing-page-box-about {width:100%; height:100%; min-height:9vh; background-color:AliceBlue;
-        border: 1px solid #AAAAAA; margin-bottom: 0.5vh; float: left; transition: 1s ease; max-height: 2.25vh;}",
+        border: 1px solid #AAAAAA; margin-bottom: 0.5vh; float: left; transition: 0.5s ease; max-height: 2.25vh;}",
                ".landing-page-box:hover, .landing-page-box-about:hover {-webkit-transform: scale(1.05); 
         -ms-transform: scale(1.05); transform: scale(1.05);}", #hover effect on boxes
                #landing-page titles for boxes
@@ -66,7 +67,7 @@ navbarPage(id = "intabset", #needed for landing page
         font-size: 12px; position: static; min-height: 8vh; width: 100%;}",
                ".landing-page-button-about {background-color: rgba(0, 116, 192, 0.5); text-align:left;
         background-image:none; color: white; white-space: normal; border-radius: 0;
-        font-size: 12px; position: static; height: 6vh; width: 100%;}",
+        font-size: 12px; position: static; height: 6.5vh; width: 100%;}",
                #landing-page column 
                ".landing-page-column {padding-right:3vh}",
                #landing-page icons
@@ -176,7 +177,7 @@ tabPanel(
       column(4, class="landing-page-column",
              div(class="landing-page-box-about", 
                  div("Resources", class = "landing-page-box-title"),
-                 actionButton('jump_to_resources', 'Find out more information about the profiles', 
+                 actionButton('jump_to_resources', 'More help to use the profiles', 
                               class="landing-page-button-about", 
                               icon = icon("arrow-circle-right", "icon-lp"))
              ),
@@ -193,11 +194,11 @@ tabPanel(
 ###############################################.
 ## Ring plot ----
 ###############################################.
-tabPanel(title = "Summary", value = "ring"),
+tabPanel(title = "Summary", icon = icon("heartbeat"), value = "ring"),
 ###############################################.
 ## Heat map ----
 ###############################################.
-tabPanel("Heatmap", icon = icon("heartbeat"), value = "heat",
+tabPanel("Heatmap", icon = icon("list-ul"), value = "heat",
          wellPanel( #Filter options
            column(3,
                   selectInput("profile_heat", "Profile", choices = profile_list),
@@ -260,9 +261,9 @@ tabPanel("Barcode", icon = icon("barcode"), value = "barcode",
                         selectInput("loc_iz_bar", label = "Partnership for localities/intermediate zones", choices = partnership_name)),
                       uiOutput("geoname_ui_bar"),
                       selectInput("geocomp_bar", "Comparator", choices = comparator_list, selectize=TRUE, selected = "Scotland"),
+                      actionButton("help_bar", label="Help", icon= icon('question-circle'), class ="down"),
                       downloadButton('download_bar', 'Download data', class = "down"),
-                      savechart_button('download_barplot', 'Save chart',  class = "down"),
-                      actionButton("help_bar",label="How to interpret this chart",icon= icon('question-circle'), class ="down")
+                      savechart_button('download_barplot', 'Save chart',  class = "down")
          ),
          mainPanel(width=9,
                    p(tags$b("The chart below shows how indicator values for different geographical areas compare. "), style= "font-size:12px;"),
@@ -284,6 +285,8 @@ tabPanel("Trend", icon = icon("area-chart"), value = "trend",
                           selectInput("scotname_trend", "Scotland", choices = c("", "Scotland"), 
                                       selectize=TRUE, selected = "Scotland"),
                           selectInput("laname_trend", "Council area", choices =  c("Select council areas" = "", paste(la_name)),
+                                      multiple=TRUE, selectize=TRUE, selected = ""),
+                          selectInput("adpname_trend", "Alcohol & drug partnership", choices =  c("Select partnerships" = "", paste(adp_name)),
                                       multiple=TRUE, selectize=TRUE, selected = ""),
                           selectInput("partname_trend", "HSC Partnership", choices =  c("Select partnerships" = "", paste(partnership_name)),
                                       multiple=TRUE, selectize=TRUE, selected = ""),
