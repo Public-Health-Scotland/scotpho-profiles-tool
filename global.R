@@ -29,6 +29,7 @@
 #----------------.
 #Time trend: 
 #   Adding numerator/rate tick box?
+#   Improve filtering, dynamic show/hide geolevels depending on indicator
 #   Add functionality to be able to add IZ/localities from different partnerships
 #   To fix long label issue move to have legend as a different chart? 
 #   Or inside same chart try to move legend below chart
@@ -164,9 +165,9 @@ topic_list <- sort(c('Alcohol', 'Behaviours',  'Cancer', 'Children and young peo
                 'Immunisations and Screening', 'Life Expectancy & Mortality',
                 'Mental health', 'Population', 'Smoking', 'Social Care & Housing'))
 
-profile_list <- setNames(c('HWB','CYP','ALC','DRG','MEN'),
+profile_list <- setNames(c('HWB','CYP','ALC','DRG','MEN', "TOB", "POP"),
                          c('Health & wellbeing','Children & young people','Alcohol',
-                           'Drugs','Mental Health'))
+                           'Drugs','Mental Health', "Tobacco control", "Population"))
 
 
 ###############################################.
