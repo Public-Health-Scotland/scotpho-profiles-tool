@@ -12,10 +12,19 @@
 #   Create user guide
 #   Host in the website and link from here: shapefiles, lookups, etc
 #----------------.
-#Barcode chart:
-#   
+#Barcode:
+#   Name of the tab
+#   Blank chart
+#   Legend cut in live tool, why not left aligned or centered?
+#   Add compare against time period feature?
+#   Space between buttons
+#   Labels text bigger than other charts, pretty big in general.
+#   Help image bigger than modal window
+#   Not fan of the text at the beginning, also topic: xxx not really adding much
+#   All the ones with “no significance can be calculated” excluded (e.g. Active travel to work), maybe that is not completely desired
 #----------------.
-#Overview:  
+#Heatmap:  
+#   name of the tab
 #   Long labels of indicators are an issue  https://github.com/plotly/plotly.js/issues/296#issuecomment-371780321
 #----------------.
 #Time trend: 
@@ -98,7 +107,6 @@ plot_nodata <- function() {
     config( displayModeBar = FALSE) # taking out plotly logo and collaborate button
 }
 
-
 ###############################################.
 ## Data ----
 ###############################################.    
@@ -146,7 +154,7 @@ indicator_list <- sort(unique(optdata$indicator))
 indicator_map_list <- sort(unique(optdata$indicator[optdata$interpret != 'O']))
 ind_depr_list <- unique(deprivation$indicator)
 
-#Topic names
+#Profile names
 topic_list <- sort(c('Alcohol', 'Behaviours',  'Cancer', 'Children and young people - Achieving',
                 'Children and young people - Active', 'Children and young people - Healthy',
                 'Children and young people - Included', 'Children and young people - Nurtured',
@@ -160,13 +168,6 @@ profile_list <- setNames(c('HWB','CYP','ALC','DRG','MEN'),
                          c('Health & wellbeing','Children & young people','Alcohol',
                            'Drugs','Mental Health'))
 
-# topic_list <- sort(c('Behaviours', 'Children and young people - Healthy', 
-#                      'Children and young people - Included', 'Children and young people - Nurtured', 
-#                      'Children and young people - Responsible', 'Children and young people - Safe', 
-#                      'Community safety', 'Crime', 'Deprivation', 'Economy', 
-#                      'Education', 'Environment', 'Ill Health & Injury', 
-#                      'Immunisations and Screening', 'Life Expectancy & Mortality', 
-#                      'Mental health', 'Population', 'Social Care & Housing'))
 
 ###############################################.
 ## Palettes ----
