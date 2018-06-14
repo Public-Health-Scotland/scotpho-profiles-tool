@@ -274,6 +274,18 @@ saveRDS(optdata, "./data/optdata.rds")
 optdata <- readRDS("./data/optdata.rds") 
 
 ###############################################.
+## Profile lookup ----
+###############################################.   
+profile_lookup <- data.frame(profile_domain = c(paste(unique(optdata$profile_domain1)),
+                                                paste(unique(optdata$profile_domain2)))) %>% 
+  mutate(profile = substr(profile_domain, 1, 3),
+         domain = substr(profile_domain, 5, nchar(as.vector(profile_domain)))) %>% 
+  select(-profile_domain)
+
+saveRDS(profile_lookup, "./data/profile_lookup.rds")
+profile_lookup <- readRDS("./data/profile_lookup.rds") 
+
+###############################################.
 ## Shapefiles ----
 ###############################################.   
 #Reading file with council shapefiles
