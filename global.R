@@ -3,10 +3,7 @@
 
 # TODO:
 #Data preparation: 
-#   Lookups need to be checked/refined: indicator measures, domains etc.
 #   Indicator and geographical info out of main file and use merge/lookups?
-#   Include deprivation indicators in lookup
-#   Deprivation needs PAR 
 #   Add denominator?
 #----------------.
 #General:
@@ -30,7 +27,6 @@
 #Rank chart
 #   Issue with long label names, take them out? put them in the side? in the bars?
 #   Vertical bars instead?
-#   Indicator list reactive to geography?
 #----------------.
 #Table:
 #   Add deprivation data to table (maybe with switch or just merging everything)
@@ -88,10 +84,25 @@ title_wrapper <- function(x, ...)
   paste(strwrap(x, ...), collapse = "\n")
 }
 
+#Function to create plot when no data available
+plot_nodata <- function() {
+  text_na <- list(x = 5, y = 5, text = "No data available" ,
+                  xref = "x", yref = "y",  showarrow = FALSE)
+  
+  plot_ly() %>%
+    layout(annotations = text_na,
+           #empty layout
+           yaxis = list(showline = FALSE, showticklabels = FALSE, showgrid = FALSE, fixedrange=TRUE),
+           xaxis = list(showline = FALSE, showticklabels = FALSE, showgrid = FALSE, fixedrange=TRUE),
+           font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif')) %>% 
+    config( displayModeBar = FALSE) # taking out plotly logo and collaborate button
+}
+
+
 ###############################################.
 ## Data ----
 ###############################################.    
-optdata <- readRDS("./data/optdata.rds") 
+optdata <- readRDS("./data/optdata.rds") #main dataset
 deprivation <- readRDS("./data/deprivation_OPT.rds")
 
 geo_lookup <- readRDS("./data/geo_lookup.rds") #geography lookup
@@ -145,9 +156,9 @@ topic_list <- sort(c('Alcohol', 'Behaviours',  'Cancer', 'Children and young peo
                 'Immunisations and Screening', 'Life Expectancy & Mortality',
                 'Mental health', 'Population', 'Smoking', 'Social Care & Housing'))
 
-profile_list <- setNames(c('HWB','CYP','ALC','DRG','MEN','DEP'),
+profile_list <- setNames(c('HWB','CYP','ALC','DRG','MEN'),
                          c('Health & wellbeing','Children & young people','Alcohol',
-                           'Drugs','Mental Health','Deprivation'))
+                           'Drugs','Mental Health'))
 
 # topic_list <- sort(c('Behaviours', 'Children and young people - Healthy', 
 #                      'Children and young people - Included', 'Children and young people - Nurtured', 
