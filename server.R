@@ -43,7 +43,7 @@ function(input, output, session) {
   })
   
   observeEvent(input$jump_to_about, {
-    updateTabsetPanel(session, "intabset", selected = "abour")
+    updateTabsetPanel(session, "intabset", selected = "about")
   })
   
   observeEvent(input$jump_to_evidence, {
@@ -54,8 +54,8 @@ function(input, output, session) {
     updateTabsetPanel(session, "intabset", selected = "resources")
   })
   
-  observeEvent(input$jump_to_about, {
-    updateTabsetPanel(session, "intabset", selected = "about")
+  observeEvent(input$jump_to_others, {
+    updateTabsetPanel(session, "intabset", selected = "others")
   })
   
   ###############################################.        
@@ -547,6 +547,7 @@ function(input, output, session) {
       subset((areaname %in% input$hbname_trend &  areatype == "Health board" |
                areaname %in% input$laname_trend & areatype == "Council area" |
                areaname %in% input$scotname_trend & areatype == "Scotland"  |
+               areaname %in% input$adpname_trend  & areatype == "Alcohol & drug partnership" |
                areaname %in% input$locname_trend  & areatype == "HSC Locality" |
                areaname %in% input$partname_trend & areatype == "HSC Partnership"   |
                areaname %in% input$izname_trend & areatype == "Intermediate zone") & 
@@ -565,15 +566,18 @@ function(input, output, session) {
     hb_length <- length(input$hbname_trend)
     ca_length <- length(input$laname_trend)
     scot_length <- length(input$scotname_trend)
+    adp_length <- length(input$adpname_trend)
     part_length <- length(input$partname_trend)
     loc_length <- length(input$locname_trend)
     iz_length <- length(input$izname_trend)
-    colorblind_length <- hb_length+ca_length+scot_length+part_length+loc_length+iz_length
+    colorblind_length <- hb_length+ca_length+scot_length+adp_length+part_length+
+      loc_length+iz_length
     
     #Then creating a gradient scale for each geography type based on its length
     hb_scale <- scales::seq_gradient_pal("#08519c", "#9ecae1", "Lab")(seq(0,1,length.out=hb_length))
     ca_scale <- scales::seq_gradient_pal("#006d2c", "#a1d99b", "Lab")(seq(0,1,length.out=ca_length))
     scot_scale <- scales::seq_gradient_pal("#000000", "#000000", "Lab")(seq(0,1,length.out=scot_length))
+    adp_scale <- scales::seq_gradient_pal("#FF0000", "#ffd6cc", "Lab")(seq(0,1,length.out=adp_length))
     part_scale <- scales::seq_gradient_pal("#FF0000", "#ffd6cc", "Lab")(seq(0,1,length.out=part_length))
     loc_scale <- scales::seq_gradient_pal("#dadaeb", "#54278f", "Lab")(seq(0,1,length.out=loc_length))
     iz_scale <- scales::seq_gradient_pal("#ffff66", "#4d4d00", "Lab")(seq(0,1,length.out=iz_length))
@@ -583,6 +587,7 @@ function(input, output, session) {
     scot_cols <- setNames(scot_scale, unique(trend_data()$areaname_full[trend_data()$areatype == "Scotland"]))
     hb_cols <- setNames(hb_scale, unique(trend_data()$areaname_full[trend_data()$areatype == "Health board"]))
     ca_cols <- setNames(ca_scale, unique(trend_data()$areaname_full[trend_data()$areatype == "Council area"]))
+    adp_cols <- setNames(adp_scale, unique(trend_data()$areaname_full[trend_data()$areatype == "Alcohol & drug partnership"]))
     part_cols <- setNames(part_scale, unique(trend_data()$areaname_full[trend_data()$areatype == "HSC Partnership"]))
     loc_cols <- setNames(loc_scale, unique(trend_data()$areaname_full[trend_data()$areatype == "HSC Locality"]))
     iz_cols <- setNames(iz_scale, unique(trend_data()$areaname_full[trend_data()$areatype == "Intermediate zone"]))
@@ -590,7 +595,7 @@ function(input, output, session) {
     
     #Combining them all in the final palette. Using different palette if colour bling option checked
     if(input$colorblind_trend == FALSE){
-      trend_col <- c(scot_cols, hb_cols, ca_cols, part_cols, loc_cols, iz_cols)
+      trend_col <- c(scot_cols, hb_cols, ca_cols, adp_cols, part_cols, loc_cols, iz_cols)
     }
     else{
       trend_col <- colorblind_cols
