@@ -111,7 +111,6 @@ function(input, output, session) {
     
   })
   
-
   # Years to compare with depending on what data is available
   output$yearcomp_ui_heat <- renderUI({
     
@@ -272,60 +271,94 @@ function(input, output, session) {
       ))
     })
     
-    # Reactive controls for barcode:area name depending on areatype selected
-    output$geoname_ui_bar2 <- renderUI({
+    #####################.
+    # Reactive controls
+    # Reactive controls for areatype depending on profile selected
+    output$geotype_ui_bar <- renderUI({
       
-      areas_bar2 <- if (input$geotype_bar2 %in% c("Health board", "Council area", 
+      areas <- optdata$areatype[substr(optdata$profile_domain1, 1, 3) == input$profile_bar |
+                                  substr(optdata$profile_domain2, 1, 3) == input$profile_bar] %>% 
+        droplevels() %>% unique() %>%  sort()
+      
+      areas <- areas [! areas %in% c("Scotland")]
+      
+      selectInput("geotype_bar", "Geography level", choices=areas,
+                  selected = "Health board")
+      
+    })
+    
+    # Reactive controls for domain depending on profile
+    output$topic_ui_bar <- renderUI({
+      
+      domain_list <- sort(profile_lookup$domain[profile_lookup$profile == input$profile_bar])
+      
+      selectInput("topic_bar", "Domain", choices = domain_list, selected='')
+      
+    })
+    
+    # Reactive controls for barcode:area name depending on areatype selected
+    output$geoname_ui_bar <- renderUI({
+      
+      areas_bar <- if (input$geotype_bar %in% c("Health board", "Council area", 
                                                   "Alcohol & drug partnership", "HSC Partnership"))
       {
-        sort(geo_lookup$areaname[geo_lookup$areatype == input$geotype_bar2])
+        sort(geo_lookup$areaname[geo_lookup$areatype == input$geotype_bar])
       } else {
-        sort(geo_lookup$areaname[geo_lookup$areatype == input$geotype_bar2
-                                 & geo_lookup$parent_area == input$loc_iz_bar2])
+        sort(geo_lookup$areaname[geo_lookup$areatype == input$geotype_bar
+                                 & geo_lookup$parent_area == input$loc_iz_bar])
       }
       
-      selectInput("geoname_bar2", "Area", choices = areas_bar2, selectize=TRUE, selected = "")
+      selectInput("geoname_bar", "Area", choices = areas_bar, selectize=TRUE, selected = "")
       
     })
     
     #Barcode all area data
-    bar_allareas2 <- reactive({
+    bar_allareas <- reactive({
       
       optdata %>%
         group_by (indicator) %>%
         mutate(max_year = max(year))%>%
         subset (year == max_year &
-                  (domain1 %in% input$topic_bar2 | domain2 %in% input$topic_bar2 |  domain3 %in% input$topic_bar2) &
-                  (areatype  == input$geotype_bar2) &
-                  indicator != "Mid-year population estimate - all ages")
+                  (substr(profile_domain1, 1, 3) == input$profile_bar |
+                     substr(profile_domain2, 1, 3) == input$profile_bar) &
+                  (substr(profile_domain1, 5, nchar(as.vector(profile_domain1))) == input$topic_bar |
+                     substr(profile_domain2, 5, nchar(as.vector(profile_domain2))) == input$topic_bar) &
+                  areatype  == input$geotype_bar &
+                  !(indicator %in% c("Mid-year population estimate - all ages", "Quit attempts")))
     })
     
     #Barcode data for the chosen area. Filtering based on user input values.
-    bar_chosenarea2 <- reactive({
+    bar_chosenarea <- reactive({
       optdata %>%
         group_by (indicator) %>%
         mutate(max_year=max(year))%>%
         subset (year == max_year &
-                  areaname == input$geoname_bar2 &
-                  indicator != "Mid-year population estimate - all ages" &
-                  areatype == input$geotype_bar2 &
-                  (domain1 %in% input$topic_bar2 | domain2 %in% input$topic_bar2 |  domain3 %in% input$topic_bar2)) %>%
+                  areaname == input$geoname_bar &
+                  (substr(profile_domain1, 1, 3) == input$profile_bar |
+                     substr(profile_domain2, 1, 3) == input$profile_bar) &
+                  (substr(profile_domain1, 5, nchar(as.vector(profile_domain1))) == input$topic_bar |
+                     substr(profile_domain2, 5, nchar(as.vector(profile_domain2))) == input$topic_bar) &
+                  areatype  == input$geotype_bar &
+                  !(indicator %in% c("Mid-year population estimate - all ages", "Quit attempts"))) %>%
         select(c(indicator, measure, lowci, upci)) %>%
         rename(measure_chosen= measure, lowci_chosen=lowci, upci_chosen= upci) %>%
         droplevels()
     })
     
     #Select comparator based on years available for area selected.
-    bar_chosencomp2 <- reactive({
+    bar_chosencomp <- reactive({
       
       optdata %>%
         group_by (indicator) %>%
         mutate(max_year=max(year))%>%
         subset (year==max_year &
-                  areaname == input$geocomp_bar2 &
-                  indicator != "Mid-year population estimate - all ages" &
+                  areaname == input$geocomp_bar &
                   areatype %in% c("Health board", "Council area", "Scotland") &
-                  (domain1 %in% input$topic_bar2 | domain2 %in% input$topic_bar2 |  domain3 %in% input$topic_bar2)) %>%
+                  (substr(profile_domain1, 1, 3) == input$profile_bar |
+                     substr(profile_domain2, 1, 3) == input$profile_bar) &
+                  (substr(profile_domain1, 5, nchar(as.vector(profile_domain1))) == input$topic_bar |
+                     substr(profile_domain2, 5, nchar(as.vector(profile_domain2))) == input$topic_bar) &
+                  !(indicator %in% c("Mid-year population estimate - all ages", "Quit attempts"))) %>%
         select(c(indicator, measure)) %>%
         rename(measure_comp =measure) %>%
         droplevels()
@@ -333,59 +366,59 @@ function(input, output, session) {
     })
     
     #Dynamically set height of bars
-    bar2_plot_height<- function(){
-      (nrow(bar_chosenarea2())*70+120)
+    bar_plot_height<- function(){
+      (nrow(bar_chosenarea())*70+120)
     }
     
-    # Create barcode2 plot function
+    # Create barcode plot function
     plot_barcode <- function(){
       
-      ind_count <- length(unique(bar_allareas2()$ind_id)) #facet_wrap requires how many chart rows to render
+      ind_count <- length(unique(bar_allareas()$ind_id)) #facet_wrap requires how many chart rows to render
       
       #Merging comparator and chosen area
-      bar2 <- merge(bar_allareas2(), bar_chosencomp2(), by=c("indicator"))
-      bar2 <- merge(bar2, bar_chosenarea2(), by=c("indicator"))
+      bar <- merge(bar_allareas(), bar_chosencomp(), by=c("indicator"))
+      bar <- merge(bar, bar_chosenarea(), by=c("indicator"))
       
       #add variable denoting if sign diff between comparator
-      bar2<-bar2 %>%
-        mutate(flag=ifelse(bar2$interpret == "O",'No significance can be calculated',
-                           ifelse(bar2$lowci_chosen<=bar2$measure_comp & bar2$upci_chosen>=bar2$measure_comp,'Statistically not significantly different from comparator average',
-                                  ifelse(bar2$lowci_chosen > bar2$measure_comp & bar2$interpret == "H", 'Statistically significantly better than comparator average',
-                                         ifelse(bar2$lowci_chosen > bar2$measure_comp & bar2$interpret == "L", 'Statistically significantly worse than comparator average',
-                                                ifelse(bar2$upci_chosen < bar2$measure_comp & bar2$interpret == "L", 'Statistically significantly better than comparator average',
-                                                       ifelse(bar2$upci_chosen < bar2$measure_comp & bar2$interpret == "H", 'Statistically significantly worse than comparator average','Statistically not significantly different from comparator average')))))))
+      bar<-bar %>%
+        mutate(flag=ifelse(bar$interpret == "O",'No significance can be calculated',
+                           ifelse(bar$lowci_chosen<=bar$measure_comp & bar$upci_chosen>=bar$measure_comp,'Statistically not significantly different from comparator average',
+                                  ifelse(bar$lowci_chosen > bar$measure_comp & bar$interpret == "H", 'Statistically significantly better than comparator average',
+                                         ifelse(bar$lowci_chosen > bar$measure_comp & bar$interpret == "L", 'Statistically significantly worse than comparator average',
+                                                ifelse(bar$upci_chosen < bar$measure_comp & bar$interpret == "L", 'Statistically significantly better than comparator average',
+                                                       ifelse(bar$upci_chosen < bar$measure_comp & bar$interpret == "H", 'Statistically significantly worse than comparator average','Statistically not significantly different from comparator average')))))))
       
       #Transposing data so that better is always to the right of plot
-      bar2 <- bar2 %>%
+      bar <- bar %>%
         mutate(comp=1)%>%
-        mutate(all=bar2$measure/bar2$measure_comp) %>%
-        mutate(chosen=bar2$measure_chosen/bar2$measure_comp) %>%
-        mutate(all2=ifelse(bar2$interpret=='L' & bar2$measure>bar2$measure_comp, -(all-1),
-                           ifelse(bar2$interpret=='L' & bar2$measure<=bar2$measure_comp, (1-all),-(1-all)))) %>%
-        mutate(chosen2=ifelse(bar2$interpret=='L' & bar2$measure_chosen>bar2$measure_comp, -(chosen-1),
-                              ifelse(bar2$interpret=='L' & bar2$measure_chosen<=bar2$measure_comp, (1-chosen),-(1-chosen)))) %>%
+        mutate(all=bar$measure/bar$measure_comp) %>%
+        mutate(chosen=bar$measure_chosen/bar$measure_comp) %>%
+        mutate(all2=ifelse(bar$interpret=='L' & bar$measure>bar$measure_comp, -(all-1),
+                           ifelse(bar$interpret=='L' & bar$measure<=bar$measure_comp, (1-all),-(1-all)))) %>%
+        mutate(chosen2=ifelse(bar$interpret=='L' & bar$measure_chosen>bar$measure_comp, -(chosen-1),
+                              ifelse(bar$interpret=='L' & bar$measure_chosen<=bar$measure_comp, (1-chosen),-(1-chosen)))) %>%
         mutate(comp=0)
       
       #define x axis value to assign as intercept for significance
-      minx <- min(bar2$all2)-0.05
+      minx <- min(bar$all2)-0.05
       
       #generate labels for comp and chosen bars
-      data_labels <- bar2 %>%
+      data_labels <- bar %>%
         select(indicator, measure_comp, measure_chosen, chosen2, comp, type_definition,trend_axis, code) %>%
         group_by(indicator, type_definition, trend_axis, code) %>%
         summarise(comp_lab=measure_comp[1], chosen_lab=measure_chosen[1],
                   x_chosen=chosen2[1], x_comp = comp[1])%>%
         droplevels()
       
-      bar2_data <- bind_rows(bar2 %>% mutate(y=0),
-                             bar2 %>% mutate(y=1))
+      bar_data <- bind_rows(bar %>% mutate(y=0),
+                             bar %>% mutate(y=1))
       
       #Chart title text & subtitle
-      areatype_name <- input$geotype_bar2
-      chosenarea_name <- input$geoname_bar2
-      comparea_name <- input$geocomp_bar2
-      topic_name <- input$topic_bar2
-      bar2_subtitle <- paste("Topic:",input$topic_bar2,sep=" ")
+      areatype_name <- input$geotype_bar
+      chosenarea_name <- input$geoname_bar
+      comparea_name <- input$geocomp_bar
+      topic_name <- input$topic_bar
+      bar_subtitle <- paste("Topic:",input$topic_bar,sep=" ")
       
       #Create colour scale for lines & legend key.
       colour_lines <-  scale_colour_manual(" ",values= setNames(c("black", "lightseagreen", "goldenrod1"), c(areatype_name, chosenarea_name, comparea_name)))
@@ -396,7 +429,7 @@ function(input, output, session) {
       names(fillcolours) <- levels(fill_df$flag)
       colour_points <- scale_fill_manual(name = "flag",values = fillcolours)
       
-      ggplot(bar2_data, aes(x = all2, y = y, group=code, colour=areatype))+
+      ggplot(bar_data, aes(x = all2, y = y, group=code, colour=areatype))+
         geom_line(alpha=0.4)+
         geom_line(aes(x = chosen2, colour=chosenarea_name), size=1) + #line for picked area
         geom_line(aes(x = comp, colour=comparea_name), size=1) + #line for comparator
@@ -434,39 +467,39 @@ function(input, output, session) {
     }
     
     # Render plot
-    output$bar2_plot <- renderPlot({
+    output$bar_plot <- renderPlot({
       plot_barcode()
     })
     
     # Resize plot height for display in app
-    output$ui_bar2_plot <-renderUI({
-      plotOutput("bar2_plot", height=bar2_plot_height(), width="100%")
+    output$ui_bar_plot <-renderUI({
+      plotOutput("bar_plot", height=bar_plot_height(), width="100%")
     })
     
     
     # Topic select title for inclusion in app
     output$topic_selected<- renderText({
-      c("<b>Topic: ",input$topic_bar2,"</br>")
+      c("<b>Topic: ",input$topic_bar,"</br>")
     })
     
     # Defined data file to down
-    bar2_csv <- reactive({
+    bar_csv <- reactive({
       
       #Merging comparator and chosen area
-      bar2 <- merge(bar_allareas2(), bar_chosencomp2(), by=c("indicator"))
-      bar2 <- merge(bar2, bar_chosenarea2(), by=c("indicator"))
-      bar2 <- bind_cols(bar2 %>% mutate(topic=input$topic_bar))
-      bar2 <- bind_cols(bar2 %>% mutate(comparator=input$geocomp_bar))
+      bar <- merge(bar_allareas(), bar_chosencomp(), by=c("indicator"))
+      bar <- merge(bar, bar_chosenarea(), by=c("indicator"))
+      bar <- bind_cols(bar %>% mutate(topic=input$topic_bar))
+      bar <- bind_cols(bar %>% mutate(comparator=input$geocomp_bar))
       
-      bar2<-bar2 %>%
-        mutate(flag=ifelse(bar2$interpret == "O",'NA',
-                           ifelse(bar2$lowci_chosen<=bar2$measure_comp & bar2$upci_chosen>=bar2$measure_comp,'NS',
-                                  ifelse(bar2$lowci_chosen > bar2$measure_comp & bar2$interpret == "H", 'Better',
-                                         ifelse(bar2$lowci_chosen > bar2$measure_comp & bar2$interpret == "L", 'Worse',
-                                                ifelse(bar2$upci_chosen < bar2$measure_comp & bar2$interpret == "L", 'Better',
-                                                       ifelse(bar2$upci_chosen < bar2$measure_comp & bar2$interpret == "H", 'Worse','NS')))))))
+      bar<-bar %>%
+        mutate(flag=ifelse(bar$interpret == "O",'NA',
+                           ifelse(bar$lowci_chosen<=bar$measure_comp & bar$upci_chosen>=bar$measure_comp,'NS',
+                                  ifelse(bar$lowci_chosen > bar$measure_comp & bar$interpret == "H", 'Better',
+                                         ifelse(bar$lowci_chosen > bar$measure_comp & bar$interpret == "L", 'Worse',
+                                                ifelse(bar$upci_chosen < bar$measure_comp & bar$interpret == "L", 'Better',
+                                                       ifelse(bar$upci_chosen < bar$measure_comp & bar$interpret == "H", 'Worse','NS')))))))
       
-      bar2 %>%
+      bar %>%
         select(c(indicator, areaname, areatype, def_period, numerator, measure,
                  lowci, upci, type_definition, topic, measure_comp, comparator, flag)) %>%
         rename(lower_confidence_interval=lowci, upper_confidence_interval=upci,
@@ -475,11 +508,11 @@ function(input, output, session) {
     })
     
     # Download barcode data
-    output$download_bar2 <- downloadHandler( filename =  'barcode2_data.csv',
-                                             content = function(file) { write.csv(bar2_csv(), file, row.names=FALSE) })
+    output$download_bar <- downloadHandler( filename =  'barcode_data.csv',
+                                             content = function(file) { write.csv(bar_csv(), file, row.names=FALSE) })
     
     # Downloading chart  
-    output$download_bar2plot <- downloadHandler(
+    output$download_barplot <- downloadHandler(
       filename = 'barcode.png',
       content = function(file){
         ggsave(file, plot = plot_barcode(), device = "png",width=15, limitsize=FALSE)
@@ -1204,7 +1237,7 @@ function(input, output, session) {
     
     DT::datatable(filter_indicator_table(),
                   style = 'bootstrap', rownames = FALSE, options = list(dom = 'tp', columnDefs = list(list(visible=FALSE, targets=c(4,8,9)))), 
-                  colnames = c("Area Code", "Area", "Type", "Indicator", "Year","Period", "Numerator", 
+                  colnames = c("Area code", "Area", "Type", "Indicator", "Year","Period", "Numerator", 
                                "Measure", "Lower CI","Upper CI", "Definition" )
     )
   })
