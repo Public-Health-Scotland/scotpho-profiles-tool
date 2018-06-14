@@ -59,7 +59,7 @@ function(input, output, session) {
   })
   
   ###############################################.        
-  #### Overview ----
+  #### Heatmap ----
   ###############################################.   
   # Heatmap help pop-up
   observeEvent(input$help_heat, {
@@ -69,6 +69,21 @@ function(input, output, session) {
       easyClose = TRUE, fade=FALSE
     ))
   })
+  
+  #####################.
+  # Reactive controls
+  # Reactive controls for areatype depending on profile selected
+  output$geotype_ui_heat <- renderUI({
+    
+    areas <- optdata$areatype[substr(optdata$profile_domain1, 1, 3) == input$profile_heat |
+                                substr(optdata$profile_domain2, 1, 3) == input$profile_heat] %>% 
+      droplevels() %>% unique() %>%  sort()
+    
+    selectInput("geotype_heat", "Geography level", choices=areas,
+                selected = "Health board")
+    
+  })
+
   
   # Reactive controls for heatmap:area name depending on areatype selected
   output$geoname_ui_heat <- renderUI({
@@ -92,7 +107,7 @@ function(input, output, session) {
     
     domain_list <- sort(profile_lookup$domain[profile_lookup$profile == input$profile_heat])
     
-    selectInput("topic_heat", "Domain", choices = domain_list)
+    selectInput("topic_heat", "Domain", choices = domain_list, selected='')
     
   })
   
@@ -107,15 +122,18 @@ function(input, output, session) {
     
   })
   
+  #####################.
+  # Reactive data
   #Heatmap data for the chosen area. Filtering based on user input values.
   heat_chosenarea <- reactive({ 
       optdata %>% 
       subset(areaname == input$geoname_heat &
               areatype == input$geotype_heat &
                !(indicator %in% c("Mid-year population estimate - all ages", "Quit attempts")) &
+               (substr(profile_domain1, 1, 3) == input$profile_heat |
+                  substr(profile_domain2, 1, 3) == input$profile_heat) &
                (substr(profile_domain1, 5, nchar(as.vector(profile_domain1))) == input$topic_heat |
                   substr(profile_domain2, 5, nchar(as.vector(profile_domain2))) == input$topic_heat)) %>% 
-               #(domain1 %in% input$topic_heat | domain2 %in% input$topic_heat |  domain3 %in% input$topic_heat)) %>% 
       select(c(indicator, areaname, areatype, numerator, measure, lowci, upci, interpret, 
                year, def_period, type_definition)) %>% 
       droplevels()
@@ -130,9 +148,10 @@ function(input, output, session) {
         subset(areaname == input$geocomp_heat &
                  indicator != "Mid-year population estimate - all ages" &
                  areatype %in% c("Health board", "Council area", "Scotland") &
+                 (substr(profile_domain1, 1, 3) == input$profile_heat |
+                    substr(profile_domain2, 1, 3) == input$profile_heat) &
                  (substr(profile_domain1, 5, nchar(as.vector(profile_domain1))) == input$topic_heat |
                     substr(profile_domain2, 5, nchar(as.vector(profile_domain2))) == input$topic_heat)) %>% 
-                 # (domain1 %in% input$topic_heat | domain2 %in% input$topic_heat |  domain3 %in% input$topic_heat)) %>% 
         select(c(year, indicator, measure)) %>% 
         rename(comp_m=measure) %>% 
         droplevels()
@@ -147,6 +166,9 @@ function(input, output, session) {
     
   })
   
+  #####################.
+  #Heatmap plot
+  
   # Calculates number of different indicators and then multiplies by pixels per row
   # it needs the sum at the end as otherwise small domains plots will be too small
   get_height_heat <- function() {
@@ -159,9 +181,6 @@ function(input, output, session) {
   
   #Title of plot
   output$title_heat <- renderText(paste0(input$geoname_heat, " - ", input$topic_heat))
-  
-  ###############.
-  #Overview plot
   
   #Function to create ggplot, then used in renderPlot and ggsave
   plot_overview <- function(){
@@ -207,26 +226,32 @@ function(input, output, session) {
   }
   
   output$heat_plot <- renderPlotly({
-
+    #If no data available for that period then plot message saying data is missing
+    if (is.data.frame(heat_chosenarea()) && nrow(heat_chosenarea()) == 0)
+    {
+      plot_nodata()
+    }
+    else { #If data is available then plot it
     #Converting ggplot into a Plotly object
-    ggplotly(plot_overview(), tooltip=c("text"), height = get_height_heat()) %>%
+      ggplotly(plot_overview(), tooltip=c("text"), height = get_height_heat()) %>%
       # margins needed as long labels don't work well with Plotly
-      layout(margin = list(l = 400, t = 50),
+        layout(margin = list(l = 400, t = 50),
              xaxis = list(side = 'top', fixedrange=TRUE), yaxis= list(fixedrange=TRUE),
              font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif')
-      ) %>%
-      config(displayModeBar = FALSE, displaylogo = F, collaborate=F, editable =F) # taking out plotly logo and collaborate button
-    
+        ) %>%
+        config(displayModeBar = FALSE, displaylogo = F, collaborate=F, editable =F) # taking out plotly logo and collaborate button
+    }
   })
   
-
- # Downloading data
+  #####################.
+  # Downloading controls
+  # Downloading data
     heat_csv <- reactive({ format_csv(heat_chosenarea()) })
   
     output$download_heat <- downloadHandler( filename =  'overview_data.csv',
       content = function(file) { write.csv(heat_csv(), file, row.names=FALSE) })
     
- # Downloading chart  
+  # Downloading chart  
     output$download_overviewplot <- downloadHandler(
       filename = 'overview.png',
       content = function(file){
@@ -548,18 +573,7 @@ function(input, output, session) {
     #If no data available for that period then plot message saying data is missing
     if (is.data.frame(trend_data()) && nrow(trend_data()) == 0)
     {
-      #plotting empty plot just with text
-      text_na <- list(x = 5, y = 5, text = "No data available" ,
-                      xref = "x", yref = "y",  showarrow = FALSE)
-      
-      plot_ly() %>%
-        layout(annotations = text_na,
-               #empty layout
-               yaxis = list(showline = FALSE, showticklabels = FALSE, showgrid = FALSE, fixedrange=TRUE),
-               xaxis = list(showline = FALSE, showticklabels = FALSE, showgrid = FALSE, fixedrange=TRUE),
-               font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif')) %>% 
-        config( displayModeBar = FALSE) # taking out plotly logo and collaborate button
-      
+      plot_nodata()
     }
     else { #If data is available then plot it
       
@@ -709,18 +723,7 @@ function(input, output, session) {
     #If no data available for that period then plot message saying data is missing
     if (is.data.frame(rank_bar_data()) && nrow(rank_bar_data()) == 0)
     {
-      #plotting empty plot just with text
-      text_na <- list(x = 5, y = 5, text = "No data available" ,
-                      xref = "x", yref = "y",  showarrow = FALSE)
-      
-      plot_ly() %>%
-        layout(annotations = text_na,
-               #empty layout
-               yaxis = list(showline = FALSE, showticklabels = FALSE, showgrid = FALSE, fixedrange=TRUE),
-               xaxis = list(showline = FALSE, showticklabels = FALSE, showgrid = FALSE, fixedrange=TRUE),
-               font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif')) %>% 
-        config( displayModeBar = FALSE) # taking out plotly logo and collaborate button
-      
+      plot_nodata()
     }
     else { #If data is available then plot it
       
@@ -992,18 +995,7 @@ function(input, output, session) {
     #If no data available for that period then plot message saying data is missing
     if (is.data.frame(simd_bar_data()) && nrow(simd_bar_data()) == 0)
     {
-      #plotting empty plot just with text
-      text_na <- list(x = 5, y = 5, text = "No data available" ,
-                      xref = "x", yref = "y",  showarrow = FALSE)
-
-      plot_ly() %>%
-        layout(annotations = text_na,
-               #empty layout
-               yaxis = list(showline = FALSE, showticklabels = FALSE, showgrid = FALSE, fixedrange=TRUE),
-               xaxis = list(showline = FALSE, showticklabels = FALSE, showgrid = FALSE, fixedrange=TRUE),
-               font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif')) %>%
-        config( displayModeBar = FALSE) # taking out plotly logo and collaborate button
-
+      plot_nodata()
     }
     else { #If data is available plot it
 
@@ -1035,18 +1027,7 @@ function(input, output, session) {
     #If no data available for that period then plot message saying data is missing
     if (is.data.frame(simd_trend_data()) && nrow(simd_trend_data()) == 0)
     {
-      #plotting empty plot just with text
-      text_na <- list(x = 5, y = 5, text = "No data available" ,
-                      xref = "x", yref = "y",  showarrow = FALSE)
-
-      plot_ly() %>%
-        layout(annotations = text_na,
-               #empty layout
-               yaxis = list(showline = FALSE, showticklabels = FALSE, showgrid = FALSE, fixedrange=TRUE),
-               xaxis = list(showline = FALSE, showticklabels = FALSE, showgrid = FALSE, fixedrange=TRUE),
-               font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif')) %>%
-        config( displayModeBar = FALSE) # taking out plotly logo and collaborate button
-
+      plot_nodata()
     }
     else { #If there is data plot it
       #Depending on what the user wants plot one or another
