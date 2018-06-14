@@ -56,7 +56,8 @@
 ############################.
 library(shiny)
 library(shinythemes) # layouts for shiny
-library(tidyverse) # data manipulation, ggplot
+library(dplyr) # data manipulation
+library(ggplot2) #data visualization
 library (DT) # for data tables
 library(leaflet) #javascript maps
 library(plotly) #interactive graphs
@@ -94,6 +95,7 @@ optdata <- readRDS("./data/optdata.rds")
 deprivation <- readRDS("./data/deprivation_OPT.rds")
 
 geo_lookup <- readRDS("./data/geo_lookup.rds") #geography lookup
+profile_lookup <- readRDS("./data/profile_lookup.rds") #profile lookup
 
 #Map-shapefile data
 ca_bound<-readRDS("./data/CA_boundary.rds") #Council area 
@@ -134,7 +136,7 @@ indicator_map_list <- sort(unique(optdata$indicator[optdata$interpret != 'O']))
 ind_depr_list <- unique(deprivation$indicator)
 
 #Topic names
-topic_list <- sort(c('Alcohol', 'Behaviours',  'Cancer', 'Children and young people - Achieving ',
+topic_list <- sort(c('Alcohol', 'Behaviours',  'Cancer', 'Children and young people - Achieving',
                 'Children and young people - Active', 'Children and young people - Healthy',
                 'Children and young people - Included', 'Children and young people - Nurtured',
                 'Children and young people - Responsible', 'Children and young people - Safe',
@@ -143,8 +145,9 @@ topic_list <- sort(c('Alcohol', 'Behaviours',  'Cancer', 'Children and young peo
                 'Immunisations and Screening', 'Life Expectancy & Mortality',
                 'Mental health', 'Population', 'Smoking', 'Social Care & Housing'))
 
-profile_list <- c("Health & wellbeing", "Children and young people", "Alcohol", 
-                  "Drugs", "Mental health", "Tobacco control")
+profile_list <- setNames(c('HWB','CYP','ALC','DRG','MEN','DEP'),
+                         c('Health & wellbeing','Children & young people','Alcohol',
+                           'Drugs','Mental Health','Deprivation'))
 
 # topic_list <- sort(c('Behaviours', 'Children and young people - Healthy', 
 #                      'Children and young people - Included', 'Children and young people - Nurtured', 
