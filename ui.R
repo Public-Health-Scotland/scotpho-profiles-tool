@@ -197,22 +197,20 @@ tabPanel(title = "Summary", value = "ring"),
 ###############################################.
 ## Heat map ----
 ###############################################.
-tabPanel("Overview", icon = icon("heartbeat"), value = "heat",
+tabPanel("Heatmap", icon = icon("heartbeat"), value = "heat",
          wellPanel( #Filter options
            column(3,
-                  selectInput("geotype_heat", "Geography level", choices= areatype_list,
-                              selected = "Health board"),
+                  selectInput("profile_heat", "Profile", choices = profile_list),
+                  uiOutput("topic_ui_heat")
+           ),
+           column(3,
+                  uiOutput("geotype_ui_heat"),
                   conditionalPanel(#Conditional panel for extra dropdown for localities & IZ
                     condition = "input.geotype_heat== 'HSC Locality' | input.geotype_heat == 'Intermediate zone' ",
                     selectInput("loc_iz_heat", label = "Partnership for localities/intermediate zones",
                                 choices = partnership_name)
                   ),
                   uiOutput("geoname_ui_heat")
-           ),
-           column(3,
-                  selectInput("profile_heat", "Profile", choices = profile_list),
-                  uiOutput("topic_ui_heat")
-                  # selectInput("topic_heat", "Domain", choices = topic_list, selectize=TRUE)
            ),
            column(2,
                   awesomeRadio("comp_heat", label = "Compare against:",
