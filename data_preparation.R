@@ -359,38 +359,17 @@ saveRDS(hscp_bound, "./data/HSCP_boundary.rds")
 hscp_bound <- readRDS("./data/HSCP_boundary.rds")
 
 ##########################.
-###Intermediate zone - STILL NOT WORKING AS IT SHOULD BE
-#Reading and simplifying shapefile
-#Two stages as memory allocation will prevempt from doing it in one.
-iz_bound_orig <- readOGR(shapefiles, "SG_IntermediateZone_Bdry_2011") 
-#Saving data frame to be able to convert shapefile back into SpatialPolygonsDataFrame
-iz_bound_df <- data.frame(iz_bound_orig)
-
-#First simplifying step, using this function, less powerful, but less memory intensive.
-iz_bound_orig <- gSimplify(iz_bound_orig, tol = 0.05, topologyPreserve=TRUE)
-
-#Returning back to SpatialPolygonsDataFrame
-iz_bound_orig <- SpatialPolygonsDataFrame(iz_bound_orig, iz_bound_df)
-
-#Second simplifying step
-iz_bound_orig2 <- iz_bound_orig %>% 
-  rmapshaper::ms_simplify(keep=0.001, keep_shapes= TRUE)
-
-object.size(iz_bound_orig2)
-
-#Changing the projection to WSG84, the ones leaflet needs.
-proj4string(iz_bound_orig)
-iz_bound_orig2 <- spTransform(iz_bound_orig, CRS("+ellps=WGS84 +proj=longlat +datum=WGS84 +no_defs"))
-
-#Saving the simplified shapefile to avoid the calculations.
-writeOGR(iz_bound_orig2, dsn=shapefiles, "IZ_simpl", 
-         driver="ESRI Shapefile", overwrite_layer=TRUE, verbose=TRUE,
-         morphToESRI=TRUE)
-# test <- as(iz_bound_orig2, "SpatialPolygonsDataFrame")
-
-iz_bound <- readOGR(shapefiles,"IZ_simpl") %>% 
+###Intermediate zone
+# It comes from Improvement Service
+iz_bound_orig <- readRDS(paste0(shapefiles, "IZshapes.rds")) %>% #IZ 
   setNames(tolower(names(.))) #variables to lower case
-saveRDS(iz_bound, "./data/IZ_boundary.rds")
+names(iz_bound_orig@data)[names(iz_bound_orig@data)=="interzone"] <- "code"
+names(iz_bound_orig@data)[names(iz_bound_orig@data)=="name"] <- "area_name"
+iz_bound_orig$council <- gsub(" and ", " & ", iz_bound_orig$council)
+iz_bound_orig$council <- gsub("Edinburgh", "City of Edinburgh", iz_bound_orig$council)
+iz_bound_orig$council <- gsub("Eilean Siar", "Na h-Eileanan Siar", iz_bound_orig$council)
+
+saveRDS(iz_bound_orig, "./data/IZ_boundary.rds")
 iz_bound <- readRDS("./data/IZ_boundary.rds")
 
 ###############################################.
