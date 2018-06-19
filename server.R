@@ -520,7 +520,9 @@ function(input, output, session) {
 
 ###############################################.        
 #### Time trend plot ----
-###############################################.   
+###############################################.  
+    #####################.
+    # Reactive controls
   #Controls for chart. Dynamic selection of locality and iz.
   output$loc_ui_trend <- renderUI({
     selectInput("locname_trend", "HSC Locality", 
@@ -684,10 +686,13 @@ function(input, output, session) {
   
   #####################################.       
   #### Rank plot ----
-  ###############################################.     
+  ###############################################.   
+  #####################.
+  # Reactive controls
   #Dropdown for time period based on indicator selection  
   output$year_ui_rank <- renderUI({
-    time_period <- sort(unique(optdata$trend_axis[optdata$indicator == input$indic_rank]))
+    time_period <- sort(unique(optdata$trend_axis[optdata$indicator == input$indic_rank&
+                                                    optdata$areatype == input$geotype_rank]))
     
     selectInput("year_rank", "Time period",
                 choices = time_period, selected = last(time_period))
@@ -882,10 +887,13 @@ function(input, output, session) {
   
   #####################################.    
   ### Map ----
-  #####################################.      
+  #####################################. 
+  #####################.
+  # Reactive controls
   #Dynamic selection of the last period available based on indicator selected
   output$year_ui_map <- renderUI({
-    time_period <- sort(unique(optdata$trend_axis[optdata$indicator == input$indic_map]))
+    time_period <- sort(unique(optdata$trend_axis[optdata$indicator == input$indic_map  &
+                                                    optdata$areatype == input$geotype_map]))
     
     selectInput("year_map", "Time period",
                 choices = time_period, selected = last(time_period))
@@ -901,23 +909,70 @@ function(input, output, session) {
                 choices = areas, selected = "Health board")
   })
   
-  #Merging shapefile with dynamic selection of data
-  poly_map <- reactive({
-    map_pol <- optdata %>% 
+  # Years to compare with depending on what data is available
+  output$yearcomp_ui_map <- renderUI({
+    map_pol <- optdata %>% subset(areatype == input$geotype_map & 
+                                    indicator==input$indic_map)
+    
+    years <- c(min(map_pol$year):max(map_pol$year))
+    periods <- c(sort(paste0(unique(map_pol$trend_axis[map_pol$year>=min(map_pol$year) &
+                                                         map_pol$year<=max(map_pol$year)]))))
+    
+    selectInput("yearcomp_map", "Baseline year", choices = periods,
+                selectize=TRUE)
+  })
+  
+  ############.
+  # Dynamic data
+  # Dataset for comparator chosen by user
+  map_compar <- reactive({
+    
+    if (input$comp_map == 1){
+      map_compar <- optdata %>% subset(trend_axis == input$year_map & 
+                                         areatype %in% c("Health board", "Council area", "Scotland") &
+                                         areaname == input$geocomp_map &
+                                         indicator == input$indic_map) %>% 
+        droplevels()
+      
+    } else if (input$comp_map == 2) { #if time comparison selected
+      
+      map_compar <- optdata %>% subset(areatype == input$geotype_map &
+                                         trend_axis == input$yearcomp_map & 
+                                         indicator==input$indic_map) %>% 
+        droplevels()
+      
+    }
+  }) 
+  
+  #Dataset for area type chosen by user
+  map_chosenarea <- reactive({ 
+    map_chosenarea <- optdata %>% 
       subset(areatype == input$geotype_map &
                trend_axis==input$year_map & 
                indicator==input$indic_map) %>% 
+      mutate(comp_value = map_compar()$measure, #comparator value and name
+             comp_name = map_compar()$areaname) %>% 
       droplevels() #dropping missing factor levels to allow merging
+  }) 
+  
+  #Merging shapefile with dynamic selection of data
+  poly_map <- reactive({
     if (input$geotype_map == "Council area"){
-      map_pol <- merge(ca_bound, map_pol, by='code')
+      map_pol <- merge(ca_bound, map_chosenarea(), by='code')
     } else if(input$geotype_map == "Health board"){
-      map_pol <- merge(hb_bound, map_pol, by='code')
+      map_pol <- merge(hb_bound, map_chosenarea(), by='code')
     } else if(input$geotype_map == "HSC Partnership"){
-      map_pol <- merge(hscp_bound, map_pol, by='code')
+      map_pol <- merge(hscp_bound, map_chosenarea(), by='code')
+    } else if(input$geotype_map == "Intermediate zone"){
+      iz_bound <- iz_bound %>% subset(council == input$iz_map)
+      
+      map_pol <- merge(iz_bound, map_chosenarea(), by='code')
     }
     
   }) 
-
+  
+  ############.
+  # Plotting map
   #title of the map. if no data available then print "No data available"
   output$title_map <- renderText(
     if(is.data.frame(map_csv()) && nrow(map_csv()) == 0) {
@@ -928,9 +983,17 @@ function(input, output, session) {
   
   #Plotting map
   output$map <- renderLeaflet({
+    #Coloring based on if signicantly different from comparator
+    color_map <- ifelse(poly_map()$interpret == "O", '#ccccff',
+                        ifelse(is.na(poly_map()$lowci) | is.na(poly_map()$upci) | is.na(poly_map()$comp_value) | is.na(poly_map()$measure) |poly_map()$measure == 0, '#ccccff',
+                               ifelse(poly_map()$lowci <= poly_map()$comp_value & poly_map()$upci >= poly_map()$comp_value,'#999999',
+                                      ifelse(poly_map()$lowci > poly_map()$comp_value & poly_map()$interpret == "H", '#3d99f5',
+                                             ifelse(poly_map()$lowci > poly_map()$comp_value & poly_map()$interpret == "L", '#ff9933',
+                                                    ifelse(poly_map()$upci < poly_map()$comp_value & poly_map()$interpret == "L", '#3d99f5',
+                                                           ifelse(poly_map()$upci < poly_map()$comp_value & poly_map()$interpret == "H", '#ff9933', '#ccccff')))))))
+    
+    #Actual map
     leaflet() %>% 
-      setView(-4, 56.33148888, zoom = 9) %>% # setting initial view point
-      fitBounds(-8, 61, 0, 54)  %>%
       addProviderTiles(providers$CartoDB.Positron) %>%
       addPolygons(data=poly_map(), 
                   color = "#444444", weight = 2, smoothFactor = 0.5, 
@@ -941,7 +1004,7 @@ function(input, output, session) {
                     %>% lapply(htmltools::HTML)),
                   opacity = 1.0, fillOpacity = 0.5,
                   #Colours
-                  fillColor = ~colorQuantile(pal_map, measure_sc, n=5)(measure_sc),
+                  fillColor = color_map,
                   highlightOptions = highlightOptions(color = "white", weight = 2,
                                                       bringToFront = TRUE)
       ) 
