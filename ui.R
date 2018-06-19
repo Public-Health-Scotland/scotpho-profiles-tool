@@ -194,7 +194,8 @@ tabPanel(
 ###############################################.
 ## Ring plot ----
 ###############################################.
-tabPanel(title = "Summary", icon = icon("heartbeat"), value = "ring"),
+tabPanel(title = "Summary", icon = icon("heartbeat"), value = "ring",
+         p("Content for this page will be added soon")),
 ###############################################.
 ## Heat map ----
 ###############################################.
@@ -320,6 +321,8 @@ tabPanel("Rank", icon = icon("signal"), value = "rank",
                   selectInput("geocomp_rank", "Comparator", choices = comparator_list,
                               selectize=TRUE, selected = "Scotland"),
                   awesomeCheckbox("ci_rank", label = "95% confidence intervals", value = FALSE),
+                  downloadButton('download_rank', 'Download data', class = "down"),
+                  savechart_button('download_rankplot', 'Save chart', class = "down"),
                   #Legend
                   p(tags$b("Legend"), style="color: black;"),
                   p(img(src='signif_better.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
@@ -329,9 +332,7 @@ tabPanel("Rank", icon = icon("signal"), value = "rank",
                     img(src='signif_worse.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
                     "Worse than comparator.", br(),
                     img(src='signif_nocalc2.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
-                    "No differences are calculated."),
-                  downloadButton('download_rank', 'Download data', class = "down"),
-                  savechart_button('download_rankplot', 'Save chart', class = "down")
+                    "No differences are calculated.")
          ),
          mainPanel(width = 8, #Main panel
                    h5(textOutput("title_rank"), style="color: black; text-align: center"),
@@ -345,12 +346,33 @@ tabPanel("Map", icon = icon("globe"), value = "map",
          sidebarPanel(    
            selectInput("indic_map", "Indicator", choices=indicator_map_list),
            uiOutput("geotype_ui_map"),
+           conditionalPanel(#Conditional panel for extra dropdown for localities & IZ
+             condition = "input.geotype_bar== 'HSC Locality' | input.geotype_map == 'Intermediate zone' ",
+             selectInput("iz_map", label = "Council for intermediate zones", choices = la_name)),
            uiOutput("year_ui_map"),
+           awesomeRadio("comp_map", label = "Compare against:",
+                        choices = list("Area" = 1, "Time" = 2), 
+                        selected = 1, inline=TRUE),
+           conditionalPanel(condition = "input.comp_map == 1 ",  
+                            selectInput("geocomp_map", "Comparator", choices = comparator_list,
+                                        selectize=TRUE, selected = "Scotland")
+           ),
+           conditionalPanel(condition = "input.comp_map == 2 ", 
+                            uiOutput("yearcomp_ui_map")
+           ), 
            downloadButton('download_map', 'Download data', class = "down"),
            savechart_button('download_mapplot', 'Save map', class = "down"),
            shiny::hr(),
+           #Legend
            p(tags$b("Legend"), style="color: black;"),
-           img(src='legend_map.png', height=150, style = "align: right")
+           p(img(src='signif_better.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
+             "Better than comparator.", br(),
+             img(src='non_signif.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
+             "Not different from comparator.", br(),
+             img(src='signif_worse.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
+             "Worse than comparator.", br(),
+             img(src='signif_nocalc2.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
+             "No differences are calculated.")
          ), 
          mainPanel( #Main panel
            h5(textOutput("title_map"), style="color: black; text-align: center"),
