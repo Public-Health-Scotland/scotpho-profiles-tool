@@ -710,7 +710,12 @@ function(input, output, session) {
   
   # Comparator data rank plot. Could be moved inside rank_bar_data
   rank_compar <- reactive({
-    subset(optdata, trend_axis == input$year_rank & 
+    #Fiddly way of selecting period because some cases (e.g. Life expectancy)
+    #might have different periods for the same year, e.g. IZ 2013 is 2011-2015
+    #and HB 2013 is 2012-2014.
+    year_chosen <- unique(optdata$year[optdata$trend_axis == input$year_rank])
+    
+    rank_compar <- optdata %>% subset(year %in% year_chosen & 
              areatype %in% c("Health board", "Council area", "Scotland") &
              areaname == input$geocomp_rank &
              indicator == input$indic_rank) %>% 
@@ -928,7 +933,12 @@ function(input, output, session) {
   map_compar <- reactive({
     
     if (input$comp_map == 1){
-      map_compar <- optdata %>% subset(trend_axis == input$year_map & 
+      #Fiddly way of selecting period because some cases (e.g. Life expectancy)
+      #might have different periods for the same year, e.g. IZ 2013 is 2011-2015
+      #and HB 2013 is 2012-2014.
+      year_chosen <- unique(optdata$year[optdata$trend_axis == input$year_map])
+      
+      map_compar <- optdata %>% subset(year %in% year_chosen & 
                                          areatype %in% c("Health board", "Council area", "Scotland") &
                                          areaname == input$geocomp_map &
                                          indicator == input$indic_map) %>% 
