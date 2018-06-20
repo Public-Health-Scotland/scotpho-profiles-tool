@@ -323,6 +323,7 @@ tabPanel("Rank", icon = icon("signal"), value = "rank",
                   awesomeCheckbox("ci_rank", label = "95% confidence intervals", value = FALSE),
                   downloadButton('download_rank', 'Download data', class = "down"),
                   savechart_button('download_rankplot', 'Save chart', class = "down"),
+                  shiny::hr(),
                   #Legend
                   p(tags$b("Legend"), style="color: black;"),
                   p(img(src='signif_better.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
@@ -371,7 +372,7 @@ tabPanel("Map", icon = icon("globe"), value = "map",
              "Not different from comparator.", br(),
              img(src='signif_worse.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
              "Worse than comparator.", br(),
-             img(src='signif_nocalc2.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
+             img(src='signif_nocalc.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
              "No differences are calculated.")
          ), 
          mainPanel( #Main panel

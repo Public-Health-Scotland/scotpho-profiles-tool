@@ -698,7 +698,6 @@ function(input, output, session) {
                 choices = time_period, selected = last(time_period))
   })
   
-  
   #Dropdown for geotype based on what data is available for that indicator
   output$geotype_ui_rank <- renderUI({
     areas <- sort(unique(optdata$areatype[optdata$indicator == input$indic_rank]))
@@ -949,6 +948,8 @@ function(input, output, session) {
       map_compar <- optdata %>% subset(areatype == input$geotype_map &
                                          trend_axis == input$yearcomp_map & 
                                          indicator==input$indic_map) %>% 
+        rename(comp_value = measure, comp_name = areaname) %>% 
+        select(code, comp_value, comp_name) %>% #to allow merging
         droplevels()
       
     }
@@ -960,9 +961,21 @@ function(input, output, session) {
       subset(areatype == input$geotype_map &
                trend_axis==input$year_map & 
                indicator==input$indic_map) %>% 
-      mutate(comp_value = map_compar()$measure, #comparator value and name
-             comp_name = map_compar()$areaname) %>% 
       droplevels() #dropping missing factor levels to allow merging
+    
+    if (input$comp_map == 1) { #for area comparisons
+      map_chosenarea <- map_chosenarea %>% 
+        mutate(comp_value = map_compar()$measure, #comparator value and name
+               comp_name = map_compar()$areaname) 
+      
+    } else if (input$comp_map == 2) { #if time comparison selected
+      #This helps to deals with cases of incomplete data, e.g. 2011 has all HB but 2013 not.
+      #Works for those cases where there are more data in the past (comparator)
+      #and one for those which have more data in the present (chosen area)
+      map_chosenarea <- merge(x = map_chosenarea, y = map_compar(), by = "code", 
+                              all.x = T)
+
+    }
   }) 
   
   #Merging shapefile with dynamic selection of data
@@ -994,15 +1007,14 @@ function(input, output, session) {
   #Function to create color palette based on if signicantly different from comparator
 
   create_map_palette <- function(){
-    ifelse(poly_map()$interpret == "O", '#ccccff',
-           ifelse(is.na(poly_map()$lowci) | is.na(poly_map()$upci) | is.na(poly_map()$comp_value) | is.na(poly_map()$measure) |poly_map()$measure == 0, '#ccccff',
+    ifelse(poly_map()$interpret == "O", '#ffffff',
+           ifelse(is.na(poly_map()$lowci) | is.na(poly_map()$upci) | is.na(poly_map()$comp_value) | is.na(poly_map()$measure) |poly_map()$measure == 0, '#ffffff',
                   ifelse(poly_map()$lowci <= poly_map()$comp_value & poly_map()$upci >= poly_map()$comp_value,'#999999',
                          ifelse(poly_map()$lowci > poly_map()$comp_value & poly_map()$interpret == "H", '#3d99f5',
                                 ifelse(poly_map()$lowci > poly_map()$comp_value & poly_map()$interpret == "L", '#ff9933',
                                        ifelse(poly_map()$upci < poly_map()$comp_value & poly_map()$interpret == "L", '#3d99f5',
-                                              ifelse(poly_map()$upci < poly_map()$comp_value & poly_map()$interpret == "H", '#ff9933', '#ccccff')))))))
+                                              ifelse(poly_map()$upci < poly_map()$comp_value & poly_map()$interpret == "H", '#ff9933', '#ffffff')))))))
   }
-  
   
   #Plotting map
   output$map <- renderLeaflet({
