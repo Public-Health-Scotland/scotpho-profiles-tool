@@ -377,7 +377,7 @@ tabPanel("Map", icon = icon("globe"), value = "map",
          ), 
          mainPanel( #Main panel
            h5(textOutput("title_map"), style="color: black; text-align: center"),
-           uiOutput("map_ui")
+           leafletOutput("map", width="100%",height="600px")
            )
 ), #Tab panel bracket
 ###############################################.
