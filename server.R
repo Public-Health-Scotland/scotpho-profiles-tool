@@ -903,8 +903,8 @@ function(input, output, session) {
   output$geotype_ui_map <- renderUI({
     areas <- sort(unique(optdata$areatype[optdata$indicator == input$indic_map]))
     #taking out areas without shapefiles
-    areas <- areas [! areas %in% c("Scotland", "Intermediate zone", 
-                                   "HSC Locality", "Alcohol & drug partnership")]
+    areas <- areas [! areas %in% c("Scotland", "HSC Locality", 
+                                   "Alcohol & drug partnership")]
     selectInput("geotype_map", label = "Geography level",
                 choices = areas, selected = "Health board")
   })
@@ -981,16 +981,23 @@ function(input, output, session) {
       paste0(input$indic_map, " - ", unique(poly_map()$def_period))
     })
   
+  #Function to create color palette based on if signicantly different from comparator
+
+  create_map_palette <- function(){
+    ifelse(poly_map()$interpret == "O", '#ccccff',
+           ifelse(is.na(poly_map()$lowci) | is.na(poly_map()$upci) | is.na(poly_map()$comp_value) | is.na(poly_map()$measure) |poly_map()$measure == 0, '#ccccff',
+                  ifelse(poly_map()$lowci <= poly_map()$comp_value & poly_map()$upci >= poly_map()$comp_value,'#999999',
+                         ifelse(poly_map()$lowci > poly_map()$comp_value & poly_map()$interpret == "H", '#3d99f5',
+                                ifelse(poly_map()$lowci > poly_map()$comp_value & poly_map()$interpret == "L", '#ff9933',
+                                       ifelse(poly_map()$upci < poly_map()$comp_value & poly_map()$interpret == "L", '#3d99f5',
+                                              ifelse(poly_map()$upci < poly_map()$comp_value & poly_map()$interpret == "H", '#ff9933', '#ccccff')))))))
+  }
+  
+  
   #Plotting map
   output$map <- renderLeaflet({
-    #Coloring based on if signicantly different from comparator
-    color_map <- ifelse(poly_map()$interpret == "O", '#ccccff',
-                        ifelse(is.na(poly_map()$lowci) | is.na(poly_map()$upci) | is.na(poly_map()$comp_value) | is.na(poly_map()$measure) |poly_map()$measure == 0, '#ccccff',
-                               ifelse(poly_map()$lowci <= poly_map()$comp_value & poly_map()$upci >= poly_map()$comp_value,'#999999',
-                                      ifelse(poly_map()$lowci > poly_map()$comp_value & poly_map()$interpret == "H", '#3d99f5',
-                                             ifelse(poly_map()$lowci > poly_map()$comp_value & poly_map()$interpret == "L", '#ff9933',
-                                                    ifelse(poly_map()$upci < poly_map()$comp_value & poly_map()$interpret == "L", '#3d99f5',
-                                                           ifelse(poly_map()$upci < poly_map()$comp_value & poly_map()$interpret == "H", '#ff9933', '#ccccff')))))))
+    
+    color_map <- create_map_palette() #palette
     
     #Actual map
     leaflet() %>% 
@@ -1012,12 +1019,8 @@ function(input, output, session) {
   
   #Function to create map that can be downloaded
   plot_map_download <- function(){
-    # Attribute on shade to each area
-    class_area <-  cut(poly_map()@data$measure_sc, 5)
-    pal_map <- pal_map[as.numeric(class_area)] 
-    
-    plot(poly_map(), col=pal_map, ylim=c(54,61))
-    
+    color_map <- create_map_palette() #palette
+    plot(poly_map(), col=color_map)
   }
   
   #Function to filter the data needed for downloading data 
