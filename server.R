@@ -1017,7 +1017,6 @@ function(input, output, session) {
     })
   
   #Function to create color palette based on if signicantly different from comparator
-
   create_map_palette <- function(){
     ifelse(poly_map()$interpret == "O", '#ffffff',
            ifelse(is.na(poly_map()$lowci) | is.na(poly_map()$upci) | is.na(poly_map()$comp_value) | is.na(poly_map()$measure) |poly_map()$measure == 0, '#ffffff',
@@ -1043,12 +1042,10 @@ function(input, output, session) {
                   color = "#444444", weight = 2, smoothFactor = 0.5, 
                   #tooltip
                   label = (sprintf(
-                    "<strong>%s</strong><br/>Total: %g<br/>Measure: %g",
-                    poly_map()$area_name, poly_map()$numerator, poly_map()$measure) 
-                    %>% lapply(htmltools::HTML)),
-                  opacity = 1.0, fillOpacity = 0.5,
-                  #Colours
-                  fillColor = color_map,
+                    "<strong>%s</strong><br/>Total: %g<br/>Measure: %g<br/>%s",
+                    poly_map()$area_name, poly_map()$numerator, poly_map()$measure, 
+                    poly_map()$type_definition) %>% lapply(htmltools::HTML)),
+                  opacity = 1.0, fillOpacity = 0.5, fillColor = color_map, #Colours
                   highlightOptions = highlightOptions(color = "white", weight = 2,
                                                       bringToFront = TRUE)
       ) 
