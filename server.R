@@ -10,6 +10,8 @@ function(input, output, session) {
   ###############################################.
   ## Landing page ----
   ###############################################.
+  # Creating events that take you to different tabs
+  # activated when pressing buttons from the landing page
   observeEvent(input$jump_to_ring, {
     updateTabsetPanel(session, "intabset", selected = "ring")
   })
@@ -258,9 +260,9 @@ function(input, output, session) {
                device = "png", scale=4, limitsize=FALSE)
       })
     
-    ##############################################.
-    ## Barcode ----
-    ###############################################.
+##############################################.
+## Barcode ----
+###############################################.
     
     # Barcode help pop-up
     observeEvent(input$help_bar, {
@@ -312,6 +314,8 @@ function(input, output, session) {
       
     })
     
+#####################.
+# Reactive data
     #Barcode all area data
     bar_allareas <- reactive({
       
@@ -364,7 +368,8 @@ function(input, output, session) {
         droplevels()
       
     })
-    
+#####################.
+# Creating plot    
     #Dynamically set height of bars
     bar_plot_height<- function(){
       (nrow(bar_chosenarea())*70+120)
@@ -482,7 +487,9 @@ function(input, output, session) {
       c("<b>Topic: ",input$topic_bar,"</br>")
     })
     
-    # Defined data file to down
+#####################.
+# Downloading plot and data  
+    # Defined data file to download
     bar_csv <- reactive({
       
       #Merging comparator and chosen area
@@ -521,8 +528,8 @@ function(input, output, session) {
 ###############################################.        
 #### Time trend plot ----
 ###############################################.  
-    #####################.
-    # Reactive controls
+#####################.
+# Reactive controls
   #Controls for chart. Dynamic selection of locality and iz.
   output$loc_ui_trend <- renderUI({
     selectInput("locname_trend", "HSC Locality", 
@@ -541,7 +548,8 @@ function(input, output, session) {
                 multiple=TRUE, selectize=TRUE, selected = "")
   })
   
-  
+#####################.
+# Reactive data 
   #Time trend data. Filtering based on user input values.
   trend_data <- reactive({ 
     
@@ -560,7 +568,8 @@ function(input, output, session) {
     trend <- trend[order(trend$year),] #Needs to be sorted by year for Plotly
   })
   
-  ################.
+#####################.
+# Creating plot
   #Function to create palette for trend plot
   create_trendpalette <- function(){
     #Creating palette of colors with a tone for each geography type
@@ -607,8 +616,8 @@ function(input, output, session) {
   #Title of plot
   output$title_trend <- renderText(paste0(input$indic_trend))
   
-  #################.
-  #Creating plot
+
+#Plot 
   output$trend_plot <- renderPlotly({
     #If no data available for that period then plot message saying data is missing
     if (is.data.frame(trend_data()) && nrow(trend_data()) == 0)
@@ -641,7 +650,8 @@ function(input, output, session) {
     }
   }) 
   
-  #################.
+#####################.
+# Downloading data and plot
   #Function in ggplot to be able to save chart
   plot_trend_ggplot <- function(){
     
@@ -684,11 +694,11 @@ function(input, output, session) {
     })
   
   
-  #####################################.       
-  #### Rank plot ----
-  ###############################################.   
-  #####################.
-  # Reactive controls
+#####################################.       
+#### Rank plot ----
+###############################################.   
+#####################.
+# Reactive controls
   #Dropdown for time period based on indicator selection  
   output$year_ui_rank <- renderUI({
     time_period <- sort(unique(optdata$trend_axis[optdata$indicator == input$indic_rank&
@@ -706,7 +716,8 @@ function(input, output, session) {
                 choices = areas, selected = "Health board")
   })
   
-  
+#####################.
+# Reactive data  
   # Comparator data rank plot. Could be moved inside rank_bar_data
   rank_compar <- reactive({
     #Fiddly way of selecting period because some cases (e.g. Life expectancy)
@@ -825,7 +836,8 @@ function(input, output, session) {
     }
   }) 
   
-  ############################.
+############################.
+#Downloading plot and data
   # Function to save plot
   plot_rank_ggplot <- function(){
     #Coloring based on if signicantly different from comparator
@@ -889,11 +901,11 @@ function(input, output, session) {
       ggsave(file, plot = plot_rank_ggplot(), device = "png", scale=3, limitsize=FALSE)
     })
   
-  #####################################.    
-  ### Map ----
-  #####################################. 
-  #####################.
-  # Reactive controls
+#####################################.    
+### Map ----
+#####################################. 
+#####################.
+# Reactive controls
   #Dynamic selection of the last period available based on indicator selected
   output$year_ui_map <- renderUI({
     time_period <- sort(unique(optdata$trend_axis[optdata$indicator == input$indic_map  &
@@ -926,7 +938,7 @@ function(input, output, session) {
                 selectize=TRUE)
   })
   
-  ############.
+  #####################.
   # Dynamic data
   # Dataset for comparator chosen by user
   map_compar <- reactive({
@@ -994,7 +1006,7 @@ function(input, output, session) {
     
   }) 
   
-  ############.
+  #####################.
   # Plotting map
   #title of the map. if no data available then print "No data available"
   output$title_map <- renderText(
@@ -1019,7 +1031,10 @@ function(input, output, session) {
   #Plotting map
   output$map <- renderLeaflet({
     
+    #For some reason it needs the second line to work correctly in the map, if not
+    #areas with no data are shown as dark grey.
     color_map <- create_map_palette() #palette
+    color_map[is.na(color_map)] <- "#ffffff"
     
     #Actual map
     leaflet() %>% 
@@ -1039,6 +1054,8 @@ function(input, output, session) {
       ) 
   })
   
+  #####################.
+  # Downloading data
   #Function to create map that can be downloaded
   plot_map_download <- function(){
     color_map <- create_map_palette() #palette
@@ -1052,15 +1069,6 @@ function(input, output, session) {
                trend_axis==input$year_map & indicator==input$indic_map) %>% 
       format_csv()
   }  
-  
-  #Dynamic UI for map, if no data available then don't print anythint
-  output$map_ui <- renderUI({
-    if(is.data.frame(map_csv()) && nrow(map_csv()) == 0) {
-      br()
-    } else {
-      leafletOutput("map", width="100%",height="600px")
-    }
-  })
   
   #Downloading map data
   output$download_map <- downloadHandler(filename =  'map_data.csv',
@@ -1078,7 +1086,8 @@ function(input, output, session) {
   ###############################################.        
   #### Deprivation ----
   ###############################################.   
-
+  #####################.
+  # Reactive controls
   #Controls for chart. Dynamic selection of area depending on area type.
   output$geoname_ui_simd <- renderUI({
     
@@ -1096,6 +1105,8 @@ function(input, output, session) {
                 choices = time_period, selected = last(time_period))
   })
   
+  #####################.
+  # Reactive data
   #reactive dataset for the simd bar plot
   simd_bar_data <- reactive({
     deprivation %>%
@@ -1215,7 +1226,9 @@ function(input, output, session) {
       }
     }
   })
-
+  
+  #####################.
+  # Downloading data
   #Downloading data
   simd_csv <- reactive({
     simd_trend_data() %>% 
@@ -1412,7 +1425,6 @@ function(input, output, session) {
     updateSelectInput(session, "profile_selected", label = NULL,
                       choices = topic_list, selected = character(0))
   })
-  
   
   #Downloading data in csv format
   table_csv_i <- reactive({ format_csv(filter_indicator_table()) })
