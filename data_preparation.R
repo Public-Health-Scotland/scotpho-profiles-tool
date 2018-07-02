@@ -73,22 +73,17 @@ geo_partnership <- geo_parents %>%
   rename(code = hscp_partnership) %>% 
   distinct() # eliminating duplicates
 
-geo_partnership <- merge(x=geo_partnership, y=geo_lookup, by="code", all.x = TRUE) 
+geo_partnership <- left_join(x=geo_partnership, y=geo_lookup, by=c("code"))
 geo_partnership <- geo_partnership %>% select(-c(areatype)) %>% 
   rename(parent_code = code, parent_area = areaname)
 
 #Merging together
 geo_parents <- rbind(geo_par_iz, geo_par_loc)
-geo_parents <- merge(x=geo_parents, y=geo_partnership, by="parent_code", all.x = TRUE) 
+geo_parents <- left_join(x=geo_parents, y=geo_partnership, by=c("parent_code")) 
 
-geo_lookup <- merge(x=geo_lookup, y=geo_parents, by="code", all.x = TRUE) 
+geo_lookup <- left_join(x=geo_lookup, y=geo_parents, by="code", all.x = TRUE) 
 
 ##No IZ seem to be assigned to more than one partnership in this file.
-
-#Replacing parent_area NA for CA, HB, Scotland and partnership with area type,
-# as parent_area is only going to be used for locality and IZ. Not really needed at the moment.
-# geo_lookup$parent_area <- ifelse(is.na(geo_lookup$parent_area), geo_lookup$areatype,
-#                                  paste(geo_lookup$areatype))
 
 ###There are a number of IZ's with the same name, recoding.
 geo_lookup <- geo_lookup %>% 
@@ -155,7 +150,6 @@ geo_lookup <- geo_lookup %>%
                            paste(areaname) #no argument
                     )))))))))))))))))))))))))))))))))))))
 
-
 geo_lookup <- geo_lookup %>% 
   #Creating variable that includeas area name and type for trend plotting
   mutate(areaname_full = paste(areaname, "-", areatype)) %>% 
@@ -198,8 +192,8 @@ optdata <- optdata %>%
   mutate_if(is.character,factor) #converting characters into factors
 
 #Merging with indicator and geography information
-optdata <- merge(x=optdata, y=ind_lookup, by="ind_id", all.x = TRUE) 
-optdata <- merge(x=optdata, y=geo_lookup, by="code", all.x = TRUE) 
+optdata <- left_join(x=optdata, y=ind_lookup, by=c("ind_id"))
+optdata <- left_join(x=optdata, y=geo_lookup, by=c("code")) 
 
 #Apply supressions. NEEDS TO CHECK THAT IT WORKS FINE ONCE WE HAVE A REAL CASE
 # If indicator is presented as standardised rate and suppression required then suppress numerator where count is less than specified value.
@@ -224,7 +218,6 @@ optdata <- optdata %>% group_by(ind_id, year, areatype) %>%
                              ifelse(interpret=="L", as.vector(rescale(measure, to=c(0,1))),
                                     0)))  %>%
   ungroup()
-
 
 #Creating variables for topic/profile filters. 
 #This probably should be added to the indicator lookup - most indicators assigned to death topic for now.
@@ -276,6 +269,7 @@ optdata <- readRDS("./data/optdata.rds")
 ###############################################.
 ## Profile lookup ----
 ###############################################.   
+#Creating a file with a column for profile and another one for domain
 profile_lookup <- data.frame(profile_domain = c(paste(unique(optdata$profile_domain1)),
                                                 paste(unique(optdata$profile_domain2)))) %>% 
   mutate(profile = substr(profile_domain, 1, 3),
