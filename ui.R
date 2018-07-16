@@ -194,8 +194,52 @@ tabPanel(
 ###############################################.
 ## Ring plot ----
 ###############################################.
-tabPanel(title = "Summary", icon = icon("heartbeat"), value = "ring",
-         p("Content for this page will be added soon")),
+tabPanel(title = "Profile Summary", icon = icon("adjust"), value = "ring",
+         #Need to have the output in the ui to get the conditional Panel working
+         span(textOutput("help_ring"), style="color:white; font-size:1px"), 
+         sidebarPanel(width=3,
+                      selectInput("profile_ring", "Profile", choices= profile_list, multiple=FALSE, selected = "HWB"),
+                      uiOutput("geotype_ui_ring"),
+                      conditionalPanel(#Conditional panel for extra dropdown for localities & IZ
+                        condition = "input.geotype_ring== 'HSC Locality' | input.geotype_ring == 'Intermediate zone' ",
+                        selectInput("loc_iz_ring", label = "Partnership for localities/intermediate zones",
+                                    choices = partnership_name)
+                      ),
+                      uiOutput("geoname_ui_ring"),
+                      br(),
+                      p("This visualisation allows you to compare one area to another area or the same area over time"),
+                      radioButtons("comp_ring", label = "Compare against:",
+                                   choices = list("Area" = 1, "Time" = 2),
+                                   selected = 1, inline=TRUE),
+                      conditionalPanel(condition = "input.comp_ring == 1 ",
+                                       selectInput("geocomp_ring", "Comparator", choices = comparator_list,
+                                                   selectize=TRUE, selected = "Scotland")
+                      ),
+                      conditionalPanel(condition = "input.comp_ring == 2 ",
+                                       uiOutput("yearcomp_ui_ring")),
+                      #Legend
+                      p(tags$b("Legend"), style="color: black;"),
+                      p(img(src='signif_better.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
+                        "Better than comparator.", br(),
+                        img(src='non_signif.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
+                        "Not different from comparator.", br(),
+                        img(src='signif_worse.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
+                        "Worse than comparator.", br(),
+                        img(src='signif_nocalc.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
+                        "No differences can be calculated."), 
+                      # "X out of X - Denotes how many indicators within a profile domain are statistically significantly better than comparator average"),
+                      br(),
+                      downloadButton('download_ring', 'Download data', class = "down"),
+                      br(),
+                      savechart_button('download_ringplot', 'Save chart',  class = "down"),
+                      br(),
+                      actionButton("help_ring", label="Help", icon= icon('question-circle'), class ="down"),
+                      br()
+         ),
+         mainPanel(width = 9,
+                   plotOutput("ring_plot", height="auto")
+         )
+), #Tab panel bracket
 ###############################################.
 ## Heat map ----
 ###############################################.

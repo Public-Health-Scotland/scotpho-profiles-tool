@@ -61,6 +61,225 @@ function(input, output, session) {
   })
   
   ###############################################.        
+  #### Profile Summary (ring plot) ----
+  ###############################################.   
+  
+  ## Profile Summary (ring) help pop-up modal dialog - still need to create image file.
+  observeEvent(input$help_ring, {
+    showModal(modalDialog(
+      title = "What does this chart show...",
+      p(img(src="help_ring.PNG",height=600)),size = "l",
+      easyClose = TRUE, fade=FALSE
+    ))
+  })
+  
+  ## REACTIVE CONTROLS
+  # Reactive controls for areatype depending on profile selected
+  output$geotype_ui_ring <- renderUI({
+    areas <- optdata$areatype[substr(optdata$profile_domain1, 1, 3) == input$profile_ring |
+                                substr(optdata$profile_domain2, 1, 3) == input$profile_ring] %>% 
+      droplevels() %>% unique() %>%  sort()
+    selectInput("geotype_ring", "Geography level", choices=areas,
+                selected = "Health board")
+  })
+  
+  # Reactive controls for profile summary:area name depending on areatype selected
+  output$geoname_ui_ring <- renderUI({
+    areas_ring <- if (input$geotype_ring %in% c("Health board", "Council area", "HSC Partnership", "Alcohol & drug partnership"))
+    {
+      sort(geo_lookup$areaname[geo_lookup$areatype == input$geotype_ring])
+    } else {
+      sort(geo_lookup$areaname[geo_lookup$areatype == input$geotype_ring
+                               & geo_lookup$parent_area == input$loc_iz_ring])
+    }
+    selectInput("geoname_ring", "Area", choices = areas_ring,
+                selectize=TRUE, selected = "Health board")
+  })
+  
+  # Years to compare with depending on what data is available
+  output$yearcomp_ui_ring <- renderUI({
+    ring_years <- optdata %>%
+      subset (areaname == input$geoname_ring &
+                domain1 != "Population" &   #exclude population indicators
+                areatype  == input$geotype_ring) %>% #not sure this is strictly neccessary?
+      select(year) %>%
+      droplevels()
+    years <- c(min(ring_years$year):max(ring_years$year))
+    selectInput("yearcomp_ring", "Baseline year", choices = years,selectize=TRUE, selected = "2011")
+  })
+  
+  ## DATA SELECTIONS
+  # Ring data for the chosen area. Filtering based on user input values.
+  ring_chosenarea <- reactive({ 
+    optdata %>%
+      group_by(indicator) %>%
+      mutate(max_year=max(year))%>%
+      subset ((year==max_year) &
+                areaname == input$geoname_ring &
+                domain1 != "Population" &  #exclude population indicators
+                (substr(profile_domain1, 1, 3) == input$profile_ring |
+                   substr(profile_domain2, 1, 3) == input$profile_ring) &
+                areatype  == input$geotype_ring) %>%
+      droplevels()
+  })
+  
+  #Select comparator based on years available for area selected.
+  ring_chosencomp <- reactive({   
+    #filter data to create series for chosen comparator
+    if(input$comp_ring == 1){
+      ring_chosencomp <- optdata %>%
+        group_by(indicator) %>%
+        mutate(max_year=max(year))%>%
+        subset (year==max_year &
+                  areaname == input$geocomp_ring &
+                  domain1 != "Population" &
+                  (substr(profile_domain1, 1, 3) == input$profile_ring |
+                     substr(profile_domain2, 1, 3) == input$profile_ring) &
+                  areatype %in% c("Health board", "Council area", "Scotland")) %>% 
+        select(c(indicator, measure, year, areatype)) %>% 
+        rename(comp_m =measure,comp_areatype=areatype) %>% 
+        droplevels()
+    }else if(input$comp_ring==2){
+      ring_chosencomp <- optdata %>%
+        group_by(indicator) %>%
+        subset (year==input$yearcomp_ring &
+                  areaname == input$geoname_ring &
+                  domain1 != "Population" &
+                  (substr(profile_domain1, 1, 3) == input$profile_ring |
+                     substr(profile_domain2, 1, 3) == input$profile_ring) &
+                  areatype %in% c("Health board", "Council area", "Scotland")) %>% 
+        select(c(indicator, measure)) %>% 
+        rename(comp_m =measure) %>% 
+        droplevels()
+    }
+  })
+  
+  ## RING PLOT FUNCTION
+  plot_ring <- function(){   
+    
+    #Merging comparator and chosen area
+    if (input$comp_ring == 1){
+      ring <- merge(ring_chosenarea(), ring_chosencomp(), by=c("indicator", "year"))
+    } else if (input$comp_ring == 2) {
+      ring <- merge(ring_chosenarea(), ring_chosencomp(), by=c("indicator"), all.x = TRUE)
+    }
+    
+    #identify significant differences
+    ring<-ring %>%  
+      mutate(flag=ifelse(ring$interpret == "O",'No significance can be calculated',
+                         ifelse(ring$lowci<=ring$comp_m & ring$upci>=ring$comp_m,'Statistically not significantly different from comparator average',
+                                ifelse(ring$lowci > ring$comp_m & ring$interpret == "H",'Statistically significantly better than comparator average',
+                                       ifelse(ring$lowci > ring$comp_m & ring$interpret == "L", 'Statistically significantly worse than comparator average',
+                                              ifelse(ring$upci < ring$comp_m & ring$interpret == "L",'Statistically significantly better than comparator average',
+                                                     ifelse(ring$upci < ring$comp_m & ring$interpret == "H",'Statistically significantly worse than comparator average','Statistically not significantly different from comparator average'))))))) %>%
+      mutate(domain=ifelse(substr(ring$profile_domain1,1,3)==input$profile_ring,substr(ring$profile_domain1,5,nchar(as.vector(profile_domain1))),substr(ring$profile_domain2,5,nchar(as.vector(profile_domain2))))) %>% #identifies correct domain name for title
+      select(domain,flag,indicator) %>%
+      droplevels()
+    
+    #reorder flag factors levels to get correct order in chart
+    ring$flag <- factor(ring$flag, levels=c("Statistically significantly better than comparator average","Statistically not significantly different from comparator average","Statistically significantly worse than comparator average","No significance can be calculated"))
+    
+    #group and count idicators within a domain by significance
+    ring <- ring %>%
+      group_by(domain,flag) %>%
+      count(indicator) %>%
+      summarise(count=sum(n))
+    
+    #group by domain to count total by domain
+    ring <- ring %>%  
+      group_by(domain) %>%
+      arrange(domain) %>%
+      mutate(fraction=count/sum(count)) %>%
+      mutate(ymax=cumsum(fraction)) %>%
+      mutate(ymin=c(0,head(ymax,n=-1))) %>%
+      mutate(ind_sum=sum(count)) %>%
+      mutate(bfrac=ifelse(flag =='Statistically significantly better than comparator average',fraction,0)) %>%
+      mutate(bcount=ifelse(flag =='Statistically significantly better than comparator average',count,0)) %>%
+      droplevels ()
+    
+    fill_df <- data.frame(flag = c ('No significance can be calculated','Statistically not significantly different from comparator average','Statistically significantly better than comparator average','Statistically significantly worse than comparator average'),stringsAsFactors = TRUE)
+    fillcolours <- c("white","#999999","DodgerBlue", "#ff9933")
+    names(fillcolours) <- levels(fill_df$flag)
+    fill_colour <- scale_fill_manual(name = "flag",values = fillcolours)
+    
+    #create title and subtitle variables
+    ring_title <- paste(profile_list," Summary: ",input$geoname_ring," (",input$geotype_ring,")",sep="")
+    ring_subtitle <- if(input$comp_ring == 1){
+      paste("Comparator geography: ",input$geocomp_ring,sep="")
+    }else if(input$comp_ring==2){
+      paste("Comparator geography: ",input$geoname_ring,"(",input$yearcomp_ring,")",sep="")
+    }
+    
+    ggplot(ring, aes(fill=flag, ymax=ymax, ymin=ymin, xmax=4.5, xmin=1.5)) +
+      geom_rect(colour='#555555') +
+      geom_label(data=ring, label.size = NA, aes(label =paste(count), x = 3, y = (ymin + ymax)/2),show.legend = F,size = 4) +
+      fill_colour +
+      labs(title=ring_title,subtitle=ring_subtitle)+
+      theme(
+        axis.text=element_blank(), # taking out x axis labels
+        axis.title = element_blank(),
+        text = element_text(family="Helvetica Neue,Helvetica,Arial,sans-serif",colour ='#555555'),
+        plot.title = element_text(face = "bold",size=16),
+        plot.subtitle = element_text(size=14,margin=margin(0,0,40,0,unit="pt")),
+        axis.ticks=element_blank(), # taking out x axis tick marks
+        legend.position = "none",
+        panel.background = element_blank(),#Blanking background
+        panel.border = element_blank())+ #remove frame round plot plot
+      facet_wrap(~ring$domain,labeller = label_wrap_gen(multi_line = TRUE)) +
+      coord_polar(theta="y") +
+      theme(
+        strip.text.x = element_text(size=12,face="bold",colour='#555555',family="Helvetica Neue,Helvetica,Arial,sans-serif"),
+        strip.background =element_rect(fill="snow"))+
+      xlim(c(0,6))
+  }
+  
+  #Render plot in app and resize 
+  output$ring_plot <- renderPlot({
+    plot_ring()
+  }, height = function() {
+    session$clientData$output_ring_plot_width
+  })
+  
+  # Defined data file to down
+  ring_csv <- reactive({
+    #plot_ring  <- reactive({
+    #Merging comparator and chosen area
+    if (input$comp_ring == 1){
+      ring <- merge(ring_chosenarea(), ring_chosencomp(), by=c("indicator", "year"))
+    } else if (input$comp_ring == 2) {
+      ring <- merge(ring_chosenarea(), ring_chosencomp(), by=c("indicator"), all.x = TRUE)
+    }
+    
+    #identify significant differences
+    ring<-ring %>%
+      mutate(flag=ifelse(ring$interpret == "O",'No significance can be calculated',
+                         ifelse(ring$lowci<=ring$comp_m & ring$upci>=ring$comp_m,'Statistically not significantly different from comparator average',
+                                ifelse(ring$lowci > ring$comp_m & ring$interpret == "H", 'Statistically significantly better than comparator average',
+                                       ifelse(ring$lowci > ring$comp_m & ring$interpret == "L", 'Statistically significantly worse than comparator average',
+                                              ifelse(ring$upci < ring$comp_m & ring$interpret == "L",'Statistically significantly better than comparator average',
+                                                     ifelse(ring$upci < ring$comp_m & ring$interpret == "H",'Statistically significantly worse than comparator average','Statistically not significantly different from comparator average'))))))) %>%
+      mutate(domain=ifelse(substr(ring$profile_domain1,1,3)==input$profile_ring,substr(ring$profile_domain1,5,nchar(as.vector(profile_domain1))),substr(ring$profile_domain2,5,nchar(as.vector(profile_domain2))))) %>% #identifies correct domain name for title
+      droplevels()
+    
+    ring <- ring %>%
+      arrange(domain, flag) %>%
+      select(c(domain, flag, indicator, areaname, areatype, def_period, numerator, measure,
+               lowci, upci, type_definition, comp_m, comp_areatype)) %>%
+      rename(lower_confidence_interval=lowci, upper_confidence_interval=upci,
+             latest_period = def_period, definition = type_definition, comparator_measure = comp_m, difference=flag,comparator_geo=comp_areatype)
+  })
+  
+  # Download data file
+  output$download_ring <- downloadHandler( filename =  'ring_data.csv',
+                                           content = function(file) { write.csv(ring_csv(), file, row.names=FALSE) })
+  # Downloading chart  
+  output$download_ringplot <- downloadHandler(
+    filename = 'Profile_Summary.png',
+    content = function(file){
+      ggsave(file, plot = plot_ring(), device = "png",height = 15,width=15, limitsize=FALSE)
+    })
+  
+  ###############################################.        
   #### Heatmap ----
   ###############################################.   
   # Heatmap help pop-up
