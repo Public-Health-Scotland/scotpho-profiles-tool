@@ -4,6 +4,7 @@
 #TODO:
 #see global syntax
 
+
 ###############################################.
 ## Header ---- 
 ###############################################.
@@ -62,10 +63,10 @@ navbarPage(id = "intabset", #needed for landing page
                ".landing-page-box-title {font-size: 14px; text-align:center; color:white;
         font-weight: bold; background-color: rgba(2, 97, 160, 1); width:100%; max-height: 20px;}",
                #landing page buttons
-               ".landing-page-button {background-color: rgba(0, 116, 192, 0.5); text-align:left;
+               ".landing-page-button {background-color: rgba(0, 116, 192, 1); text-align:left;
         background-image:none; color: white; white-space: normal; border-radius: 0;
         font-size: 12px; position: static; min-height: 8vh; width: 100%;}",
-               ".landing-page-button-about {background-color: rgba(0, 116, 192, 0.5); text-align:left;
+               ".landing-page-button-about {background-color: rgba(0, 116, 192, 1); text-align:left;
         background-image:none; color: white; white-space: normal; border-radius: 0;
         font-size: 12px; position: static; height: 6.5vh; width: 100%;}",
                #landing-page column 
@@ -94,67 +95,68 @@ tabPanel(
       column(4, class="landing-page-column",
              div(class="landing-page-box", style="background-image: url(ring_lp.png);
                  background-repeat: no-repeat; background-size: cover;",
-                 div("Summary", class = "landing-page-box-title"),
-                 actionButton('jump_to_ring', 'A high level view of how an area is doing for a profile of indicators', 
+                 div("Profile Summary", class = "landing-page-box-title"),
+                 actionButton('jump_to_ring', 'A high level of an area across a suit of indicators', 
                               class="landing-page-button", 
                               icon = icon("arrow-circle-right", "icon-lp")))),
       #Heat map box
       column(4, class="landing-page-column",
              div(class="landing-page-box", style="background-image: url(heat_lp.png);
                  background-repeat: no-repeat; background-size: cover ",
-                 div("Heat map", class = "landing-page-box-title"),
-                 actionButton('jump_to_heat', 'Investigate the change over time of smaller sets of indicators', 
+                 div("Topic Summary: Time Trends", class = "landing-page-box-title"),
+                 actionButton('jump_to_heat', 'Explore how indicators for a topic area have changed over time', 
                               class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp")))),
       #Barcode plot box
       column(4, class="landing-page-column",
              div(class="landing-page-box", style="background-image: url(barcode_lp.png);
                  background-repeat: no-repeat; background-size: cover ",
-                 div("Barcode", class = "landing-page-box-title"),
-                 actionButton('jump_to_barcode', 'Explore how an area compares to other similar ones and the dispersion of the data',
+                 div("Topic Summary: Geographic Distribution", class = "landing-page-box-title"),
+                 actionButton('jump_to_barcode', 'Explore how indicators for a topic compare across different geographies',
                               class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp"))))
     ),
-    fluidRow(h5("Investigate the data for an specific indicator")),
+    fluidRow(h5("Explore a single indicator in more detail")),
     #2nd row of boxes
     fluidRow(
       #Trend plot box
-      column(3, class="landing-page-column",
+      column(4, class="landing-page-column",
              div(class="landing-page-box", style="background-image: url(trend_lp.png);
                  background-repeat: no-repeat; background-size: cover ",
                  div("Trend", class = "landing-page-box-title"),
-                 actionButton('jump_to_trend', 'Explore the evolution of an indicator over time.',
+                 actionButton('jump_to_trend', 'Look at how an indicator changes over time.',
                               class="landing-page-button", 
                               icon = icon("arrow-circle-right", "icon-lp")))),
       #Rank plot box
-      column(3, class="landing-page-column",
+      column(4, class="landing-page-column",
              div(class="landing-page-box", style="background-image: url(rank_lp.png);
                  background-repeat: no-repeat; background-size: cover ",
                  div("Rank", class = "landing-page-box-title"),
-                 actionButton('jump_to_rank', 'Compare different geography levels through a bar chart', 
+                 actionButton('jump_to_rank', 'Compare geographical variation for an indicator using a bar chart', 
                               class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp")))),
       #Map plot box
-      column(3, class="landing-page-column",
+      column(4, class="landing-page-column",
              div(class="landing-page-box", style="background-image: url(map_lp.png);
                  background-repeat: no-repeat; background-size: cover ",
                  div("Map", class = "landing-page-box-title"),
-                 actionButton('jump_to_map', 'Explore the geographical patterns of specific indicators', 
-                              class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp")))),
+                 actionButton('jump_to_map', 'Compare geographical variation for an indicator using a map', 
+                              class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp"))))
+      #, - VE removed inequalities data for initial launch of profiles
       #Inequalities plots box
-      column(3, class="landing-page-column",
-             div(class="landing-page-box", style="background-image: url(simd_lp.png);
-                 background-repeat: no-repeat; background-size: cover ",
-                 div("Inequalities", class = "landing-page-box-title"),
-                 actionButton('jump_to_simd', 'Explore the effects of deprivation on public health inequalities', 
-                              class="landing-page-button", 
-                              icon = icon("arrow-circle-right", "icon-lp"))))
+      # column(3, class="landing-page-column",
+      #        div(class="landing-page-box", style="background-image: url(simd_lp.png);
+      #            background-repeat: no-repeat; background-size: cover ",
+      #            div("Inequalities", class = "landing-page-box-title"),
+      #            actionButton('jump_to_simd', 'Explore the effects of deprivation on public health inequalities', 
+      #                         class="landing-page-button", 
+      #                         icon = icon("arrow-circle-right", "icon-lp"))))
     ),
-    fluidRow(h5("Access all the data behind the tool and check other useful resources")),
+    fluidRow(h5("Access the data behind and find supporting information")),
     fluidRow(
       #Table box 
       column(4, class="landing-page-column",
              div(class="landing-page-box", style="background-image: url(table_lp.png);
                  background-repeat: no-repeat; background-size: cover ", 
                  div("Table", class = "landing-page-box-title"),
-                 actionButton('jump_to_table', 'Access and download the data behind the tool', 
+                 actionButton('jump_to_table', 'View and download the data behind the tool', 
                               class="landing-page-button", 
                               icon = icon("arrow-circle-right", "icon-lp"))
              )),
@@ -162,29 +164,29 @@ tabPanel(
       column(4, class="landing-page-column",
              div(class="landing-page-box-about", 
                  div("About", class = "landing-page-box-title"),
-                 actionButton('jump_to_about', 'What are the profiles about?', 
+                 actionButton('jump_to_about', 'About ScotPHO Profiles', 
                               class="landing-page-button-about", 
                               icon = icon("arrow-circle-right", "icon-lp"))
              ),
              #Evidence box
              div(class="landing-page-box-about",
-                 div("Evidence for action", class = "landing-page-box-title"),
-                 actionButton('jump_to_evidence', 'How to tackle public health issues?', 
+                 div("Related Links", class = "landing-page-box-title"),
+                 actionButton('jump_to_evidence', 'Links to websites or documents with useful profiles information', 
                               class="landing-page-button-about", 
                               icon = icon("arrow-circle-right", "icon-lp")))
       ),
       #Resources box
       column(4, class="landing-page-column",
              div(class="landing-page-box-about", 
-                 div("Resources", class = "landing-page-box-title"),
-                 actionButton('jump_to_resources', 'More help to use the profiles', 
+                 div("Technical Resources", class = "landing-page-box-title"),
+                 actionButton('jump_to_resources', 'Find technical information about the ScotPHO profile definitions and methodology', 
                               class="landing-page-button-about", 
                               icon = icon("arrow-circle-right", "icon-lp"))
              ),
              #Other profiles
              div(class="landing-page-box-about", 
-                 div("Other profiles", class = "landing-page-box-title"),
-                 actionButton('jump_to_others', 'Check out other related products', 
+                 div("Other Profiles", class = "landing-page-box-title"),
+                 actionButton('jump_to_others', 'Links to alternative profiling tools', 
                               class="landing-page-button-about", 
                               icon = icon("arrow-circle-right", "icon-lp")))
       )
@@ -427,33 +429,33 @@ tabPanel("Map", icon = icon("globe"), value = "map",
 ###############################################.
 ## Deprivation ---- 
 ###############################################.
-tabPanel("Inequalities", icon = icon("balance-scale"), value = "simd",
-         #Intro text
-         p(tags$b("This section is under development and a limited number of indicators are available."), style = "color: red "),
-         p(tags$b("Explore the data by different levels of deprivation. ")),
-         tags$ul( 
-           tags$li("ScotPHO are working on new ways to display information related to", 
-                   tags$a(href="http://www.scotpho.org.uk/life-circumstances/deprivation/key-points/", "deprivation",
-                          class="externallink"), ".")),
-         wellPanel( #Filter options
-                   column(6, selectInput("indic_simd", label = "Indicator",
-                                         choices = ind_depr_list)),
-                   column(3, selectInput("geotype_simd", label = "Geography level",
-                                         choices = areatype_depr_list, selected =  "Scotland")),
-                   column(3, uiOutput("geoname_ui_simd")),
-                   column(5, uiOutput("year_ui_simd")),
-                   column(5, selectInput("measure_simd", label = "Type of measure",
-                                         choices = c("Rate/Percentage", "Index of inequality"))),
-                   column(2, downloadButton(outputId = 'download_simd',
-                                            "Download data",class = "down"))
-         ),
-         mainPanel(width = 12, #Main panel
-                   column(6,
-                          plotlyOutput("simd_bar_plot")),
-                   column(6,
-                          plotlyOutput("simd_trend_plot"))
-         )
-), #Tab panel bracket
+# tabPanel("Inequalities", icon = icon("balance-scale"), value = "simd",
+#          #Intro text
+#          p(tags$b("This section is under development and a limited number of indicators are available."), style = "color: red "),
+#          p(tags$b("Explore the data by different levels of deprivation. ")),
+#          tags$ul( 
+#            tags$li("ScotPHO are working on new ways to display information related to", 
+#                    tags$a(href="http://www.scotpho.org.uk/life-circumstances/deprivation/key-points/", "deprivation",
+#                           class="externallink"), ".")),
+#          wellPanel( #Filter options
+#                    column(6, selectInput("indic_simd", label = "Indicator",
+#                                          choices = ind_depr_list)),
+#                    column(3, selectInput("geotype_simd", label = "Geography level",
+#                                          choices = areatype_depr_list, selected =  "Scotland")),
+#                    column(3, uiOutput("geoname_ui_simd")),
+#                    column(5, uiOutput("year_ui_simd")),
+#                    column(5, selectInput("measure_simd", label = "Type of measure",
+#                                          choices = c("Rate/Percentage", "Index of inequality"))),
+#                    column(2, downloadButton(outputId = 'download_simd',
+#                                             "Download data",class = "down"))
+#          ),
+#          mainPanel(width = 12, #Main panel
+#                    column(6,
+#                           plotlyOutput("simd_bar_plot")),
+#                    column(6,
+#                           plotlyOutput("simd_trend_plot"))
+#          )
+# ), #Tab panel bracket
 ###############################################.
 ## Table ----
 ###############################################.
@@ -576,7 +578,7 @@ navbarMenu("Info", icon = icon("info-circle"),
                     mainPanel(width=8,
                               h4("Welcome to the ScotPHO Profiles Tool", style = "color:black;"),
                               p("The tool is designed to allow users to explore the various different profiles 
-                                produced by the ", tags$a(href="http://www.scotpho.org.uk/", "ScotPHO collaboration.", 
+                                produced by the ", tags$a(href="http://www.scotpho.org.uk/about-us/about-scotpho/", "ScotPHO collaboration.", 
                                                           class="externallink")),
                               p("The profiles are intended to increase understanding of local health issues 
                                 and to prompt further investigation, rather than to be used as a performance 
@@ -592,7 +594,7 @@ navbarMenu("Info", icon = icon("info-circle"),
 ###############################################.             
 ##############Resources----    
 ###############################################.      
-           tabPanel("Resources", value = "resources",
+           tabPanel("Technical Resources", value = "resources",
                     sidebarPanel(width=1),
                     mainPanel(
                       h4("Resources", style = "color:black;"),
@@ -643,13 +645,11 @@ navbarMenu("Info", icon = icon("info-circle"),
 ###############################################.             
 ##############Evidence for action----    
 ###############################################.      
-tabPanel("Evidence for action", value = "evidence",
+tabPanel("Related Links", value = "evidence",
          sidebarPanel(width=1),
          mainPanel(
-           h4("Evidence for action", style = "color:black;"),
-           p("What to do with all this data? What is a sucessful strategy to tackle a 
-             public health issue? We have listed some resources from various organizations 
-             which can help you to develop succesful strategies in the public health context."),
+           h4("Related Links", style = "color:black;"),
+           p("Below are links to organisations and documents that provide supporting evidence for action."),
            tags$ul( 
              #Link to HS
              tags$li(class= "li-custom", tags$a(href="http://www.healthscotland.scot/improve-policy-and-practice", 
@@ -688,14 +688,18 @@ tabPanel("Evidence for action", value = "evidence",
 tabPanel("Other profiles", value = "others",
          sidebarPanel(width=1),
          mainPanel(
-           h4("Other profiles", style = "color:black;"),
-           p("Other Scottish public sector organizations produce profiles with different
-             focuses. "),
+           h4("Alternative profiles", style = "color:black;"),
+           p("A number of different organisations produce local area profile products. These different profile products have often
+              been designed to serve a particular purpse or to suit a specific audience.  Occassionally the same or similar key indicators
+              may appear across multiple different profile products, ScotPHO aim to align indicator definitions with recognised 
+              national definitions or with other Scottish organisations.  We aim to highlight similarities or differences between defintions
+              used by ScotPHO and some of the other major Scottish profiles in our techinical documentation. 
+.             Below are links to some related profiling products."),
            tags$ul( 
              #Link to old tool
              tags$li(class= "li-custom", tags$a(href="https://scotpho.nhsnss.scot.nhs.uk/scotpho/homeAction.do", 
-                                                "ScotPHO profiles",  class="externallink"), 
-                     " - Some of the profiles (e.g. Alcohol) are still not in this new tool."),
+                                                "Historic ScotPHO profiles",  class="externallink"), 
+                     " - The old style ScotPHO profiles are currently still accessible via our old profile platform"),
              #Link to GCPH
              tags$li(class= "li-custom", tags$a(href="http://www.understandingglasgow.com/",
                                                 "Glasgow profiles",  class="externallink"), 
