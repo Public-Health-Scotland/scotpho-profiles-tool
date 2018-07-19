@@ -477,113 +477,129 @@ tabPanel("Map", icon = icon("globe"), value = "map",
 ###############################################.
 tabPanel("Table", icon = icon("table"), value = "table",
          #Sidepanel for filtering data
-         sidebarPanel(
-           
-           tags$h4("Filter ScotPHO Data by", style = "font-weight: bold; color: black;"),
-           
-           tags$div(tags$i("Select appropriate conditions to filter data"), 
-                    tags$br(),
-                    tags$i("To delete choices use RETURN or select item and DELETE")),
-           tags$br(),
-           tags$br(),
-           actionButton("clear", label = "Clear all filters", icon ("eraser"), style='background: #3399FF; color: #FFF; font-size:100%'),
-           tags$h4("Geography", style = "font-weight: bold; color: black;"),
-           
-           tags$style(type='text/css', ".selectize-input { font-size: 12px; line-height: 18px;} .selectize-dropdown { font-size: 12px; line-height: 18px; }"),
-           awesomeCheckbox("iz",label = "Intermediate zone", value = FALSE),
-           conditionalPanel(
-             condition = "input.iz == true",
-             selectInput("iz_parent", label = "Filter list by HSC Partnership",
-                         width = "200px", choices = parent_geo_list, selected = NULL, multiple=FALSE),
-             conditionalPanel(
-               condition = "input.iz_parent != 'Show all'",
-               awesomeCheckbox("iz_parent_all",label = "Select all intermediate zones in this area", value = FALSE)),
-             uiOutput("iz_filtered")
-           )
-           ,
-           awesomeCheckbox("la",label = "Council area", value = FALSE),
-           conditionalPanel(
-             condition = "input.la == true",
-             selectInput("la_true", label = NULL,
-                         width = "200px", choices = la_name, selected = NULL, multiple=TRUE)),
-           
-           awesomeCheckbox("hb",label = "Health board", value = FALSE),
-           conditionalPanel(
-             condition = "input.hb == true",
-             selectInput("hb_true", label = NULL,
-                         width = "200px", choices = hb_name, selected = NULL, multiple=TRUE)),
-           
-           awesomeCheckbox("hscl",label = "Health and Social Care Locality", value = FALSE),
-           conditionalPanel(
-             condition = "input.hscl == true",
-             selectInput("hscl_true", label = NULL,
-                         width = "200px", choices = locality_name, selected = NULL, multiple=TRUE)),
-           
-           awesomeCheckbox("hscp",label = "Health and Social Care Partnership", value = FALSE),
-           conditionalPanel(
-             condition = "input.hscp == true",
-             selectInput("hscp_true", label = NULL,
-                         width = "200px", choices = partnership_name, selected = NULL, multiple=TRUE)),
-           
-           awesomeCheckbox("scotland",label = "Scotland", value = FALSE),
-           awesomeCheckbox("all_data",label = "All available geographies", value = FALSE),
-           
-           hr(),
-           p(tags$h5("Find geography by area code", style = "font-weight: bold; color: black;")),
-           selectInput("code", label = NULL, #"Type in the box to search for area code" 
-                       width = "200px", choices = code_list, multiple=TRUE, selectize=TRUE, selected = ""),
-           
-           hr(),
-           p(tags$h4("Time period", style = "font-weight: bold; color: black;")),
-           #p(tags$h4("Display data for the date range", style = "font-weight: bold; color: black;")),
-           sliderInput("date_from",label = NULL, min = min_year, max = max_year, value = c(min_year,max_year), 
-                       width = "200px", step = 1, sep="", round = TRUE, ticks = TRUE, dragRange = FALSE)
-           #sliderInput("date_to",label = "To", min = min_year, max = max_year, value = max_year, 
-           #  width = "200px", step = 1, sep="", round = TRUE, ticks = TRUE, dragRange = FALSE)
-                    ),
-         #splitting up the main panel to include a header that filters for indicator of interest and lower one to display the table
          mainPanel(
-           tabsetPanel(type = "tabs",
-                       tabPanel("Select data by indicators", 
-                                tags$br(),
-                                tags$br(),
-                                column(width=8,
-                                       selectInput("indicator_selected", label = "Type in the box to search",
-                                                   width = "400px", choices = indicator_list, selected = NULL, multiple=TRUE),
-                                       tags$br(),
-                                       tags$br()), 
-                                column(width=4,
-                                       tags$br(),
-                                       downloadButton("download_table_i_csv", 'Download data (csv)', class = "down"),
-                                       tags$br(),
-                                       tags$br()),  #For downloading the data
-                                #downloadButton("download_xlsx", 'Download data (xlsx)', class = "down"),  #For downloading the data
-                                column(11, DT::dataTableOutput("table_opt_indicator")),
-                                column(1)),
-                       #}),
-                       
-                       tabPanel("Select data by topic", 
-                                tags$br(),
-                                tags$br(),
-                                column(width=8,
-                                       selectInput("profile_selected", label = "Type in the box to search",
-                                                   width = "400px", choices = topic_list, selected = NULL, multiple=TRUE),
-                                       tags$br(),
-                                       tags$br()), 
-                                column(width=4,
-                                       tags$br(),
-                                       downloadButton("download_table_p_csv", 'Download data (csv)', class = "down"), #For downloading the data
-                                       tags$br(),
-                                       tags$br()), 
-                                # downloadButton("download_table_p_xlsx", 'Download data (xlsx)', class = "down"),  #For downloading the data
-                                column(11, DT::dataTableOutput("table_opt_profile")),
-                                column(1))
-           )
+           width = 12, style="margin-left:0.5%; margin-right:0.5%",
            
-         )
+           #Row 1 for intro  
+           fluidRow(
+             column(10,
+                    p("Filter ScotPHO Data by", style = "font-weight: bold; color: black;"),
+                    
+                    tags$div("Select appropriate conditions to filter data", 
+                             tags$br(),
+                             "To delete choices use RETURN or select item and DELETE"),
+                    tags$br(),
+                    tags$br()),
+             column(2,
+                    actionButton("clear", label = "Clear all filters", icon ("eraser"), style='background: #3399FF; color: #FFF; font-size:100%')
+             )),
+           
+           #Row 2 for selections
+           fluidRow(
+             column(3,
+                    p("Profile product", style = "font-weight: bold; color: black;"),  
+                    tags$div("All available indicators will be displayed for",tags$br(),"selected geography if none specified"),
+                    br(),
+                    awesomeRadio("product_filter", label=NULL, choices = c("Indicator", "Topic", "Profile"), selected = NULL, inline = FALSE,
+                                 status = "primary", checkbox = TRUE, width = NULL),
+                    br(),
+                    conditionalPanel(
+                      condition="input.product_filter=='Indicator'",
+                      selectizeInput("indicator_filter", label = NULL,
+                                     width = "270px", choices = indicator_list, selected = NULL,
+                                     multiple=TRUE, options = list(maxOptions = 1000, placeholder = "Select or type indicators you would like to filter by"))
+                      
+                    ),
+                    conditionalPanel(
+                      condition="input.product_filter=='Topic'",
+                      selectizeInput("topic_filter", label = NULL,
+                                     width = "270px", choices = topic_list, selected = NULL,
+                                     multiple=TRUE, options = list(maxOptions = 1000, placeholder = "Select or type topics you would like to filter by"))
+                    ),
+                    conditionalPanel(
+                      condition="input.product_filter=='Profile'",
+                      selectizeInput("profile_filter", label = NULL,
+                                     width = "270px", choices = profile_list, selected = NULL,
+                                     multiple=TRUE, options = list(maxOptions = 1000, placeholder = "Select or type profiles you would like to filter by"))    
+                      
+                    )
+                    
+             ),
+             column(3,
+                    
+                    p("Geography", style = "font-weight: bold; color: black;"),
+                    
+                    tags$style(type='text/css', ".selectize-input { font-size: 12px; line-height: 18px;} .selectize-dropdown { font-size: 12px; line-height: 18px; }"),
+                    awesomeCheckbox("iz",label = "Intermediate zone", value = FALSE),
+                    conditionalPanel(
+                      condition = "input.iz == true",
+                      selectizeInput("iz_parent", label = "Filter list by HSC Partnership",
+                                     width = "229px", choices = parent_geo_list, selected = NULL, multiple=FALSE, options = list(placeholder = "Select or type intermediate zone of interest")),
+                      conditionalPanel(
+                        condition = "input.iz_parent != 'Show all'",
+                        checkboxInput("iz_parent_all",label = "Select all intermediate zones in this area", value = FALSE)),
+                      uiOutput("iz_filtered")),
+                    
+                    awesomeCheckbox("la",label = "Council area", value = FALSE),
+                    conditionalPanel(
+                      condition = "input.la == true",
+                      selectizeInput("la_true", label = NULL,
+                                     width = "229px", choices = la_name, selected = NULL, multiple=TRUE, options = list(placeholder = "Select or type council area of interest"))),
+                    
+                    awesomeCheckbox("hscl",label = "Health and Social Care Locality", value = FALSE),
+                    conditionalPanel(
+                      condition = "input.hscl == true",
+                      selectizeInput("hscl_parent", label = "Filter list by HSC Partnership",
+                                     width = "229px", choices = parent_geo_list, selected = NULL, multiple=FALSE, options = list(placeholder = "Select or type HSC locality of interest")),
+                      conditionalPanel(
+                        condition = "input.hscl_parent != 'Show all'",
+                        checkboxInput("hscl_parent_all",label = "Select all HSC localities in this area", value = FALSE)),
+                      uiOutput("hscl_filtered")),
+                    
+                    awesomeCheckbox("adp",label = "Alcohol and Drugs Partnership", value = FALSE),
+                    conditionalPanel(
+                      condition = "input.adp == true",
+                      selectizeInput("adp_true", label = NULL,
+                                     width = "229px", choices = adp_name, selected = NULL, multiple=TRUE,options = list(placeholder = "Select or type ADP of interest")))  
+                    
+             ),
+             column(3,
+                    br(),
+                    awesomeCheckbox("hscp",label = "Health and Social Care Partnership", value = FALSE),
+                    conditionalPanel(
+                      condition = "input.hscp == true",
+                      selectInput("hscp_true", label = NULL,
+                                  width = "229px", choices = partnership_name, selected = NULL, multiple=TRUE)),
+                    
+                    awesomeCheckbox("hb",label = "Health board", value = FALSE),
+                    conditionalPanel(
+                      condition = "input.hb == true",
+                      selectInput("hb_true", label = NULL,
+                                  width = "229px", choices = hb_name, selected = NULL, multiple=TRUE)),
+                    
+                    
+                    awesomeCheckbox("scotland",label = "Scotland", value = FALSE),
+                    awesomeCheckbox("all_data",label = "All available geographies", value = FALSE),
+                    selectizeInput("code", label = NULL,
+                                   width = "229px", choices = code_list, options = list(placeholder = 'Or search by area code'), multiple=TRUE, selected = "")
+                    
+             ),
+             column(3,
+                    p("Time period", style = "font-weight: bold; color: black;"),
+                    br(),
+                    sliderInput("date_from",label = NULL, min = min_year, max = max_year, value = c(min_year,max_year), 
+                                width = "260px", step = 1, sep="", round = TRUE, ticks = TRUE, dragRange = FALSE),
+                    br(), br(), br(),
+                    downloadButton("download_table_csv", 'Download data (csv)', class = "down")
+             )
+           ),
+           
+           #Row 3- Table
+           fluidRow(  
+             column(12, div(DT::dataTableOutput("table_filtered"), style = "font-size: 98%; width: 98%"))
+           ))
          
-         
-), #Tab panel bracket   
+ ), #Tab panel bracket   
 ###############################################.             
 ##############About----    
 ###############################################.
