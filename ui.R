@@ -105,23 +105,23 @@ tabPanel(
     fluidRow(
       #Ring plot box
       column(4, class="landing-page-column",
-             div(class="landing-page-box", style="background-image: url(ring_lp.png);
-                 background-repeat: no-repeat; background-size: cover;",
+             div(class="landing-page-box", style="background-image: url(donut9.png);
+                 background-repeat: no-repeat; background-size: 35%; background-position: bottom 20px center; ;background-color: white;",
                  div("Profile Summary", class = "landing-page-box-title"),
-                 actionButton('jump_to_ring', 'A high level of an area across a suit of indicators', 
+                 actionButton('jump_to_ring', 'A high level view of an area across a suit of indicators', 
                               class="landing-page-button", 
                               icon = icon("arrow-circle-right", "icon-lp")))),
       #Heat map box
       column(4, class="landing-page-column",
-             div(class="landing-page-box", style="background-image: url(heat_lp.png);
-                 background-repeat: no-repeat; background-size: cover ",
+             div(class="landing-page-box", style="background-image: url(heatmap.png);
+                 background-repeat: no-repeat; background-size: 30%; background-position: bottom 25px center ;background-color: white;",
                  div("Topic Summary: Time Trends", class = "landing-page-box-title"),
                  actionButton('jump_to_heat', 'Explore how indicators for a topic area have changed over time', 
                               class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp")))),
       #Barcode plot box
       column(4, class="landing-page-column",
-             div(class="landing-page-box", style="background-image: url(barcode_lp.png);
-                 background-repeat: no-repeat; background-size: cover ",
+             div(class="landing-page-box", style="background-image: url(barcode_2.png);
+                 background-repeat: no-repeat; background-size: 60%; background-position: bottom 25px center ;background-color: white;",
                  div("Topic Summary: Geographic Distribution", class = "landing-page-box-title"),
                  actionButton('jump_to_barcode', 'Explore how indicators for a topic compare across different geographies',
                               class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp"))))
@@ -131,23 +131,23 @@ tabPanel(
     fluidRow(
       #Trend plot box
       column(4, class="landing-page-column",
-             div(class="landing-page-box", style="background-image: url(trend_lp.png);
-                 background-repeat: no-repeat; background-size: cover ",
+             div(class="landing-page-box", style="background-image: url(trend_2.png);
+                 background-repeat: no-repeat; background-size: 85%; background-position: center ;background-color: white; ",
                  div("Trend", class = "landing-page-box-title"),
-                 actionButton('jump_to_trend', 'Look at how an indicator changes over time.',
+                 actionButton('jump_to_trend', 'Look at how an indicator changes over time',
                               class="landing-page-button", 
                               icon = icon("arrow-circle-right", "icon-lp")))),
       #Rank plot box
       column(4, class="landing-page-column",
-             div(class="landing-page-box", style="background-image: url(rank_lp.png);
-                 background-repeat: no-repeat; background-size: cover ",
+             div(class="landing-page-box", style="background-image: url(rank_4.png);
+                 background-repeat: no-repeat; background-size: 55%; background-position: bottom 20px center ;background-color: white;",
                  div("Rank", class = "landing-page-box-title"),
                  actionButton('jump_to_rank', 'Compare geographical variation for an indicator using a bar chart', 
                               class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp")))),
       #Map plot box
       column(4, class="landing-page-column",
-             div(class="landing-page-box", style="background-image: url(map_lp.png);
-                 background-repeat: no-repeat; background-size: cover ",
+             div(class="landing-page-box", style="background-image: url(map_colourr.png);
+                 background-repeat: no-repeat; background-size: 44%; background-position: center ;background-color: white; ",
                  div("Map", class = "landing-page-box-title"),
                  actionButton('jump_to_map', 'Compare geographical variation for an indicator using a map', 
                               class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp"))))
@@ -161,12 +161,12 @@ tabPanel(
       #                         class="landing-page-button", 
       #                         icon = icon("arrow-circle-right", "icon-lp"))))
     ),
-    fluidRow(h5("Access the data behind and find supporting information")),
+    fluidRow(h5("Access the data behind the tool and find supporting information")),
     fluidRow(
       #Table box 
       column(4, class="landing-page-column",
-             div(class="landing-page-box", style="background-image: url(table_lp.png);
-                 background-repeat: no-repeat; background-size: cover ", 
+             div(class="landing-page-box", style="background-image: url(table_4.png);
+                 background-repeat: no-repeat; background-size: 35%; background-position: bottom 30px center ;background-color: white;", 
                  div("Table", class = "landing-page-box-title"),
                  actionButton('jump_to_table', 'View and download the data behind the tool', 
                               class="landing-page-button", 
@@ -174,37 +174,41 @@ tabPanel(
              )),
       #About box
       column(4, class="landing-page-column",
-             div(class="landing-page-box-about", 
+             div(class="landing-page-box-about", style="background-image: url(info_yellow.png);
+                 background-repeat: no-repeat; background-size: 15%; background-position: bottom 6px center ;background-color: white;", 
                  div("About", class = "landing-page-box-title"),
                  actionButton('jump_to_about', 'About ScotPHO Profiles', 
                               class="landing-page-button-about", 
                               icon = icon("arrow-circle-right", "icon-lp"))
              ),
              #Evidence box
-             div(class="landing-page-box-about",
-                 div("Related Links", class = "landing-page-box-title"),
+             div(class="landing-page-box-about", style="background-image: url(link_yellow.png);
+                 background-repeat: no-repeat; background-size: 15%; background-position: bottom 6px center ;background-color: white;", 
+                 div("Related Links", class = "landing-page-box-title" ),
                  actionButton('jump_to_evidence', 'Links to websites or documents with useful profiles information', 
                               class="landing-page-button-about", 
                               icon = icon("arrow-circle-right", "icon-lp")))
       ),
       #Resources box
-      column(4, class="landing-page-column",
-             div(class="landing-page-box-about", 
+      column(4, class="landing-page-column", 
+             div(class="landing-page-box-about", style="background-image: url(book_dark.png);
+                 background-repeat: no-repeat; background-size: 15%; background-position: bottom 6px center ;background-color: white;", 
                  div("Technical Resources", class = "landing-page-box-title"),
                  actionButton('jump_to_resources', 'Find technical information about the ScotPHO profile definitions and methodology', 
                               class="landing-page-button-about", 
                               icon = icon("arrow-circle-right", "icon-lp"))
              ),
              #Other profiles
-             div(class="landing-page-box-about", 
-                 div("Other Profiles", class = "landing-page-box-title"),
+             div(class="landing-page-box-about", style="background-image: url(external_link.png);
+                 background-repeat: no-repeat; background-size: 15%; background-position: bottom 6px center ;background-color: white;", 
+                 div("Other profiles", class = "landing-page-box-title"),
                  actionButton('jump_to_others', 'Links to alternative profiling tools', 
                               class="landing-page-button-about", 
                               icon = icon("arrow-circle-right", "icon-lp")))
       )
-    )#Fluidrow bracket
+  )#Fluidrow bracket
 ) #main Panel bracket
-),# tab panel bracket
+  ),# tab panel bracket
 ###############################################.
 ## Ring plot ----
 ###############################################.
