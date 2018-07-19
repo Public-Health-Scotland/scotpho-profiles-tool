@@ -9,12 +9,12 @@
 ## Header ---- 
 ###############################################.
 navbarPage(id = "intabset", #needed for landing page
-    title = div(tags$a(img(src="scotpho_reduced.png", height=40), href= "http://www.scotpho.org.uk/"),
-                style = "position: relative; top: -5px;"), # Navigation bar
-             windowTitle = "ScotPHO profiles", #title for browser tab
-             theme = shinytheme("cerulean"), #Theme of the app (blue navbar)
-             collapsible = TRUE, #tab panels collapse into menu in small screens
-             header =         
+           title = div(tags$a(img(src="scotpho_reduced.png", height=40), href= "http://www.scotpho.org.uk/"),
+                       style = "position: relative; top: -5px;"), # Navigation bar
+           windowTitle = "ScotPHO profiles", #title for browser tab
+           theme = shinytheme("cerulean"), #Theme of the app (blue navbar)
+           collapsible = TRUE, #tab panels collapse into menu in small screens
+           header =         
              tags$head( #CSS styles
                beta_box,  ##### Feedback box. TAKE OUT AFTER BETA PERIOD
                tags$link(rel="shortcut icon", href="favicon_scotpho.ico"), #Icon for browser tab
@@ -23,52 +23,64 @@ navbarPage(id = "intabset", #needed for landing page
                #Style sidebars/well panels
                tags$style(".well {background-color:#ffffff; border: 0px solid #336699;
                           padding: 5px; box-shadow: none; }",
-               #Background colour of header navBar
-               ".navbar-brand {background-color: white}",
-               ".navbar {font-size: 12px; border: 0}", #font size and border
-               ".dropdown-menu { font-size: 12px;}", #dropdown menu within navBar
-               ".container-fluid {padding-right: 0px}",
-               #Text size and line height. Padding needed for footer
-               "body { font-size: 11px; line-height: 1.1; padding-bottom:30px}",
-               ".checkbox label, .radio label, .checkbox-bs label, .radio-bs label
-                { line-height: 1.6 }",
-               ".radio-inline {line-height: 2}",
-               #Padding and margins of filters and labels
-               ".form-group {margin: 3px}",
-               ".li-custom {margin-bottom: 10px;}", #bullet point list items
-               ".shiny-options-group { margin-top: 3px; }",
-               ".selectize-control { margin-bottom: 3px}",
-               ".selectize-input {padding: 3px 3px; min-height: 10px}",
-               ".control-label { margin-bottom: 1px}",
-               #Padding of columns
-               ".col-xs-1, .col-sm-1, .col-md-1, .col-lg-1, .col-xs-2, .col-sm-2, .col-md-2, 
-               .col-lg-2, .col-xs-3, .col-sm-3, .col-md-3, .col-lg-3, .col-xs-4, .col-sm-4, 
-               .col-md-4, .col-lg-4, .col-xs-5, .col-sm-5, .col-md-5, .col-lg-5, .col-xs-6, 
-               .col-sm-6, .col-md-6, .col-lg-6, .col-xs-7, .col-sm-7, .col-md-7, .col-lg-7, 
-               .col-xs-8, .col-sm-8, .col-md-8, .col-lg-8, .col-xs-9, .col-sm-9, .col-md-9, 
-               .col-lg-9, .col-xs-10, .col-sm-10, .col-md-10, .col-lg-10, .col-xs-11, .col-sm-11, 
-               .col-md-11, .col-lg-11, .col-xs-12, .col-sm-12, .col-md-12, .col-lg-12 {
-                 padding-left: 5px; padding-right: 5px;}",
-               #Style for download buttons
-               ".down{background-color:#4da6ff; color: white; background-image:none; min-width: 20vh;
-               font-size: 11px; padding: 5px 10px; margin-top: 5px; margin-left: 3px}",
-               #landing page boxes
-               ".landing-page-box {width:100%; height:100%; min-height:18vh; background-color:AliceBlue;
-        border: 1px solid #AAAAAA; margin-bottom: 5px; float: left; transition: 0.5s ease;}",
-               ".landing-page-box-about {width:100%; height:100%; min-height:9vh; background-color:AliceBlue;
-        border: 1px solid #AAAAAA; margin-bottom: 0.5vh; float: left; transition: 0.5s ease; max-height: 2.25vh;}",
-               ".landing-page-box:hover, .landing-page-box-about:hover {-webkit-transform: scale(1.05); 
-        -ms-transform: scale(1.05); transform: scale(1.05);}", #hover effect on boxes
-               #landing-page titles for boxes
-               ".landing-page-box-title {font-size: 14px; text-align:center; color:white;
-        font-weight: bold; background-color: rgba(2, 97, 160, 1); width:100%; max-height: 20px;}",
-               #landing page buttons
-               ".landing-page-button {background-color: rgba(0, 116, 192, 1); text-align:left;
-        background-image:none; color: white; white-space: normal; border-radius: 0;
-        font-size: 12px; position: static; min-height: 8vh; width: 100%;}",
-               ".landing-page-button-about {background-color: rgba(0, 116, 192, 1); text-align:left;
-        background-image:none; color: white; white-space: normal; border-radius: 0;
-        font-size: 12px; position: static; height: 6.5vh; width: 100%;}",
+                          #Background colour of header navBar
+                          ".navbar-brand {background-color: white}",
+                          ".navbar {font-size: 12px; border: 0}", #font size and border
+                          ".dropdown-menu { font-size: 12px;}", #dropdown menu within navBar
+                          ".container-fluid {padding-right: 0px}",
+                          #Text size and line height. Padding needed for footer
+                          "body { font-size: 11px; line-height: 1.1; padding-bottom:30px}",
+                          ".checkbox label, .radio label, .checkbox-bs label, .radio-bs label
+                          { line-height: 1.6 }",
+                          ".radio-inline {line-height: 2}",
+                          #Padding and margins of filters and labels
+                          ".form-group {margin: 3px}",
+                          ".li-custom {margin-bottom: 10px;}", #bullet point list items
+                          ".shiny-options-group { margin-top: 3px; }",
+                          ".selectize-control { margin-bottom: 3px}",
+                          ".selectize-input {padding: 3px 3px; min-height: 10px}",
+                          ".control-label { margin-bottom: 1px}",
+                          #Padding of columns
+                          ".col-xs-1, .col-sm-1, .col-md-1, .col-lg-1, .col-xs-2, .col-sm-2, .col-md-2, 
+                          .col-lg-2, .col-xs-3, .col-sm-3, .col-md-3, .col-lg-3, .col-xs-4, .col-sm-4, 
+                          .col-md-4, .col-lg-4, .col-xs-5, .col-sm-5, .col-md-5, .col-lg-5, .col-xs-6, 
+                          .col-sm-6, .col-md-6, .col-lg-6, .col-xs-7, .col-sm-7, .col-md-7, .col-lg-7, 
+                          .col-xs-8, .col-sm-8, .col-md-8, .col-lg-8, .col-xs-9, .col-sm-9, .col-md-9, 
+                          .col-lg-9, .col-xs-10, .col-sm-10, .col-md-10, .col-lg-10, .col-xs-11, .col-sm-11, 
+                          .col-md-11, .col-lg-11, .col-xs-12, .col-sm-12, .col-md-12, .col-lg-12 {
+                          padding-left: 5px; padding-right: 5px;}",
+                          #Style for download buttons
+                          ".down{background-color:#4da6ff; color: white; background-image:none; min-width: 20vh;
+                          font-size: 11px; padding: 5px 10px; margin-top: 5px; margin-left: 3px}",
+                          #landing page boxes
+                          ".landing-page-box {width:100%; height:100%; min-height:18vh; background-color:AliceBlue;
+                          border: 1px solid #AAAAAA; margin-bottom: 5px; float: left; transition: 0.5s ease;}",
+                          ".landing-page-box-about {width:100%; height:100%; min-height:9vh; background-color:AliceBlue;
+                          border: 1px solid #AAAAAA; margin-bottom: 5px; float: left; transition: 0.5s ease; }",
+                          ".landing-page-box:hover, .landing-page-box-about:hover {-webkit-transform: scale(1.05); 
+                          -ms-transform: scale(1.05); transform: scale(1.05); }", #hover effect on boxes
+                          #landing-page titles for boxes
+                          ".landing-page-box-title {font-size: 14px; text-align:center; color: darkblue;
+                          font-weight: bold; background-color: none; width:100%; max-height: 20px; margin-top: 10px; }",
+                          #landing page titles for ABOUT boxes
+                          ".landing-page-box-about-title {font-size: 14px; text-align:center; color: darkblue;
+                          font-weight: bold; background-color: none; width:100%; max-height: 20px; margin-top: 5px; }",
+                          #landing page buttons
+                          ".landing-page-button {text-align:center;
+                          background-image:none; color: black; white-space: normal; border-radius: 0;border: 0px;
+                          font-size: 16px; position: static; min-height: 18vh; width: 100%; opacity: 0;}",
+           
+               
+               ".landing-page-button-about {text-align:center;
+               background-image:none; color: black; white-space: normal; border-radius: 0; border:0px;
+               font-size: 14px; position: static; height: 7vh; width: 100%; opacity:0;}",
+               ".landing-page-button:hover , .landing-page-button:active , .landing-page-button-about:hover, .landing-page-button-about:active {opacity: 1; 
+               background-color: #fff; /* fallback */
+               background-color: rgba(255, 255, 255, 0.8);
+               color: darkblue;
+               border-color: #fff; /* fallback */
+               border-color: rgba(255, 255, 255, 0.8); transition: background-color 0.3s ease-in,
+               color 0.3s ease-in;}",
                #landing-page column 
                ".landing-page-column {padding-right:3vh}",
                #landing-page icons
