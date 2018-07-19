@@ -7,6 +7,183 @@
 
 ## Define a server for the Shiny app
 function(input, output, session) {
+  ################################################################
+  #    MoDAL
+  ################################################################
+  #Welcome Modal
+  showModal(modalDialog(
+    br(),
+    p(img(src="scotpho_reduced.png", height=100)),
+    br(),
+    br(),
+    p(tags$h4("Welcome to the ScotPHO Profiles Tool"), tags$br(),tags$br(),tags$div(h5("This interactive tool provides access to a range of public health related indicators at different"),
+                                                                                    h5("geographies including NHS boards, council areas and health and social care partnerships.")),
+      style = "color:0E3E5D; font-size:20px"),
+    br(),
+    br(),
+    p(tags$h5("Find out more about how to get the most out of the tool")),
+    #br(),
+    actionButton("tour","Take a tour", icon("play-circle")),
+    HTML("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"),
+    #For when we make any updates in future
+    actionButton("updates","Latest updates", icon("wrench")),
+    HTML("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"),
+    modalButton("Go to the tool", icon("times-circle")),
+    size = "l", align= "center",
+    easyClose = FALSE, fade=TRUE, footer = NULL
+  ))
+  
+  #"Take a Tour" Modal - first window
+  observeEvent(input$tour, {
+    showModal(modalDialog(
+      fluidRow( 
+        column(12,
+               p(tags$div(" To begin, select the visualisation you want to see", style = "color:0E3E5D; font-size:20px; width: 90%; text-align: left;")),
+               br(), tags$h5("There are different ways to navigate around the tool.", style = "width: 90%; text-align: left; " ), br(), br())), 
+      fluidRow(
+        column(5, offset=1,tags$h5("You can select visualisations via the tabs at the top of the page")),
+        column(3, br(), img(src="tabs_select.png", height=43, width=400))),
+      fluidRow(
+        column(6, br(), br(), br(), br(), tags$a(img(src="landing_select.png", height=150, width=250, align="right"))),
+        column(4, br(), br(), br(),br(),  br(), br(), br(), br(), tags$h5("Or select to view a visualisation using the option buttons shown on the Home Page"))),
+      fluidRow(
+        column(5, offset=1,  br(), br(), br(), br(), br(), h5("To return to the profiles Home Page at any point just click on the house button at the top of the page."),
+               h5("Clicking on the ScotPHO logo will take you to the main ScotPHO website.")),
+        column(3,br(),br(), br(), br(), br(), br(), br(), img(src="home_select.png", height=50, width=300))
+      ),
+      br(),
+      br(),
+      actionButton("next1","Next", icon("play-circle")),
+      HTML("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"),
+      modalButton("Exit", icon("times-circle")),
+      size = "l", align= "center",
+      easyClose = FALSE, fade=TRUE, footer = NULL
+    ))
+  })
+  
+  #"Take a Tour" Modal - second window
+  observeEvent(input$next1, {
+    showModal(modalDialog(
+      fluidRow(
+        column(12,
+               p(tags$div("Next use the menus to select the data you want to see", style = "color:0E3E5D; font-size:20px; width: 90%; text-align: left; ")),                 
+               br(),
+               br(),
+               p(tags$h5("Some of our visualisations allow you to look at a predefined set of indicators related to a particular topic or profile e.g. ‘health and wellbeing’ or ‘children and young people’,
+                         while others are designed to look at a single indicator in more detail. Using menus next to a visualisation you can select the area you are interested in and the time period.", style = "width: 90%; text-align: left; "))),
+        column(6,
+               br(),
+               br(),
+               br(),
+               br(),
+               br(),
+               tags$h5("Use the drop-down menus to select filters of interest",  style="width:300px; "),
+               p(tags$a(img(src="select_indic_single.png", height=200, width=300))),
+               br()
+        ),
+        column(6,
+               br(),
+               br(),
+               br(),
+               p(tags$a(img(src="select_indicator.png", height=180, width=260))),
+               p(tags$h5("Some fields may allow for multiple entries and most fields can be searched by typing into the field, as well as scrolling down the list of options", style = "width: 350px")),
+               p(tags$a(img(src="type_select.png", height=180, width=260))),
+               br()
+        )),
+      br(),
+      p(tags$h5("For more information about geographic areas within Scotland, please refer to" , tags$a(href="http://statistics.gov.scot/home", "statistics.gov.scot.", 
+                                                                                                        class="externallink"))),
+      br(),
+      actionButton("next2","Next", icon("play-circle")),
+      HTML("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"),
+      modalButton("Exit", icon("times-circle")),
+      size = "l", align= "center",
+      easyClose = FALSE, fade=TRUE, footer = NULL
+               ))
+  })
+  
+  
+  #"Take a Tour" Modal - third window
+  observeEvent(input$next2, {
+    showModal(modalDialog(
+      fluidRow(
+        column(12,
+               p(tags$div("Finally, save the visualisation or download data", style = "color:0E3E5D; font-size:20px; width: 90%; text-align: left; ")),                 
+               br(),
+               br(),
+               p(tags$h5("Our tool allows you to download the visualisation images and the data behind them.", style = "width: 90%; text-align: left; "))),
+        column(6,
+               br(),
+               br(),
+               br(),
+               tags$h5("Charts displayed can be saved by clicking on the ‘Save chart’ button",  style="width:300px; "),
+               p(tags$a(img(src="save_chart2.png", height=60, width=230))),
+               br()
+        ),
+        column(6,
+               br(),
+               br(),
+               br(),
+               p(tags$h5("The raw data used to draw a chart can also be downloaded in csv format", style = "width: 350px")),
+               p(tags$a(img(src="save.png", height=60, width=230))),
+               br()
+        )),
+      br(),
+      p(tags$h5("The ", tags$b("'Table'")," tab within our tool allows users to quickly and easily download larger selections of data covering multiple area or multiple indicators.", style = "width: 750px")),
+      br(),
+      actionButton("next3","Next", icon("play-circle")),
+      HTML("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"),
+      modalButton("Exit", icon("times-circle")),
+      size = "l", align= "center",
+      easyClose = FALSE, fade=TRUE, footer = NULL
+    ))
+  })
+  
+  #"See latest updates" Modal window - Activate if Update is carried out once rolled out live to users
+  observeEvent(input$updates, {
+    showModal(modalDialog(
+      fluidRow(
+        column(12,
+               p(tags$div("We are continuously developing our tool", style = "color:0E3E5D; font-size:20px; width: 90%; text-align: left; ")),                 
+               br(),
+               br(),
+               p(tags$h5("Some new exciting features that have been added to our tool include:", style = "width: 90%; text-align: left; "))),
+        column(12,
+               tags$ul(tags$li(tags$h5("You can now filter by Alcohol and drug partnerships, for indicators where data is available")   
+               )))),
+      br(),
+      p(tags$h5("Thanks for stopping by!")),
+      p(tags$h5("For any further questions or other developments you would like to suggest for our current tool, please contact us at", tags$a(href="mailto:ScotPHO@nhs.net", "ScotPHO@nhs.net", class="externallink"), style = "width: 700px")),
+      br(),
+      modalButton("Exit", icon("times-circle")),
+      size = "l", align= "center",
+      easyClose = FALSE, fade=TRUE, footer = NULL
+    ))
+  })
+  
+  #"Take a Tour" Modal - last window  
+  observeEvent(input$next3, {
+    showModal(modalDialog(
+      fluidRow(
+        column(12,
+               p(tags$div("Please note", style = "color:0E3E5D; font-size:20px; width: 90%; text-align: left; ")))),          
+      br(),
+      p(tags$h5("The profiles are intended to increase understanding of local health and social issues and to prompt further investigation, rather than to be used as a performance management tool.
+        The information needs to be interpreted within a local framework; an indicator may be higher or lower in one area compared to another, but local knowledge is needed to understand and interpret differences.", style = "width: 700px")),
+      br(),
+      br(),
+      br(),
+      p(tags$h5("If you require any further information by bespoke geographies or have any questions regarding the tool, please", tags$a(href="mailto:ScotPHO@nhs.net", "contact us.", class="externallink"), style = "width: 600px")),
+      br(),
+      br(),
+      p(tags$h5("Please also note this tool is being continuously developed and we welcome any ", tags$a(href="mailto:ScotPHO@nhs.net", "feedback", class="externallink"), " you may have on it.", style = "width: 600px")),
+      br(),
+      modalButton("Exit", icon("times-circle")),
+      size = "l", align= "center",
+      easyClose = FALSE, fade=TRUE, footer = NULL
+    ))
+  })
+  
   ###############################################.
   ## Landing page ----
   ###############################################.
