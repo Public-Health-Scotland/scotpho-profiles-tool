@@ -140,6 +140,7 @@ adp_name <- sort(geo_lookup$areaname[geo_lookup$areatype=="Alcohol & drug partne
 intzone_name <- sort(geo_lookup$areaname[geo_lookup$areatype=="Intermediate zone"]) 
 partnership_name <- sort(geo_lookup$areaname[geo_lookup$areatype=="HSC Partnership"]) 
 locality_name <- sort(geo_lookup$areaname[geo_lookup$areatype=="HSC Locality"]) 
+adp_name <- sort(geo_lookup$areaname[geo_lookup$areatype=="Alcohol & drug partnership"])
 
 #year of indicators
 min_year <- min(optdata$year)
