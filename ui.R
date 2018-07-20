@@ -214,7 +214,7 @@ tabPanel(
 ###############################################.
 tabPanel(title = "Profile Summary", icon = icon("adjust"), value = "ring",
          #Need to have the output in the ui to get the conditional Panel working
-         span(textOutput("help_ring"), style="color:white; font-size:1px"), 
+         #span(textOutput("help_ring"), style="color:white; font-size:1px"), 
          sidebarPanel(width=3,
                       selectInput("profile_ring", "Profile", choices= profile_list, multiple=FALSE, selected = "HWB"),
                       uiOutput("geotype_ui_ring"),
@@ -329,8 +329,8 @@ tabPanel("Barcode", icon = icon("barcode"), value = "barcode",
                       savechart_button('download_barplot', 'Save chart',  class = "down")
          ),
          mainPanel(width=9,
-                   p(tags$b("The chart below shows how indicator values for different geographical areas compare. "), style= "font-size:12px;"),
-                   htmlOutput("topic_selected"),
+                   #p(tags$b("The chart below shows how indicator values for different geographical areas compare. "), style= "font-size:12px;"),
+                   #htmlOutput("topic_selected"),
                    uiOutput("ui_bar_plot")
          )
 ),
@@ -534,7 +534,7 @@ tabPanel("Table", icon = icon("table"), value = "table",
                     conditionalPanel(
                       condition = "input.iz == true",
                       selectizeInput("iz_parent", label = "Filter list by HSC Partnership",
-                                     width = "229px", choices = parent_geo_list, selected = NULL, multiple=FALSE, options = list(placeholder = "Select or type intermediate zone of interest")),
+                                     width = "229px", choices = parent_geo_list, selected = "Show all", multiple=FALSE),
                       conditionalPanel(
                         condition = "input.iz_parent != 'Show all'",
                         checkboxInput("iz_parent_all",label = "Select all intermediate zones in this area", value = FALSE)),
@@ -550,7 +550,7 @@ tabPanel("Table", icon = icon("table"), value = "table",
                     conditionalPanel(
                       condition = "input.hscl == true",
                       selectizeInput("hscl_parent", label = "Filter list by HSC Partnership",
-                                     width = "229px", choices = parent_geo_list, selected = NULL, multiple=FALSE, options = list(placeholder = "Select or type HSC locality of interest")),
+                                     width = "229px", choices = parent_geo_list, selected = "Show all", multiple=FALSE),
                       conditionalPanel(
                         condition = "input.hscl_parent != 'Show all'",
                         checkboxInput("hscl_parent_all",label = "Select all HSC localities in this area", value = FALSE)),
