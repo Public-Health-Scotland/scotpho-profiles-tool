@@ -97,7 +97,7 @@ navbarPage(id = "intabset", #needed for landing page
 ## Landing page ----
 ###############################################.
 tabPanel(
-  title = " ", icon = icon("home", "home-icon"),
+  title = "Home", icon = icon("home", "home-icon"),
   mainPanel(
     width = 11, style="margin-left:4%; margin-right:4%",
     fluidRow(h4("Welcome to the ScotPHO profiles", style="margin-top:0px;")),
@@ -167,7 +167,7 @@ tabPanel(
       column(4, class="landing-page-column",
              div(class="landing-page-box", style="background-image: url(table_4.png);
                  background-repeat: no-repeat; background-size: 35%; background-position: bottom 30px center ;background-color: white;", 
-                 div("Table", class = "landing-page-box-title"),
+                 div("Data", class = "landing-page-box-title"),
                  actionButton('jump_to_table', 'View and download the data behind the tool', 
                               class="landing-page-button", 
                               icon = icon("arrow-circle-right", "icon-lp"))
@@ -475,7 +475,7 @@ tabPanel("Map", icon = icon("globe"), value = "map",
 ###############################################.
 ## Table ----
 ###############################################.
-tabPanel("Table", icon = icon("table"), value = "table",
+tabPanel("Data", icon = icon("table"), value = "table",
          #Sidepanel for filtering data
          mainPanel(
            width = 12, style="margin-left:0.5%; margin-right:0.5%",
