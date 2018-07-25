@@ -105,7 +105,7 @@ tabPanel(
     fluidRow(
       #Ring plot box
       column(4, class="landing-page-column",
-             div(class="landing-page-box", style="background-image: url(donut9.png);
+             div(class="landing-page-box", style="background-image: url(donut_graphics.jpg);
                  background-repeat: no-repeat; background-size: 35%; background-position: bottom 20px center; ;background-color: white;",
                  div("Profile Summary", class = "landing-page-box-title"),
                  actionButton('jump_to_ring', 'A high level view of an area across a suit of indicators', 
@@ -113,14 +113,14 @@ tabPanel(
                               icon = icon("arrow-circle-right", "icon-lp")))),
       #Heat map box
       column(4, class="landing-page-column",
-             div(class="landing-page-box", style="background-image: url(heatmap.png);
+             div(class="landing-page-box", style="background-image: url(heatmap_graphics.jpg);
                  background-repeat: no-repeat; background-size: 30%; background-position: bottom 25px center ;background-color: white;",
                  div("Topic Summary: Time Trends", class = "landing-page-box-title"),
                  actionButton('jump_to_heat', 'Explore how indicators for a topic area have changed over time', 
                               class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp")))),
       #Barcode plot box
       column(4, class="landing-page-column",
-             div(class="landing-page-box", style="background-image: url(barcode_2.png);
+             div(class="landing-page-box", style="background-image: url(barcode_graphics.jpg);
                  background-repeat: no-repeat; background-size: 60%; background-position: bottom 25px center ;background-color: white;",
                  div("Topic Summary: Geographic Distribution", class = "landing-page-box-title"),
                  actionButton('jump_to_barcode', 'Explore how indicators for a topic compare across different geographies',
@@ -131,7 +131,7 @@ tabPanel(
     fluidRow(
       #Trend plot box
       column(4, class="landing-page-column",
-             div(class="landing-page-box", style="background-image: url(trend_2.png);
+             div(class="landing-page-box", style="background-image: url(timetrend_graphics.jpg);
                  background-repeat: no-repeat; background-size: 85%; background-position: center ;background-color: white; ",
                  div("Trend", class = "landing-page-box-title"),
                  actionButton('jump_to_trend', 'Look at how an indicator changes over time',
@@ -139,14 +139,14 @@ tabPanel(
                               icon = icon("arrow-circle-right", "icon-lp")))),
       #Rank plot box
       column(4, class="landing-page-column",
-             div(class="landing-page-box", style="background-image: url(rank_4.png);
+             div(class="landing-page-box", style="background-image: url(rank_graphics.jpg);
                  background-repeat: no-repeat; background-size: 55%; background-position: bottom 20px center ;background-color: white;",
                  div("Rank", class = "landing-page-box-title"),
                  actionButton('jump_to_rank', 'Compare geographical variation for an indicator using a bar chart', 
                               class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp")))),
       #Map plot box
       column(4, class="landing-page-column",
-             div(class="landing-page-box", style="background-image: url(map_colourr.png);
+             div(class="landing-page-box", style="background-image: url(map_graphics.jpg);
                  background-repeat: no-repeat; background-size: 44%; background-position: center ;background-color: white; ",
                  div("Map", class = "landing-page-box-title"),
                  actionButton('jump_to_map', 'Compare geographical variation for an indicator using a map', 
@@ -165,7 +165,7 @@ tabPanel(
     fluidRow(
       #Table box 
       column(4, class="landing-page-column",
-             div(class="landing-page-box", style="background-image: url(table_4.png);
+             div(class="landing-page-box", style="background-image: url(datatable_graphics.jpg);
                  background-repeat: no-repeat; background-size: 35%; background-position: bottom 30px center ;background-color: white;", 
                  div("Data", class = "landing-page-box-title"),
                  actionButton('jump_to_table', 'View and download the data behind the tool', 
@@ -174,7 +174,7 @@ tabPanel(
              )),
       #About box
       column(4, class="landing-page-column",
-             div(class="landing-page-box-about", style="background-image: url(info_yellow.png);
+             div(class="landing-page-box-about", style="background-image: url(about_graphics.jpg);
                  background-repeat: no-repeat; background-size: 15%; background-position: bottom 6px center ;background-color: white;", 
                  div("About", class = "landing-page-box-title"),
                  actionButton('jump_to_about', 'About ScotPHO Profiles', 
