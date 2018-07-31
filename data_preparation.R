@@ -192,16 +192,16 @@ ind_lookup<- read_csv(paste(lookups, "indicator_lookup.csv", sep = "")) %>%
 optdata <- read_csv(paste(basefiles, "All Data for Shiny.csv", sep = ""),
                     col_types = cols(NUMERATOR = col_number()))
 
-#TEMPORARY FIX. dealing with change in ca, hb and hscp codes
-optdata$code <- recode(as.character(optdata$code), 
-                          "S12000015"='S12000047', "S12000024"='S12000048', 
-                          "S08000018"='S08000029', "S08000027"= 'S08000030', 
-                          "S37000014"='S37000032', "S37000023"='S37000033')
-
 optdata <- optdata %>%
   setNames(tolower(names(.)))%>% #names to lower case
   rename(ind_id = indicator_id, code = geography_code) %>% 
   mutate_if(is.character,factor) #converting characters into factors
+
+#TEMPORARY FIX. dealing with change in ca, hb and hscp codes
+optdata$code <- as.factor(recode(as.character(optdata$code), 
+                       "S12000015"='S12000047', "S12000024"='S12000048', 
+                       "S08000018"='S08000029', "S08000027"= 'S08000030', 
+                       "S37000014"='S37000032', "S37000023"='S37000033'))
 
 #Merging with indicator and geography information
 optdata <- left_join(x=optdata, y=ind_lookup, by=c("ind_id"))
