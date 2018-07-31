@@ -46,6 +46,12 @@ geo_lookup<- read_spss(paste(lookups, "code_dictionary.sav", sep="")) %>%
                                                 ifelse(substr(code, 1, 3) == "S37", "HSC Partnership",
                                                        ifelse(substr(code, 1, 3) == "S02", "Intermediate zone", "Error")))))))) 
 
+#TEMPORARY FIX. dealing with change in ca, hb and hscp codes
+geo_lookup$code <- recode(as.character(geo_lookup$code), 
+                    "S12000015"='S12000047', "S12000024"='S12000048', 
+                    "S08000018"='S08000029', "S08000027"= 'S08000030', 
+                    "S37000014"='S37000032', "S37000023"='S37000033')
+
 #Changing ands for & to reduce issues with long labels
 #and " - " for "-"
 geo_lookup$areaname <- gsub(" and ", " & ", geo_lookup$areaname)
@@ -185,6 +191,12 @@ ind_lookup<- read_csv(paste(lookups, "indicator_lookup.csv", sep = "")) %>%
 ###############################################.   
 optdata <- read_csv(paste(basefiles, "All Data for Shiny.csv", sep = ""),
                     col_types = cols(NUMERATOR = col_number()))
+
+#TEMPORARY FIX. dealing with change in ca, hb and hscp codes
+optdata$code <- recode(as.character(optdata$code), 
+                          "S12000015"='S12000047', "S12000024"='S12000048', 
+                          "S08000018"='S08000029', "S08000027"= 'S08000030', 
+                          "S37000014"='S37000032', "S37000023"='S37000033')
 
 optdata <- optdata %>%
   setNames(tolower(names(.)))%>% #names to lower case
