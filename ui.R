@@ -51,7 +51,7 @@ navbarPage(id = "intabset", #needed for landing page
                           padding-left: 5px; padding-right: 5px;}",
                           #Style for download buttons
                           ".down{background-color:#4da6ff; color: white; background-image:none; min-width: 20vh;
-                          font-size: 11px; padding: 5px 10px; margin-top: 5px; margin-left: 3px}",
+                          font-size: 14px; padding: 5px 10px; margin-top: 5px; margin-left: 3px}",
                           #landing page boxes
                           ".landing-page-box {width:100%; height:100%; min-height:18vh; background-color:AliceBlue;
                           border: 1px solid #AAAAAA; margin-bottom: 5px; float: left; transition: 0.5s ease;}",
@@ -97,7 +97,7 @@ navbarPage(id = "intabset", #needed for landing page
 ## Landing page ----
 ###############################################.
 tabPanel(
-  title = "Home", icon = icon("home", "home-icon"),
+  title = " Home", icon = icon("home", "home-icon"),
   mainPanel(
     width = 11, style="margin-left:4%; margin-right:4%",
     fluidRow(h4("Welcome to the ScotPHO profiles", style="margin-top:0px;")),
@@ -105,24 +105,24 @@ tabPanel(
     fluidRow(
       #Ring plot box
       column(4, class="landing-page-column",
-             div(class="landing-page-box", style="background-image: url(donut_graphics.jpg);
-                 background-repeat: no-repeat; background-size: 35%; background-position: bottom 20px center; ;background-color: white;",
+             div(class="landing-page-box", style="background-image: url(donut_10.png);
+                 background-repeat: no-repeat; background-size: 38%; background-position: bottom 23px center; background-color: white;",
                  div("Profile Summary", class = "landing-page-box-title"),
                  actionButton('jump_to_ring', 'A high level view of an area across a suit of indicators', 
                               class="landing-page-button", 
                               icon = icon("arrow-circle-right", "icon-lp")))),
       #Heat map box
       column(4, class="landing-page-column",
-             div(class="landing-page-box", style="background-image: url(heatmap_graphics.jpg);
-                 background-repeat: no-repeat; background-size: 30%; background-position: bottom 25px center ;background-color: white;",
-                 div("Topic Summary: Time Trends", class = "landing-page-box-title"),
+             div(class="landing-page-box", style="background-image: url(heatmap_2.png);
+                 background-repeat: no-repeat; background-size: 60%; background-position: bottom 30px center ;background-color: white;",
+                 div("Heatmap", class = "landing-page-box-title"),
                  actionButton('jump_to_heat', 'Explore how indicators for a topic area have changed over time', 
                               class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp")))),
       #Barcode plot box
       column(4, class="landing-page-column",
-             div(class="landing-page-box", style="background-image: url(barcode_graphics.jpg);
-                 background-repeat: no-repeat; background-size: 60%; background-position: bottom 25px center ;background-color: white;",
-                 div("Topic Summary: Geographic Distribution", class = "landing-page-box-title"),
+             div(class="landing-page-box", style="background-image: url(barcode_3.png);
+                 background-repeat: no-repeat; background-size: 50%; background-position: bottom 25px center ;background-color: white;",
+                 div("Barcode", class = "landing-page-box-title"),
                  actionButton('jump_to_barcode', 'Explore how indicators for a topic compare across different geographies',
                               class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp"))))
     ),
@@ -131,23 +131,23 @@ tabPanel(
     fluidRow(
       #Trend plot box
       column(4, class="landing-page-column",
-             div(class="landing-page-box", style="background-image: url(timetrend_graphics.jpg);
-                 background-repeat: no-repeat; background-size: 85%; background-position: center ;background-color: white; ",
+             div(class="landing-page-box", style="background-image: url(time_trend.png);
+                 background-repeat: no-repeat; background-size: 61%; background-position: bottom 25px center ;background-color: white; ",
                  div("Trend", class = "landing-page-box-title"),
                  actionButton('jump_to_trend', 'Look at how an indicator changes over time',
                               class="landing-page-button", 
                               icon = icon("arrow-circle-right", "icon-lp")))),
       #Rank plot box
       column(4, class="landing-page-column",
-             div(class="landing-page-box", style="background-image: url(rank_graphics.jpg);
-                 background-repeat: no-repeat; background-size: 55%; background-position: bottom 20px center ;background-color: white;",
+             div(class="landing-page-box", style="background-image: url(rank_5.png);
+                 background-repeat: no-repeat; background-size: 63%; background-position: bottom 25px center ;background-color: white;",
                  div("Rank", class = "landing-page-box-title"),
                  actionButton('jump_to_rank', 'Compare geographical variation for an indicator using a bar chart', 
                               class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp")))),
       #Map plot box
       column(4, class="landing-page-column",
-             div(class="landing-page-box", style="background-image: url(map_graphics.jpg);
-                 background-repeat: no-repeat; background-size: 44%; background-position: center ;background-color: white; ",
+             div(class="landing-page-box", style="background-image: url(map_2.png);
+                 background-repeat: no-repeat; background-size: 54%; background-position: bottom 25px center ;background-color: white; ",
                  div("Map", class = "landing-page-box-title"),
                  actionButton('jump_to_map', 'Compare geographical variation for an indicator using a map', 
                               class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp"))))
@@ -165,8 +165,8 @@ tabPanel(
     fluidRow(
       #Table box 
       column(4, class="landing-page-column",
-             div(class="landing-page-box", style="background-image: url(datatable_graphics.jpg);
-                 background-repeat: no-repeat; background-size: 35%; background-position: bottom 30px center ;background-color: white;", 
+             div(class="landing-page-box", style="background-image: url(data_table.png);
+                 background-repeat: no-repeat; background-size: 57%; background-position: bottom 20px center ;background-color: white;", 
                  div("Data", class = "landing-page-box-title"),
                  actionButton('jump_to_table', 'View and download the data behind the tool', 
                               class="landing-page-button", 
@@ -174,16 +174,16 @@ tabPanel(
              )),
       #About box
       column(4, class="landing-page-column",
-             div(class="landing-page-box-about", style="background-image: url(about_graphics.jpg);
-                 background-repeat: no-repeat; background-size: 15%; background-position: bottom 6px center ;background-color: white;", 
+             div(class="landing-page-box-about", style="background-image: url(about_2.png);
+                 background-repeat: no-repeat; background-size: 14%; background-position: bottom 7px center ;background-color: white;", 
                  div("About", class = "landing-page-box-title"),
-                 actionButton('jump_to_about', 'About ScotPHO Profiles', 
+                 actionButton('jump_to_about', 'About ScotPHO', 
                               class="landing-page-button-about", 
                               icon = icon("arrow-circle-right", "icon-lp"))
              ),
              #Evidence box
-             div(class="landing-page-box-about", style="background-image: url(link_yellow.png);
-                 background-repeat: no-repeat; background-size: 15%; background-position: bottom 6px center ;background-color: white;", 
+             div(class="landing-page-box-about", style="background-image: url(other_profile.png);
+                 background-repeat: no-repeat; background-size: 18%; background-position: bottom 7px center ;background-color: white;", 
                  div("Related Links", class = "landing-page-box-title" ),
                  actionButton('jump_to_evidence', 'Links to websites or documents with useful profiles information', 
                               class="landing-page-button-about", 
@@ -191,16 +191,16 @@ tabPanel(
       ),
       #Resources box
       column(4, class="landing-page-column", 
-             div(class="landing-page-box-about", style="background-image: url(book_dark.png);
-                 background-repeat: no-repeat; background-size: 15%; background-position: bottom 6px center ;background-color: white;", 
+             div(class="landing-page-box-about", style="background-image: url(technical_resources.png);
+                 background-repeat: no-repeat; background-size: 21%; background-position: bottom 7px center ;background-color: white;", 
                  div("Technical Resources", class = "landing-page-box-title"),
                  actionButton('jump_to_resources', 'Find technical information about the ScotPHO profile definitions and methodology', 
                               class="landing-page-button-about", 
                               icon = icon("arrow-circle-right", "icon-lp"))
              ),
              #Other profiles
-             div(class="landing-page-box-about", style="background-image: url(external_link.png);
-                 background-repeat: no-repeat; background-size: 15%; background-position: bottom 6px center ;background-color: white;", 
+             div(class="landing-page-box-about", style="background-image: url(related_links.png);
+                 background-repeat: no-repeat; background-size: 19%; background-position: bottom 7px center ;background-color: white;", 
                  div("Other profiles", class = "landing-page-box-title"),
                  actionButton('jump_to_others', 'Links to alternative profiling tools', 
                               class="landing-page-button-about", 
@@ -213,8 +213,6 @@ tabPanel(
 ## Ring plot ----
 ###############################################.
 tabPanel(title = "Profile Summary", icon = icon("adjust"), value = "ring",
-         #Need to have the output in the ui to get the conditional Panel working
-         #span(textOutput("help_ring"), style="color:white; font-size:1px"), 
          sidebarPanel(width=3,
                       selectInput("profile_ring", "Profile", choices= profile_list, multiple=FALSE, selected = "HWB"),
                       uiOutput("geotype_ui_ring"),
@@ -226,9 +224,9 @@ tabPanel(title = "Profile Summary", icon = icon("adjust"), value = "ring",
                       uiOutput("geoname_ui_ring"),
                       br(),
                       p("This visualisation allows you to compare one area to another area or the same area over time"),
-                      radioButtons("comp_ring", label = "Compare against:",
+                      awesomeRadio("comp_ring", label = "Compare against:",
                                    choices = list("Area" = 1, "Time" = 2),
-                                   selected = 1, inline=TRUE),
+                                   selected = 1, inline=TRUE, checkbox=TRUE),
                       conditionalPanel(condition = "input.comp_ring == 1 ",
                                        selectInput("geocomp_ring", "Comparator", choices = comparator_list,
                                                    selectize=TRUE, selected = "Scotland")
@@ -236,22 +234,21 @@ tabPanel(title = "Profile Summary", icon = icon("adjust"), value = "ring",
                       conditionalPanel(condition = "input.comp_ring == 2 ",
                                        uiOutput("yearcomp_ui_ring")),
                       #Legend
-                      p(tags$b("Legend"), style="color: black;"),
-                      p(img(src='signif_better.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
+                      br(),
+                      p(img(src='signif_better.png', height=18, style="padding-right: 2px; vertical-align:middle"), 
                         "Better than comparator.", br(),
-                        img(src='non_signif.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
+                        img(src='non_signif.png', height=18, style="padding-right: 2px; vertical-align:middle"), 
                         "Not different from comparator.", br(),
-                        img(src='signif_worse.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
+                        img(src='signif_worse.png', height=18, style="padding-right: 2px; vertical-align:middle"), 
                         "Worse than comparator.", br(),
-                        img(src='signif_nocalc.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
+                        img(src='signif_nocalc.png', height=18, style="padding-right: 2px; vertical-align:middle"), 
                         "No differences can be calculated."), 
-                      # "X out of X - Denotes how many indicators within a profile domain are statistically significantly better than comparator average"),
+                      br(),
+                      actionButton("help_ring", label="Help", icon= icon('question-circle'), class ="down"),
                       br(),
                       downloadButton('download_ring', 'Download data', class = "down"),
                       br(),
                       savechart_button('download_ringplot', 'Save chart',  class = "down"),
-                      br(),
-                      actionButton("help_ring", label="Help", icon= icon('question-circle'), class ="down"),
                       br()
          ),
          mainPanel(width = 9,
@@ -290,14 +287,13 @@ tabPanel("Heatmap", icon = icon("list-ul"), value = "heat",
            ),
            column(2,
                   #Legend
-                  p(tags$b("Legend"), style="color: black;"),
-                  p(img(src='signif_better.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
+                  p(img(src='signif_better.png', height=18, style="padding-right: 2px; vertical-align:middle"), 
                     "Better than comparator.", br(),
-                    img(src='non_signif.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
+                    img(src='non_signif.png', height=18, style="padding-right: 2px; vertical-align:middle"), 
                     "Not different from comparator.", br(),
-                    img(src='signif_worse.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
+                    img(src='signif_worse.png', height=18, style="padding-right: 2px; vertical-align:middle"), 
                     "Worse than comparator.", br(),
-                    img(src='signif_nocalc.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
+                    img(src='signif_nocalc.png', height=18, style="padding-right: 2px; vertical-align:middle"), 
                     "No differences are calculated.")
            ),
            column(2,
@@ -323,14 +319,29 @@ tabPanel("Barcode", icon = icon("barcode"), value = "barcode",
                         condition = "input.geotype_bar== 'HSC Locality' | input.geotype_bar == 'Intermediate zone' ",
                         selectInput("loc_iz_bar", label = "Partnership for localities/intermediate zones", choices = partnership_name)),
                       uiOutput("geoname_ui_bar"),
-                      selectInput("geocomp_bar", "Comparator", choices = comparator_list, selectize=TRUE, selected = "Scotland"),
+                      selectInput("geocomp_bar", "Compare against", choices = comparator_list, selectize=TRUE, selected = "Scotland"),
+                      p(img(src='signif_better.png', height=18, style="padding-right: 2px; vertical-align:middle"), 
+                        "Better than comparator.", br(),
+                        img(src='non_signif.png', height=18, style="padding-right: 2px; vertical-align:middle"), 
+                        "Not different from comparator.", br(),
+                        img(src='signif_worse.png', height=18, style="padding-right: 2px; vertical-align:middle"), 
+                        "Worse than comparator.", br(),
+                        img(src='signif_nocalc.png', height=18, style="padding-right: 2px; vertical-align:middle"), 
+                        "No differences can be calculated."),
+                      br(),
+                      br(),
+                      uiOutput("ui_bar_legend_selected"),
+                      uiOutput("ui_bar_legend_comparator"),
+                      uiOutput("ui_bar_legend_areatype"),
+                      br(),
+                      br(),
                       actionButton("help_bar", label="Help", icon= icon('question-circle'), class ="down"),
                       downloadButton('download_bar', 'Download data', class = "down"),
                       savechart_button('download_barplot', 'Save chart',  class = "down")
          ),
          mainPanel(width=9,
-                   #p(tags$b("The chart below shows how indicator values for different geographical areas compare. "), style= "font-size:12px;"),
-                   #htmlOutput("topic_selected"),
+                   h4(textOutput("bar_title"), style="color: black; text-align: left"),
+                   h5(textOutput("bar_subtitle"), style="color: black; text-align: left"),
                    uiOutput("ui_bar_plot")
          )
 ),
@@ -387,7 +398,6 @@ tabPanel("Rank", icon = icon("signal"), value = "rank",
                   savechart_button('download_rankplot', 'Save chart', class = "down"),
                   shiny::hr(),
                   #Legend
-                  p(tags$b("Legend"), style="color: black;"),
                   p(img(src='signif_better.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
                     "Better than comparator.", br(),
                     img(src='non_signif.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
@@ -415,7 +425,7 @@ tabPanel("Map", icon = icon("globe"), value = "map",
            uiOutput("year_ui_map"),
            awesomeRadio("comp_map", label = "Compare against:",
                         choices = list("Area" = 1, "Time" = 2), 
-                        selected = 1, inline=TRUE),
+                        selected = 1, inline=TRUE, checkbox=TRUE),
            conditionalPanel(condition = "input.comp_map == 1 ",  
                             selectInput("geocomp_map", "Comparator", choices = comparator_list,
                                         selectize=TRUE, selected = "Scotland")
@@ -427,7 +437,6 @@ tabPanel("Map", icon = icon("globe"), value = "map",
            savechart_button('download_mapplot', 'Save map', class = "down"),
            shiny::hr(),
            #Legend
-           p(tags$b("Legend"), style="color: black;"),
            p(img(src='signif_better.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
              "Better than comparator.", br(),
              img(src='non_signif.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
