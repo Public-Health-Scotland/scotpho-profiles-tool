@@ -25,8 +25,8 @@ navbarPage(id = "intabset", #needed for landing page
                           padding: 5px; box-shadow: none; }",
                           #Background colour of header navBar
                           ".navbar-brand {background-color: white}",
-                          ".navbar {font-size: 12px; border: 0}", #font size and border
-                          ".dropdown-menu { font-size: 12px;}", #dropdown menu within navBar
+                          ".navbar {font-size: 14px; border: 0}", #font size and border
+                          ".dropdown-menu { font-size: 14px;}", #dropdown menu within navBar
                           ".container-fluid {padding-right: 0px}",
                           #Text size and line height. Padding needed for footer
                           "body { font-size: 11px; line-height: 1.1; padding-bottom:30px}",
@@ -276,7 +276,7 @@ tabPanel("Heatmap", icon = icon("list-ul"), value = "heat",
            column(2,
                   awesomeRadio("comp_heat", label = "Compare against:",
                                choices = list("Area" = 1, "Time" = 2), 
-                               selected = 1, inline=TRUE),
+                               selected = 1, inline=TRUE, checkbox = TRUE),
                   conditionalPanel(condition = "input.comp_heat == 1 ",  
                                    selectInput("geocomp_heat", "Comparator", choices = comparator_list,
                                                selectize=TRUE, selected = "Scotland")
