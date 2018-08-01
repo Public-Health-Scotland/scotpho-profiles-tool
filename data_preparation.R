@@ -203,6 +203,16 @@ optdata$code <- as.factor(recode(as.character(optdata$code),
                        "S08000018"='S08000029', "S08000027"= 'S08000030', 
                        "S37000014"='S37000032', "S37000023"='S37000033'))
 
+#Dealing with lack of update_date for HSCP and HSC locality
+update_table <- optdata %>% select(c(ind_id, update_date)) %>% distinct() %>% 
+  subset(!is.na(update_date))
+update_table$update_date <- as.Date(update_table$update_date,"%m/%d/%Y")
+update_table <- update_table %>% group_by(ind_id) %>% top_n(1, update_date) %>% ungroup()
+
+optdata <- optdata %>% select(-update_date)
+
+optdata <- left_join(x=optdata, y=update_table, by=c("ind_id"))
+
 #Merging with indicator and geography information
 optdata <- left_join(x=optdata, y=ind_lookup, by=c("ind_id"))
 optdata <- left_join(x=optdata, y=geo_lookup, by=c("code")) 
