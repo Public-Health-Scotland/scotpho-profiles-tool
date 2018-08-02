@@ -61,6 +61,10 @@ geo_lookup$areaname <- gsub(" - ", "-", geo_lookup$areaname)
 geo_parents <- read_spss(paste(lookups, "IZtoPartnership_parent_lookup.sav", sep="")) %>% 
   setNames(tolower(names(.)))  #variables to lower case
 
+#TEMPORARY FIX. dealing with change in ca, hb and hscp codes
+geo_parents$hscp_partnership <- recode(as.character(geo_parents$hscp_partnership), 
+                          "S37000014"='S37000032', "S37000023"='S37000033')
+
 #Creating parent geography for IZ level.
 geo_par_iz <- geo_parents %>% 
   select(c(intzone2011, hscp_partnership)) %>% 
