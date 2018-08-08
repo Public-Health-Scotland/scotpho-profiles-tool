@@ -69,7 +69,7 @@ function(input, output, session) {
                p(tags$div("Next use the menus to select the data you want to see", style = "color:0E3E5D; font-size:20px; width: 90%; text-align: left; ")),                 
                br(),
                br(),
-               p(tags$h5("Some of our visualisations allow you to look at a predefined set of indicators related to a particular topic or profile e.g. ‘health and wellbeing’ or ‘children and young people’,
+               p(tags$h5("Some of our visualisations allow you to look at a predefined set of indicators related to a particular domain or profile e.g. ‘health and wellbeing’ or ‘children and young people’,
                          while others are designed to look at a single indicator in more detail. Using menus next to a visualisation you can select the area you are interested in and the time period.", style = "width: 90%; text-align: left; "))),
         column(6,
                br(),
@@ -262,7 +262,7 @@ function(input, output, session) {
   
   # Reactive controls for profile summary:area name depending on areatype selected
   output$geoname_ui_ring <- renderUI({
-    areas_ring <- if (input$geotype_ring %in% c("Health board", "Council area", "HSC Partnership", "Alcohol & drug partnership"))
+    areas_ring <- if (input$geotype_ring %in% c("Health board", "Council area", "HSC partnership", "Alcohol & drug partnership"))
     {
       sort(geo_lookup$areaname[geo_lookup$areatype == input$geotype_ring])
     } else {
@@ -380,11 +380,12 @@ function(input, output, session) {
     fill_colour <- scale_fill_manual(name = "flag",values = fillcolours)
     
     #create title and subtitle variables
-    ring_title <- paste("ScotPHO ",input$profile_ring," Profile",sep="")
+    ring_title <- paste0(names(profile_list[unname(profile_list) == input$profile_ring])
+                        " profile")
     ring_subtitle <- if(input$comp_ring == 1){
-      paste(input$geoname_ring," (",input$geotype_ring,") compared against ",input$geocomp_ring,sep="")
+      paste0(input$geoname_ring," (",input$geotype_ring,") compared against ",input$geocomp_ring)
     }else if(input$comp_ring==2){
-      paste("Comparator geography: ",input$geoname_ring,"(",input$yearcomp_ring,")",sep="")
+      paste0("Comparator geography: ",input$geoname_ring,"(",input$yearcomp_ring,")")
     }
     
     ggplot(ring, aes(fill=flag, ymax=ymax, ymin=ymin, xmax=4.5, xmin=1.5)) +
@@ -405,7 +406,7 @@ function(input, output, session) {
       facet_wrap(~ring$domain,labeller = label_wrap_gen(multi_line = TRUE)) +
       coord_polar(theta="y") +
       theme(
-        strip.text.x = element_text(size=16,colour='#555555',family="Helvetica Neue,Helvetica,Arial,sans-serif"),
+        strip.text.x = element_text(size=14,colour='#555555',family="Helvetica Neue,Helvetica,Arial,sans-serif"),
         strip.background = element_blank())+
       xlim(c(0,4.5))
   }
@@ -450,7 +451,7 @@ function(input, output, session) {
                                            content = function(file) { write.csv(ring_csv(), file, row.names=FALSE) })
   # Downloading chart  
   output$download_ringplot <- downloadHandler(
-    filename = 'Profile_Summary.png',
+    filename = 'Profile_summary.png',
     content = function(file){
       ggsave(file, plot = plot_ring(), device = "png",height = 15,width=15, limitsize=FALSE)
     })
@@ -486,7 +487,7 @@ function(input, output, session) {
   output$geoname_ui_heat <- renderUI({
     
     areas_heat <- if (input$geotype_heat %in% c("Health board", "Council area", 
-                                                "HSC Partnership", "Scotland", "Alcohol & drug partnership"))
+                                                "HSC partnership", "Scotland", "Alcohol & drug partnership"))
       {
       sort(geo_lookup$areaname[geo_lookup$areatype == input$geotype_heat])
       } else {
@@ -697,7 +698,7 @@ function(input, output, session) {
     output$geoname_ui_bar <- renderUI({
       
       areas_bar <- if (input$geotype_bar %in% c("Health board", "Council area", 
-                                                  "Alcohol & drug partnership", "HSC Partnership"))
+                                                  "Alcohol & drug partnership", "HSC partnership"))
       {
         sort(geo_lookup$areaname[geo_lookup$areatype == input$geotype_bar])
       } else {
@@ -900,7 +901,8 @@ function(input, output, session) {
     }) 
     
     output$bar_title <- renderText({
-      paste("ScotPHO ",input$profile_bar," Profile: ",input$topic_bar,sep="")
+      paste(names(profile_list[unname(profile_list) == input$profile_bar]),
+            " profile: ", input$topic_bar,sep="")
     })
     
     output$bar_subtitle <- renderText({
@@ -952,10 +954,10 @@ function(input, output, session) {
 # Reactive controls
   #Controls for chart. Dynamic selection of locality and iz.
   output$loc_ui_trend <- renderUI({
-    selectInput("locname_trend", "HSC Locality", 
+    selectInput("locname_trend", "HSC locality", 
                 choices = c("Select localities" = "", paste(unique(geo_lookup$areaname[
                   geo_lookup$parent_area == input$loc_iz_trend &
-                    geo_lookup$areatype == 'HSC Locality' ]))),
+                    geo_lookup$areatype == 'HSC locality' ]))),
                 multiple=TRUE, selectize=TRUE, selected = "")
   })
 
@@ -978,8 +980,8 @@ function(input, output, session) {
                areaname %in% input$laname_trend & areatype == "Council area" |
                areaname %in% input$scotname_trend & areatype == "Scotland"  |
                areaname %in% input$adpname_trend  & areatype == "Alcohol & drug partnership" |
-               areaname %in% input$locname_trend  & areatype == "HSC Locality" |
-               areaname %in% input$partname_trend & areatype == "HSC Partnership"   |
+               areaname %in% input$locname_trend  & areatype == "HSC locality" |
+               areaname %in% input$partname_trend & areatype == "HSC partnership"   |
                areaname %in% input$izname_trend & areatype == "Intermediate zone") & 
                indicator == input$indic_trend) %>% 
       droplevels() 
@@ -1019,8 +1021,8 @@ function(input, output, session) {
     hb_cols <- setNames(hb_scale, unique(trend_data()$areaname_full[trend_data()$areatype == "Health board"]))
     ca_cols <- setNames(ca_scale, unique(trend_data()$areaname_full[trend_data()$areatype == "Council area"]))
     adp_cols <- setNames(adp_scale, unique(trend_data()$areaname_full[trend_data()$areatype == "Alcohol & drug partnership"]))
-    part_cols <- setNames(part_scale, unique(trend_data()$areaname_full[trend_data()$areatype == "HSC Partnership"]))
-    loc_cols <- setNames(loc_scale, unique(trend_data()$areaname_full[trend_data()$areatype == "HSC Locality"]))
+    part_cols <- setNames(part_scale, unique(trend_data()$areaname_full[trend_data()$areatype == "HSC partnership"]))
+    loc_cols <- setNames(loc_scale, unique(trend_data()$areaname_full[trend_data()$areatype == "HSC locality"]))
     iz_cols <- setNames(iz_scale, unique(trend_data()$areaname_full[trend_data()$areatype == "Intermediate zone"]))
     colorblind_cols <- c(setNames(colorblind_scale, unique(trend_data()$areaname_full)))
     
@@ -1156,7 +1158,7 @@ function(input, output, session) {
   rank_bar_data <- reactive({
     #Makes different subsets depending on the geography type selected by the user
     if (input$geotype_rank %in% c("Scotland", "Health board", "Council area", 
-                                  "Alcohol & drug partnership", "HSC Partnership"))
+                                  "Alcohol & drug partnership", "HSC partnership"))
     {
       rank_bar <-optdata %>% 
         subset(areatype == input$geotype_rank &  
@@ -1339,7 +1341,7 @@ function(input, output, session) {
   output$geotype_ui_map <- renderUI({
     areas <- sort(unique(optdata$areatype[optdata$indicator == input$indic_map]))
     #taking out areas without shapefiles
-    areas <- areas [! areas %in% c("Scotland", "HSC Locality", 
+    areas <- areas [! areas %in% c("Scotland", "HSC locality", 
                                    "Alcohol & drug partnership")]
     selectInput("geotype_map", label = "Geography level",
                 choices = areas, selected = "Health board")
@@ -1416,7 +1418,7 @@ function(input, output, session) {
       map_pol <- merge(ca_bound, map_chosenarea(), by='code')
     } else if(input$geotype_map == "Health board"){
       map_pol <- merge(hb_bound, map_chosenarea(), by='code')
-    } else if(input$geotype_map == "HSC Partnership"){
+    } else if(input$geotype_map == "HSC partnership"){
       map_pol <- merge(hscp_bound, map_chosenarea(), by='code')
     } else if(input$geotype_map == "Intermediate zone"){
       iz_bound <- iz_bound %>% subset(council == input$iz_map)
@@ -1577,7 +1579,7 @@ function(input, output, session) {
     updateCheckboxInput(session, "iz_parent_all", label = NULL, value = FALSE)
     updateSelectizeInput(session, "iz_true", label = NULL,
                          choices = intzone_name, selected = character(0), options = list(placeholder = "Select or type specific intermediate zone")) 
-    updateSelectizeInput(session, "iz_parent", label = "Filter list by HSC Partnership", selected = "Show all")})
+    updateSelectizeInput(session, "iz_parent", label = "Filter list by HSC partnership", selected = "Show all")})
   
   observeEvent(input$la=="FALSE", {
     updateSelectizeInput(session, "la_true", label = NULL,
@@ -1588,7 +1590,7 @@ function(input, output, session) {
   observeEvent(input$hscl=="FALSE", {
     updateSelectizeInput(session, "hscl_true", label = NULL,
                          choices = locality_name, selected = character(0), options = list(placeholder = "Select or type specific HSC locality"))
-    updateSelectizeInput(session, "hscl_parent", label = "Filter list by HSC Partnership", selected = "Show all")})
+    updateSelectizeInput(session, "hscl_parent", label = "Filter list by HSC partnership", selected = "Show all")})
   observeEvent(input$hscp=="FALSE", {
     updateSelectizeInput(session, "hscp_true", label = NULL,
                          choices = partnership_name, selected = character(0), options = list(placeholder = "Select or type specific HSC partnership")) })
@@ -1600,7 +1602,7 @@ function(input, output, session) {
                          choices = indicator_list, selected = character(0),
                          options = list(maxOptions = 1000, placeholder = "Click or type indicators you would like to filter by"))
     updateSelectizeInput(session,"topic_filter", label = NULL, choices = topic_list, selected = NULL,
-                         options = list(maxOptions = 1000, placeholder = "Click or type topics you would like to filter by"))
+                         options = list(maxOptions = 1000, placeholder = "Click or type domains you would like to filter by"))
     updateSelectizeInput(session,"profile_filter", label = NULL, choices = profile_list, selected = NULL,
                          options = list(maxOptions = 1000, placeholder = "Click or type profiles you would like to filter by"))
     
@@ -1616,8 +1618,8 @@ function(input, output, session) {
       } else {filtered_geo <- optdata %>% filter((areaname %in% input$iz_true & areatype == "Intermediate zone")|
                                                    (areaname %in% input$la_true & areatype == "Council area")|
                                                    (areaname %in% input$hb_true & areatype == "Health board")|
-                                                   (areaname %in% input$hscl_true & areatype == "HSC Locality")|
-                                                   (areaname %in% input$hscp_true & areatype == "HSC Partnership")|
+                                                   (areaname %in% input$hscl_true & areatype == "HSC locality")|
+                                                   (areaname %in% input$hscp_true & areatype == "HSC partnership")|
                                                    (code %in% input$code)
       ) %>% filter(year>=input$date_from[1] & year<=input$date_from[2]) %>% filter(indicator %in% input$indicator_filter)
       
@@ -1634,7 +1636,7 @@ function(input, output, session) {
       table <- filtered_geos %>% subset(select=c("code", "areaname", "areatype", "indicator","year", 
                                                  "def_period","numerator", "measure", "lowci","upci","type_definition"))
       
-      #if list of topics selected
+      #if list of domains selected
     } else if (!is.null(input$topic_filter)) { 
       if (input$all_data == TRUE) {
         filtered_geos <- optdata %>%  filter(year>=input$date_from[1] & year<=input$date_from[2]) %>% 
@@ -1642,8 +1644,8 @@ function(input, output, session) {
       } else {filtered_geo <- optdata %>% filter((areaname %in% input$iz_true & areatype == "Intermediate zone")|
                                                    (areaname %in% input$la_true & areatype == "Council area")|
                                                    (areaname %in% input$hb_true & areatype == "Health board")|
-                                                   (areaname %in% input$hscl_true & areatype == "HSC Locality")|
-                                                   (areaname %in% input$hscp_true & areatype == "HSC Partnership")|
+                                                   (areaname %in% input$hscl_true & areatype == "HSC locality")|
+                                                   (areaname %in% input$hscp_true & areatype == "HSC partnership")|
                                                    (code %in% input$code)
       ) %>% filter(year>=input$date_from[1] & year<=input$date_from[2]) %>% 
         filter((domain1 %in% input$topic_filter)|(domain2 %in% input$topic_filter)|(domain3 %in% input$topic_filter))
@@ -1669,8 +1671,8 @@ function(input, output, session) {
       } else {filtered_geo <- optdata %>% filter((areaname %in% input$iz_true & areatype == "Intermediate zone")|
                                                    (areaname %in% input$la_true & areatype == "Council area")|
                                                    (areaname %in% input$hb_true & areatype == "Health board")|
-                                                   (areaname %in% input$hscl_true & areatype == "HSC Locality")|
-                                                   (areaname %in% input$hscp_true & areatype == "HSC Partnership")|
+                                                   (areaname %in% input$hscl_true & areatype == "HSC locality")|
+                                                   (areaname %in% input$hscp_true & areatype == "HSC partnership")|
                                                    (code %in% input$code)
       ) %>% filter(year>=input$date_from[1] & year<=input$date_from[2]) %>% 
         filter((grepl((paste("^",input$profile_filter,sep="",collapse="|")),profile_domain1))|(grepl((paste("^",input$profile_filter,sep="",collapse="|")),profile_domain2)))
@@ -1694,8 +1696,8 @@ function(input, output, session) {
       } else {filtered_geo <- optdata %>% filter((areaname %in% input$iz_true & areatype == "Intermediate zone")|
                                                    (areaname %in% input$la_true & areatype == "Council area")|
                                                    (areaname %in% input$hb_true & areatype == "Health board")|
-                                                   (areaname %in% input$hscl_true & areatype == "HSC Locality")|
-                                                   (areaname %in% input$hscp_true & areatype == "HSC Partnership")|
+                                                   (areaname %in% input$hscl_true & areatype == "HSC locality")|
+                                                   (areaname %in% input$hscp_true & areatype == "HSC partnership")|
                                                    (code %in% input$code)
       ) %>% filter(year>=input$date_from[1] & year<=input$date_from[2])
       
@@ -1756,10 +1758,10 @@ function(input, output, session) {
                          choices = indicator_list, selected = character(0),
                          options = list(maxOptions = 1000, placeholder = "Click or type indicators you would like to filter by"))
     updateSelectizeInput(session,"topic_filter", label = NULL, choices = topic_list, selected = NULL,
-                         options = list(maxOptions = 1000, placeholder = "Click or type topics you would like to filter by"))
+                         options = list(maxOptions = 1000, placeholder = "Click or type domains you would like to filter by"))
     updateSelectizeInput(session,"profile_filter", label = NULL, choices = profile_list, selected = NULL,
                          options = list(maxOptions = 1000, placeholder = "Click or type profiles you would like to filter by"))
-    updateAwesomeRadio(session,"product_filter", label=NULL, choices = c("Indicator", "Topic", "Profile"), selected = NULL, inline = FALSE,
+    updateAwesomeRadio(session,"product_filter", label=NULL, choices = c("Indicator", "Domain", "Profile"), selected = NULL, inline = FALSE,
                        status = "primary", checkbox = TRUE)
     
   })
