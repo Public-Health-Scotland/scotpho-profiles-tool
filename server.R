@@ -8,7 +8,7 @@
 ## Define a server for the Shiny app
 function(input, output, session) {
   ################################################################
-  #    MoDAL
+  #    Modal ----
   ################################################################
   #Welcome Modal
   showModal(modalDialog(
@@ -30,7 +30,7 @@ function(input, output, session) {
     HTML("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"),
     modalButton("Go to the tool", icon("times-circle")),
     size = "l", align= "center",
-    easyClose = FALSE, fade=TRUE, footer = NULL
+    easyClose = TRUE, fade=FALSE, footer = NULL
   ))
   
   #"Take a Tour" Modal - first window
@@ -57,7 +57,7 @@ function(input, output, session) {
       HTML("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"),
       modalButton("Exit", icon("times-circle")),
       size = "l", align= "center",
-      easyClose = FALSE, fade=TRUE, footer = NULL
+      easyClose = TRUE, fade=TRUE, footer = NULL
     ))
   })
   
@@ -98,7 +98,7 @@ function(input, output, session) {
       HTML("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"),
       modalButton("Exit", icon("times-circle")),
       size = "l", align= "center",
-      easyClose = FALSE, fade=TRUE, footer = NULL
+      easyClose = TRUE, fade=TRUE, footer = NULL
                ))
   })
   
@@ -135,7 +135,7 @@ function(input, output, session) {
       HTML("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"),
       modalButton("Exit", icon("times-circle")),
       size = "l", align= "center",
-      easyClose = FALSE, fade=TRUE, footer = NULL
+      easyClose = TRUE, fade=TRUE, footer = NULL
     ))
   })
   
@@ -157,7 +157,7 @@ function(input, output, session) {
       br(),
       modalButton("Exit", icon("times-circle")),
       size = "l", align= "center",
-      easyClose = FALSE, fade=TRUE, footer = NULL
+      easyClose = TRUE, fade=TRUE, footer = NULL
     ))
   })
   
@@ -180,7 +180,7 @@ function(input, output, session) {
       br(),
       modalButton("Exit", icon("times-circle")),
       size = "l", align= "center",
-      easyClose = FALSE, fade=TRUE, footer = NULL
+      easyClose = TRUE, fade=TRUE, footer = NULL
     ))
   })
   
@@ -244,8 +244,8 @@ function(input, output, session) {
   ## Profile Summary (ring) help pop-up modal dialog - still need to create image file.
   observeEvent(input$help_ring, {
     showModal(modalDialog(
-      title = "What does this chart show...",
-      p(img(src="help_ring.PNG",height=600)),size = "l",
+      title = "How to use this chart...",
+      p(img(src="help_ring.png",height=600)),size = "l",
       easyClose = TRUE, fade=FALSE
     ))
   })
@@ -269,7 +269,7 @@ function(input, output, session) {
       sort(geo_lookup$areaname[geo_lookup$areatype == input$geotype_ring
                                & geo_lookup$parent_area == input$loc_iz_ring])
     }
-    selectInput("geoname_ring", "Area", choices = areas_ring,
+    selectInput("geoname_ring", "Select your area", choices = areas_ring,
                 selectize=TRUE, selected = "Health board")
   })
   
@@ -375,29 +375,29 @@ function(input, output, session) {
       droplevels ()
     
     fill_df <- data.frame(flag = c ('No significance can be calculated','Statistically not significantly different from comparator average','Statistically significantly better than comparator average','Statistically significantly worse than comparator average'),stringsAsFactors = TRUE)
-    fillcolours <- c("white","#999999","DodgerBlue", "#ff9933")
+    fillcolours <- c("white","grey88","#4da6ff", "#ffa64d")
     names(fillcolours) <- levels(fill_df$flag)
     fill_colour <- scale_fill_manual(name = "flag",values = fillcolours)
     
     #create title and subtitle variables
-    ring_title <- paste(profile_list," Summary: ",input$geoname_ring," (",input$geotype_ring,")",sep="")
+    ring_title <- paste("ScotPHO ",input$profile_ring," Profile",sep="")
     ring_subtitle <- if(input$comp_ring == 1){
-      paste("Comparator geography: ",input$geocomp_ring,sep="")
+      paste(input$geoname_ring," (",input$geotype_ring,") compared against ",input$geocomp_ring,sep="")
     }else if(input$comp_ring==2){
       paste("Comparator geography: ",input$geoname_ring,"(",input$yearcomp_ring,")",sep="")
     }
     
     ggplot(ring, aes(fill=flag, ymax=ymax, ymin=ymin, xmax=4.5, xmin=1.5)) +
       geom_rect(colour='#555555') +
-      geom_label(data=ring, label.size = NA, aes(label =paste(count), x = 3, y = (ymin + ymax)/2),show.legend = F,size = 4) +
+      geom_label(data=ring, label.size = NA, aes(label =paste(count), x = 3, y = (ymin + ymax)/2),show.legend = F,size = 7, colour='#555555') +
       fill_colour +
       labs(title=ring_title,subtitle=ring_subtitle)+
       theme(
         axis.text=element_blank(), # taking out x axis labels
         axis.title = element_blank(),
         text = element_text(family="Helvetica Neue,Helvetica,Arial,sans-serif",colour ='#555555'),
-        plot.title = element_text(face = "bold",size=16),
-        plot.subtitle = element_text(size=14,margin=margin(0,0,40,0,unit="pt")),
+        plot.title = element_text(face = "bold",size=17),
+        plot.subtitle = element_text(size=16,margin=margin(0,0,20,0,unit="pt")),
         axis.ticks=element_blank(), # taking out x axis tick marks
         legend.position = "none",
         panel.background = element_blank(),#Blanking background
@@ -405,9 +405,9 @@ function(input, output, session) {
       facet_wrap(~ring$domain,labeller = label_wrap_gen(multi_line = TRUE)) +
       coord_polar(theta="y") +
       theme(
-        strip.text.x = element_text(size=12,face="bold",colour='#555555',family="Helvetica Neue,Helvetica,Arial,sans-serif"),
-        strip.background =element_rect(fill="snow"))+
-      xlim(c(0,6))
+        strip.text.x = element_text(size=16,colour='#555555',family="Helvetica Neue,Helvetica,Arial,sans-serif"),
+        strip.background = element_blank())+
+      xlim(c(0,4.5))
   }
   
   #Render plot in app and resize 
@@ -419,7 +419,6 @@ function(input, output, session) {
   
   # Defined data file to down
   ring_csv <- reactive({
-    #plot_ring  <- reactive({
     #Merging comparator and chosen area
     if (input$comp_ring == 1){
       ring <- merge(ring_chosenarea(), ring_chosencomp(), by=c("indicator", "year"))
@@ -495,7 +494,7 @@ function(input, output, session) {
                                    & geo_lookup$parent_area == input$loc_iz_heat])
       }
 
-    selectInput("geoname_heat", "Area", choices = areas_heat,
+    selectInput("geoname_heat", "Select your area", choices = areas_heat,
                 selectize=TRUE, selected = "")
 
   })
@@ -608,7 +607,7 @@ function(input, output, session) {
       geom_text(aes(label = round(measure, 0)), size =2.5) +
       #Another step needed to make the palette of colours for the tile work
       scale_fill_manual(name = "Legend", labels = c("Significantly better", "Not significantly different", "Significantly worse", "Significance is not calculated"),
-                        values = c(blue = "#3d99f5", gray = "#999999", red = "#ff9933", white = "#ffffff")) +
+                        values = c(blue = "#4da6ff", gray = "gray88", red = "#ffa64d", white = "#ffffff")) +
       #Giving the right dimensions to the plot
       scale_x_continuous(position = "top", breaks=seq(from = min(heat$year), to = max(heat$year), by =1)) +
       #Layout
@@ -663,8 +662,8 @@ function(input, output, session) {
     # Barcode help pop-up
     observeEvent(input$help_bar, {
       showModal(modalDialog(
-        title = "What does the barcode plot show...",
-        p(img(src="help_bar.PNG",height=600)),size = "l",
+        title = "How to use this chart...",
+        p(img(src="help_barcode2.png",height=600)),size = "l",
         easyClose = TRUE, fade=FALSE
       ))
     })
@@ -706,7 +705,7 @@ function(input, output, session) {
                                  & geo_lookup$parent_area == input$loc_iz_bar])
       }
       
-      selectInput("geoname_bar", "Area", choices = areas_bar, selectize=TRUE, selected = "")
+      selectInput("geoname_bar", "Select your area", choices = areas_bar, selectize=TRUE, selected = "")
       
     })
     
@@ -801,7 +800,7 @@ function(input, output, session) {
         mutate(comp=0)
       
       #define x axis value to assign as intercept for significance
-      minx <- min(bar$all2)-0.05
+      minx <- min(bar$all2)-0.1
       
       #generate labels for comp and chosen bars
       data_labels <- bar %>%
@@ -818,15 +817,18 @@ function(input, output, session) {
       areatype_name <- input$geotype_bar
       chosenarea_name <- input$geoname_bar
       comparea_name <- input$geocomp_bar
-      topic_name <- input$topic_bar
-      bar_subtitle <- paste("Topic:",input$topic_bar,sep=" ")
+      # topic_name <- input$topic_bar
+      # bar_subtitle <- paste("Topic:",input$topic_bar,sep=" ")
       
       #Create colour scale for lines & legend key.
-      colour_lines <-  scale_colour_manual(" ",values= setNames(c("black", "lightseagreen", "goldenrod1"), c(areatype_name, chosenarea_name, comparea_name)))
+      #colour_lines <-  scale_colour_manual(" ",values= setNames(c("black", "lightseagreen", "goldenrod1"), c(areatype_name, chosenarea_name, comparea_name)))
+      colour_lines <-  scale_colour_manual(" ",values= setNames(c("black","#76e5a2","#e576b9"), c(areatype_name, chosenarea_name, comparea_name)))
+      
       
       #Create fill colour scheme for significance.
       fill_df <- data.frame(flag = c('No significance can be calculated', 'Statistically not significantly different from comparator average', 'Statistically significantly better than comparator average','Statistically significantly worse than comparator average'),stringsAsFactors = TRUE)
-      fillcolours <- c("white", "#999999","DodgerBlue","#ff9933")
+      #fillcolours <- c("white", "#999999","DodgerBlue","#ff9933")
+      fillcolours <- c("white", "gray","#ffa64d","#ffa64d")
       names(fillcolours) <- levels(fill_df$flag)
       colour_points <- scale_fill_manual(name = "flag",values = fillcolours)
       
@@ -834,37 +836,41 @@ function(input, output, session) {
         geom_line(alpha=0.4)+
         geom_line(aes(x = chosen2, colour=chosenarea_name), size=1) + #line for picked area
         geom_line(aes(x = comp, colour=comparea_name), size=1) + #line for comparator
-        geom_point(aes(fill=flag, shape=flag, x= minx, y=0.5),size=4,colour="grey40") +
+        geom_point(aes(fill=flag, shape=flag, x= minx, y=0.5),size=8,colour="grey40") +
         geom_text(data=data_labels, aes(x=x_chosen,y=1.5,label=round(chosen_lab,digits=0)),
-                  check_overlap = TRUE,size=5,colour = "lightseagreen",vjust=1, hjust=1) + #label for chosenarea
+                  check_overlap = TRUE,size=5,colour = "#76e5a2",vjust=1, hjust=0) + #label for chosenarea
         geom_text(data=data_labels, aes(x=x_comp,y=-0.6,label=round(comp_lab,digits=0)),
-                  check_overlap = TRUE,size=5,colour = "goldenrod1",vjust=0, hjust=0) + #label for comparator
+                  check_overlap = TRUE,size=5,colour = "#e576b9",vjust=0, hjust=1) + #label for comparator
         xlab("Worse  <-------------------->  Better")+
         scale_x_discrete(position = "top") +
         colour_lines+
         colour_points+
-        scale_shape_manual(values=21:24) +
-        guides(color = guide_legend(order = 1),fill = guide_legend(order = 0))+
-        theme(axis.title.y=element_blank(), #Taking out y axis title
-              axis.title.x=element_text(size=12, colour ='#555555',hjust=0.6), #x axis title contains better/worse
-              #plot.title = element_text(hjust=0), #?
-              #plot.subtitle = element_text(size=12,colour ='#555555'), #format substitle
-              #plot.caption = element_text(colour ='#555555',hjust=0),
-              text = element_text(family="Helvetica Neue,Helvetica,Arial,sans-serif"),
-              legend.direction = "vertical",
-              legend.position="top",
-              legend.key = element_rect(colour = NA, fill = NA),
-              legend.text = element_text(size=12,colour ='#555555', hjust=-1),
-              legend.title = element_blank(),
-              axis.text.x=element_blank(), # taking out x axis labels
-              axis.text.y=element_blank(), # taking out y axis labels
-              axis.ticks.x=element_blank(), # taking out x axis tick marks
-              axis.ticks.y=element_blank(), # taking out x axis tick marks
-              panel.background = element_blank(),#Blanking background
-              panel.border = element_blank())+ #remove frame round plot plot
-        facet_wrap(~indicator + type_definition + trend_axis, nrow=ind_count,ncol=1,scales="fixed",labeller = label_wrap_gen(multi_line = TRUE), strip.position="left")+ #facet wrap on indicator description to allow full description of indicator in strip text
-        theme(strip.text.y = element_text(size=14,colour ='#555555', angle = 180, hjust = 0))+
-        theme(strip.background =element_rect(fill="grey96"))
+        scale_shape_manual(values=c(22,22,22,22)) +
+        guides(color = "none",fill = "none", shape="none")+
+        #guides(color = guide_legend(order = 1),fill = "none", shape="none")+ #switch guides when fixed problem of wrong colours for significance
+        #guides(color = guide_legend(order = 1),fill = guide_legend(order = 0))+
+        theme(
+          axis.title.y=element_blank(), #Taking out y axis title
+          axis.title.x=element_text(size=12, colour ='#555555',hjust=0.6), #x axis title contains better/worse
+          text = element_text(family="Arial"),
+          legend.direction = "vertical",
+          legend.position="top",
+          legend.key = element_rect(colour = NA, fill = NA),
+          legend.text = element_text(size=14,colour ='#555555', hjust=-1),
+          legend.title = element_blank(),
+          axis.text=element_blank(), # taking out x axis labels
+          axis.ticks=element_blank(), # taking out x axis tick marks
+          panel.background = element_blank(),#Blanking background
+          panel.border = element_blank())+ #remove frame round plot plot
+        facet_wrap(~indicator + type_definition + trend_axis, # fields to facet on
+                   nrow=ind_count,ncol=1,                   # how many rows and colums to include
+                   scales="fixed",                          # fix scale so can compare % diff down column
+                   labeller = label_wrap_gen(multi_line = TRUE), # allow labels to wrap 
+                   strip.position="left")+                    # swap strip text to appear on left
+        theme(strip.text.y = element_text(size=14,colour ='#555555', angle = 180, hjust = 0), #adjust font & rotation
+              strip.switch.pad.wrap = unit(-1, "cm"), # reducing white space between strip panel & chart
+              strip.placement = "outside",            # formatting again to try and limit white space
+              strip.background = element_blank())     # no background colour on strip panel
     }
     
     # Render plot
@@ -877,10 +883,28 @@ function(input, output, session) {
       plotOutput("bar_plot", height=bar_plot_height(), width="100%")
     })
     
+    #Create text output for responsive plot legend
+    #legend - selected area - green
+    output$ui_bar_legend_selected <- renderUI({
+      img(src='bar_legend_selected.jpg', height=18, style="padding-right: 2px; vertical-align:middle",paste(input$geoname_bar,sep = ""))
+    }) 
     
-    # Topic select title for inclusion in app
-    output$topic_selected<- renderText({
-      c("<b>Topic: ",input$topic_bar,"</br>")
+    #legend - comparator - pink
+    output$ui_bar_legend_comparator <- renderUI({
+      img(src='bar_legend_comparator.jpg', height=18, style="padding-right: 2px; vertical-align:middle",paste(input$geocomp_bar))
+    })
+    
+    #legend - area type - grey bars
+    output$ui_bar_legend_areatype <- renderUI({
+      img(src='bar_legend_areatype.jpg', height=18, style="padding-right: 2px; vertical-align:middle",paste(input$geotype_bar))
+    }) 
+    
+    output$bar_title <- renderText({
+      paste("ScotPHO ",input$profile_bar," Profile: ",input$topic_bar,sep="")
+    })
+    
+    output$bar_subtitle <- renderText({
+      paste(input$geoname_bar," (",input$geotype_bar,") compared against ",input$geocomp_bar,sep="")
     })
     
 #####################.
@@ -1184,11 +1208,11 @@ function(input, output, session) {
       #Coloring based on if signicantly different from comparator
       color_pal <- ifelse(rank_bar_data()$interpret == "O", '#ccccff',
                    ifelse(is.na(rank_bar_data()$lowci) | is.na(rank_bar_data()$upci) | is.na(rank_bar_data()$comp_value) | is.na(rank_bar_data()$measure) |rank_bar_data()$measure == 0, '#ccccff',
-        ifelse(rank_bar_data()$lowci <= rank_bar_data()$comp_value & rank_bar_data()$upci >= rank_bar_data()$comp_value,'#999999',
-                     ifelse(rank_bar_data()$lowci > rank_bar_data()$comp_value & rank_bar_data()$interpret == "H", '#3d99f5',
-                           ifelse(rank_bar_data()$lowci > rank_bar_data()$comp_value & rank_bar_data()$interpret == "L", '#ff9933',
-                                   ifelse(rank_bar_data()$upci < rank_bar_data()$comp_value & rank_bar_data()$interpret == "L", '#3d99f5',
-                                         ifelse(rank_bar_data()$upci < rank_bar_data()$comp_value & rank_bar_data()$interpret == "H", '#ff9933', '#ccccff')))))))
+        ifelse(rank_bar_data()$lowci <= rank_bar_data()$comp_value & rank_bar_data()$upci >= rank_bar_data()$comp_value,'#cccccc',
+                     ifelse(rank_bar_data()$lowci > rank_bar_data()$comp_value & rank_bar_data()$interpret == "H", '#4da6ff',
+                           ifelse(rank_bar_data()$lowci > rank_bar_data()$comp_value & rank_bar_data()$interpret == "L", '#ffa64d',
+                                   ifelse(rank_bar_data()$upci < rank_bar_data()$comp_value & rank_bar_data()$interpret == "L", '#4da6ff',
+                                         ifelse(rank_bar_data()$upci < rank_bar_data()$comp_value & rank_bar_data()$interpret == "H", '#ffa64d', '#ccccff')))))))
 
       # Text for tooltip
       tooltip_rank <- c(paste0(rank_bar_data()$areaname, ": ", rank_bar_data()$measure, "<br>",
@@ -1239,11 +1263,11 @@ function(input, output, session) {
     #Coloring based on if signicantly different from comparator
     color_pal <- ifelse(rank_bar_data()$interpret == "O", '#ccccff',
                         ifelse(is.na(rank_bar_data()$lowci) | is.na(rank_bar_data()$upci) | is.na(rank_bar_data()$comp_value) | is.na(rank_bar_data()$measure) |rank_bar_data()$measure == 0, '#ccccff',
-                               ifelse(rank_bar_data()$lowci <= rank_bar_data()$comp_value & rank_bar_data()$upci >= rank_bar_data()$comp_value,'#999999',
-                                      ifelse(rank_bar_data()$lowci > rank_bar_data()$comp_value & rank_bar_data()$interpret == "H", '#3d99f5',
-                                             ifelse(rank_bar_data()$lowci > rank_bar_data()$comp_value & rank_bar_data()$interpret == "L", '#ff9933',
-                                                    ifelse(rank_bar_data()$upci < rank_bar_data()$comp_value & rank_bar_data()$interpret == "L", '#3d99f5',
-                                                           ifelse(rank_bar_data()$upci < rank_bar_data()$comp_value & rank_bar_data()$interpret == "H", '#ff9933', '#ccccff')))))))
+                               ifelse(rank_bar_data()$lowci <= rank_bar_data()$comp_value & rank_bar_data()$upci >= rank_bar_data()$comp_value,'#cccccc',
+                                      ifelse(rank_bar_data()$lowci > rank_bar_data()$comp_value & rank_bar_data()$interpret == "H", '#4da6ff',
+                                             ifelse(rank_bar_data()$lowci > rank_bar_data()$comp_value & rank_bar_data()$interpret == "L", '#ffa64d',
+                                                    ifelse(rank_bar_data()$upci < rank_bar_data()$comp_value & rank_bar_data()$interpret == "L", '#4da6ff',
+                                                           ifelse(rank_bar_data()$upci < rank_bar_data()$comp_value & rank_bar_data()$interpret == "H", '#ffa64d', '#ccccff')))))))
     
     
     #Creating a vector with the area names in the order they are going to be plotted
