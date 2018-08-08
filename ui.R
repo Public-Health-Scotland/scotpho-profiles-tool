@@ -38,7 +38,9 @@ navbarPage(id = "intabset", #needed for landing page
                           ".li-custom {margin-bottom: 10px;}", #bullet point list items
                           ".shiny-options-group { margin-top: 3px; }",
                           ".selectize-control { margin-bottom: 3px}",
-                          ".selectize-input {padding: 3px 3px; min-height: 10px}",
+                          ".selectize-input {padding: 3px 3px; min-height: 10px; line-height: 18px;}",
+                          # ".selectize-input { font-size: 12px; line-height: 18px;}", 
+                          ".selectize-dropdown {line-height: 18px; }",
                           ".control-label { margin-bottom: 1px}",
                           #Padding of columns
                           ".col-xs-1, .col-sm-1, .col-md-1, .col-lg-1, .col-xs-2, .col-sm-2, .col-md-2, 
@@ -107,7 +109,7 @@ tabPanel(
       column(4, class="landing-page-column",
              div(class="landing-page-box", style="background-image: url(donut_10.png);
                  background-repeat: no-repeat; background-size: 38%; background-position: bottom 23px center; background-color: white;",
-                 div("Profile Summary", class = "landing-page-box-title"),
+                 div("Summary", class = "landing-page-box-title"),
                  actionButton('jump_to_ring', 'A high level view of an area across a suit of indicators', 
                               class="landing-page-button", 
                               icon = icon("arrow-circle-right", "icon-lp")))),
@@ -184,7 +186,7 @@ tabPanel(
              #Evidence box
              div(class="landing-page-box-about", style="background-image: url(other_profile.png);
                  background-repeat: no-repeat; background-size: 18%; background-position: bottom 7px center ;background-color: white;", 
-                 div("Related Links", class = "landing-page-box-title" ),
+                 div("Related links", class = "landing-page-box-title" ),
                  actionButton('jump_to_evidence', 'Links to websites or documents with useful profiles information', 
                               class="landing-page-button-about", 
                               icon = icon("arrow-circle-right", "icon-lp")))
@@ -193,7 +195,7 @@ tabPanel(
       column(4, class="landing-page-column", 
              div(class="landing-page-box-about", style="background-image: url(technical_resources.png);
                  background-repeat: no-repeat; background-size: 21%; background-position: bottom 7px center ;background-color: white;", 
-                 div("Technical Resources", class = "landing-page-box-title"),
+                 div("Technical resources", class = "landing-page-box-title"),
                  actionButton('jump_to_resources', 'Find technical information about the ScotPHO profile definitions and methodology', 
                               class="landing-page-button-about", 
                               icon = icon("arrow-circle-right", "icon-lp"))
@@ -212,7 +214,7 @@ tabPanel(
 ###############################################.
 ## Ring plot ----
 ###############################################.
-tabPanel(title = "Profile Summary", icon = icon("adjust"), value = "ring",
+tabPanel(title = "Summary", icon = icon("adjust"), value = "ring",
          sidebarPanel(width=3,
                       selectInput("profile_ring", "Profile", choices= profile_list, multiple=FALSE, selected = "HWB"),
                       uiOutput("geotype_ui_ring"),
@@ -228,7 +230,7 @@ tabPanel(title = "Profile Summary", icon = icon("adjust"), value = "ring",
                                    choices = list("Area" = 1, "Time" = 2),
                                    selected = 1, inline=TRUE, checkbox=TRUE),
                       conditionalPanel(condition = "input.comp_ring == 1 ",
-                                       selectInput("geocomp_ring", "Comparator", choices = comparator_list,
+                                       selectInput("geocomp_ring", "Compare with", choices = comparator_list,
                                                    selectize=TRUE, selected = "Scotland")
                       ),
                       conditionalPanel(condition = "input.comp_ring == 2 ",
@@ -278,7 +280,7 @@ tabPanel("Heatmap", icon = icon("list-ul"), value = "heat",
                                choices = list("Area" = 1, "Time" = 2), 
                                selected = 1, inline=TRUE, checkbox = TRUE),
                   conditionalPanel(condition = "input.comp_heat == 1 ",  
-                                   selectInput("geocomp_heat", "Comparator", choices = comparator_list,
+                                   selectInput("geocomp_heat", "Compare with", choices = comparator_list,
                                                selectize=TRUE, selected = "Scotland")
                   ),
                   conditionalPanel(condition = "input.comp_heat == 2 ", 
@@ -299,7 +301,7 @@ tabPanel("Heatmap", icon = icon("list-ul"), value = "heat",
            column(2,
                   actionButton("help_heat",label="Help", icon= icon('question-circle'), class ="down"),
                   downloadButton('download_heat', 'Download data', class = "down"),
-                  savechart_button('download_overviewplot', 'Save chart',  class = "down")
+                  savechart_button('download_heatplot', 'Save chart',  class = "down")
            )
          ),
          mainPanel(width = 12,
@@ -532,13 +534,10 @@ tabPanel("Data", icon = icon("table"), value = "table",
                                      multiple=TRUE, options = list(maxOptions = 1000, placeholder = "Select or type profiles you would like to filter by"))    
                       
                     )
-                    
              ),
              column(3,
                     
                     p("Geography", style = "font-weight: bold; color: black;"),
-                    
-                    tags$style(type='text/css', ".selectize-input { font-size: 12px; line-height: 18px;} .selectize-dropdown { font-size: 12px; line-height: 18px; }"),
                     awesomeCheckbox("iz",label = "Intermediate zone", value = FALSE),
                     conditionalPanel(
                       condition = "input.iz == true",
