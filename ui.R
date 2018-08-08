@@ -453,36 +453,7 @@ tabPanel("Map", icon = icon("globe"), value = "map",
            leafletOutput("map", width="100%",height="600px")
            )
 ), #Tab panel bracket
-###############################################.
-## Deprivation ---- 
-###############################################.
-# tabPanel("Inequalities", icon = icon("balance-scale"), value = "simd",
-#          #Intro text
-#          p(tags$b("This section is under development and a limited number of indicators are available."), style = "color: red "),
-#          p(tags$b("Explore the data by different levels of deprivation. ")),
-#          tags$ul( 
-#            tags$li("ScotPHO are working on new ways to display information related to", 
-#                    tags$a(href="http://www.scotpho.org.uk/life-circumstances/deprivation/key-points/", "deprivation",
-#                           class="externallink"), ".")),
-#          wellPanel( #Filter options
-#                    column(6, selectInput("indic_simd", label = "Indicator",
-#                                          choices = ind_depr_list)),
-#                    column(3, selectInput("geotype_simd", label = "Geography level",
-#                                          choices = areatype_depr_list, selected =  "Scotland")),
-#                    column(3, uiOutput("geoname_ui_simd")),
-#                    column(5, uiOutput("year_ui_simd")),
-#                    column(5, selectInput("measure_simd", label = "Type of measure",
-#                                          choices = c("Rate/Percentage", "Index of inequality"))),
-#                    column(2, downloadButton(outputId = 'download_simd',
-#                                             "Download data",class = "down"))
-#          ),
-#          mainPanel(width = 12, #Main panel
-#                    column(6,
-#                           plotlyOutput("simd_bar_plot")),
-#                    column(6,
-#                           plotlyOutput("simd_trend_plot"))
-#          )
-# ), #Tab panel bracket
+
 ###############################################.
 ## Table ----
 ###############################################.
