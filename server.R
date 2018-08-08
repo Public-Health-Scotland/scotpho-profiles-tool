@@ -244,7 +244,7 @@ function(input, output, session) {
   ## Profile Summary (ring) help pop-up modal dialog - still need to create image file.
   observeEvent(input$help_ring, {
     showModal(modalDialog(
-      title = "How to use this chart...",
+      title = "How to use this chart",
       p(img(src="help_ring.png",height=600)),size = "l",
       easyClose = TRUE, fade=FALSE
     ))
@@ -461,8 +461,8 @@ function(input, output, session) {
   # Heatmap help pop-up
   observeEvent(input$help_heat, {
     showModal(modalDialog(
-      title = "What does the overview plot show...",
-      p(img(src="help_overview.png"), height=500),  size = "l",
+      title = "How to use this chart",
+      p(img(src="help_heatmpa.png"), height=500),  size = "l",
       easyClose = TRUE, fade=FALSE
     ))
   })
@@ -530,8 +530,8 @@ function(input, output, session) {
                   substr(profile_domain2, 1, 3) == input$profile_heat) &
                (substr(profile_domain1, 5, nchar(as.vector(profile_domain1))) == input$topic_heat |
                   substr(profile_domain2, 5, nchar(as.vector(profile_domain2))) == input$topic_heat)) %>% 
-      select(c(indicator, areaname, areatype, numerator, measure, lowci, upci, interpret, 
-               year, def_period, type_definition)) %>% 
+      # select(c(indicator, areaname, areatype, numerator, measure, lowci, upci, interpret, 
+      #          year, def_period, type_definition)) %>% 
       droplevels()
     
   })
@@ -579,7 +579,7 @@ function(input, output, session) {
   output$title_heat <- renderText(paste0(input$geoname_heat, " - ", input$topic_heat))
   
   #Function to create ggplot, then used in renderPlot and ggsave
-  plot_overview <- function(){
+  plot_heat <- function(){
     
     #Merging comparator and chosen area
     if (input$comp_heat == 1){
@@ -629,7 +629,7 @@ function(input, output, session) {
     }
     else { #If data is available then plot it
     #Converting ggplot into a Plotly object
-      ggplotly(plot_overview(), tooltip=c("text"), height = get_height_heat()) %>%
+      ggplotly(plot_heat(), tooltip=c("text"), height = get_height_heat()) %>%
       # margins needed as long labels don't work well with Plotly
         layout(margin = list(l = 400, t = 50),
              xaxis = list(side = 'top', fixedrange=TRUE), yaxis= list(fixedrange=TRUE),
@@ -644,14 +644,14 @@ function(input, output, session) {
   # Downloading data
     heat_csv <- reactive({ format_csv(heat_chosenarea()) })
   
-    output$download_heat <- downloadHandler( filename =  'overview_data.csv',
+    output$download_heat <- downloadHandler( filename =  'heatmap_data.csv',
       content = function(file) { write.csv(heat_csv(), file, row.names=FALSE) })
     
   # Downloading chart  
-    output$download_overviewplot <- downloadHandler(
-      filename = 'overview.png',
+    output$download_heatplot <- downloadHandler(
+      filename = 'heatmap.png',
       content = function(file){
-        ggsave(file, plot = plot_overview()+ ggtitle(paste0(input$geoname_heat, " - ", input$topic_heat)), 
+        ggsave(file, plot = plot_heat()+ ggtitle(paste0(input$geoname_heat, " - ", input$topic_heat)), 
                device = "png", scale=4, limitsize=FALSE)
       })
     
