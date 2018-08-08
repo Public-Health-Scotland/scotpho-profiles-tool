@@ -29,7 +29,7 @@ navbarPage(id = "intabset", #needed for landing page
                           ".dropdown-menu { font-size: 14px;}", #dropdown menu within navBar
                           ".container-fluid {padding-right: 0px}",
                           #Text size and line height. Padding needed for footer
-                          "body { font-size: 11px; line-height: 1.1; padding-bottom:30px}",
+                          "body { font-size: 14px; line-height: 1.1; padding-bottom:30px}",
                           ".checkbox label, .radio label, .checkbox-bs label, .radio-bs label
                           { line-height: 1.6 }",
                           ".radio-inline {line-height: 2}",
@@ -60,10 +60,10 @@ navbarPage(id = "intabset", #needed for landing page
                           ".landing-page-box:hover, .landing-page-box-about:hover {-webkit-transform: scale(1.05); 
                           -ms-transform: scale(1.05); transform: scale(1.05); }", #hover effect on boxes
                           #landing-page titles for boxes
-                          ".landing-page-box-title {font-size: 14px; text-align:center; color: darkblue;
+                          ".landing-page-box-title {font-size: 16px; text-align:center; color: darkblue;
                           font-weight: bold; background-color: none; width:100%; max-height: 20px; margin-top: 10px; }",
                           #landing page titles for ABOUT boxes
-                          ".landing-page-box-about-title {font-size: 14px; text-align:center; color: darkblue;
+                          ".landing-page-box-about-title {font-size: 16px; text-align:center; color: darkblue;
                           font-weight: bold; background-color: none; width:100%; max-height: 20px; margin-top: 5px; }",
                           #landing page buttons
                           ".landing-page-button {text-align:center;
@@ -100,8 +100,8 @@ tabPanel(
   title = " Home", icon = icon("home", "home-icon"),
   mainPanel(
     width = 11, style="margin-left:4%; margin-right:4%",
-    fluidRow(h4("Welcome to the ScotPHO profiles", style="margin-top:0px;")),
-    fluidRow(h5("Explore data by profile or topic area", style="margin-top:0px;")),
+    fluidRow(h3("Welcome to the ScotPHO profiles", style="margin-top:0px;")),
+    fluidRow(h4("Explore data by profile or topic area", style="margin-top:0px; ")),
     fluidRow(
       #Ring plot box
       column(4, class="landing-page-column",
@@ -126,7 +126,7 @@ tabPanel(
                  actionButton('jump_to_barcode', 'Explore how indicators for a topic compare across different geographies',
                               class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp"))))
     ),
-    fluidRow(h5("Explore a single indicator in more detail")),
+    fluidRow(h4("Explore a single indicator in more detail")),
     #2nd row of boxes
     fluidRow(
       #Trend plot box
@@ -161,7 +161,7 @@ tabPanel(
       #                         class="landing-page-button", 
       #                         icon = icon("arrow-circle-right", "icon-lp"))))
     ),
-    fluidRow(h5("Access the data behind the tool and find supporting information")),
+    fluidRow(h4("Access the data behind the tool and find supporting information")),
     fluidRow(
       #Table box 
       column(4, class="landing-page-column",
