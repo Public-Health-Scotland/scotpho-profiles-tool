@@ -52,7 +52,7 @@ navbarPage(id = "intabset", #needed for landing page
                           .col-md-11, .col-lg-11, .col-xs-12, .col-sm-12, .col-md-12, .col-lg-12 {
                           padding-left: 5px; padding-right: 5px;}",
                           #Style for download buttons
-                          ".down{background-color:#4da6ff; color: white; background-image:none; min-width: 20vh;
+                          ".down{background-color:#4da6ff; color: white; background-image:none; min-width: 22vh;
                           font-size: 14px; padding: 5px 10px; margin-top: 5px; margin-left: 3px}",
                           #landing page boxes
                           ".landing-page-box {width:100%; height:100%; min-height:18vh; background-color:AliceBlue;
@@ -87,7 +87,6 @@ navbarPage(id = "intabset", #needed for landing page
                ".landing-page-column {padding-right:3vh}",
                #landing-page icons
                ".icon-lp{font-size: 1.3em; padding-right: 4px;}",
-               ".home-icon {font-size: 1.3em; width: 0.7em;}",
                #to avoid red text error messages in the whole app, take out for testing
                ".shiny-output-error { visibility: hidden; }",
                ".shiny-output-error:before { visibility: hidden; }",
@@ -99,11 +98,11 @@ navbarPage(id = "intabset", #needed for landing page
 ## Landing page ----
 ###############################################.
 tabPanel(
-  title = " Home", icon = icon("home", "home-icon"),
+  title = " Home", icon = icon("home"),
   mainPanel(
     width = 11, style="margin-left:4%; margin-right:4%",
     fluidRow(h3("Welcome to the ScotPHO profiles", style="margin-top:0px;")),
-    fluidRow(h4("Explore data by profile or topic area", style="margin-top:0px; ")),
+    fluidRow(h4("Explore data by profile or domain area", style="margin-top:0px; ")),
     fluidRow(
       #Ring plot box
       column(4, class="landing-page-column",
@@ -118,14 +117,14 @@ tabPanel(
              div(class="landing-page-box", style="background-image: url(heatmap_2.png);
                  background-repeat: no-repeat; background-size: 60%; background-position: bottom 30px center ;background-color: white;",
                  div("Heatmap", class = "landing-page-box-title"),
-                 actionButton('jump_to_heat', 'Explore how indicators for a topic area have changed over time', 
+                 actionButton('jump_to_heat', 'Explore how indicators for a domain area have changed over time', 
                               class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp")))),
       #Barcode plot box
       column(4, class="landing-page-column",
              div(class="landing-page-box", style="background-image: url(barcode_3.png);
                  background-repeat: no-repeat; background-size: 50%; background-position: bottom 25px center ;background-color: white;",
                  div("Barcode", class = "landing-page-box-title"),
-                 actionButton('jump_to_barcode', 'Explore how indicators for a topic compare across different geographies',
+                 actionButton('jump_to_barcode', 'Explore how indicators for a domain compare across different geographies',
                               class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp"))))
     ),
     fluidRow(h4("Explore a single indicator in more detail")),
@@ -216,10 +215,11 @@ tabPanel(
 ###############################################.
 tabPanel(title = "Summary", icon = icon("adjust"), value = "ring",
          sidebarPanel(width=3,
+                      actionButton("help_ring", label="Help", icon= icon('question-circle'), class ="down"),
                       selectInput("profile_ring", "Profile", choices= profile_list, multiple=FALSE, selected = "HWB"),
                       uiOutput("geotype_ui_ring"),
                       conditionalPanel(#Conditional panel for extra dropdown for localities & IZ
-                        condition = "input.geotype_ring== 'HSC Locality' | input.geotype_ring == 'Intermediate zone' ",
+                        condition = "input.geotype_ring== 'HSC locality' | input.geotype_ring == 'Intermediate zone' ",
                         selectInput("loc_iz_ring", label = "Partnership for localities/intermediate zones",
                                     choices = partnership_name)
                       ),
@@ -245,13 +245,8 @@ tabPanel(title = "Summary", icon = icon("adjust"), value = "ring",
                         "Worse than comparator.", br(),
                         img(src='signif_nocalc.png', height=18, style="padding-right: 2px; vertical-align:middle"), 
                         "No differences can be calculated."), 
-                      br(),
-                      actionButton("help_ring", label="Help", icon= icon('question-circle'), class ="down"),
-                      br(),
                       downloadButton('download_ring', 'Download data', class = "down"),
-                      br(),
-                      savechart_button('download_ringplot', 'Save chart',  class = "down"),
-                      br()
+                      savechart_button('download_ringplot', 'Save chart',  class = "down")
          ),
          mainPanel(width = 9,
                    plotOutput("ring_plot", height="auto")
@@ -269,7 +264,7 @@ tabPanel("Heatmap", icon = icon("list-ul"), value = "heat",
            column(3,
                   uiOutput("geotype_ui_heat"),
                   conditionalPanel(#Conditional panel for extra dropdown for localities & IZ
-                    condition = "input.geotype_heat== 'HSC Locality' | input.geotype_heat == 'Intermediate zone' ",
+                    condition = "input.geotype_heat== 'HSC locality' | input.geotype_heat == 'Intermediate zone' ",
                     selectInput("loc_iz_heat", label = "Partnership for localities/intermediate zones",
                                 choices = partnership_name)
                   ),
@@ -314,14 +309,15 @@ tabPanel("Heatmap", icon = icon("list-ul"), value = "heat",
 #####################################################################.
 tabPanel("Barcode", icon = icon("barcode"), value = "barcode",
          sidebarPanel(width=3,
+                      actionButton("help_bar", label="Help", icon= icon('question-circle'), class ="down"),
                       selectInput("profile_bar", "Profile", choices = profile_list),
                       uiOutput("topic_ui_bar"),
                       uiOutput("geotype_ui_bar"),
                       conditionalPanel(#Conditional panel for extra dropdown for localities & IZ
-                        condition = "input.geotype_bar== 'HSC Locality' | input.geotype_bar == 'Intermediate zone' ",
+                        condition = "input.geotype_bar== 'HSC locality' | input.geotype_bar == 'Intermediate zone' ",
                         selectInput("loc_iz_bar", label = "Partnership for localities/intermediate zones", choices = partnership_name)),
                       uiOutput("geoname_ui_bar"),
-                      selectInput("geocomp_bar", "Compare against", choices = comparator_list, selectize=TRUE, selected = "Scotland"),
+                      selectInput("geocomp_bar", "Compare with", choices = comparator_list, selectize=TRUE, selected = "Scotland"),
                       p(img(src='signif_better.png', height=18, style="padding-right: 2px; vertical-align:middle"), 
                         "Better than comparator.", br(),
                         img(src='non_signif.png', height=18, style="padding-right: 2px; vertical-align:middle"), 
@@ -330,14 +326,9 @@ tabPanel("Barcode", icon = icon("barcode"), value = "barcode",
                         "Worse than comparator.", br(),
                         img(src='signif_nocalc.png', height=18, style="padding-right: 2px; vertical-align:middle"), 
                         "No differences can be calculated."),
-                      br(),
-                      br(),
                       uiOutput("ui_bar_legend_selected"),
                       uiOutput("ui_bar_legend_comparator"),
                       uiOutput("ui_bar_legend_areatype"),
-                      br(),
-                      br(),
-                      actionButton("help_bar", label="Help", icon= icon('question-circle'), class ="down"),
                       downloadButton('download_bar', 'Download data', class = "down"),
                       savechart_button('download_barplot', 'Save chart',  class = "down")
          ),
@@ -354,7 +345,7 @@ tabPanel("Trend", icon = icon("area-chart"), value = "trend",
                    sidebarPanel(width=3,
                           selectInput("indic_trend", "Indicator", choices=indicator_list),
                           shiny::hr(),
-                          p(tags$b("Select the geographies you want to plot.
+                          p(tags$b("Select the areas you want to plot.
                                    You can select multiple areas per geography level")),
                           selectInput("hbname_trend", "Health board", choices = c("Select health boards" = "", paste(hb_name)),
                                       multiple=TRUE, selectize=TRUE, selected = ""),
@@ -364,7 +355,7 @@ tabPanel("Trend", icon = icon("area-chart"), value = "trend",
                                       multiple=TRUE, selectize=TRUE, selected = ""),
                           selectInput("adpname_trend", "Alcohol & drug partnership", choices =  c("Select partnerships" = "", paste(adp_name)),
                                       multiple=TRUE, selectize=TRUE, selected = ""),
-                          selectInput("partname_trend", "HSC Partnership", choices =  c("Select partnerships" = "", paste(partnership_name)),
+                          selectInput("partname_trend", "HSC partnership", choices =  c("Select partnerships" = "", paste(partnership_name)),
                                       multiple=TRUE, selectize=TRUE, selected = ""),
                           selectInput("loc_iz_trend", "To choose a locality or intermediate zone first 
                                       select an HSC partnership", 
@@ -389,7 +380,7 @@ tabPanel("Rank", icon = icon("signal"), value = "rank",
                   selectInput("indic_rank", "Indicator", choices=indicator_list),
                   uiOutput("geotype_ui_rank"),
                   conditionalPanel( #Conditional panel for extra dropdown for localities & IZ
-                    condition = "input.geotype_rank == 'HSC Locality' | input.geotype_rank == 'Intermediate zone' ",
+                    condition = "input.geotype_rank == 'HSC locality' | input.geotype_rank == 'Intermediate zone' ",
                     selectInput("loc_iz_rank", label = "Partnership for localities/intermediate zones",
                                 choices = partnership_name)),
                   uiOutput("year_ui_rank"), 
@@ -422,7 +413,7 @@ tabPanel("Map", icon = icon("globe"), value = "map",
            selectInput("indic_map", "Indicator", choices=indicator_map_list),
            uiOutput("geotype_ui_map"),
            conditionalPanel(#Conditional panel for extra dropdown for localities & IZ
-             condition = "input.geotype_bar== 'HSC Locality' | input.geotype_map == 'Intermediate zone' ",
+             condition = "input.geotype_bar== 'HSC locality' | input.geotype_map == 'Intermediate zone' ",
              selectInput("iz_map", label = "Council for intermediate zones", choices = la_name)),
            uiOutput("year_ui_map"),
            awesomeRadio("comp_map", label = "Compare against:",
@@ -461,28 +452,19 @@ tabPanel("Data", icon = icon("table"), value = "table",
          #Sidepanel for filtering data
          mainPanel(
            width = 12, style="margin-left:0.5%; margin-right:0.5%",
-           
            #Row 1 for intro  
            fluidRow(
-             column(10,
-                    p("Filter ScotPHO Data by", style = "font-weight: bold; color: black;"),
-                    
-                    tags$div("Select appropriate conditions to filter data", 
-                             tags$br(),
-                             "To delete choices use RETURN or select item and DELETE"),
-                    tags$br(),
-                    tags$br()),
-             column(2,
-                    actionButton("clear", label = "Clear all filters", icon ("eraser"), style='background: #3399FF; color: #FFF; font-size:100%')
-             )),
-           
+                    p("Filter ScotPHO data by", style = "font-weight: bold; color: black;"),
+                    tags$div("Select appropriate conditions to filter data. ",
+                             "To delete choices use RETURN or select item and DELETE")
+                    ),
            #Row 2 for selections
            fluidRow(
              column(3,
                     p("Profile product", style = "font-weight: bold; color: black;"),  
                     tags$div("All available indicators will be displayed for",tags$br(),"selected geography if none specified"),
                     br(),
-                    awesomeRadio("product_filter", label=NULL, choices = c("Indicator", "Topic", "Profile"), selected = NULL, inline = FALSE,
+                    awesomeRadio("product_filter", label=NULL, choices = c("Indicator", "Domain", "Profile"), selected = NULL, inline = FALSE,
                                  status = "primary", checkbox = TRUE, width = NULL),
                     br(),
                     conditionalPanel(
@@ -493,10 +475,10 @@ tabPanel("Data", icon = icon("table"), value = "table",
                       
                     ),
                     conditionalPanel(
-                      condition="input.product_filter=='Topic'",
+                      condition="input.product_filter=='Domain'",
                       selectizeInput("topic_filter", label = NULL,
                                      width = "270px", choices = topic_list, selected = NULL,
-                                     multiple=TRUE, options = list(maxOptions = 1000, placeholder = "Select or type topics you would like to filter by"))
+                                     multiple=TRUE, options = list(maxOptions = 1000, placeholder = "Select or type domains you would like to filter by"))
                     ),
                     conditionalPanel(
                       condition="input.product_filter=='Profile'",
@@ -512,7 +494,7 @@ tabPanel("Data", icon = icon("table"), value = "table",
                     awesomeCheckbox("iz",label = "Intermediate zone", value = FALSE),
                     conditionalPanel(
                       condition = "input.iz == true",
-                      selectizeInput("iz_parent", label = "Filter list by HSC Partnership",
+                      selectizeInput("iz_parent", label = "Filter list by HSC partnership",
                                      width = "229px", choices = parent_geo_list, selected = "Show all", multiple=FALSE),
                       conditionalPanel(
                         condition = "input.iz_parent != 'Show all'",
@@ -525,17 +507,17 @@ tabPanel("Data", icon = icon("table"), value = "table",
                       selectizeInput("la_true", label = NULL,
                                      width = "229px", choices = la_name, selected = NULL, multiple=TRUE, options = list(placeholder = "Select or type council area of interest"))),
                     
-                    awesomeCheckbox("hscl",label = "Health and Social Care Locality", value = FALSE),
+                    awesomeCheckbox("hscl",label = "Health and social care locality", value = FALSE),
                     conditionalPanel(
                       condition = "input.hscl == true",
-                      selectizeInput("hscl_parent", label = "Filter list by HSC Partnership",
+                      selectizeInput("hscl_parent", label = "Filter list by HSC partnership",
                                      width = "229px", choices = parent_geo_list, selected = "Show all", multiple=FALSE),
                       conditionalPanel(
                         condition = "input.hscl_parent != 'Show all'",
                         checkboxInput("hscl_parent_all",label = "Select all HSC localities in this area", value = FALSE)),
                       uiOutput("hscl_filtered")),
                     
-                    awesomeCheckbox("adp",label = "Alcohol and Drugs Partnership", value = FALSE),
+                    awesomeCheckbox("adp",label = "Alcohol and drugs partnership", value = FALSE),
                     conditionalPanel(
                       condition = "input.adp == true",
                       selectizeInput("adp_true", label = NULL,
@@ -544,7 +526,7 @@ tabPanel("Data", icon = icon("table"), value = "table",
              ),
              column(3,
                     br(),
-                    awesomeCheckbox("hscp",label = "Health and Social Care Partnership", value = FALSE),
+                    awesomeCheckbox("hscp",label = "Health and social care partnership", value = FALSE),
                     conditionalPanel(
                       condition = "input.hscp == true",
                       selectInput("hscp_true", label = NULL,
@@ -568,8 +550,8 @@ tabPanel("Data", icon = icon("table"), value = "table",
                     br(),
                     sliderInput("date_from",label = NULL, min = min_year, max = max_year, value = c(min_year,max_year), 
                                 width = "260px", step = 1, sep="", round = TRUE, ticks = TRUE, dragRange = FALSE),
-                    br(), br(), br(),
-                    downloadButton("download_table_csv", 'Download data (csv)', class = "down")
+                    actionButton("clear", label = "Clear all filters", icon ("eraser"), style='background: #3399FF; color: #FFF; font-size:100%'),
+                    downloadButton("download_table_csv", 'Download data', class = "down")
              )
            ),
            
@@ -587,8 +569,8 @@ navbarMenu("Info", icon = icon("info-circle"),
            tabPanel("About", value = "about",
                     sidebarPanel(width=1),
                     mainPanel(width=8,
-                              h4("Welcome to the ScotPHO Profiles Tool", style = "color:black;"),
-                              p("The tool is designed to allow users to explore the various different profiles 
+                              h4("About", style = "color:black;"),
+                              p("ScotPHO's profiles tool is designed to allow users to explore the various different profiles 
                                 produced by the ", tags$a(href="http://www.scotpho.org.uk/about-us/about-scotpho/", "ScotPHO collaboration.", 
                                                           class="externallink")),
                               p("The profiles are intended to increase understanding of local health issues 
