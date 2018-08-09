@@ -114,7 +114,6 @@ plot_nodata <- function() {
 ## Data ----
 ###############################################.    
 optdata <- readRDS("./data/optdata.rds") #main dataset
-deprivation <- readRDS("./data/deprivation_OPT.rds")
 
 geo_lookup <- readRDS("./data/geo_lookup.rds") #geography lookup
 profile_lookup <- readRDS("./data/profile_lookup.rds") #profile lookup
