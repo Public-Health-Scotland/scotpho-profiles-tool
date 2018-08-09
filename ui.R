@@ -301,6 +301,8 @@ tabPanel("Heatmap", icon = icon("list-ul"), value = "heat",
          ),
          mainPanel(width = 12,
                    h5(textOutput("title_heat"), style="color: black; text-align: center"),
+                   h4(textOutput("heat_title"), style="color: black; text-align: left"),
+                   h5(textOutput("heat_subtitle"), style="color: black; text-align: left"),
                    plotlyOutput("heat_plot")
         )
   ), #Tab panel bracket
