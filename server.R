@@ -380,12 +380,13 @@ function(input, output, session) {
     fill_colour <- scale_fill_manual(name = "flag",values = fillcolours)
     
     #create title and subtitle variables
-    ring_title <- paste0(names(profile_list[unname(profile_list) == input$profile_ring])
+    ring_title <- paste0(names(profile_list[unname(profile_list) == input$profile_ring]),
                         " profile")
     ring_subtitle <- if(input$comp_ring == 1){
-      paste0(input$geoname_ring," (",input$geotype_ring,") compared against ",input$geocomp_ring)
+      paste0(input$geoname_ring," (",input$geotype_ring,") compared against ", input$geocomp_ring)
     }else if(input$comp_ring==2){
-      paste0("Comparator geography: ",input$geoname_ring,"(",input$yearcomp_ring,")")
+      paste0("Changes within ", input$geoname_ring, ": latest data available",
+             " compared to ", input$yearcomp_ring)
     }
     
     ggplot(ring, aes(fill=flag, ymax=ymax, ymin=ymin, xmax=4.5, xmin=1.5)) +
@@ -455,7 +456,7 @@ function(input, output, session) {
     content = function(file){
       ggsave(file, plot = plot_ring(), device = "png",height = 15,width=15, limitsize=FALSE)
     })
-  
+   
   ###############################################.        
   #### Heatmap ----
   ###############################################.   
@@ -564,6 +565,23 @@ function(input, output, session) {
   })
   
   #####################.
+  # titles 
+  #create title and subtitle variables
+  output$heat_title <- renderText({
+    paste0(names(profile_list[unname(profile_list) == input$profile_heat]),
+                       " profile: ", input$topic_heat)
+  })
+  output$heat_subtitle <- renderText({
+    if(input$comp_heat == 1){
+      paste0(input$geoname_heat," (",input$geotype_heat,") compared against ",
+             input$geocomp_heat)
+    } else if(input$comp_heat==2){
+      paste0("Changes within ",input$geoname_heat,": latest data available",
+           " compared to ", input$yearcomp_heat)
+    }
+  })
+  
+  #####################.
   #Heatmap plot
   
   # Calculates number of different indicators and then multiplies by pixels per row
@@ -575,10 +593,7 @@ function(input, output, session) {
     length <- length(no_ind) * 28 + 125
   
   }
-  
-  #Title of plot
-  output$title_heat <- renderText(paste0(input$geoname_heat, " - ", input$topic_heat))
-  
+
   #Function to create ggplot, then used in renderPlot and ggsave
   plot_heat <- function(){
     
@@ -605,7 +620,7 @@ function(input, output, session) {
     ggplot(heat, aes(x = year, y = indicator, fill = color,
                      text= heat_tooltip)) +
       geom_tile(color = "black") +
-      geom_text(aes(label = round(measure, 0)), size =2.5) +
+      geom_text(aes(label = round(measure, 0)), size =3) +
       #Another step needed to make the palette of colours for the tile work
       scale_fill_manual(name = "Legend", labels = c("Significantly better", "Not significantly different", "Significantly worse", "Significance is not calculated"),
                         values = c(blue = "#4da6ff", gray = "gray88", red = "#ffa64d", white = "#ffffff")) +
@@ -618,7 +633,7 @@ function(input, output, session) {
             axis.title.y=element_blank(), #Taking out y axis title
             panel.background = element_blank(),#Blanking background
             legend.position="none", #taking out legend
-            text = element_text(size=11) # changing font size
+            text = element_text(size=14) # changing font size
       )
   }
   
