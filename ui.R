@@ -456,7 +456,7 @@ tabPanel("Map", icon = icon("globe"), value = "map",
 ), #Tab panel bracket
 
 ###############################################.
-## Table ----
+## Data ----
 ###############################################.
 tabPanel("Data", icon = icon("table"), value = "table",
          #Sidepanel for filtering data
@@ -466,7 +466,8 @@ tabPanel("Data", icon = icon("table"), value = "table",
            fluidRow(
                     p("Filter ScotPHO data by", style = "font-weight: bold; color: black;"),
                     tags$div("Select appropriate conditions to filter data. ",
-                             "To delete choices use RETURN or select item and DELETE")
+                             "To delete choices use RETURN or select item and DELETE"),
+                    br()
                     ),
            #Row 2 for selections
            fluidRow(
@@ -606,41 +607,41 @@ navbarMenu("Info", icon = icon("info-circle"),
                       tags$ul( 
                         #Link to user guide
                         tags$li(class= "li-custom", tags$a(href="", "User guide",  class="externallink"), 
-                                tags$b(" (coming soon)"), " - Learn how to use and get the most out of the tool."),
+                                tags$b(" (coming soon)"), " - Learn how to use and get the most out of the tool"),
                         #Link to technical report
                         tags$li(class= "li-custom", tags$a(href="http://www.scotpho.org.uk/comparative-health/profiles/resources/",
                                                            "Technical reports",  class="externallink"), 
-                                " - Detailed description of the methodology, statistics and caveats of the data presented."),
+                                " - Detailed description of the methodology, statistics and caveats of the data presented"),
                         #Link to overview reports
                         tags$li(class= "li-custom", tags$a(href="http://www.scotpho.org.uk/comparative-health/profiles/resources/",
                                                            "Overview reports",  class="externallink"), 
-                                " - These provide context, narrative and analysis for each profile."),
+                                " - These provide context, narrative and analysis for each profile"),
                         #Link to user guide
                         tags$li(class= "li-custom", tags$a(href="http://www.scotpho.org.uk/media/1026/explanation-of-statistics-used-in-profiles-v2.pptx", 
                                                            "Statistics of the profiles",  class="externallink"), 
-                                " - A guide and explanation of the statistics used in the profiles."),
+                                " - A guide and explanation of the statistics used in the profiles"),
                         #Link to timetable of updates
                         tags$li(class= "li-custom", tags$a(href="https://docs.google.com/spreadsheets/d/e/2PACX-1vQUQMORMqe9RrMnS9WJSu51Q6ef0rubiF1M-QN3BYZIBueErtTvvbRe_kTZbWmnupiO_Uie80BoZCnK/pubhtml",
                                                            "Timetable of updates", class="externallink"), 
-                                "- List of available indicators, date of last update and expected next update."),
+                                "- List of available indicators, date of last update and expected next update"),
                         #Link to Github repositories
                         tags$li(class= "li-custom", tags$a(href="https://github.com/Health-SocialCare-Scotland/ScotPHO-profile-indicators",
                                                            "Indicator production code", class="externallink"), 
                                 " and ",
                                 tags$a(href="https://github.com/Health-SocialCare-Scotland/ScotPHO-profile-tool",
                                        "Profile tool code", class="externallink"), 
-                                "- Access the code used to produce the indicator data and this tool."),
+                                "- Access the code used to produce the indicator data and this tool"),
                         #Link to population lookups
                         tags$li(class= "li-custom", tags$a(href="https://www.opendata.nhs.scot/dataset/population-estimates",
                                                            "Population estimate", class="externallink"),  " and ",
                                 tags$a(href="                   https://www.opendata.nhs.scot/dataset/geography-codes-and-labels",
                                        "geography names and codes", class="externallink"), 
                                 "- Where you can find the files with the populations and geographies
-                                used for the analysis."),
+                                used for the analysis"),
                         #Link to shapefiles
                         tags$li(class= "li-custom", tags$a(href="https://data.gov.uk/publisher/scottish-government-spatial-data-infrastructure",
                                                            "Shapefiles", class="externallink"), 
-                                "- Where you can find the shapefiles used for the map.")
+                                "- Where you can find the shapefiles used for the map")
                         ), #Bullet point list bracket
                       br()
                       ) # mainPanel bracket
