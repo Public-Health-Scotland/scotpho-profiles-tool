@@ -157,7 +157,7 @@ areatype_depr_list <- c("Scotland", "Health board", "Council area") #for depriva
 #Indicator names
 indicator_list <- sort(unique(optdata$indicator))
 indicator_map_list <- sort(unique(optdata$indicator[optdata$interpret != 'O']))
-ind_depr_list <- unique(deprivation$indicator)
+#ind_depr_list <- unique(deprivation$indicator)
 
 #Profile names
 topic_list <- sort(c('Alcohol', 'Behaviours',  'Cancer', 'Children and young people - Achieving',
