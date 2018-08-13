@@ -798,11 +798,11 @@ function(input, output, session) {
       #add variable denoting if sign diff between comparator
       bar<-bar %>%
         mutate(flag=ifelse(bar$interpret == "O",'No significance can be calculated',
-                           ifelse(bar$lowci_chosen<=bar$measure_comp & bar$upci_chosen>=bar$measure_comp,'Statistically not significantly different from comparator average',
-                                  ifelse(bar$lowci_chosen > bar$measure_comp & bar$interpret == "H", 'Statistically significantly better than comparator average',
-                                         ifelse(bar$lowci_chosen > bar$measure_comp & bar$interpret == "L", 'Statistically significantly worse than comparator average',
-                                                ifelse(bar$upci_chosen < bar$measure_comp & bar$interpret == "L", 'Statistically significantly better than comparator average',
-                                                       ifelse(bar$upci_chosen < bar$measure_comp & bar$interpret == "H", 'Statistically significantly worse than comparator average','Statistically not significantly different from comparator average')))))))
+                           ifelse(bar$lowci_chosen<=bar$measure_comp & bar$upci_chosen>=bar$measure_comp,'Not different to comparator',
+                                  ifelse(bar$lowci_chosen > bar$measure_comp & bar$interpret == "H", 'Better than comparator',
+                                         ifelse(bar$lowci_chosen > bar$measure_comp & bar$interpret == "L", 'Worse than comparator',
+                                                ifelse(bar$upci_chosen < bar$measure_comp & bar$interpret == "L", 'Better than comparator',
+                                                       ifelse(bar$upci_chosen < bar$measure_comp & bar$interpret == "H", 'Worse than comparator','Not different to comparator')))))))
       
       #Transposing data so that better is always to the right of plot
       bar <- bar %>%
@@ -833,18 +833,14 @@ function(input, output, session) {
       areatype_name <- input$geotype_bar
       chosenarea_name <- input$geoname_bar
       comparea_name <- input$geocomp_bar
-      # topic_name <- input$topic_bar
-      # bar_subtitle <- paste("Topic:",input$topic_bar,sep=" ")
-      
+
       #Create colour scale for lines & legend key.
-      #colour_lines <-  scale_colour_manual(" ",values= setNames(c("black", "lightseagreen", "goldenrod1"), c(areatype_name, chosenarea_name, comparea_name)))
-      colour_lines <-  scale_colour_manual(" ",values= setNames(c("black","#76e5a2","#e576b9"), c(areatype_name, chosenarea_name, comparea_name)))
-      
+      #468961 (green-selected) #e5769b (pink-comparator)
+      colour_lines <-  scale_colour_manual(" ",values= setNames(c("black","#468961","#e5769b"), c(areatype_name, chosenarea_name, comparea_name)))
       
       #Create fill colour scheme for significance.
-      fill_df <- data.frame(flag = c('No significance can be calculated', 'Statistically not significantly different from comparator average', 'Statistically significantly better than comparator average','Statistically significantly worse than comparator average'),stringsAsFactors = TRUE)
-      #fillcolours <- c("white", "#999999","DodgerBlue","#ff9933")
-      fillcolours <- c("white", "gray","#ffa64d","#ffa64d")
+      fill_df <- data.frame(flag = c ('No significance can be calculated','Not different to comparator','Better than comparator','Worse than comparator'),stringsAsFactors = TRUE)
+      fillcolours <- c("#4da6ff","white","grey88","#ffa64d")
       names(fillcolours) <- levels(fill_df$flag)
       colour_points <- scale_fill_manual(name = "flag",values = fillcolours)
       
@@ -854,7 +850,7 @@ function(input, output, session) {
         geom_line(aes(x = comp, colour=comparea_name), size=1) + #line for comparator
         geom_point(aes(fill=flag, shape=flag, x= minx, y=0.5),size=8,colour="grey40") +
         geom_text(data=data_labels, aes(x=x_chosen,y=1.5,label=round(chosen_lab,digits=0)),
-                  check_overlap = TRUE,size=5,colour = "#76e5a2",vjust=1, hjust=0) + #label for chosenarea
+                  check_overlap = TRUE,size=5,colour = "#468961",vjust=1, hjust=0) + #label for chosenarea
         geom_text(data=data_labels, aes(x=x_comp,y=-0.6,label=round(comp_lab,digits=0)),
                   check_overlap = TRUE,size=5,colour = "#e576b9",vjust=0, hjust=1) + #label for comparator
         xlab("Worse  <-------------------->  Better")+
@@ -863,8 +859,6 @@ function(input, output, session) {
         colour_points+
         scale_shape_manual(values=c(22,22,22,22)) +
         guides(color = "none",fill = "none", shape="none")+
-        #guides(color = guide_legend(order = 1),fill = "none", shape="none")+ #switch guides when fixed problem of wrong colours for significance
-        #guides(color = guide_legend(order = 1),fill = guide_legend(order = 0))+
         theme(
           axis.title.y=element_blank(), #Taking out y axis title
           axis.title.x=element_text(size=12, colour ='#555555',hjust=0.6), #x axis title contains better/worse

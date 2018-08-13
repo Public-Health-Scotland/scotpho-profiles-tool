@@ -246,13 +246,13 @@ tabPanel(title = "Summary", icon = icon("adjust"), value = "ring",
                       #Legend
                       br(),
                       p(img(src='signif_better.png', height=18, style="padding-right: 2px; vertical-align:middle"), 
-                        "Better than comparator.", br(),
+                        "Better than comparator", br(),
                         img(src='non_signif.png', height=18, style="padding-right: 2px; vertical-align:middle"), 
-                        "Not different from comparator.", br(),
+                        "Not different to comparator", br(),
                         img(src='signif_worse.png', height=18, style="padding-right: 2px; vertical-align:middle"), 
-                        "Worse than comparator.", br(),
+                        "Worse than comparator", br(),
                         img(src='signif_nocalc.png', height=18, style="padding-right: 2px; vertical-align:middle"), 
-                        "No differences can be calculated."), 
+                        "No differences can be calculated"), 
                       downloadButton('download_ring', 'Download data', class = "down"),
                       savechart_button('download_ringplot', 'Save chart',  class = "down")
          ),
@@ -265,7 +265,7 @@ tabPanel(title = "Summary", icon = icon("adjust"), value = "ring",
 ###############################################.
 tabPanel("Heatmap", icon = icon("list-ul"), value = "heat",
          wellPanel( #Filter options
-           column(3,
+           column(2,
                   selectInput("profile_heat", "Profile", choices = profile_list),
                   uiOutput("topic_ui_heat")
            ),
@@ -290,16 +290,16 @@ tabPanel("Heatmap", icon = icon("list-ul"), value = "heat",
                                    uiOutput("yearcomp_ui_heat")
                   ) 
            ),
-           column(2,
+           column(3,
                   #Legend
                   p(img(src='signif_better.png', height=18, style="padding-right: 2px; vertical-align:middle"), 
-                    "Better than comparator.", br(),
+                    "Better than comparator", br(),
                     img(src='non_signif.png', height=18, style="padding-right: 2px; vertical-align:middle"), 
-                    "Not different from comparator.", br(),
+                    "Not different to comparator", br(),
                     img(src='signif_worse.png', height=18, style="padding-right: 2px; vertical-align:middle"), 
-                    "Worse than comparator.", br(),
+                    "Worse than comparator", br(),
                     img(src='signif_nocalc.png', height=18, style="padding-right: 2px; vertical-align:middle"), 
-                    "No differences are calculated.")
+                    "No differences can be calculated")
            ),
            column(2,
                   actionButton("help_heat",label="Help", icon= icon('question-circle'), class ="down"),
@@ -329,13 +329,13 @@ tabPanel("Barcode", icon = icon("barcode"), value = "barcode",
                       uiOutput("geoname_ui_bar"),
                       selectInput("geocomp_bar", "Compare with", choices = comparator_list, selectize=TRUE, selected = "Scotland"),
                       p(img(src='signif_better.png', height=18, style="padding-right: 2px; vertical-align:middle"), 
-                        "Better than comparator.", br(),
+                        "Better than comparator", br(),
                         img(src='non_signif.png', height=18, style="padding-right: 2px; vertical-align:middle"), 
-                        "Not different from comparator.", br(),
+                        "Not different to comparator", br(),
                         img(src='signif_worse.png', height=18, style="padding-right: 2px; vertical-align:middle"), 
-                        "Worse than comparator.", br(),
+                        "Worse than comparator", br(),
                         img(src='signif_nocalc.png', height=18, style="padding-right: 2px; vertical-align:middle"), 
-                        "No differences can be calculated."),
+                        "No differences can be calculated"),
                       uiOutput("ui_bar_legend_selected"),
                       uiOutput("ui_bar_legend_comparator"),
                       uiOutput("ui_bar_legend_areatype"),
@@ -402,13 +402,13 @@ tabPanel("Rank", icon = icon("signal"), value = "rank",
                   shiny::hr(),
                   #Legend
                   p(img(src='signif_better.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
-                    "Better than comparator.", br(),
+                    "Better than comparator", br(),
                     img(src='non_signif.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
-                    "Not different from comparator.", br(),
+                    "Not different to comparator", br(),
                     img(src='signif_worse.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
-                    "Worse than comparator.", br(),
+                    "Worse than comparator", br(),
                     img(src='signif_nocalc2.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
-                    "No differences are calculated.")
+                    "No differences can be calculated")
          ),
          mainPanel(width = 8, #Main panel
                    h5(textOutput("title_rank"), style="color: black; text-align: center"),
@@ -441,13 +441,13 @@ tabPanel("Map", icon = icon("globe"), value = "map",
            shiny::hr(),
            #Legend
            p(img(src='signif_better.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
-             "Better than comparator.", br(),
+             "Better than comparator", br(),
              img(src='non_signif.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
-             "Not different from comparator.", br(),
+             "Not different to comparator", br(),
              img(src='signif_worse.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
-             "Worse than comparator.", br(),
+             "Worse than comparator", br(),
              img(src='signif_nocalc.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
-             "No differences are calculated.")
+             "No differences can be calculated")
          ), 
          mainPanel( #Main panel
            h5(textOutput("title_map"), style="color: black; text-align: center"),
@@ -691,8 +691,8 @@ tabPanel("Related Links", value = "evidence",
 tabPanel("Other profiles", value = "others",
          sidebarPanel(width=1),
          mainPanel(
-           h4("Alternative profiles", style = "color:black;"),
-           p("There are numerous profiles covering local areas within Scotland. Different profile products are often designed for a specific purpose or to suit a specific audience.
+           h4("Alternative profiles & resources", style = "color:black;"),
+           p("There are a number of organisations that provide local information relating to the wider determinants of health in Scotland.
              Below are links to some of alternative profiling products."),
            tags$ul( 
              #Link to old tool
@@ -701,7 +701,7 @@ tabPanel("Other profiles", value = "others",
                      " - The old style ScotPHO profiles are currently still accessible via our old profile platform"),
              #Link to GCPH
              tags$li(class= "li-custom", tags$a(href="http://www.understandingglasgow.com/",
-                                                "Glasgow Centre for Population Health (GCPH) profiles",  class="externallink")), 
+                                                "Glasgow Centre for Population Health (GCPH)",  class="externallink")), 
              #Link to Fife
              tags$li(class= "li-custom", tags$a(href="https://knowfife.fife.gov.uk/",
                                                 "KnowFife Dataset",  class="externallink")), 
@@ -710,7 +710,7 @@ tabPanel("Other profiles", value = "others",
                                                 "Improvement Service (IS) - Community planning outcomes profile (CPOP)",  class="externallink")), 
              #Link to NRS
              tags$li(class= "li-custom", tags$a(href="https://www.nrscotland.gov.uk/statistics-and-data/statistics/stats-at-a-glance/council-area-profiles", 
-                                                "National Records of Scotland (NRS) Council area profiles",  class="externallink")), 
+                                                "National Records of Scotland (NRS) Council Area Profiles",  class="externallink")), 
              #Link to stats.gov.scot
              tags$li(class= "li-custom", tags$a(href="http://statistics.gov.scot/home", 
                                                 "Statistics.gov.scot",  class="externallink")), 
