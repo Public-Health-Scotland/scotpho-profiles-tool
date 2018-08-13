@@ -55,12 +55,17 @@ navbarPage(id = "intabset", #needed for landing page
                           ".down{background-color:#4da6ff; color: white; background-image:none; min-width: 22vh;
                           font-size: 14px; padding: 5px 10px; margin-top: 5px; margin-left: 3px}",
                           #landing page boxes
-                          ".landing-page-box {width:100%; height:100%; min-height:18vh; background-color:AliceBlue;
-                          border: 1px solid #AAAAAA; margin-bottom: 5px; float: left; transition: 0.5s ease;}",
-                          ".landing-page-box-about {width:100%; height:100%; min-height:9vh; background-color:AliceBlue;
-                          border: 1px solid #AAAAAA; margin-bottom: 5px; float: left; transition: 0.5s ease; }",
+                          ".landing-page-box {width:100%; height:100%; min-height:20vh; background-color:white;
+                          border: 1px solid #AAAAAA; margin-bottom: 5px; float: left; transition: 0.5s ease; position: relative; object-fit: scale-down;}",
+                          ".landing-page-box-about {width:100%; height:100%; min-height:9.7vh; background-color:white;
+                          border: 1px solid #AAAAAA; margin-bottom: 5px; float: left; position: relative; object-fit: scale-down;}",
                           ".landing-page-box:hover, .landing-page-box-about:hover {-webkit-transform: scale(1.05); 
                           -ms-transform: scale(1.05); transform: scale(1.05); }", #hover effect on boxes
+                          #landing page icons
+                          ".landing-page-icon {width:100%; height:85%; min-height:12vh; background-color: white;
+                          border: 0px ; position: absolute; object-fit: scale-down;}",
+                          ".landing-page-about-icon {width:100%; height:65%; min-height:5vh; background-color: white;
+                          border: 0px; position: absolute; object-fit: scale-down;}",
                           #landing-page titles for boxes
                           ".landing-page-box-title {font-size: 16px; text-align:center; color: darkblue;
                           font-weight: bold; background-color: none; width:100%; max-height: 20px; margin-top: 10px; }",
@@ -70,19 +75,22 @@ navbarPage(id = "intabset", #needed for landing page
                           #landing page buttons
                           ".landing-page-button {text-align:center;
                           background-image:none; color: black; white-space: normal; border-radius: 0;border: 0px;
-                          font-size: 16px; position: static; min-height: 18vh; width: 100%; opacity: 0;}",
-           
-               
-               ".landing-page-button-about {text-align:center;
-               background-image:none; color: black; white-space: normal; border-radius: 0; border:0px;
-               font-size: 14px; position: static; height: 7vh; width: 100%; opacity:0;}",
-               ".landing-page-button:hover , .landing-page-button:active , .landing-page-button-about:hover, .landing-page-button-about:active {opacity: 1; 
-               background-color: #fff; /* fallback */
-               background-color: rgba(255, 255, 255, 0.8);
-               color: darkblue;
-               border-color: #fff; /* fallback */
-               border-color: rgba(255, 255, 255, 0.8); transition: background-color 0.3s ease-in,
-               color 0.3s ease-in;}",
+                          font-size: 16px; min-height: 14vh; position: absolute; margin-bottom: 0px; margin-top: 5px; float: middle;width: 100%; opacity: 0;}",
+                          ".landing-page-button-about {text-align:center;
+                          background-image:none; color: black; white-space: normal; border-radius: 0; border:0px ;
+                          font-size: 14px; position: absolute; min-height: 5vh; margin-bottom: 0px; margin-top: 1px; float: middle; width: 100%; opacity:0;}",
+                          #hover effect on landing page buttons
+                           ".landing-page-button:hover , .landing-page-button:active , .landing-page-button-about:hover, .landing-page-button-about:active {opacity: 1; 
+                          background-color: #fff; /* fallback */
+                          background-color: rgba(255, 255, 255, 0.8);
+                          color: darkblue;
+                          border-color: #fff; /* fallback */
+                          border-color: rgba(255, 255, 255, 0.8); transition: background-color 0.3s ease-in,
+                          color 0.3s ease-in;}",
+                 #center image - for normal icons
+                 "img.center {object-fit: scale-down; position:absolute; width:100%; height:100%; margin-left:auto; margin-right: auto; display: block; padding:20px;}",
+                 #center image - for about icons
+                 "img.centerabout {object-fit: scale-down; position:absolute; width:100%; height:100%; margin-left:auto; margin-right: auto; display: block; padding:8px;}",
                #landing-page column 
                ".landing-page-column {padding-right:3vh}",
                #landing-page icons
@@ -106,25 +114,25 @@ tabPanel(
     fluidRow(
       #Ring plot box
       column(4, class="landing-page-column",
-             div(class="landing-page-box", style="background-image: url(donut_10.png);
-                 background-repeat: no-repeat; background-size: 38%; background-position: bottom 23px center; background-color: white;",
-                 div("Summary", class = "landing-page-box-title"),
+             div(class="landing-page-box", 
+                 div("Profile Summary", class = "landing-page-box-title"),
+                 div(class = "landing-page-icon", div(img(src="donut_10.png", class="center"))),
                  actionButton('jump_to_ring', 'A high level view of an area across a suit of indicators', 
                               class="landing-page-button", 
                               icon = icon("arrow-circle-right", "icon-lp")))),
       #Heat map box
       column(4, class="landing-page-column",
-             div(class="landing-page-box", style="background-image: url(heatmap_2.png);
-                 background-repeat: no-repeat; background-size: 60%; background-position: bottom 30px center ;background-color: white;",
-                 div("Heatmap", class = "landing-page-box-title"),
-                 actionButton('jump_to_heat', 'Explore how indicators for a domain area have changed over time', 
+             div(class="landing-page-box",
+                 div("Topic Summary: Time Trends", class = "landing-page-box-title"),
+                 div(class = "landing-page-icon", div(img(src="heatmap_2.png", class="center"))),
+                 actionButton('jump_to_heat', 'Explore how indicators for a topic area have changed over time', 
                               class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp")))),
       #Barcode plot box
       column(4, class="landing-page-column",
-             div(class="landing-page-box", style="background-image: url(barcode_3.png);
-                 background-repeat: no-repeat; background-size: 50%; background-position: bottom 25px center ;background-color: white;",
-                 div("Barcode", class = "landing-page-box-title"),
-                 actionButton('jump_to_barcode', 'Explore how indicators for a domain compare across different geographies',
+             div(class="landing-page-box", 
+                 div("Topic Summary: Geographic Distribution", class = "landing-page-box-title"),
+                 div(class = "landing-page-icon", div(img(src="barcode_3.png", class="center"))),
+                 actionButton('jump_to_barcode', 'Explore how indicators for a topic compare across different geographies',
                               class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp"))))
     ),
     fluidRow(h4("Explore a single indicator in more detail")),
@@ -132,24 +140,24 @@ tabPanel(
     fluidRow(
       #Trend plot box
       column(4, class="landing-page-column",
-             div(class="landing-page-box", style="background-image: url(time_trend.png);
-                 background-repeat: no-repeat; background-size: 61%; background-position: bottom 25px center ;background-color: white; ",
+             div(class="landing-page-box", 
                  div("Trend", class = "landing-page-box-title"),
+                 div(class = "landing-page-icon", div(img(src="time_trend.png", class="center"))),
                  actionButton('jump_to_trend', 'Look at how an indicator changes over time',
                               class="landing-page-button", 
                               icon = icon("arrow-circle-right", "icon-lp")))),
       #Rank plot box
       column(4, class="landing-page-column",
-             div(class="landing-page-box", style="background-image: url(rank_5.png);
-                 background-repeat: no-repeat; background-size: 63%; background-position: bottom 25px center ;background-color: white;",
+             div(class="landing-page-box", 
                  div("Rank", class = "landing-page-box-title"),
+                 div(class = "landing-page-icon", div(img(src="rank_5.png", class="center"))),
                  actionButton('jump_to_rank', 'Compare geographical variation for an indicator using a bar chart', 
                               class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp")))),
       #Map plot box
       column(4, class="landing-page-column",
-             div(class="landing-page-box", style="background-image: url(map_2.png);
-                 background-repeat: no-repeat; background-size: 54%; background-position: bottom 25px center ;background-color: white; ",
+             div(class="landing-page-box", 
                  div("Map", class = "landing-page-box-title"),
+                 div(class = "landing-page-icon", div(img(src="map_2.png", class="center"))),
                  actionButton('jump_to_map', 'Compare geographical variation for an indicator using a map', 
                               class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp"))))
       #, - VE removed inequalities data for initial launch of profiles
@@ -166,43 +174,43 @@ tabPanel(
     fluidRow(
       #Table box 
       column(4, class="landing-page-column",
-             div(class="landing-page-box", style="background-image: url(data_table.png);
-                 background-repeat: no-repeat; background-size: 57%; background-position: bottom 20px center ;background-color: white;", 
+             div(class="landing-page-box", 
                  div("Data", class = "landing-page-box-title"),
+                 div(class = "landing-page-icon", div(img(src="data_table.png", class="center"))),
                  actionButton('jump_to_table', 'View and download the data behind the tool', 
                               class="landing-page-button", 
                               icon = icon("arrow-circle-right", "icon-lp"))
              )),
       #About box
       column(4, class="landing-page-column",
-             div(class="landing-page-box-about", style="background-image: url(about_2.png);
-                 background-repeat: no-repeat; background-size: 14%; background-position: bottom 7px center ;background-color: white;", 
+             div(class="landing-page-box-about", 
                  div("About", class = "landing-page-box-title"),
-                 actionButton('jump_to_about', 'About ScotPHO', 
+                 div(class = "landing-page-about-icon", div(img(src="about_2.png", class="centerabout"))),
+                 actionButton('jump_to_about', 'About ScotPHO Profiles', 
                               class="landing-page-button-about", 
                               icon = icon("arrow-circle-right", "icon-lp"))
              ),
              #Evidence box
-             div(class="landing-page-box-about", style="background-image: url(other_profile.png);
-                 background-repeat: no-repeat; background-size: 18%; background-position: bottom 7px center ;background-color: white;", 
-                 div("Related links", class = "landing-page-box-title" ),
+             div(class="landing-page-box-about", 
+                 div("Related Links", class = "landing-page-box-title" ),
+                 div(class = "landing-page-about-icon", div(img(src="other_profile.png", class="centerabout"))),
                  actionButton('jump_to_evidence', 'Links to websites or documents with useful profiles information', 
                               class="landing-page-button-about", 
                               icon = icon("arrow-circle-right", "icon-lp")))
       ),
       #Resources box
       column(4, class="landing-page-column", 
-             div(class="landing-page-box-about", style="background-image: url(technical_resources.png);
-                 background-repeat: no-repeat; background-size: 21%; background-position: bottom 7px center ;background-color: white;", 
-                 div("Technical resources", class = "landing-page-box-title"),
+             div(class="landing-page-box-about",
+                 div("Technical Resources", class = "landing-page-box-title"),
+                 div(class = "landing-page-about-icon", div(img(src="technical_resources.png", class="centerabout"))),
                  actionButton('jump_to_resources', 'Find technical information about the ScotPHO profile definitions and methodology', 
                               class="landing-page-button-about", 
                               icon = icon("arrow-circle-right", "icon-lp"))
              ),
              #Other profiles
-             div(class="landing-page-box-about", style="background-image: url(related_links.png);
-                 background-repeat: no-repeat; background-size: 19%; background-position: bottom 7px center ;background-color: white;", 
+             div(class="landing-page-box-about", 
                  div("Other profiles", class = "landing-page-box-title"),
+                 div(class = "landing-page-about-icon", div(img(src="related_links.png", class="centerabout"))),
                  actionButton('jump_to_others', 'Links to alternative profiling tools', 
                               class="landing-page-button-about", 
                               icon = icon("arrow-circle-right", "icon-lp")))
@@ -572,7 +580,7 @@ navbarMenu("Info", icon = icon("info-circle"),
                     sidebarPanel(width=1),
                     mainPanel(width=8,
                               h4("About", style = "color:black;"),
-                              p("ScotPHO's profiles tool is designed to allow users to explore the various different profiles 
+                              p("ScotPHO's profiles tool allows users to explore the various different profiles 
                                 produced by the ", tags$a(href="http://www.scotpho.org.uk/about-us/about-scotpho/", "ScotPHO collaboration.", 
                                                           class="externallink")),
                               p("The profiles are intended to increase understanding of local health issues 
@@ -684,12 +692,8 @@ tabPanel("Other profiles", value = "others",
          sidebarPanel(width=1),
          mainPanel(
            h4("Alternative profiles", style = "color:black;"),
-           p("A number of different organisations produce local area profile products. These different profile products have often
-              been designed to serve a particular purpse or to suit a specific audience.  Occassionally the same or similar key indicators
-              may appear across multiple different profile products, ScotPHO aim to align indicator definitions with recognised 
-              national definitions or with other Scottish organisations.  We aim to highlight similarities or differences between defintions
-              used by ScotPHO and some of the other major Scottish profiles in our techinical documentation. 
-.             Below are links to some related profiling products."),
+           p("There are numerous profiles covering local areas within Scotland. Different profile products are often designed for a specific purpose or to suit a specific audience.
+             Below are links to some of alternative profiling products."),
            tags$ul( 
              #Link to old tool
              tags$li(class= "li-custom", tags$a(href="https://scotpho.nhsnss.scot.nhs.uk/scotpho/homeAction.do", 
@@ -697,24 +701,22 @@ tabPanel("Other profiles", value = "others",
                      " - The old style ScotPHO profiles are currently still accessible via our old profile platform"),
              #Link to GCPH
              tags$li(class= "li-custom", tags$a(href="http://www.understandingglasgow.com/",
-                                                "Glasgow profiles",  class="externallink"), 
-                     " - Glasgow Centre for Population Health."),
+                                                "Glasgow Centre for Population Health (GCPH) profiles",  class="externallink")), 
              #Link to Fife
              tags$li(class= "li-custom", tags$a(href="https://knowfife.fife.gov.uk/",
-                                                "Fife profiles",  class="externallink"), 
-                     " - Fife Council."),
+                                                "KnowFife Dataset",  class="externallink")), 
              #Link to IS
              tags$li(class= "li-custom", tags$a(href="http://www.improvementservice.org.uk/community-planning-outcomes-profile.html",
-                                                "Community planning outcomes profile",  class="externallink"), 
-                     " - Improvement Service."),
+                                                "Improvement Service (IS) - Community planning outcomes profile (CPOP)",  class="externallink")), 
              #Link to NRS
              tags$li(class= "li-custom", tags$a(href="https://www.nrscotland.gov.uk/statistics-and-data/statistics/stats-at-a-glance/council-area-profiles", 
-                                                "Council area profiles",  class="externallink"), 
-                     " - National Records of Scotland."),
-             #Link to NRS
+                                                "National Records of Scotland (NRS) Council area profiles",  class="externallink")), 
+             #Link to stats.gov.scot
              tags$li(class= "li-custom", tags$a(href="http://statistics.gov.scot/home", 
-                                                "Open data and area profiles for Scotland",  class="externallink"), 
-                     " - Statistics.gov.scot -  Scotland's official statistics site.")
+                                                "Statistics.gov.scot",  class="externallink")), 
+             #Link to Scottish nation
+             tags$li(class= "li-custom", tags$a(href="http://www.environment.gov.scot/", 
+                                                "Scotland's Environment Hub",  class="externallink"))
            ), #Bullet point list bracket
            br()
            ) # mainPanel bracket
