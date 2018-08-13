@@ -55,9 +55,9 @@ navbarPage(id = "intabset", #needed for landing page
                           ".down{background-color:#4da6ff; color: white; background-image:none; min-width: 22vh;
                           font-size: 14px; padding: 5px 10px; margin-top: 5px; margin-left: 3px}",
                           #landing page boxes
-                          ".landing-page-box {width:100%; height:100%; min-height:20vh; background-color:white;
+                          ".landing-page-box {width:100%; height:100%; min-height:22vh; background-color:white;
                           border: 1px solid #AAAAAA; margin-bottom: 5px; float: left; transition: 0.5s ease; position: relative; object-fit: scale-down;}",
-                          ".landing-page-box-about {width:100%; height:100%; min-height:9.7vh; background-color:white;
+                          ".landing-page-box-about {width:100%; height:100%; min-height:10.7vh; background-color:white;
                           border: 1px solid #AAAAAA; margin-bottom: 5px; float: left; position: relative; object-fit: scale-down;}",
                           ".landing-page-box:hover, .landing-page-box-about:hover {-webkit-transform: scale(1.05); 
                           -ms-transform: scale(1.05); transform: scale(1.05); }", #hover effect on boxes
@@ -75,10 +75,10 @@ navbarPage(id = "intabset", #needed for landing page
                           #landing page buttons
                           ".landing-page-button {text-align:center;
                           background-image:none; color: black; white-space: normal; border-radius: 0;border: 0px;
-                          font-size: 16px; min-height: 14vh; position: absolute; margin-bottom: 0px; margin-top: 5px; float: middle;width: 100%; opacity: 0;}",
+                          font-size: 16px; min-height: 16vh; position: absolute; margin-bottom: 0px; margin-top: 5px; float: middle;width: 100%; opacity: 0;}",
                           ".landing-page-button-about {text-align:center;
                           background-image:none; color: black; white-space: normal; border-radius: 0; border:0px ;
-                          font-size: 14px; position: absolute; min-height: 5vh; margin-bottom: 0px; margin-top: 1px; float: middle; width: 100%; opacity:0;}",
+                          font-size: 14px; position: absolute; min-height: 7vh; margin-bottom: 0px; margin-top: 1px; float: middle; width: 100%; opacity:0;}",
                           #hover effect on landing page buttons
                            ".landing-page-button:hover , .landing-page-button:active , .landing-page-button-about:hover, .landing-page-button-about:active {opacity: 1; 
                           background-color: #fff; /* fallback */
@@ -115,7 +115,7 @@ tabPanel(
       #Ring plot box
       column(4, class="landing-page-column",
              div(class="landing-page-box", 
-                 div("Profile Summary", class = "landing-page-box-title"),
+                 div("Summary: Profile View", class = "landing-page-box-title"),
                  div(class = "landing-page-icon", div(img(src="donut_10.png", class="center"))),
                  actionButton('jump_to_ring', 'A high level view of an area across a suit of indicators', 
                               class="landing-page-button", 
@@ -123,14 +123,14 @@ tabPanel(
       #Heat map box
       column(4, class="landing-page-column",
              div(class="landing-page-box",
-                 div("Topic Summary: Time Trends", class = "landing-page-box-title"),
+                 div("Heatmap: Time Trends", class = "landing-page-box-title"),
                  div(class = "landing-page-icon", div(img(src="heatmap_2.png", class="center"))),
                  actionButton('jump_to_heat', 'Explore how indicators for a topic area have changed over time', 
                               class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp")))),
       #Barcode plot box
       column(4, class="landing-page-column",
              div(class="landing-page-box", 
-                 div("Topic Summary: Geographic Distribution", class = "landing-page-box-title"),
+                 div("Barcode: Geographic Distribution", class = "landing-page-box-title"),
                  div(class = "landing-page-icon", div(img(src="barcode_3.png", class="center"))),
                  actionButton('jump_to_barcode', 'Explore how indicators for a topic compare across different geographies',
                               class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp"))))
