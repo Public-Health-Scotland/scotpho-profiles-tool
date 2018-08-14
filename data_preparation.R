@@ -326,6 +326,11 @@ ca_bound<-readOGR(shapefiles, "CA_simpl") %>%
   setNames(tolower(names(.))) #variables to lower case
 names(ca_bound@data)[names(ca_bound@data)=="gss_cod"] <- "code"
 names(ca_bound@data)[names(ca_bound@data)=="name"] <- "area_name"
+
+#TEMPORARY FIX. dealing with change in ca, hb and hscp codes
+ca_bound$code <- recode(as.character(ca_bound$code), 
+                          "S12000015"='S12000047', "S12000024"='S12000048')
+
 saveRDS(ca_bound, "./data/CA_boundary.rds")
 
 ##########################.
@@ -347,6 +352,11 @@ hb_bound<-readOGR(shapefiles,"HB_simpl") %>%
   setNames(tolower(names(.))) #variables to lower case
 names(hb_bound@data)[names(hb_bound@data)=="hbcode"] <- "code"
 names(hb_bound@data)[names(hb_bound@data)=="hbname"] <- "area_name"
+
+#TEMPORARY FIX. dealing with change in ca, hb and hscp codes
+hb_bound$code <- recode(as.character(hb_bound$code), 
+                          "S08000018"='S08000029', "S08000027"= 'S08000030')
+
 saveRDS(hb_bound, "./data/HB_boundary.rds")
 
 ##########################.
@@ -375,6 +385,11 @@ writeOGR(hscp_bound_orig, dsn=shapefiles, "HSCP_simpl",
 hscp_bound <- readOGR(shapefiles,"HSCP_simpl")
 names(hscp_bound@data)[names(hscp_bound@data)=="hiacode"] <- "code"
 names(hscp_bound@data)[names(hscp_bound@data)=="hianame"] <- "area_name"
+
+#TEMPORARY FIX. dealing with change in ca, hb and hscp codes
+hscp_bound$code <- recode(as.character(hscp_bound$code), 
+                          "S37000014"='S37000032', "S37000023"='S37000033')
+
 saveRDS(hscp_bound, "./data/HSCP_boundary.rds")
 hscp_bound <- readRDS("./data/HSCP_boundary.rds")
 
