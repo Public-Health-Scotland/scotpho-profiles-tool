@@ -308,7 +308,6 @@ tabPanel("Heatmap", icon = icon("list-ul"), value = "heat",
            )
          ),
          mainPanel(width = 12,
-                   h5(textOutput("title_heat"), style="color: black; text-align: center"),
                    h4(textOutput("heat_title"), style="color: black; text-align: left"),
                    h5(textOutput("heat_subtitle"), style="color: black; text-align: left"),
                    plotlyOutput("heat_plot")
@@ -378,7 +377,7 @@ tabPanel("Trend", icon = icon("area-chart"), value = "trend",
                                  label = "Improved accessibility", value = FALSE)
                    ),
          mainPanel(width = 9, #Main panel
-          h5(textOutput("title_trend"), style="color: black; text-align: center"),
+          h4(textOutput("title_trend"), style="color: black; text-align: left"),
           plotlyOutput("trend_plot")
          )
 ), #Tab panel bracket
@@ -411,7 +410,8 @@ tabPanel("Rank", icon = icon("signal"), value = "rank",
                     "No differences can be calculated")
          ),
          mainPanel(width = 8, #Main panel
-                   h5(textOutput("title_rank"), style="color: black; text-align: center"),
+                   h4(textOutput("rank_title"), style="color: black; text-align: left"),
+                   h5(textOutput("rank_subtitle"), style="color: black; text-align: left"),
                    plotlyOutput("rank_plot") 
          )
 ), #Tab panel bracket
@@ -450,7 +450,8 @@ tabPanel("Map", icon = icon("globe"), value = "map",
              "No differences can be calculated")
          ), 
          mainPanel( #Main panel
-           h5(textOutput("title_map"), style="color: black; text-align: center"),
+           h4(textOutput("map_title"), style="color: black; text-align: left"),
+           h5(textOutput("map_subtitle"), style="color: black; text-align: left"),
            leafletOutput("map", width="100%",height="600px")
            )
 ), #Tab panel bracket
