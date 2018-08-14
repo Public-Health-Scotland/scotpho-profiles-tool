@@ -507,7 +507,6 @@ function(input, output, session) {
     domain_list <- sort(profile_lookup$domain[profile_lookup$profile == input$profile_heat])
     
     selectInput("topic_heat", "Domain", choices = domain_list, selected='')
-    
   })
   
   # Years to compare with depending on what data is available
@@ -517,7 +516,6 @@ function(input, output, session) {
     
     selectInput("yearcomp_heat", "Baseline year", choices = years,
                 selectize=TRUE)
-    
   })
   
   #####################.
@@ -532,8 +530,6 @@ function(input, output, session) {
                   substr(profile_domain2, 1, 3) == input$profile_heat) &
                (substr(profile_domain1, 5, nchar(as.vector(profile_domain1))) == input$topic_heat |
                   substr(profile_domain2, 5, nchar(as.vector(profile_domain2))) == input$topic_heat)) %>% 
-      # select(c(indicator, areaname, areatype, numerator, measure, lowci, upci, interpret, 
-      #          year, def_period, type_definition)) %>% 
       droplevels()
     
   })
@@ -571,6 +567,7 @@ function(input, output, session) {
     paste0(names(profile_list[unname(profile_list) == input$profile_heat]),
                        " profile: ", input$topic_heat)
   })
+  
   output$heat_subtitle <- renderText({
     if(input$comp_heat == 1){
       paste0(input$geoname_heat," (",input$geotype_heat,") compared against ",
@@ -667,8 +664,10 @@ function(input, output, session) {
     output$download_heatplot <- downloadHandler(
       filename = 'heatmap.png',
       content = function(file){
-        ggsave(file, plot = plot_heat()+ ggtitle(paste0(input$geoname_heat, " - ", input$topic_heat)), 
-               device = "png", scale=4, limitsize=FALSE)
+        ggsave(file, plot = plot_heat()+ 
+                 ggtitle(paste0(input$geoname_heat, " - ", 
+                                              input$topic_heat), width = 40), 
+               device = "png", scale=8, limitsize=FALSE)
       })
     
 ##############################################.
@@ -1045,8 +1044,11 @@ function(input, output, session) {
   }
   
   #Title of plot
-  output$title_trend <- renderText(paste0(input$indic_trend))
+
   
+  #####################.
+  # titles 
+  output$title_trend <- renderText(paste0(input$indic_trend))
 
 #Plot 
   output$trend_plot <- renderPlotly({
@@ -1201,9 +1203,14 @@ function(input, output, session) {
     }
   })
   
+  ############################.
   #Title of plot
-  output$title_rank <- renderText(paste0(input$indic_rank, " - ", unique(rank_bar_data()$def_period)))
+  output$rank_title <- renderText( paste0(input$indic_rank) )
   
+  output$rank_subtitle <- renderText({
+    paste0(input$geotype_rank, "s compared against ",
+           input$geocomp_rank, " - ",  unique(rank_bar_data()$def_period))
+  })
   
   ############################.
   # Creating  plot
@@ -1437,16 +1444,17 @@ function(input, output, session) {
     
   }) 
   
+  ############################.
+  #Title of plot
+  output$map_title <- renderText( paste0(input$indic_map) )
+  
+  output$map_subtitle <- renderText({
+    paste0(input$geotype_map, "s compared against ",
+           input$geocomp_map, " - ", unique(poly_map()$def_period))
+  })
+  
   #####################.
   # Plotting map
-  #title of the map. if no data available then print "No data available"
-  output$title_map <- renderText(
-    if(is.data.frame(map_csv()) && nrow(map_csv()) == 0) {
-      "No data available"
-    } else {
-      paste0(input$indic_map, " - ", unique(poly_map()$def_period))
-    })
-  
   #Function to create color palette based on if signicantly different from comparator
   create_map_palette <- function(){
     ifelse(poly_map()$interpret == "O", '#ffffff',
