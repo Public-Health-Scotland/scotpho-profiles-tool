@@ -42,8 +42,8 @@ geo_lookup<- read_spss(paste(lookups, "code_dictionary.sav", sep="")) %>%
                            ifelse(substr(code, 1, 3) == "S08", "Health board", 
                                   ifelse(substr(code, 1, 3) == "S12", "Council area", 
                                          ifelse(substr(code, 1, 3) == "S11", "Alcohol & drug partnership", 
-                                            ifelse(substr(code, 1, 3) == "S99", "HSC Locality", 
-                                                ifelse(substr(code, 1, 3) == "S37", "HSC Partnership",
+                                            ifelse(substr(code, 1, 3) == "S99", "HSC locality", 
+                                                ifelse(substr(code, 1, 3) == "S37", "HSC partnership",
                                                        ifelse(substr(code, 1, 3) == "S02", "Intermediate zone", "Error")))))))) 
 
 #TEMPORARY FIX. dealing with change in ca, hb and hscp codes
@@ -172,8 +172,8 @@ geo_lookup$areaname_full <- ifelse(geo_lookup$areaname == "Scotland", "Scotland"
 geo_lookup$areaname_full <- gsub("Health board", "HB", geo_lookup$areaname_full)
 geo_lookup$areaname_full <- gsub("Council area", "CA", geo_lookup$areaname_full)
 geo_lookup$areaname_full <- gsub("Alcohol & drug partnership", "ADP", geo_lookup$areaname_full)
-geo_lookup$areaname_full <- gsub("HSC Partnership", "HSCP", geo_lookup$areaname_full)
-geo_lookup$areaname_full <- gsub("HSC Locality", "HSCL", geo_lookup$areaname_full)
+geo_lookup$areaname_full <- gsub("HSC partnership", "HSCP", geo_lookup$areaname_full)
+geo_lookup$areaname_full <- gsub("HSC locality", "HSCL", geo_lookup$areaname_full)
 geo_lookup$areaname_full <- gsub("Intermediate zone", "IZ", geo_lookup$areaname_full)
 
 geo_lookup <- as.data.frame(geo_lookup)
@@ -191,7 +191,7 @@ ind_lookup<- read_csv(paste(lookups, "indicator_lookup.csv", sep = "")) %>%
   mutate_if(is.character, factor) # converting variables into factors
 
 ###############################################.
-## Locality data ----
+## Indicator data ----
 ###############################################.   
 optdata <- read_csv(paste(basefiles, "All Data for Shiny.csv", sep = ""),
                     col_types = cols(NUMERATOR = col_number()))
@@ -406,69 +406,6 @@ iz_bound_orig$council <- gsub("Eilean Siar", "Na h-Eileanan Siar", iz_bound_orig
 
 saveRDS(iz_bound_orig, "./data/IZ_boundary.rds")
 iz_bound <- readRDS("./data/IZ_boundary.rds")
-
-###############################################.
-## Deprivation data ----
-###############################################.  
-deaths_all_depr <- read_csv("./data/deaths_allages_deprivation_OPTdata.csv")
-deaths_all_depr_rii <- read_csv("./data/deaths_allages_deprivation_rii_OPTdata.csv") %>% 
-  select(-ind_id)
-deaths_all_depr_sii <- read_csv("./data/deaths_allages_deprivation_sii_OPTdata.csv")
-
-deaths_all_depr_merged <- merge(deaths_all_depr, deaths_all_depr_rii, 
-                                by = c("code", "year", "def_period", "trend_axis"),
-                                all.x = TRUE)
-
-deaths_all_depr_merged <- merge(deaths_all_depr_merged, deaths_all_depr_sii, 
-                               by = c("code", "year", "def_period", "trend_axis"),
-                               all.x = TRUE)
-
-
-deaths_15to44_depr <- read_csv("./data/deaths_15to44_deprivation_OPTdata.csv")
-deaths_15to44_depr_rii <- read_csv("./data/deaths_15to44_deprivation_rii_OPTdata.csv") %>% 
-  select(-ind_id)
-deaths_15to44_depr_sii <- read_csv("./data/deaths_15to44_deprivation_sii_OPTdata.csv")
-
-deaths_15to44_depr_merged <- merge(deaths_15to44_depr, deaths_15to44_depr_rii, 
-                                by = c("code", "year", "def_period", "trend_axis"),
-                                all.x = TRUE)
-
-deaths_15to44_depr_merged <- merge(deaths_15to44_depr_merged, deaths_15to44_depr_sii, 
-                                by = c("code", "year", "def_period", "trend_axis"),
-                                all.x = TRUE)
-
-#It has the same ind_id as the the other indicator.
-deaths_15to44_depr_merged$ind_id <- 10000
-
-deprivation_data <- rbind(deaths_15to44_depr_merged, deaths_all_depr_merged)
-
-deprivation_data <- deprivation_data %>% 
-  mutate(quintile = ifelse(substr(code, 4, 4)=="0", "Total",
-                           ifelse(substr(code, 4, 4)=="1", "1 - Most deprived",
-                                  ifelse(substr(code, 4, 4)=="2", "2",
-                                         ifelse(substr(code, 4, 4)=="3", "3",
-                                                ifelse(substr(code, 4, 4)=="4", "4",
-                                                       ifelse(substr(code, 4, 4)=="5", "5 - Least deprived", "Error"))))))) %>% 
-  mutate(code = paste(substr(code, 1, 3), "0", substr(code, 5, 9), sep = "")) %>% 
-  rename(measure=rate)
-table(deprivation_data$quintile)
-
-
-#Merging with lookup, at the moment lookup does not have this.
-#deprivation_data <- merge(x=deprivation_data, y=ind_lookup, by="ind_id", all.x = TRUE) 
-#Patch in the meantime.
-deprivation_data <- deprivation_data %>% 
-  mutate(indicator = ifelse(ind_id == "10000", "All-cause mortality among the 15-44 year olds",
-                            "Deaths all ages")) %>% 
-  mutate(type_definition = "Age-sex standardized rate per 100,000") %>% 
-  mutate(numerator = round(numerator, 1), measure = round(measure, 1),
-         lowci = round(lowci, 1), upci = round(upci, 1), rii  = round(rii, 1), 
-         slope_coef = round(slope_coef, 1), lowci_slope = round(lowci_slope, 1),
-         upci_slope = round(upci_slope, 1), lowci_rii = round(lowci_rii, 1), upci_rii = round(upci_rii, 1)) %>% 
-  select(-c(uni_id, ind_id, ind_id_sii))
-
-saveRDS(deprivation_data, "./data/deprivation_OPT.rds")
-deprivation_data <- readRDS("./data/deprivation_OPT.rds")
 
 ###############################################.
 ## New process data ----
