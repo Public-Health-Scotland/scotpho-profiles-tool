@@ -134,13 +134,13 @@ comparator_list <- sort(geo_lookup$areaname[geo_lookup$areatype %in%
 code_list <- unique(optdata$code)
 parent_geo_list <- c("Show all", sort(as.character((unique(optdata$parent_area))[-1])))
 parent_iz_list <- geo_lookup %>% filter(areatype=="Intermediate zone") %>% select(areaname,parent_area)
-parent_hscl_list <- geo_lookup %>% filter(areatype=="HSC Locality") %>% select(areaname,parent_area)
+parent_hscl_list <- geo_lookup %>% filter(areatype=="HSC locality") %>% select(areaname,parent_area)
 hb_name <- sort(geo_lookup$areaname[geo_lookup$areatype=="Health board"]) 
 la_name <- sort(geo_lookup$areaname[geo_lookup$areatype=="Council area"]) 
 adp_name <- sort(geo_lookup$areaname[geo_lookup$areatype=="Alcohol & drug partnership"]) 
 intzone_name <- sort(geo_lookup$areaname[geo_lookup$areatype=="Intermediate zone"]) 
-partnership_name <- sort(geo_lookup$areaname[geo_lookup$areatype=="HSC Partnership"]) 
-locality_name <- sort(geo_lookup$areaname[geo_lookup$areatype=="HSC Locality"]) 
+partnership_name <- sort(geo_lookup$areaname[geo_lookup$areatype=="HSC partnership"]) 
+locality_name <- sort(geo_lookup$areaname[geo_lookup$areatype=="HSC locality"]) 
 adp_name <- sort(geo_lookup$areaname[geo_lookup$areatype=="Alcohol & drug partnership"])
 
 #year of indicators
@@ -149,9 +149,9 @@ max_year <- max(optdata$year)
 
 #Area type names
 areatype_list <- c("Alcohol & drug partnership", "Council area", "Health board",  
-                   "HSC Locality", "HSC Partnership",  "Intermediate zone", "Scotland")
+                   "HSC locality", "HSC partnership",  "Intermediate zone", "Scotland")
 areatype_noscot_list <- c("Alcohol & drug partnership", "Council area", "Health board",  
-                          "HSC Locality", "HSC Partnership",  "Intermediate zone")
+                          "HSC locality", "HSC partnership",  "Intermediate zone")
 areatype_depr_list <- c("Scotland", "Health board", "Council area") #for deprivation tab
 
 #Indicator names
