@@ -464,7 +464,7 @@ function(input, output, session) {
   observeEvent(input$help_heat, {
     showModal(modalDialog(
       title = "How to use this chart",
-      p(img(src="help_heatmpa.png"), height=500),  size = "l",
+      p(img(src="help_heatmap.png"), height=500),  size = "l",
       easyClose = TRUE, fade=FALSE
     ))
   })
@@ -590,7 +590,7 @@ function(input, output, session) {
     
     #Obtaining number of indicators
     no_ind <- unique(heat_chosenarea()$indicator)
-    length <- length(no_ind) * 28 + 125
+    length <- length(no_ind) * 50 + 125
   
   }
 
