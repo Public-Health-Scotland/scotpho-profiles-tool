@@ -353,6 +353,7 @@ tabPanel("Barcode", icon = icon("barcode"), value = "barcode",
 tabPanel("Trend", icon = icon("area-chart"), value = "trend",
                    sidebarPanel(width=3,
                           selectInput("indic_trend", "Indicator", choices=indicator_list),
+                          awesomeCheckbox("ci_trend", label = "95% confidence intervals", value = FALSE),
                           shiny::hr(),
                           p(tags$b("Select the areas you want to plot.
                                    You can select multiple areas per geography level")),
