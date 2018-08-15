@@ -1092,7 +1092,7 @@ function(input, output, session) {
                                 "<br>", trend_data()$measure))
       
       #Creating time trend plot
-        plot_ly(data=trend_data(), x=~trend_axis,  y = ~measure, 
+      trend_plot <-   plot_ly(data=trend_data(), x=~trend_axis,  y = ~measure, 
                 text=tooltip_trend, hoverinfo="text",
                 type = 'scatter', mode = 'lines+markers',
                 color = ~areaname_full, colors = trend_col) %>% 
@@ -1105,6 +1105,15 @@ function(input, output, session) {
                font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif')) %>%  
         config(displayModeBar = FALSE, displaylogo = F, collaborate=F, editable =F) # taking out plotly logo and collaborate button
       
+      #Adding confidence intervals depending on user input
+      if (input$ci_trend == TRUE) {
+        trend_plot %>% 
+          add_ribbons(data = trend_data(), ymin = ~lowci, ymax = ~upci, showlegend = F,
+                      opacity = 0.2) 
+        
+      } else if (input$ci_trend == FALSE) {
+        trend_plot
+      }
     }
   }) 
   
@@ -1116,13 +1125,12 @@ function(input, output, session) {
     trend_col <- create_trendpalette() #palette
 
     #Creating time trend plot
-    ggplot(data=trend_data(), aes(y = measure,  x = trend_axis, group = areaname_full))+
+    trend_plot <- ggplot(data=trend_data(), aes(y = measure,  x = trend_axis, group = areaname_full))+
       geom_line(aes(color=areaname_full))+
       geom_point(aes(color=areaname_full))+
       labs(title=title_wrapper(paste0(input$indic_trend), width = 40), 
            y = unique(trend_data()$type_definition))+
       scale_color_manual(values=trend_col, name = "")+
-      scale_y_continuous(expand = c(0, 2), limits=c(0, max(trend_data()$measure)+ (max(trend_data()$measure)/100)))+
       #Layout
       theme(text = element_text(size=11, family="Helvetica Neue,Helvetica,Arial,sans-serif"),
             axis.text.x = element_text(angle=90),
@@ -1135,8 +1143,20 @@ function(input, output, session) {
             panel.grid.major = element_line(colour="#F0F0F0"),#grid lines
             panel.background = element_blank() #Blanking background
       )
+    
+    #Adding confidence intervals depending on user input
+    if (input$ci_trend == TRUE) {
+      trend_plot +
+        geom_ribbon(aes(ymin = lowci, ymax = upci, alpha = 0.2, 
+                        color=areaname_full, fill = areaname_full), 
+                    show.legend=F) +
+        scale_y_continuous(expand = c(0, 2), limits=c(0, max(trend_data()$upci)+ (max(trend_data()$upci)/100)))+
+        scale_fill_manual(values=trend_col, name = "")
+    } else if (input$ci_trend == FALSE) {
+      trend_plot +
+        scale_y_continuous(expand = c(0, 2), limits=c(0, max(trend_data()$measure)+ (max(trend_data()$measure)/100)))
+    }
   } 
-  
   
   #Downloading data
   trend_csv <- reactive({ format_csv(trend_data()) })
@@ -1148,9 +1168,8 @@ function(input, output, session) {
   output$download_trendplot <- downloadHandler(
     filename = 'trend.png',
     content = function(file){
-      ggsave(file, plot = plot_trend_ggplot(), device = "png", scale=3, limitsize=FALSE)
+      ggsave(file, plot = plot_trend_ggplot(), device = "png", scale=6, limitsize=FALSE)
     })
-  
   
 #####################################.       
 #### Rank plot ----
