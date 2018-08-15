@@ -336,13 +336,13 @@ function(input, output, session) {
     
     #Merging comparator and chosen area
     if (input$comp_ring == 1){
-      ring <- merge(ring_chosenarea(), ring_chosencomp(), by=c("indicator", "year"))
+      ring <- merge(x=ring_chosenarea(), y=ring_chosencomp(), by=c("indicator", "year"))
     } else if (input$comp_ring == 2) {
-      ring <- merge(ring_chosenarea(), ring_chosencomp(), by=c("indicator"), all.x = TRUE)
+      ring <- left_join(x=ring_chosenarea(), y=ring_chosencomp(), by=c("indicator"))
     }
     
     #identify significant differences
-    ring<-ring %>%  
+    ring <- ring %>%  
       mutate(flag=ifelse(ring$interpret == "O",'No significance can be calculated',
                          ifelse(ring$lowci<=ring$comp_m & ring$upci>=ring$comp_m,'Statistically not significantly different from comparator average',
                                 ifelse(ring$lowci > ring$comp_m & ring$interpret == "H",'Statistically significantly better than comparator average',
@@ -423,13 +423,13 @@ function(input, output, session) {
   ring_csv <- reactive({
     #Merging comparator and chosen area
     if (input$comp_ring == 1){
-      ring <- merge(ring_chosenarea(), ring_chosencomp(), by=c("indicator", "year"))
+      ring <- merge(x = ring_chosenarea(), y = ring_chosencomp(), by=c("indicator", "year"))
     } else if (input$comp_ring == 2) {
-      ring <- merge(ring_chosenarea(), ring_chosencomp(), by=c("indicator"), all.x = TRUE)
+      ring <- left_join(x = ring_chosenarea(), y = ring_chosencomp(), by=c("indicator"))
     }
     
     #identify significant differences
-    ring<-ring %>%
+    ring <- ring %>%
       mutate(flag=ifelse(ring$interpret == "O",'No significance can be calculated',
                          ifelse(ring$lowci<=ring$comp_m & ring$upci>=ring$comp_m,'Statistically not significantly different from comparator average',
                                 ifelse(ring$lowci > ring$comp_m & ring$interpret == "H", 'Statistically significantly better than comparator average',
@@ -464,9 +464,26 @@ function(input, output, session) {
   observeEvent(input$help_heat, {
     showModal(modalDialog(
       title = "How to use this chart",
-      p(img(src="help_heatmap.png"), height=500),  size = "l",
-      easyClose = TRUE, fade=FALSE
-    ))
+      
+      p(column(6,"Select 'Area' to compare against another region, or select 'Time' to compare
+               against a baseline year of the same area."),
+        column(6, img(src="help_heatmap1.png"))),
+      p(column(6, "Hover over each tile to see indicator definitions and time periods."),
+        column(6, img(src="help_heatmap2.png"))), 
+      p("Colours are used to indicate if the value for an indicator is 
+        statistically different from the comparator. Here, there are two indicators 
+        with different evolutions over time, the first one improves respecting 
+        the comparator, Scotland, and the second one gets worse. "),
+      h5("Comparing against Scotland", style = "font-weight: bold; color: black; margin-bottom: 0px;"),
+      p(img(src="help_heatmap3.png")),  
+      p("The interpretation could be very different if you compare against a
+        baseline year, as in this case when both are improving. What comparator 
+        you should choose will depend on which are your aims."),
+      h5("Comparing against 2003", style = "font-weight: bold; color: black; margin-bottom: 0px;"),
+      p(img(src="help_heatmap4.png")),  
+      
+      size = "l", easyClose = TRUE, fade=FALSE
+      ))
   })
   
   #####################.
@@ -596,9 +613,9 @@ function(input, output, session) {
     
     #Merging comparator and chosen area
     if (input$comp_heat == 1){
-      heat <- merge(heat_chosenarea(), heat_chosencomp(), by=c("indicator", "year"))
+      heat <- left_join(x = heat_chosenarea(), y = heat_chosencomp(), by=c("indicator", "year"))
     } else if (input$comp_heat == 2) {
-      heat <- merge(heat_chosenarea(), heat_chosencomp(), by=c("indicator"), all.x = TRUE)
+      heat <- left_join(x = heat_chosenarea(), y = heat_chosencomp(), by=c("indicator"))
     }
     
     #Creating a palette of colours based on statistical significance
@@ -665,9 +682,17 @@ function(input, output, session) {
       filename = 'heatmap.png',
       content = function(file){
         ggsave(file, plot = plot_heat()+ 
-                 ggtitle(paste0(input$geoname_heat, " - ", 
-                                              input$topic_heat), width = 40), 
-               device = "png", scale=8, limitsize=FALSE)
+                 ggtitle(paste0(names(profile_list[unname(profile_list) == input$profile_heat]),
+                                " profile: ", input$topic_heat),
+                         subtitle =       if(input$comp_heat == 1){
+                           paste0(input$geoname_heat," (",input$geotype_heat,") compared against ",
+                                  input$geocomp_heat)
+                         } else if(input$comp_heat==2){
+                           paste0("Changes within ",input$geoname_heat,": latest data available",
+                                  " compared to ", input$yearcomp_heat)
+                         }
+                         ), 
+               device = "png", scale=4, limitsize=FALSE)
       })
     
 ##############################################.
@@ -677,7 +702,7 @@ function(input, output, session) {
     # Barcode help pop-up
     observeEvent(input$help_bar, {
       showModal(modalDialog(
-        title = "How to use this chart...",
+        title = "How to use this chart",
         p(img(src="help_barcode2.png",height=600)),size = "l",
         easyClose = TRUE, fade=FALSE
       ))
@@ -792,7 +817,7 @@ function(input, output, session) {
       
       #Merging comparator and chosen area
       bar <- merge(bar_allareas(), bar_chosencomp(), by=c("indicator"))
-      bar <- merge(bar, bar_chosenarea(), by=c("indicator"))
+      bar <- left_join(bar, bar_chosenarea(), by=c("indicator"))
       
       #add variable denoting if sign diff between comparator
       bar<-bar %>%
@@ -924,7 +949,7 @@ function(input, output, session) {
       
       #Merging comparator and chosen area
       bar <- merge(bar_allareas(), bar_chosencomp(), by=c("indicator"))
-      bar <- merge(bar, bar_chosenarea(), by=c("indicator"))
+      bar <- left_join(bar, bar_chosenarea(), by=c("indicator"))
       bar <- bind_cols(bar %>% mutate(topic=input$topic_bar))
       bar <- bind_cols(bar %>% mutate(comparator=input$geocomp_bar))
       
@@ -1089,12 +1114,12 @@ function(input, output, session) {
   plot_trend_ggplot <- function(){
     
     trend_col <- create_trendpalette() #palette
-    
+
     #Creating time trend plot
     ggplot(data=trend_data(), aes(y = measure,  x = trend_axis, group = areaname_full))+
       geom_line(aes(color=areaname_full))+
       geom_point(aes(color=areaname_full))+
-      labs(title=title_wrapper(unique(trend_data()$indicator), width = 40), 
+      labs(title=title_wrapper(paste0(input$indic_trend), width = 40), 
            y = unique(trend_data()$type_definition))+
       scale_color_manual(values=trend_col, name = "")+
       scale_y_continuous(expand = c(0, 2), limits=c(0, max(trend_data()$measure)+ (max(trend_data()$measure)/100)))+
@@ -1209,7 +1234,7 @@ function(input, output, session) {
   
   output$rank_subtitle <- renderText({
     paste0(input$geotype_rank, "s compared against ",
-           input$geocomp_rank, " - ",  unique(rank_bar_data()$def_period))
+           input$geocomp_rank, " - ",  input$year_rank)
   })
   
   ############################.
@@ -1292,13 +1317,16 @@ function(input, output, session) {
     color_pal <- setNames(color_pal, rank_bar_data()$areaname)
     
     #title for rank
-    title_rank <- paste0(input$indic_rank, " - ", unique(rank_bar_data()$def_period))
-    
+    title_rank <- paste0(input$indic_rank)
+    subtitle_rank <-  paste0(input$geotype_rank, "s compared against ",
+                             input$geocomp_rank, " - ",  input$year_rank)
+
     # General plot and layout, bars with or without error bars will be added after user input
     p <- ggplot(data=rank_bar_data(), aes(y = measure,  x = reorder(areaname, -measure)))+
       geom_bar(aes(fill=areaname), stat = "identity")+
       geom_hline(aes(yintercept=comp_value, color="red"))+
-      labs(title=title_wrapper(title_rank, width = 40), y=unique(rank_bar_data()$type_definition))+
+      labs(title=title_rank, subtitle = subtitle_rank,
+           y=unique(rank_bar_data()$type_definition))+
       scale_fill_manual(values=color_pal, name = "")+
       scale_y_continuous(expand = c(0, 0), limits=c(0, max(rank_bar_data()$upci)))+
       #Layout
@@ -1336,7 +1364,7 @@ function(input, output, session) {
   output$download_rankplot <- downloadHandler(
     filename = 'rank.png',
     content = function(file){
-      ggsave(file, plot = plot_rank_ggplot(), device = "png", scale=3, limitsize=FALSE)
+      ggsave(file, plot = plot_rank_ggplot(), device = "png", scale=5, limitsize=FALSE)
     })
   
 #####################################.    
@@ -1422,8 +1450,7 @@ function(input, output, session) {
       #This helps to deals with cases of incomplete data, e.g. 2011 has all HB but 2013 not.
       #Works for those cases where there are more data in the past (comparator)
       #and one for those which have more data in the present (chosen area)
-      map_chosenarea <- merge(x = map_chosenarea, y = map_compar(), by = "code", 
-                              all.x = T)
+      map_chosenarea <- left_join(x = map_chosenarea, y = map_compar(), by = "code")
 
     }
   }) 
@@ -1431,15 +1458,15 @@ function(input, output, session) {
   #Merging shapefile with dynamic selection of data
   poly_map <- reactive({
     if (input$geotype_map == "Council area"){
-      map_pol <- merge(ca_bound, map_chosenarea(), by='code')
+      map_pol <- sp::merge(ca_bound, map_chosenarea(), by='code')
     } else if(input$geotype_map == "Health board"){
-      map_pol <- merge(hb_bound, map_chosenarea(), by='code')
+      map_pol <- sp::merge(hb_bound, map_chosenarea(), by='code')
     } else if(input$geotype_map == "HSC partnership"){
-      map_pol <- merge(hscp_bound, map_chosenarea(), by='code')
+      map_pol <- sp::merge(hscp_bound, map_chosenarea(), by='code')
     } else if(input$geotype_map == "Intermediate zone"){
       iz_bound <- iz_bound %>% subset(council == input$iz_map)
       
-      map_pol <- merge(iz_bound, map_chosenarea(), by='code')
+      map_pol <- sp::merge(iz_bound, map_chosenarea(), by='code')
     }
     
   }) 
@@ -1450,7 +1477,7 @@ function(input, output, session) {
   
   output$map_subtitle <- renderText({
     paste0(input$geotype_map, "s compared against ",
-           input$geocomp_map, " - ", unique(poly_map()$def_period))
+           input$geocomp_map, " - ", input$year_map)
   })
   
   #####################.
@@ -1496,7 +1523,11 @@ function(input, output, session) {
   plot_map_download <- function(){
     color_map <- create_map_palette() #palette
     plot(poly_map(), col=color_map)
+    title(paste0(input$indic_map, "\n", input$geotype_map, 
+                 "s compared against ", input$geocomp_map, " - ", input$year_map),
+          cex.main = 3,  line = -1)
   }
+  
   
   #Function to filter the data needed for downloading data 
   map_csv <- function(){
