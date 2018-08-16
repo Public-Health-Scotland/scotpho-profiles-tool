@@ -158,12 +158,10 @@ areatype_list <- c("Alcohol & drug partnership", "Council area", "Health board",
                    "HSC locality", "HSC partnership",  "Intermediate zone", "Scotland")
 areatype_noscot_list <- c("Alcohol & drug partnership", "Council area", "Health board",  
                           "HSC locality", "HSC partnership",  "Intermediate zone")
-areatype_depr_list <- c("Scotland", "Health board", "Council area") #for deprivation tab
 
 #Indicator names
 indicator_list <- sort(unique(optdata$indicator))
 indicator_map_list <- sort(unique(optdata$indicator[optdata$interpret != 'O']))
-#ind_depr_list <- unique(deprivation$indicator)
 
 #Profile names
 topic_list <- sort(c('Alcohol', 'Behaviours',  'Cancer', 'Children and young people - Achieving',
