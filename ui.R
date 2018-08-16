@@ -115,7 +115,7 @@ tabPanel(
       #Ring plot box
       column(4, class="landing-page-column",
              div(class="landing-page-box", 
-                 div("Summary: Profile View", class = "landing-page-box-title"),
+                 div("Summary: Profile overview", class = "landing-page-box-title"),
                  div(class = "landing-page-icon", div(img(src="donut_10.png", class="center"))),
                  actionButton('jump_to_ring', 'A high level view of an area across a suite of indicators', 
                               class="landing-page-button", 
@@ -123,14 +123,14 @@ tabPanel(
       #Heat map box
       column(4, class="landing-page-column",
              div(class="landing-page-box",
-                 div("Heatmap: Time Trends", class = "landing-page-box-title"),
+                 div("Heatmap: Time trends", class = "landing-page-box-title"),
                  div(class = "landing-page-icon", div(img(src="heatmap_2.png", class="center"))),
                  actionButton('jump_to_heat', 'Explore how indicators for a topic area have changed over time', 
                               class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp")))),
       #Barcode plot box
       column(4, class="landing-page-column",
              div(class="landing-page-box", 
-                 div("Barcode: Geographic Distribution", class = "landing-page-box-title"),
+                 div("Barcode: Geographic distribution", class = "landing-page-box-title"),
                  div(class = "landing-page-icon", div(img(src="barcode_3.png", class="center"))),
                  actionButton('jump_to_barcode', 'Explore how indicators for a topic compare across different geographies',
                               class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp"))))
@@ -160,15 +160,6 @@ tabPanel(
                  div(class = "landing-page-icon", div(img(src="map_2.png", class="center"))),
                  actionButton('jump_to_map', 'Compare geographical variation for an indicator using a map', 
                               class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp"))))
-      #, - VE removed inequalities data for initial launch of profiles
-      #Inequalities plots box
-      # column(3, class="landing-page-column",
-      #        div(class="landing-page-box", style="background-image: url(simd_lp.png);
-      #            background-repeat: no-repeat; background-size: cover ",
-      #            div("Inequalities", class = "landing-page-box-title"),
-      #            actionButton('jump_to_simd', 'Explore the effects of deprivation on public health inequalities', 
-      #                         class="landing-page-button", 
-      #                         icon = icon("arrow-circle-right", "icon-lp"))))
     ),
     fluidRow(h4("Access the data behind the tool and find supporting information")),
     fluidRow(
@@ -192,7 +183,7 @@ tabPanel(
              ),
              #Evidence box
              div(class="landing-page-box-about", 
-                 div("Related Links", class = "landing-page-box-title" ),
+                 div("Related links", class = "landing-page-box-title" ),
                  div(class = "landing-page-about-icon", div(img(src="other_profile.png", class="centerabout"))),
                  actionButton('jump_to_evidence', 'Links to websites or documents with useful profiles information', 
                               class="landing-page-button-about", 
@@ -201,7 +192,7 @@ tabPanel(
       #Resources box
       column(4, class="landing-page-column", 
              div(class="landing-page-box-about",
-                 div("Technical Resources", class = "landing-page-box-title"),
+                 div("Technical resources", class = "landing-page-box-title"),
                  div(class = "landing-page-about-icon", div(img(src="technical_resources.png", class="centerabout"))),
                  actionButton('jump_to_resources', 'Find technical information about the ScotPHO profile definitions and methodology', 
                               class="landing-page-button-about", 
