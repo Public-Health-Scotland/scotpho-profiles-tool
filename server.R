@@ -285,6 +285,7 @@ function(input, output, session) {
     selectInput("yearcomp_ring", "Baseline year", choices = years,selectize=TRUE, selected = "2011")
   })
   
+
   ## DATA SELECTIONS
   # Ring data for the chosen area. Filtering based on user input values.
   ring_chosenarea <- reactive({ 
@@ -378,28 +379,17 @@ function(input, output, session) {
     fillcolours <- c("white","grey88","#4da6ff", "#ffa64d")
     names(fillcolours) <- levels(fill_df$flag)
     fill_colour <- scale_fill_manual(name = "flag",values = fillcolours)
-    
-    #create title and subtitle variables
-    ring_title <- paste0(names(profile_list[unname(profile_list) == input$profile_ring]),
-                        " profile")
-    ring_subtitle <- if(input$comp_ring == 1){
-      paste0(input$geoname_ring," (",input$geotype_ring,") compared against ", input$geocomp_ring)
-    }else if(input$comp_ring==2){
-      paste0("Changes within ", input$geoname_ring, ": latest data available",
-             " compared to ", input$yearcomp_ring)
-    }
-    
+
     ggplot(ring, aes(fill=flag, ymax=ymax, ymin=ymin, xmax=4.5, xmin=1.5)) +
       geom_rect(colour='#555555') +
       geom_label(data=ring, label.size = NA, aes(label =paste(count), x = 3, y = (ymin + ymax)/2),show.legend = F,size = 7, colour='#555555') +
       fill_colour +
-      labs(title=ring_title,subtitle=ring_subtitle)+
       theme(
         axis.text=element_blank(), # taking out x axis labels
         axis.title = element_blank(),
         text = element_text(family="Helvetica Neue,Helvetica,Arial,sans-serif",colour ='#555555'),
-        plot.title = element_text(face = "bold",size=17),
-        plot.subtitle = element_text(size=16,margin=margin(0,0,20,0,unit="pt")),
+        #plot.title = element_text(face = "bold",size=17),
+        #plot.subtitle = element_text(size=16,margin=margin(0,0,20,0,unit="pt")),
         axis.ticks=element_blank(), # taking out x axis tick marks
         legend.position = "none",
         panel.background = element_blank(),#Blanking background
@@ -411,6 +401,22 @@ function(input, output, session) {
         strip.background = element_blank())+
       xlim(c(0,4.5))
   }
+  
+  # titles 
+  #create title and subtitle variables
+  output$ring_title <- renderText({
+    paste0(names(profile_list[unname(profile_list) == input$profile_ring])," profile")
+  })
+  
+  output$ring_subtitle <- renderText({
+    if(input$comp_ring == 1){
+      paste0(input$geoname_ring," (",input$geotype_ring,") compared against ",
+             input$geocomp_ring)
+    } else if(input$comp_ring==2){
+      paste0("Changes within ",input$geoname_ring,": latest data available",
+             " compared to ", input$yearcomp_ring)
+    }
+  })
   
   #Render plot in app and resize 
   output$ring_plot <- renderPlot({
@@ -450,13 +456,23 @@ function(input, output, session) {
   # Download data file
   output$download_ring <- downloadHandler( filename =  'ring_data.csv',
                                            content = function(file) { write.csv(ring_csv(), file, row.names=FALSE) })
-  # Downloading chart  
+ # Downloading chart
   output$download_ringplot <- downloadHandler(
     filename = 'Profile_summary.png',
     content = function(file){
-      ggsave(file, plot = plot_ring(), device = "png",height = 15,width=15, limitsize=FALSE)
+      if(input$comp_ring == 1){
+        ggsave(file, plot = plot_ring()
+               +ggtitle(label=paste0(names(profile_list[unname(profile_list) == input$profile_ring])," profile"),
+                        subtitle =paste0(input$geoname_ring," (",input$geotype_ring,") compared against ",input$geocomp_ring)),
+               device = "png",height = 15,width=15, limitsize=FALSE)
+      } else if(input$comp_ring==2){
+        ggsave(file, plot = plot_ring()
+               +ggtitle(label=paste0(names(profile_list[unname(profile_list) == input$profile_ring])," profile"),
+                        subtitle =paste0("Changes within ",input$geoname_ring,": latest data available"," compared to ", input$yearcomp_ring)),
+               device = "png",height = 15,width=15, limitsize=FALSE)
+      }
     })
-   
+
   ###############################################.        
   #### Heatmap ----
   ###############################################.   
@@ -977,7 +993,10 @@ function(input, output, session) {
     output$download_barplot <- downloadHandler(
       filename = 'barcode.png',
       content = function(file){
-        ggsave(file, plot = plot_barcode(), device = "png",width=15, limitsize=FALSE)
+        ggsave(file, plot = plot_barcode()
+               +ggtitle(label=paste(names(profile_list[unname(profile_list) == input$profile_bar])," profile: ", input$topic_bar,sep=""),
+                    subtitle =paste(input$geoname_bar," (",input$geotype_bar,") compared against ",input$geocomp_bar,sep="")),
+               device = "png",width=15, limitsize=FALSE)
       })
 
 ###############################################.        

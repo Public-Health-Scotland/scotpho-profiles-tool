@@ -248,6 +248,8 @@ tabPanel(title = "Summary", icon = icon("adjust"), value = "ring",
                       savechart_button('download_ringplot', 'Save chart',  class = "down")
          ),
          mainPanel(width = 9,
+                   h4(textOutput("ring_title"), style="color: black; text-align: left"),
+                   h5(textOutput("ring_subtitle"), style="color: black; text-align: left"),
                    plotOutput("ring_plot", height="auto")
          )
 ), #Tab panel bracket
