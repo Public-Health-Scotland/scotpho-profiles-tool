@@ -339,7 +339,7 @@ function(input, output, session) {
     if (input$comp_ring == 1){
       ring <- merge(x=ring_chosenarea(), y=ring_chosencomp(), by=c("indicator", "year"))
     } else if (input$comp_ring == 2) {
-      ring <- left_join(x=ring_chosenarea(), y=ring_chosencomp(), by=c("indicator"))
+      ring <- merge(x=ring_chosenarea(), y=ring_chosencomp(), by=c("indicator"), all.x = TRUE)
     }
     
     #identify significant differences
@@ -431,7 +431,7 @@ function(input, output, session) {
     if (input$comp_ring == 1){
       ring <- merge(x = ring_chosenarea(), y = ring_chosencomp(), by=c("indicator", "year"))
     } else if (input$comp_ring == 2) {
-      ring <- left_join(x = ring_chosenarea(), y = ring_chosencomp(), by=c("indicator"))
+      ring <- merge(x = ring_chosenarea(), y = ring_chosencomp(), by=c("indicator"), all.x = TRUE)
     }
     
     #identify significant differences
