@@ -125,10 +125,10 @@ hscp_bound <- readRDS("./data/HSCP_boundary.rds") #HSC Partnerships
 iz_bound <- readRDS("./data/IZ_boundary.rds") #Intermediate zone
 
 #definitions
-definitions <- read.csv(
-  url("https://script.google.com/macros/s/AKfycbwhJ8YqEa-Ujg-gcfr6l2bGA5_SZCeJNH9A8fa3CByCemJ3oho/exec?sheet=Raw"),
-  strip.white = TRUE
-)
+#definitions <- read.csv(
+ # url("https://script.google.com/macros/s/AKfycbwhJ8YqEa-Ujg-gcfr6l2bGA5_SZCeJNH9A8fa3CByCemJ3oho/exec?sheet=Raw"),
+ # strip.white = TRUE
+#)
 
 ###############################################.
 ## Names ----
