@@ -1023,6 +1023,37 @@ function(input, output, session) {
                 multiple=TRUE, selectize=TRUE, selected = "")
   })
   
+  ###############################################.
+  # disabling controls if no data available for a type of geography
+  
+  observeEvent(input$indic_trend, {
+    
+    trend <- optdata %>% subset(indicator == input$indic_trend) %>% 
+      droplevels() 
+    
+    toggleState ("adpname_trend", condition= 
+                   "Alcohol & drug partnership" %in%   unique(trend$areatype) )
+    
+    toggleState ("partname_trend", condition= 
+                   "HSC partnership" %in%  unique(trend$areatype))
+    
+    toggleState ("locname_trend", condition= 
+                   "HSC locality" %in%  unique(trend$areatype))
+    
+    toggleState ("izname_trend", condition= 
+                   "Intermediate zone" %in%  unique(trend$areatype)) 
+    
+    toggleState ("loc_iz_trend", 
+                 condition = "Intermediate zone" %in%  unique(trend$areatype) |
+                   "HSC locality" %in%  unique(trend$areatype))
+    
+    toggleState("caname_trend",
+                condition = ("Council area" %in%  unique(trend$areatype)))
+    
+    toggleState("hbname_trend",
+                condition = ("Health board" %in%  unique(trend$areatype)))
+  })
+  
 #####################.
 # Reactive data 
   #Time trend data. Filtering based on user input values.
@@ -1030,7 +1061,7 @@ function(input, output, session) {
     
     trend <- optdata %>% 
       subset((areaname %in% input$hbname_trend &  areatype == "Health board" |
-               areaname %in% input$laname_trend & areatype == "Council area" |
+               areaname %in% input$caname_trend & areatype == "Council area" |
                areaname %in% input$scotname_trend & areatype == "Scotland"  |
                areaname %in% input$adpname_trend  & areatype == "Alcohol & drug partnership" |
                areaname %in% input$locname_trend  & areatype == "HSC locality" |
@@ -1050,7 +1081,7 @@ function(input, output, session) {
     #Creating palette of colors with a tone for each geography type
     #First obtaining length of each geography type
     hb_length <- length(input$hbname_trend)
-    ca_length <- length(input$laname_trend)
+    ca_length <- length(input$caname_trend)
     scot_length <- length(input$scotname_trend)
     adp_length <- length(input$adpname_trend)
     part_length <- length(input$partname_trend)

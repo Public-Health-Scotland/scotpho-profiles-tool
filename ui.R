@@ -8,7 +8,9 @@
 ###############################################.
 ## Header ---- 
 ###############################################.
-navbarPage(id = "intabset", #needed for landing page
+tagList( #needed for shinyjs
+  useShinyjs(),  # Include shinyjs
+  navbarPage(id = "intabset", #needed for landing page
            title = div(tags$a(img(src="scotpho_reduced.png", height=40), href= "http://www.scotpho.org.uk/"),
                        style = "position: relative; top: -5px;"), # Navigation bar
            windowTitle = "ScotPHO profiles", #title for browser tab
@@ -354,7 +356,7 @@ tabPanel("Trend", icon = icon("area-chart"), value = "trend",
                                       multiple=TRUE, selectize=TRUE, selected = ""),
                           selectInput("scotname_trend", "Scotland", choices = c("", "Scotland"), 
                                       selectize=TRUE, selected = "Scotland"),
-                          selectInput("laname_trend", "Council area", choices =  c("Select council areas" = "", paste(la_name)),
+                          selectInput("caname_trend", "Council area", choices =  c("Select council areas" = "", paste(la_name)),
                                       multiple=TRUE, selectize=TRUE, selected = ""),
                           selectInput("adpname_trend", "Alcohol & drug partnership", choices =  c("Select partnerships" = "", paste(adp_name)),
                                       multiple=TRUE, selectize=TRUE, selected = ""),
@@ -736,6 +738,6 @@ tags$footer("© Scottish Public Health Observatory v2.0 2018", style = "
    background-color: #1995dc"
     ) 
 ################################################.
-) #Bracket  navbarPage
-
+  ) #Bracket  navbarPage
+) #bracket tagList
 ###END
