@@ -70,6 +70,7 @@ library(leaflet) #javascript maps
 library(plotly) #interactive graphs
 library(shinyWidgets) # for extra widgets
 library(tidyr) #for string maniupulations in ring plot
+library(shinyjs)
 
 ###############################################.
 ## Functions ----
