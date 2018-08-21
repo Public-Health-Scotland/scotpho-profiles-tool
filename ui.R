@@ -724,7 +724,11 @@ tabPanel("Other profiles", value = "others",
 ##############Footer----    
 ###############################################.
 #Copyright warning
-tags$footer("© Scottish Public Health Observatory v2.0 2018", style = "
+tags$footer(column(6, "© Scottish Public Health Observatory v2.0 2018"), 
+            column(6, actionLink("twitter_share", label = "Share", icon = icon("twitter"),
+                              style= "color:white;", onclick = sprintf("window.open('%s')", 
+                              "https://twitter.com/intent/tweet?text=Check%out%ScotPHO's%profile%tool&url=https://scotland.shinyapps.io/ScotPHO_profiles_tool/"))), 
+  style = "
    position:fixed;
    text-align:center;
    left: 0;
