@@ -651,6 +651,7 @@ function(input, output, session) {
                      text= heat_tooltip)) +
       geom_tile(color = "black") +
       geom_text(aes(label = round(measure, 0)), size =3) +
+      ylim(rev(levels(heat$indicator))) + #to order with A on top
       #Another step needed to make the palette of colours for the tile work
       scale_fill_manual(name = "Legend", labels = c("Significantly better", "Not significantly different", "Significantly worse", "Significance is not calculated"),
                         values = c(blue = "#4da6ff", gray = "gray88", red = "#ffa64d", white = "#ffffff")) +
