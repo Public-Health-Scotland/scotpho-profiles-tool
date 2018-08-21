@@ -719,7 +719,8 @@ tabPanel("Other profiles", value = "others",
            br()
            ) # mainPanel bracket
            ) #tabPanel bracket
-), # NavbarMenu bracket
+    ) # NavbarMenu bracket
+  ), #Bracket  navbarPage
 ###############################################.             
 ##############Footer----    
 ###############################################.
@@ -742,6 +743,5 @@ tags$footer(column(6, "© Scottish Public Health Observatory v2.0 2018"),
    background-color: #1995dc"
     ) 
 ################################################.
-  ) #Bracket  navbarPage
 ) #bracket tagList
 ###END
