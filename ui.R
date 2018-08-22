@@ -185,9 +185,9 @@ tabPanel(
              ),
              #Evidence box
              div(class="landing-page-box-about", 
-                 div("Related links", class = "landing-page-box-title" ),
+                 div("Evidence for Action", class = "landing-page-box-title" ),
                  div(class = "landing-page-about-icon", div(img(src="other_profile.png", class="centerabout"))),
-                 actionButton('jump_to_evidence', 'Links to websites or documents with useful profiles information', 
+                 actionButton('jump_to_efa', 'Links to ScotPHO evidence for action briefings', 
                               class="landing-page-button-about", 
                               icon = icon("arrow-circle-right", "icon-lp")))
       ),
@@ -646,43 +646,43 @@ navbarMenu("Info", icon = icon("info-circle"),
 ###############################################.             
 ##############Evidence for action----    
 ###############################################.      
-tabPanel("Related Links", value = "evidence",
-         sidebarPanel(width=1),
-         mainPanel(
-           h4("Related Links", style = "color:black;"),
-           p("Below are links to organisations and documents that provide supporting evidence for action."),
-           tags$ul( 
-             #Link to HS
-             tags$li(class= "li-custom", tags$a(href="http://www.healthscotland.scot/improve-policy-and-practice", 
-                                                "NHS Health Scotland",  class="externallink")),
-             #Link to HPHS
-             tags$li(class= "li-custom", tags$a(href="http://www.knowledge.scot.nhs.uk/home/portals-and-topics/health-improvement/hphs/evidence-briefings.aspx", 
-                                                "Health Promotion Health Service - Evidence briefings",  class="externallink")),
-             #Link to What Works Scotland
-             tags$li(class= "li-custom", tags$a(href="http://whatworksscotland.ac.uk/", 
-                                                "What Works Scotland",  class="externallink")),
-             #Link to NICE - Evidence UK
-             tags$li(class= "li-custom", tags$a(href="https://www.evidence.nhs.uk/", 
-                                                "NICE - Evidence UK",  class="externallink")),
-             #NICE - guidance
-             tags$li(class= "li-custom", tags$a(href="https://www.nice.org.uk/guidance", 
-                                                "NICE - guidance",  class="externallink")),
-             #Link to SIGN
-             tags$li(class= "li-custom", tags$a(href="http://www.sign.ac.uk/", 
-                                                "Scottish Intercollegiate Guidelines Network (SIGN)",  class="externallink")),
-             #Link to Centre for Reviews and Dissemination
-             tags$li(class= "li-custom", tags$a(href="https://www.york.ac.uk/crd/", 
-                                                "Centre for Reviews and Dissemination",  class="externallink")),
-             #Link to Cochrane Library
-             tags$li(class= "li-custom", tags$a(href="http://www.cochranelibrary.com/home/topic-and-review-group-list.html?page=topic", 
-                                                "Cochrane Library",  class="externallink")),
-             #Link to EPPI-Centre
-             tags$li(class= "li-custom", tags$a(href="http://eppi.ioe.ac.uk/cms/Default.aspx?tabid=56&language=en-US", 
-                                                "EPPI-Centre - Evidence library",  class="externallink"))
-           ), #Bullet point list bracket
-           br()
-           ) # mainPanel bracket
-), #tabPanel bracket
+# tabPanel("Evidence for Action", value = "evidence",
+#          sidebarPanel(width=1),
+#          mainPanel(
+#            h4("Related Links", style = "color:black;"),
+#            p("Below are links to organisations and documents that provide supporting evidence for action."),
+#            tags$ul(
+#              #Link to HS
+#              tags$li(class= "li-custom", tags$a(href="http://www.healthscotland.scot/improve-policy-and-practice",
+#                                                 "NHS Health Scotland",  class="externallink")),
+#              #Link to HPHS
+#              tags$li(class= "li-custom", tags$a(href="http://www.knowledge.scot.nhs.uk/home/portals-and-topics/health-improvement/hphs/evidence-briefings.aspx",
+#                                                 "Health Promotion Health Service - Evidence briefings",  class="externallink")),
+#              #Link to What Works Scotland
+#              tags$li(class= "li-custom", tags$a(href="http://whatworksscotland.ac.uk/",
+#                                                 "What Works Scotland",  class="externallink")),
+#              #Link to NICE - Evidence UK
+#              tags$li(class= "li-custom", tags$a(href="https://www.evidence.nhs.uk/",
+#                                                 "NICE - Evidence UK",  class="externallink")),
+#              #NICE - guidance
+#              tags$li(class= "li-custom", tags$a(href="https://www.nice.org.uk/guidance",
+#                                                 "NICE - guidance",  class="externallink")),
+#              #Link to SIGN
+#              tags$li(class= "li-custom", tags$a(href="http://www.sign.ac.uk/",
+#                                                 "Scottish Intercollegiate Guidelines Network (SIGN)",  class="externallink")),
+#              #Link to Centre for Reviews and Dissemination
+#              tags$li(class= "li-custom", tags$a(href="https://www.york.ac.uk/crd/",
+#                                                 "Centre for Reviews and Dissemination",  class="externallink")),
+#              #Link to Cochrane Library
+#              tags$li(class= "li-custom", tags$a(href="http://www.cochranelibrary.com/home/topic-and-review-group-list.html?page=topic",
+#                                                 "Cochrane Library",  class="externallink")),
+#              #Link to EPPI-Centre
+#              tags$li(class= "li-custom", tags$a(href="http://eppi.ioe.ac.uk/cms/Default.aspx?tabid=56&language=en-US",
+#                                                 "EPPI-Centre - Evidence library",  class="externallink"))
+#            ), #Bullet point list bracket
+#            br()
+#            ) # mainPanel bracket
+# ), #tabPanel bracket
 ###############################################.             
 ##############Other profiles----    
 ###############################################.

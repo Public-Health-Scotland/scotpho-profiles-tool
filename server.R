@@ -225,8 +225,8 @@ function(input, output, session) {
     updateTabsetPanel(session, "intabset", selected = "about")
   })
   
-  observeEvent(input$jump_to_evidence, {
-    updateTabsetPanel(session, "intabset", selected = "evidence")
+  observeEvent(input$jump_to_efa, {
+    browseURL("https://www.scotpho.org.uk/comparative-health/profiles/resources/evidence-for-action/")
   })
   
   observeEvent(input$jump_to_resources, {
