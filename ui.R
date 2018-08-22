@@ -645,7 +645,8 @@ navbarMenu("Info", icon = icon("info-circle"),
 ), #Tab panel bracket
 ###############################################.             
 ##############Evidence for action----    
-###############################################.      
+###############################################. 
+tabPanel(a("Evidence for action", href="https://www.scotpho.org.uk/comparative-health/profiles/resources/evidence-for-action/", target="_blank")
 # tabPanel("Evidence for Action", value = "evidence",
 #          sidebarPanel(width=1),
 #          mainPanel(
@@ -682,7 +683,7 @@ navbarMenu("Info", icon = icon("info-circle"),
 #            ), #Bullet point list bracket
 #            br()
 #            ) # mainPanel bracket
-# ), #tabPanel bracket
+), #tabPanel bracket
 ###############################################.             
 ##############Other profiles----    
 ###############################################.
