@@ -1896,6 +1896,70 @@ function(input, output, session) {
                 file, row.names=FALSE) } 
   )
   
+  #################################################.
+  ##  Technical Doc Page
+  #################################################
+  #useShinydashboard() 
+  indicator_selected <- reactive({ filter(techdoc,techdoc$indicator_name==input$indicator_defined)})
+  
+  output$indicator <- renderValueBox({
+    #valueBox("Definition", definitions$indicator_definition[definitions$indicator_name==input$indicator_defined], icon = icon ("book"),color = "blue", width = 8)
+    
+    valueBox(tags$p(indicator_selected()$indicator_name, style="color: white; font-size: 30px; font-weight: bold;"), HTML(paste("<b>","Indicator number:","</b>",indicator_selected()$indicator_number,br(),"<b>","Profile:","</b>",indicator_selected()$profile,br(),
+                                                                                                                                "<b>","Domain:","</b>",indicator_selected()$domain)), icon = icon ("book"),color = "blue")
+    
+  })
+  #  valueBox(tags$p(techdoc$indicator_name[techdoc$indicator_name==input$indicator_defined], style="color: white; font-size: 30px; font-weight: bold;"), HTML(paste("<b>","Indicator number:","</b>",techdoc$indicator_number[techdoc$indicator_name==input$indicator_defined],br(),"<b>","Profile:","</b>",techdoc$profile[techdoc$indicator_name==input$indicator_defined])), icon = icon ("book"),color = "blue")
+  
+  #  })
+  output$definition <- renderText ({indicator_selected()$indicator_definition })
+  output$rationale <- renderText ({ indicator_selected()$inclusion_rationale})
+  output$source <- renderText ({indicator_selected()$data_source})
+  output$numerator <- renderText ({indicator_selected()$numerator})
+  output$diagnosis <- renderText ({indicator_selected()$diagnostic_code_position})
+  output$numerator <- renderText ({indicator_selected()$numerator})
+  output$measure <- renderText ({indicator_selected()$measure})
+  output$rounding <- renderText ({indicator_selected()$rounding})
+  output$year <- renderText ({indicator_selected()$year_type})
+  output$geos <- renderText ({indicator_selected()$available_geographies})
+  output$trends_from <- renderText ({indicator_selected()$trends_from})
+  output$notes <- renderText ({indicator_selected()$notes_caveats})
+  output$last_updated <- renderText ({indicator_selected()$last_updated})
+  output$denominator <- renderText ({indicator_selected()$denominator})
+  output$disclosure <- renderText ({indicator_selected()$disclosure_control})
+  output$age <- renderText ({indicator_selected()$age_group})
+  output$sex <- renderText ({indicator_selected()$sex})  #change this when combined
+  output$aggregation <- renderText ({indicator_selected()$aggregation})
+  output$update_frequency <- renderText ({indicator_selected()$update_frequency})
+  output$confidence_interval <- renderText ({indicator_selected()$confidence_interval_method})
+  output$related_pubs <- renderText ({indicator_selected()$related_publications})
+  output$supporting_info <- renderText ({indicator_selected()$supporting_information})
+  output$next_update <- renderText ({indicator_selected()$next_update})
+  
+  #Filter indicator list by  profile or by domain
+  profile_filtered_list <- reactive({ sort(unique(optdata$indicator[grep(input$profile_defined,optdata$profile_domain1)|grep(input$profile_defined,optdata$profile_domain2)] )) })
+  topic_filtered_list <- reactive({ sort(unique(optdata$indicator[optdata$domain1==input$topic_defined|optdata$domain2==input$topic_defined|optdata$domain3==input$topic_defined])) })
+  
+  output$indicator_chosen <- renderUI ({ 
+    if (input$profile_defined != "Show all"){ selectizeInput("indicator_defined", label = "Select indicator to see technical information for",
+                                                             width = "510px", choices = profile_filtered_list(), selected = character(0), multiple=TRUE, options = list(placeholder = "Select your indicator of interest", maxItems = 1)) 
+    } else if (input$topic_defined != "Show all"){ selectizeInput("indicator_defined", label = "Select indicator to see technical information for",
+                                                                  width = "510px", choices = topic_filtered_list(), selected = character(0), multiple=TRUE, options = list(placeholder = "Select your indicator of interest", maxItems = 1)) 
+      
+    } else {selectizeInput("indicator_defined", label = "Select indicator to see technical information for",
+                           width = "510px", choices = indicator_list, selected = character(0), multiple=TRUE, options = list(placeholder = "Select your indicator of interest", maxItems = 1))}
+  }) 
+  
+  #To keep it simple, when you change profile, reset topic and vice versa.
+  observeEvent(input$profile_defined, { 
+    if (input$topic_defined != "Show all" && input$profile_defined != "Show all"){ updateSelectizeInput(session,"topic_defined", label = "Or by Topic",
+                                                                                                        choices = topic_list_filter, selected = "Show all")}
+  })
+  observeEvent(input$topic_defined, { 
+    if (input$profile_defined != "Show all" && input$topic_defined != "Show all"){ updateSelectizeInput(session,"profile_defined", label = "Filter by Profile",
+                                                                                                        choices = profile_list_filter, selected = "Show all")}
+  })  
+  
 } #server closing bracket
 
 #########################  END ----

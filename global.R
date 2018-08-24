@@ -115,7 +115,7 @@ plot_nodata <- function() {
 ## Data ----
 ###############################################.    
 optdata <- readRDS("./data/optdata.rds") #main dataset
-
+techdoc <- readRDS("./data/techdoc.rds") #technical documents data including definitions
 geo_lookup <- readRDS("./data/geo_lookup.rds") #geography lookup
 profile_lookup <- readRDS("./data/profile_lookup.rds") #profile lookup
 
@@ -165,19 +165,16 @@ indicator_list <- sort(unique(optdata$indicator))
 indicator_map_list <- sort(unique(optdata$indicator[optdata$interpret != 'O']))
 
 #Profile names
-topic_list <- sort(c('Alcohol', 'Behaviours',  'Cancer', 'Children and young people - Achieving',
-                'Children and young people - Active', 'Children and young people - Healthy',
-                'Children and young people - Included', 'Children and young people - Nurtured',
-                'Children and young people - Responsible', 'Children and young people - Safe',
-                'Community safety', 'Crime', 'Deprivation', 'Drugs', 'Economy',
-                'Education', 'Environment', 'Ill Health & Injury',
-                'Immunisations and Screening', 'Life Expectancy & Mortality',
-                'Mental health', 'Population', 'Smoking', 'Social Care & Housing'))
+topic_list <- sort(as.factor(unique(c(as.character(optdata$domain1), 
+                            as.character(optdata$domain2),
+                            as.character(optdata$domain3)))))
 
 profile_list <- setNames(c('HWB','CYP','ALC','DRG','MEN', "TOB", "POP"),
                          c('Health & wellbeing','Children & young people','Alcohol',
                            'Drugs','Mental Health', "Tobacco control", "Population"))
 
+profile_list_filter <-c(setNames("Show all","Show all"),sort(profile_list))
+topic_list_filter <-c(("Show all"),sort(topic_list))
 
 ###############################################.
 ## Palettes ----
