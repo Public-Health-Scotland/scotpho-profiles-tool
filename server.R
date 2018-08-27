@@ -1718,11 +1718,11 @@ function(input, output, session) {
   observeEvent(input$product_filter, {
     updateSelectizeInput(session,"indicator_filter", label = NULL,
                          choices = indicator_list, selected = character(0),
-                         options = list(maxOptions = 1000, placeholder = "Click or type indicators you would like to filter by"))
+                         options = list(maxOptions = 1000, placeholder = "Click or type indicators to filter by"))
     updateSelectizeInput(session,"topic_filter", label = NULL, choices = topic_list, selected = NULL,
-                         options = list(maxOptions = 1000, placeholder = "Click or type domains you would like to filter by"))
+                         options = list(maxOptions = 1000, placeholder = "Click or type domains to filter by"))
     updateSelectizeInput(session,"profile_filter", label = NULL, choices = profile_list, selected = NULL,
-                         options = list(maxOptions = 1000, placeholder = "Click or type profiles you would like to filter by"))
+                         options = list(maxOptions = 1000, placeholder = "Click or type profiles to filter by"))
     
   })
   
