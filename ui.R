@@ -101,9 +101,12 @@ tagList( #needed for shinyjs
                ".shiny-output-error { visibility: hidden; }",
                ".shiny-output-error:before { visibility: hidden; }",
                #External links underlined an open a new tab
-               ".externallink{text-decoration: underline;} "),
+               ".externallink{text-decoration: underline;} ",
+               ".definitionbox {width:100%; height:100%; text-align:left ;background-color:white;
+        border: 2px solid #2FA4E7; padding: 10px; margin-top: 0px; margin-bottom: 5px; float: left; transition: 0.5s ease; position: relative; object-fit: scale-down;}"),
                HTML("<base target='_blank'>")
                ),
+       
 ###############################################.
 ## Landing page ----
 ###############################################.
@@ -214,7 +217,7 @@ tabPanel(
              div(class="landing-page-box-about", 
                  div("Other profiles", class = "landing-page-box-title"),
                  div(class = "landing-page-about-icon", style="background-image: url(related_links.png);
-                     background-size: auto 20%; background-position: center; background-repeat: no-repeat; "),
+                     background-size: auto 80%; background-position: center; background-repeat: no-repeat; "),
                  actionButton('jump_to_others', 'Links to alternative profiling tools', 
                               class="landing-page-button-about", 
                               icon = icon("arrow-circle-right", "icon-lp")))
@@ -222,6 +225,7 @@ tabPanel(
   )#Fluidrow bracket
 ) #main Panel bracket
   ),# tab panel bracket
+
 ###############################################.
 ## Ring plot ----
 ###############################################.
@@ -587,8 +591,7 @@ tabPanel("Data", icon = icon("table"), value = "table",
 ###############################################.
 tabPanel("Technical Definitions", icon = icon("book"), value = "definition",
          #Sidepanel for filtering data
-         useShinydashboard(),
-         fluidRow(
+          fluidRow(
            column(width = 5, offset= 1, #align="center"#style="margin-left:0.5%; margin-right:0.5%",
                   #fluidRow(
                   p("Indicator definitions and technical information", style = "font-weight: bold; color: black;"),
@@ -613,6 +616,7 @@ tabPanel("Technical Definitions", icon = icon("book"), value = "definition",
          
          fluidRow(      
            column(width=10, offset=1,
+                  useShinydashboard(),
                   conditionalPanel(
                     condition="input.indicator_defined != null",
                     valueBoxOutput("indicator", width=12)))),
@@ -811,15 +815,27 @@ tabPanel("Other profiles", value = "others",
            br()
            ) # mainPanel bracket
            ) #tabPanel bracket
-) # NavbarMenu bracket
+
+),# NavbarMenu bracket
+
+#####################################################################
+#MODAL REOPEN button
+#####################################################################
+
+#Trying to create link to get Modal back in top right hand corner
+tabPanel(
+div(actionLink("openModal", label = "",  style = "float:right;")), icon = icon("question-circle")
+)
+
   ), #Bracket  navbarPage
+
 
 ###############################################.             
 ##############Footer----    
 ###############################################.
 #Copyright warning
-tags$footer(column(6, "© Scottish Public Health Observatory v2.0 2018"), 
-            column(6, actionLink("twitter_share", label = "Share", icon = icon("twitter"),
+tags$footer(column(11, "© Scottish Public Health Observatory v2.0 2018"), 
+            column(1, actionLink("twitter_share", label = "Share", icon = icon("twitter"),
                               style= "color:white;", onclick = sprintf("window.open('%s')", 
                               "https://twitter.com/intent/tweet?text=Check%out%ScotPHO's%profile%tool&url=https://scotland.shinyapps.io/ScotPHO_profiles_tool/"))), 
   style = "
