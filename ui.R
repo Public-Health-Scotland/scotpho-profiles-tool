@@ -607,8 +607,8 @@ tabPanel("Technical Definitions", icon = icon("book"), value = "definition",
            ), # column bracket 
            column(width=6,
                   br(), br(), br(),
-                  div(style="display:inline-block", downloadButton("definitions_by_profile", 'Download selected profile definitions', class = "down")),
-                  div(style="display:inline-block", downloadButton("definitions_by_domain", 'Download selected topic definitions', class = "down")),
+                 # div(style="display:inline-block", downloadButton("definitions_by_profile", 'Download selected profile definitions', class = "down")),
+                  #div(style="display:inline-block", downloadButton("definitions_by_domain", 'Download selected topic definitions', class = "down")),
                   br(), br(), downloadButton("definitions_by_indicator", 'Download indicator definition', class = "down")
            )#column bracket
            

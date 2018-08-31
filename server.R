@@ -1954,7 +1954,7 @@ showModal(welcome_modal)
   output$next_update <- renderText ({indicator_selected()$next_update})
   
   #Filter indicator list by  profile or by domain
-  profile_filtered_list <- reactive({ sort(unique(c(optdata$indicator[grep(input$profile_defined,optdata$profile_domain1)],optdata$indicator[grep(input$profile_defined,optdata$profile_domain2)] ))) })
+  profile_filtered_list <- reactive({ sort(unique(c(as.character(optdata$indicator[grep(input$profile_defined,optdata$profile_domain1)]),as.character(optdata$indicator[grep(input$profile_defined,optdata$profile_domain2)] )))) })
   topic_filtered_list <- reactive({ sort(unique(optdata$indicator[optdata$domain1==input$topic_defined|optdata$domain2==input$topic_defined|optdata$domain3==input$topic_defined])) })
   
   output$indicator_chosen <- renderUI ({ 
@@ -1976,6 +1976,21 @@ showModal(welcome_modal)
     if (input$profile_defined != "Show all" && input$topic_defined != "Show all"){ updateSelectizeInput(session,"profile_defined", label = "Filter by Profile",
                                                                                                         choices = profile_list_filter, selected = "Show all")}
   })
+  
+  #Download definitions table for selected indicator
+  
+  indicator_definitions <- reactive({ techdoc %>% filter(grepl(as.character(input$indicator_defined),.$indicator_name))})
+  indicator_csv <- reactive({ format_definitions_csv(indicator_definitions()) })
+  output$definitions_by_indicator <- downloadHandler(
+    filename ="indicator_definitions.csv",
+    content = function(file) {
+      write.csv(indicator_csv(),
+                file, row.names=FALSE) } 
+  )
+  
+  ########################
+  #Re-open Modal
+  ########################
   
   observeEvent(input$openModal, {
     showModal(
