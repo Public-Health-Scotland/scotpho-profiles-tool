@@ -196,12 +196,18 @@ tabPanel(
              ),
              #Evidence box
              div(class="landing-page-box-about", 
-                 div("Related Links", class = "landing-page-box-title" ),
-                 div(class = "landing-page-about-icon", style="background-image: url(other_profile.png);
-                     background-size: auto 80%; background-position: center; background-repeat: no-repeat; "),
-                 actionButton('jump_to_evidence', 'Links to websites or documents with useful profiles information', 
+                 div("Evidence for Action", class = "landing-page-box-title" ),
+                 div(class = "landing-page-about-icon", div(img(src="other_profile.png", class="centerabout"))),
+                 actionButton('jump_to_efa', 'Links to ScotPHO evidence for action briefings', 
                               class="landing-page-button-about", 
                               icon = icon("arrow-circle-right", "icon-lp")))
+      #        div(class="landing-page-box-about", 
+      #            div("Related Links", class = "landing-page-box-title" ),
+      #            div(class = "landing-page-about-icon", style="background-image: url(other_profile.png);
+      #                background-size: auto 80%; background-position: center; background-repeat: no-repeat; "),
+      #            actionButton('jump_to_evidence', 'Links to websites or documents with useful profiles information', 
+      #                         class="landing-page-button-about", 
+      #                         icon = icon("arrow-circle-right", "icon-lp")))
       ),
       #Resources box
       column(4, class="landing-page-column", 
