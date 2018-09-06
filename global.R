@@ -169,7 +169,21 @@ profile_list <- setNames(c('HWB','CYP','ALC','DRG','MEN', "TOB", "POP"),
                          c('Health & wellbeing','Children & young people','Alcohol',
                            'Drugs','Mental Health', "Tobacco control", "Population"))
 
-profile_list_filter <-c(setNames("Show all","Show all"),sort(profile_list))
+profile_list_filter <-c(setNames("Show all", "Show all"), sort(profile_list))
+
+#Geography types available for each indicator
+areatype_profile <- list(
+  'Health & wellbeing' = c("Council area", "Health board", "HSC locality", 
+                           "HSC partnership",  "Intermediate zone", "Scotland"),
+  'Children & young people' = c("Council area", "Health board", "HSC locality", 
+                                "HSC partnership",  "Intermediate zone", "Scotland"),
+  'Alcohol' = c("Alcohol & drug partnership", "Health board", "Scotland"),
+  'Drugs' = c("Alcohol & drug partnership", "Health board", "Scotland"),
+  'Mental Health' = c("Council area", "Scotland"),
+  "Tobacco control" = c("Council area", "Health board", "Scotland"), 
+  "Population" = c("Alcohol & drug partnership", "Council area", "Health board",  
+                   "HSC locality", "HSC partnership",  "Intermediate zone", "Scotland") 
+)
 
 ###############################################.
 ## Palettes ----
@@ -185,14 +199,14 @@ pal_map <- c('#2c7bb6','#abd9e9', '#ffffbf','#fdae61','#d7191c')
 #######
 #Beta version warning/feedback
 beta_box <- div(style =  "background-color: #ffffcc; padding: 5px; border: 1px solid #000000; margin: 5px;",
-    p(tags$b("Beta version:"), "this tool is under development. The current version 
-      is available on the main", tags$a(href="https://scotpho.nhsnss.scot.nhs.uk/scotpho/homeAction.do", 
-                                        "ScotPHO website",  class="externallink"), 
+    p(tags$b("Beta version:"), "welcome to our new profile tool. The old version 
+      is available ", tags$a(href="https://scotpho.nhsnss.scot.nhs.uk/scotpho/homeAction.do", 
+                                        "here",  class="externallink"), 
       ". We would welcome ", tags$a(href="mailto:ScotPHO@nhs.net", tags$b("any feedback"), 
                                     class="externallink"), " you have on this tool."))
 
 # Identify which geographies have data for each indicator
 # indic <- unique(optdata$indicator[!is.na(optdata$measure)])
-# indic_geog <- tapply(optdata$code[!is.na(optdata$measure)], optdata$indicator[!is.na(optdata$measure)], unique)
+# indic_geog <- tapply(optdata$areatype[!is.na(optdata$measure)], optdata$indicator[!is.na(optdata$measure)], unique)
 
 ##END

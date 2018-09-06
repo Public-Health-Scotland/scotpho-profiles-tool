@@ -270,9 +270,8 @@ showModal(welcome_modal)
   ## REACTIVE CONTROLS
   # Reactive controls for areatype depending on profile selected
   output$geotype_ui_ring <- renderUI({
-    areas <- optdata$areatype[substr(optdata$profile_domain1, 1, 3) == input$profile_ring |
-                                substr(optdata$profile_domain2, 1, 3) == input$profile_ring] %>% 
-      droplevels() %>% unique() %>%  sort()
+    areas <- areatype_profile[[names(profile_list[unname(profile_list) == input$profile_ring])]]
+    
     selectInput("geotype_ring", "Geography level", choices=areas,
                 selected = "Health board")
   })
@@ -536,17 +535,14 @@ showModal(welcome_modal)
   # Reactive controls
   # Reactive controls for areatype depending on profile selected
   output$geotype_ui_heat <- renderUI({
-    
-    areas <- optdata$areatype[substr(optdata$profile_domain1, 1, 3) == input$profile_heat |
-                                substr(optdata$profile_domain2, 1, 3) == input$profile_heat] %>% 
-      droplevels() %>% unique() %>%  sort()
+
+    areas <- areatype_profile[[names(profile_list[unname(profile_list) == input$profile_heat])]]
     
     selectInput("geotype_heat", "Geography level", choices=areas,
                 selected = "Health board")
     
   })
 
-  
   # Reactive controls for heatmap:area name depending on areatype selected
   output$geoname_ui_heat <- renderUI({
     
@@ -774,10 +770,8 @@ showModal(welcome_modal)
     # Reactive controls for areatype depending on profile selected
     output$geotype_ui_bar <- renderUI({
       
-      areas <- optdata$areatype[substr(optdata$profile_domain1, 1, 3) == input$profile_bar |
-                                  substr(optdata$profile_domain2, 1, 3) == input$profile_bar] %>% 
-        droplevels() %>% unique() %>%  sort()
-      
+      areas <- areatype_profile[[names(profile_list[unname(profile_list) == input$profile_bar])]]
+
       areas <- areas [! areas %in% c("Scotland")]
       
       selectInput("geotype_bar", "Geography level", choices=areas,
