@@ -474,4 +474,16 @@ optdata$ind_id <- as.factor(optdata$ind_id )
 saveRDS(optdata, "./data/optdata.rds")
 optdata <- readRDS("./data/optdata.rds") 
 
+#This syntax updates the Technical Document table based on an online Google Drive version of the table
+#Run every time you want to refresh the data in the local copy to represent what's in the online copy
+
+definition_table <-read.csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vTzrwAG7IFBjLvxuxUO0vJ7mn2AgilWVA1ZJQ9oVaLOSG4mgkquMKWga8MY5g2OFkFn-3awM_GYaHjL/pub?gid=94312583&single=true&output=csv",
+                            sep = ",", na.strings=c("NA", " ", ""), strip.white = TRUE, stringsAsFactors = FALSE)
+
+definition_table <- as.data.frame(definition_table)
+definition_table$indicator_number <- as.factor(definition_table$indicator_number)
+
+saveRDS(definition_table,"./data/techdoc.rds")
+techdoc <- readRDS("./data/techdoc.rds") 
+
 ##END
