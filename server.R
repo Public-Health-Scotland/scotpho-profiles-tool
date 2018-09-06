@@ -242,9 +242,9 @@ showModal(welcome_modal)
     updateTabsetPanel(session, "intabset", selected = "about")
   })
   
-  observeEvent(input$jump_to_efa, {
-    browseURL("https://www.scotpho.org.uk/comparative-health/profiles/resources/evidence-for-action/")
-  })
+  # observeEvent(input$jump_to_efa, {
+  #   browseURL("https://www.scotpho.org.uk/comparative-health/profiles/resources/evidence-for-action/")
+  # })
   
   observeEvent(input$jump_to_resources, {
     updateTabsetPanel(session, "intabset", selected = "resources")
@@ -518,7 +518,20 @@ showModal(welcome_modal)
       size = "l", easyClose = TRUE, fade=FALSE
       ))
   })
+  ###############################################.
+  # Indicator definitions
+  #Subsetting by domain and profile. Profile is fiddly as vector uses abbreviations 
+  # so needs to be converted to the names to match techdoc.
+  defs_data_heat <- reactive({techdoc %>% subset(grepl(input$topic_heat, domain) &
+                                                   grepl(names(profile_list[unname(profile_list) == input$profile_heat]),
+                                                         profile))})
   
+  output$defs_text_heat <- renderUI({
+    
+    HTML(paste(sprintf("<b><u>%s</b></u> <br> %s ", defs_data_heat()$indicator_name, 
+                       defs_data_heat()$indicator_definition), collapse = "<br><br>"))
+  })
+
   #####################.
   # Reactive controls
   # Reactive controls for areatype depending on profile selected
@@ -740,6 +753,20 @@ showModal(welcome_modal)
         p(img(src="help_barcode2.png",height=600)),size = "l",
         easyClose = TRUE, fade=FALSE
       ))
+    })
+    
+    ###############################################.
+    # Indicator definitions
+    #Subsetting by domain and profile. Profile is fiddly as vector uses abbreviations 
+    # so needs to be converted to the names to match techdoc.
+    defs_data_bar <- reactive({techdoc %>% subset(grepl(input$topic_bar, domain) &
+                                                     grepl(names(profile_list[unname(profile_list) == input$profile_bar]),
+                                                           profile))})
+    
+    output$defs_text_bar <- renderUI({
+      
+      HTML(paste(sprintf("<b><u>%s</b></u> <br> %s ", defs_data_bar()$indicator_name, 
+                         defs_data_bar()$indicator_definition), collapse = "<br><br>"))
     })
     
     #####################.
@@ -1071,6 +1098,18 @@ showModal(welcome_modal)
                 condition = ("Health board" %in%  unique(trend$areatype)))
   })
   
+  ###############################################.
+  # Indicator definitions
+  #Subsetting by domain and profile. Profile is fiddly as vector uses abbreviations 
+  # so needs to be converted to the names to match techdoc.
+  defs_data_trend <- reactive({techdoc %>% subset(input$indic_trend == indicator_name)})
+  
+  output$defs_text_trend <- renderUI({
+    
+    HTML(paste(sprintf("<b><u>%s</b></u> <br> %s ", defs_data_trend()$indicator_name, 
+                       defs_data_trend()$indicator_definition), collapse = "<br><br>"))
+  })
+  
 #####################.
 # Reactive data 
   #Time trend data. Filtering based on user input values.
@@ -1259,6 +1298,18 @@ showModal(welcome_modal)
     areas <- areas [! areas %in% c("Scotland")] #taking out Scotland
     selectInput("geotype_rank", label = "Geography level",
                 choices = areas, selected = "Health board")
+  })
+  
+  ###############################################.
+  # Indicator definitions
+  #Subsetting by domain and profile. Profile is fiddly as vector uses abbreviations 
+  # so needs to be converted to the names to match techdoc.
+  defs_data_rank <- reactive({techdoc %>% subset(input$indic_rank == indicator_name)})
+  
+  output$defs_text_rank <- renderUI({
+    
+    HTML(paste(sprintf("<b><u>%s</b></u> <br> %s ", defs_data_rank()$indicator_name, 
+                       defs_data_rank()$indicator_definition), collapse = "<br><br>"))
   })
   
 #####################.
@@ -1489,6 +1540,18 @@ showModal(welcome_modal)
     
     selectInput("yearcomp_map", "Baseline year", choices = periods,
                 selectize=TRUE)
+  })
+  
+  ###############################################.
+  # Indicator definitions
+  #Subsetting by domain and profile. Profile is fiddly as vector uses abbreviations 
+  # so needs to be converted to the names to match techdoc.
+  defs_data_map <- reactive({techdoc %>% subset(input$indic_map == indicator_name)})
+  
+  output$defs_text_map <- renderUI({
+    
+    HTML(paste(sprintf("<b><u>%s</b></u> <br> %s ", defs_data_map()$indicator_name, 
+                       defs_data_map()$indicator_definition), collapse = "<br><br>"))
   })
   
   #####################.
@@ -1916,7 +1979,6 @@ showModal(welcome_modal)
   #################################################.
   ##  Technical Doc Page
   #################################################
-  #useShinydashboard() 
   indicator_selected <- reactive({ filter(techdoc,techdoc$indicator_name==input$indicator_defined)})
   
   output$indicator <- renderValueBox({

@@ -199,6 +199,7 @@ tabPanel(
                  div("Evidence for action", class = "landing-page-box-title" ),
                  div(class = "landing-page-about-icon", div(img(src="other_profile.png", class="centerabout"))),
                  actionButton('jump_to_efa', 'Links to ScotPHO evidence for action briefings', 
+                              onclick ="window.open('https://www.scotpho.org.uk/comparative-health/profiles/resources/evidence-for-action/', '_blank')",
                               class="landing-page-button-about", 
                               icon = icon("arrow-circle-right", "icon-lp")))
       ),
@@ -312,11 +313,13 @@ tabPanel("Heatmap", icon = icon("list-ul"), value = "heat",
            ),
            column(2,
                   actionButton("help_heat",label="Help", icon= icon('question-circle'), class ="down"),
+                  actionButton("defs_heat",label="Definitions", icon= icon('info'), class ="down"),
                   downloadButton('download_heat', 'Download data', class = "down"),
                   savechart_button('download_heatplot', 'Save chart',  class = "down")
            )
          ),
          mainPanel(width = 12,
+                   bsModal("mod_defs_heat", "Definitions", "defs_heat", htmlOutput('defs_text_heat')),
                    h4(textOutput("heat_title"), style="color: black; text-align: left"),
                    h5(textOutput("heat_subtitle"), style="color: black; text-align: left"),
                    plotlyOutput("heat_plot")
@@ -328,6 +331,7 @@ tabPanel("Heatmap", icon = icon("list-ul"), value = "heat",
 tabPanel("Barcode", icon = icon("barcode"), value = "barcode",
          sidebarPanel(width=3,
                       actionButton("help_bar", label="Help", icon= icon('question-circle'), class ="down"),
+                      actionButton("defs_bar",label="Definitions", icon= icon('info'), class ="down"),
                       selectInput("profile_bar", "Profile", choices = profile_list),
                       uiOutput("topic_ui_bar"),
                       uiOutput("geotype_ui_bar"),
@@ -351,6 +355,7 @@ tabPanel("Barcode", icon = icon("barcode"), value = "barcode",
                       savechart_button('download_barplot', 'Save chart',  class = "down")
          ),
          mainPanel(width=9,
+                   bsModal("mod_defs_bar", "Definitions", "defs_bar", htmlOutput('defs_text_bar')),
                    h4(textOutput("bar_title"), style="color: black; text-align: left"),
                    h5(textOutput("bar_subtitle"), style="color: black; text-align: left"),
                    uiOutput("ui_bar_plot")
@@ -363,6 +368,9 @@ tabPanel("Trend", icon = icon("area-chart"), value = "trend",
                    sidebarPanel(width=3,
                           selectInput("indic_trend", "Indicator", choices=indicator_list),
                           awesomeCheckbox("ci_trend", label = "95% confidence intervals", value = FALSE),
+                          awesomeCheckbox("colorblind_trend",  
+                                          label = "Improved accessibility", value = FALSE),
+                          actionButton("defs_trend",label="Definitions", icon= icon('info'), class ="down"),
                           shiny::hr(),
                           p(tags$b("Select the areas you want to plot.
                                    You can select multiple areas per geography level")),
@@ -382,11 +390,10 @@ tabPanel("Trend", icon = icon("area-chart"), value = "trend",
                           uiOutput("loc_ui_trend"),
                           uiOutput("iz_ui_trend"),
                           downloadButton('download_trend', 'Download data', class = "down"),
-                          savechart_button('download_trendplot', 'Save chart',  class = "down"),
-                          awesomeCheckbox("colorblind_trend",  
-                                 label = "Improved accessibility", value = FALSE)
+                          savechart_button('download_trendplot', 'Save chart',  class = "down")
                    ),
          mainPanel(width = 9, #Main panel
+          bsModal("mod_defs_trend", "Definitions", "defs_trend", htmlOutput('defs_text_trend')),
           h4(textOutput("title_trend"), style="color: black; text-align: left"),
           plotlyOutput("trend_plot")
          )
@@ -397,6 +404,7 @@ tabPanel("Trend", icon = icon("area-chart"), value = "trend",
 tabPanel("Rank", icon = icon("signal"), value = "rank",
          sidebarPanel(width=4, #Filter options
                   selectInput("indic_rank", "Indicator", choices=indicator_list),
+                  actionButton("defs_rank", label="Definitions", icon= icon('info'), class ="down"),
                   uiOutput("geotype_ui_rank"),
                   conditionalPanel( #Conditional panel for extra dropdown for localities & IZ
                     condition = "input.geotype_rank == 'HSC locality' | input.geotype_rank == 'Intermediate zone' ",
@@ -406,9 +414,6 @@ tabPanel("Rank", icon = icon("signal"), value = "rank",
                   selectInput("geocomp_rank", "Comparator", choices = comparator_list,
                               selectize=TRUE, selected = "Scotland"),
                   awesomeCheckbox("ci_rank", label = "95% confidence intervals", value = FALSE),
-                  downloadButton('download_rank', 'Download data', class = "down"),
-                  savechart_button('download_rankplot', 'Save chart', class = "down"),
-                  shiny::hr(),
                   #Legend
                   p(img(src='signif_better.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
                     "Better than comparator", br(),
@@ -417,9 +422,12 @@ tabPanel("Rank", icon = icon("signal"), value = "rank",
                     img(src='signif_worse.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
                     "Worse than comparator", br(),
                     img(src='signif_nocalc2.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
-                    "No differences can be calculated")
+                    "No differences can be calculated"),
+                  downloadButton('download_rank', 'Download data', class = "down"),
+                  savechart_button('download_rankplot', 'Save chart', class = "down")
          ),
          mainPanel(width = 8, #Main panel
+                   bsModal("mod_defs_rank", "Definitions", "defs_rank", htmlOutput('defs_text_rank')),
                    h4(textOutput("rank_title"), style="color: black; text-align: left"),
                    h5(textOutput("rank_subtitle"), style="color: black; text-align: left"),
                    plotlyOutput("rank_plot") 
@@ -431,6 +439,7 @@ tabPanel("Rank", icon = icon("signal"), value = "rank",
 tabPanel("Map", icon = icon("globe"), value = "map",
          sidebarPanel(    
            selectInput("indic_map", "Indicator", choices=indicator_map_list),
+           actionButton("defs_map", label="Definitions", icon= icon('info'), class ="down"),
            uiOutput("geotype_ui_map"),
            conditionalPanel(#Conditional panel for extra dropdown for localities & IZ
              condition = "input.geotype_bar== 'HSC locality' | input.geotype_map == 'Intermediate zone' ",
@@ -445,10 +454,7 @@ tabPanel("Map", icon = icon("globe"), value = "map",
            ),
            conditionalPanel(condition = "input.comp_map == 2 ", 
                             uiOutput("yearcomp_ui_map")
-           ), 
-           downloadButton('download_map', 'Download data', class = "down"),
-           savechart_button('download_mapplot', 'Save map', class = "down"),
-           shiny::hr(),
+           ),
            #Legend
            p(img(src='signif_better.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
              "Better than comparator", br(),
@@ -457,9 +463,12 @@ tabPanel("Map", icon = icon("globe"), value = "map",
              img(src='signif_worse.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
              "Worse than comparator", br(),
              img(src='signif_nocalc.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
-             "No differences can be calculated")
+             "No differences can be calculated"),
+           downloadButton('download_map', 'Download data', class = "down"),
+           savechart_button('download_mapplot', 'Save map', class = "down")
          ), 
          mainPanel( #Main panel
+           bsModal("mod_defs_map", "Definitions", "defs_map", htmlOutput('defs_text_map')),
            h4(textOutput("map_title"), style="color: black; text-align: left"),
            h5(textOutput("map_subtitle"), style="color: black; text-align: left"),
            leafletOutput("map", width="100%",height="600px")
@@ -611,7 +620,7 @@ navbarMenu("Info", icon = icon("info-circle"),
            ###############################################.
            ## Definitions ----
            ###############################################.
-           tabPanel("Technical Definitions", icon = icon("book"), value = "definition",
+           tabPanel("Indicator definitions", value = "definition",
                     #Sidepanel for filtering data
                     fluidRow(
                       column(width = 5, offset= 1, #align="center"#style="margin-left:0.5%; margin-right:0.5%",
