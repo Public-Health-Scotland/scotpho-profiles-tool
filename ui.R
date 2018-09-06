@@ -841,7 +841,9 @@ div(actionLink("openModal", label = "",  style = "float:right;")), icon = icon("
 ##############Footer----    
 ###############################################.
 #Copyright warning
-tags$footer(column(11, "© Scottish Public Health Observatory v2.0 2018"), 
+tags$footer(column(8, "© Scottish Public Health Observatory v2.0 2018"), 
+            column(3, tags$a(href="mailto:ScotPHO@nhs.net", tags$b("Contact us!"), 
+                              class="externallink", style = "color: white; text-decoration: none")), 
             column(1, actionLink("twitter_share", label = "Share", icon = icon("twitter"),
                               style= "color:white;", onclick = sprintf("window.open('%s')", 
                               "https://twitter.com/intent/tweet?text=Check%out%ScotPHO's%profile%tool&url=https://scotland.shinyapps.io/ScotPHO_profiles_tool/"))), 
