@@ -162,9 +162,9 @@ showModal(welcome_modal)
              br(),
              br(),
              p(tags$h5("Some new exciting features that have been added to our tool include:", style = "width: 90%; text-align: left; "))),
-      column(12,
-             tags$ul(tags$li(tags$h5("You can now filter by Alcohol and drug partnerships, for indicators where data is available")   
-             )))),
+      column(12, 
+             tags$ul(tags$li(tags$h5(tags$b("You can now filter by Alcohol and drug partnerships for indicators where data is available")   
+             ))))),
     br(),
     p(tags$h5("Thanks for stopping by!")),
     p(tags$h5("For any further questions or other developments you would like to suggest for our current tool, please contact us at", tags$a(href="mailto:ScotPHO@nhs.net", "ScotPHO@nhs.net", class="externallink"), style = "width: 700px")),
@@ -241,10 +241,6 @@ showModal(welcome_modal)
   observeEvent(input$jump_to_about, {
     updateTabsetPanel(session, "intabset", selected = "about")
   })
-  
-  # observeEvent(input$jump_to_efa, {
-  #   browseURL("https://www.scotpho.org.uk/comparative-health/profiles/resources/evidence-for-action/")
-  # })
   
   observeEvent(input$jump_to_resources, {
     updateTabsetPanel(session, "intabset", selected = "resources")
@@ -1201,8 +1197,8 @@ showModal(welcome_modal)
         layout(annotations = list(), #It needs this because of a buggy behaviour of Plotly
                margin = list(b = 160, t=5), #to avoid labels getting cut out
                yaxis = list(title = ~type_definition, rangemode="tozero", fixedrange=TRUE,
-                            size = 4, titlefont =list(size=12), tickfont =list(size=11)), 
-               xaxis = list(title = FALSE, tickfont =list(size=10), tickangle = 270, fixedrange=TRUE),
+                            size = 4, titlefont =list(size=14), tickfont =list(size=14)), 
+               xaxis = list(title = FALSE, tickfont =list(size=14), tickangle = 270, fixedrange=TRUE),
                font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif')) %>%  
         config(displayModeBar = FALSE, displaylogo = F, collaborate=F, editable =F) # taking out plotly logo and collaborate button
       
@@ -1403,10 +1399,10 @@ showModal(welcome_modal)
                   line = list(color = '#FF0000'), showlegend = FALSE, hoverinfo="skip") %>% 
         #Layout
         layout(annotations = list(), #It needs this because of a buggy behaviour
-               yaxis = list(title = ~type_definition, titlefont =list(size=11), 
-                            tickfont =list(size=11), fixedrange=TRUE),
+               yaxis = list(title = ~type_definition, titlefont =list(size=14), 
+                            tickfont =list(size=14), fixedrange=TRUE),
                xaxis = list(title = "", tickangle = 270, fixedrange=TRUE,
-                            tickfont =list(size=11), #axis parameters
+                            tickfont =list(size=13), #axis parameters
                             categoryorder="array", #order of plotting
                             categoryarray = order_areas),
                font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif'),
