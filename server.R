@@ -584,8 +584,7 @@ showModal(welcome_modal)
                (substr(profile_domain1, 1, 3) == input$profile_heat |
                   substr(profile_domain2, 1, 3) == input$profile_heat) &
                (substr(profile_domain1, 5, nchar(as.vector(profile_domain1))) == input$topic_heat |
-                  substr(profile_domain2, 5, nchar(as.vector(profile_domain2))) == input$topic_heat)) %>% 
-      droplevels()
+                  substr(profile_domain2, 5, nchar(as.vector(profile_domain2))) == input$topic_heat)) 
     
   })
   
@@ -602,14 +601,12 @@ showModal(welcome_modal)
                  (substr(profile_domain1, 5, nchar(as.vector(profile_domain1))) == input$topic_heat |
                     substr(profile_domain2, 5, nchar(as.vector(profile_domain2))) == input$topic_heat)) %>% 
         select(c(year, indicator, measure)) %>% 
-        rename(comp_m=measure) %>% 
-        droplevels()
+        rename(comp_m=measure) 
     } else if (input$comp_heat == 2) { #if time comparison selected
       heat_chosencomp <- heat_chosenarea() %>% 
         subset(year == input$yearcomp_heat) %>% 
         select(c(indicator, measure)) %>% 
-        rename(comp_m=measure) %>% 
-        droplevels()
+        rename(comp_m=measure) 
       
     }
     
@@ -651,9 +648,11 @@ showModal(welcome_modal)
     
     #Merging comparator and chosen area
     if (input$comp_heat == 1){
-      heat <- left_join(x = heat_chosenarea(), y = heat_chosencomp(), by=c("indicator", "year"))
+      heat <- left_join(x = heat_chosenarea(), y = heat_chosencomp(), by=c("indicator", "year")) %>% 
+        droplevels()
     } else if (input$comp_heat == 2) {
-      heat <- left_join(x = heat_chosenarea(), y = heat_chosencomp(), by=c("indicator"))
+      heat <- left_join(x = heat_chosenarea(), y = heat_chosencomp(), by=c("indicator")) %>% 
+        droplevels()
     }
     
     #Creating a palette of colours based on statistical significance
