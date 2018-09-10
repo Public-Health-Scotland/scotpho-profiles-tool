@@ -129,7 +129,7 @@ tabPanel(
       #Heat map box
       column(4, class="landing-page-column",
              div(class="landing-page-box",
-                 div("Topic summary: Time trends", class = "landing-page-box-title"),
+                 div("Topic summary: Heatmap", class = "landing-page-box-title"),
                  div(class = "landing-page-icon", style="background-image: url(heatmap_2.png);
                      background-size: auto 80%; background-position: center; background-repeat: no-repeat; "),
                  actionButton('jump_to_heat', 'Explore how indicators for a topic area have changed over time', 
@@ -137,7 +137,7 @@ tabPanel(
       #Barcode plot box
       column(4, class="landing-page-column",
              div(class="landing-page-box", 
-                 div("Topic summary: Geographic distribution", class = "landing-page-box-title"),
+                 div("Topic summary: Barcode", class = "landing-page-box-title"),
                  div(class = "landing-page-icon", style="background-image: url(barcode_3.png);
                      background-size: auto 80%; background-position: center; background-repeat: no-repeat; "),
                  actionButton('jump_to_barcode', 'Explore how indicators for a topic compare across different geographies',
@@ -743,10 +743,6 @@ navbarMenu("Info", icon = icon("info-circle"),
                         #Link to user guide
                         tags$li(class= "li-custom", tags$a(href="", "User guide",  class="externallink"), 
                                 tags$b(" (coming soon)"), " - Learn how to use and get the most out of the tool"),
-                        #Link to technical report
-                        tags$li(class= "li-custom", tags$a(href="http://www.scotpho.org.uk/comparative-health/profiles/resources/",
-                                                           "Technical reports",  class="externallink"), 
-                                " - Detailed description of the methodology, statistics and caveats of the data presented"),
                         #Link to overview reports
                         tags$li(class= "li-custom", tags$a(href="http://www.scotpho.org.uk/comparative-health/profiles/resources/",
                                                            "Overview reports",  class="externallink"), 
@@ -823,19 +819,8 @@ tabPanel("Other profiles", value = "others",
            ) # mainPanel bracket
            ) #tabPanel bracket
 
-),# NavbarMenu bracket
-
-#####################################################################
-#MODAL REOPEN button
-#####################################################################
-
-#Trying to create link to get Modal back in top right hand corner
-tabPanel(
-div(actionLink("openModal", label = "",  style = "float:right;")), icon = icon("question-circle")
-)
-
+)# NavbarMenu bracket
   ), #Bracket  navbarPage
-
 
 ###############################################.             
 ##############Footer----    
