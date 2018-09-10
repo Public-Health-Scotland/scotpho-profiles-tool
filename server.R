@@ -2030,12 +2030,12 @@ showModal(welcome_modal)
   
   #Download definitions table for selected indicator
   
-  indicator_definitions <- reactive({ techdoc %>% filter(grepl(as.character(input$indicator_defined),.$indicator_name))})
-  indicator_csv <- reactive({ format_definitions_csv(indicator_definitions()) })
+  indicator_definitions <- reactive({ techdoc %>% filter(indicator_name == input$indicator_defined)})
+  #indicator_csv <- reactive({ format_definitions_csv(indicator_definitions()) })
   output$definitions_by_indicator <- downloadHandler(
     filename ="indicator_definitions.csv",
     content = function(file) {
-      write.csv(indicator_csv(),
+      write.csv(indicator_definitions(),
                 file, row.names=FALSE) } 
   )
   
