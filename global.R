@@ -72,6 +72,7 @@ library(shinyWidgets) # for extra widgets
 library(tidyr) #for string maniupulations in ring plot
 library(shinyjs)
 library(shinydashboard) #for valuebox on techdoc tab
+library(sp)
 
 ###############################################.
 ## Functions ----
