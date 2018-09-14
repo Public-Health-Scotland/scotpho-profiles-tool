@@ -87,6 +87,15 @@ format_csv <- function(reactive_dataset) {
            period = def_period, definition = type_definition, area_code=code, area_name=areaname,area_type=areatype)
 }
 
+format_definitions_csv <- function(reactive_dataset) {
+  reactive_dataset %>% 
+    select(c(indicator_name, indicator_number, profile, domain, indicator_definition, inclusion_rationale, data_source,
+             diagnostic_code_position, numerator, denominator, measure, disclosure_control, rounding, age_group, sex, year_type,
+             trends_from, aggregation, update_frequency, available_geographies, confidence_interval_method, notes_caveats, 
+             related_publications, supporting_information, last_updated, next_update
+    )) 
+}
+
 #Download button for charts, just changing the icon
 savechart_button <- function(outputId, label = "Save chart", class=NULL){
   tags$a(id = outputId, class = paste("btn btn-default shiny-download-link", class), 

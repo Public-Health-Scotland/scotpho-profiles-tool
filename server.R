@@ -169,7 +169,7 @@ showModal(welcome_modal)
     p(tags$h5("Thanks for stopping by!")),
     p(tags$h5("For any further questions or other developments you would like to suggest for our current tool, please contact us at", tags$a(href="mailto:ScotPHO@nhs.net", "ScotPHO@nhs.net", class="externallink"), style = "width: 700px")),
     br(),
-    actionButton("back3","Back", icon("backward")),
+    actionButton("updatesreturn","Back", icon("backward")),
     HTML("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"),
     modalButton("Exit", icon("times-circle")),
     size = "l", align= "center",
@@ -177,6 +177,7 @@ showModal(welcome_modal)
   )
   
   observeEvent(input$updates, {   showModal(updates_modal)  })
+  observeEvent(input$updatesreturn, {   showModal(welcome_modal)  })
   
   #"Take a Tour" Modal - last window
   fourth_modal <- modalDialog(
@@ -2031,11 +2032,11 @@ showModal(welcome_modal)
   #Download definitions table for selected indicator
   
   indicator_definitions <- reactive({ techdoc %>% filter(indicator_name == input$indicator_defined)})
-  #indicator_csv <- reactive({ format_definitions_csv(indicator_definitions()) })
+  indicator_csv <- reactive({ format_definitions_csv(indicator_definitions()) })
   output$definitions_by_indicator <- downloadHandler(
     filename ="indicator_definitions.csv",
     content = function(file) {
-      write.csv(indicator_definitions(),
+      write.csv(indicator_csv(),
                 file, row.names=FALSE) } 
   )
   
