@@ -38,13 +38,13 @@ geo_lookup<- read_spss(paste(lookups, "code_dictionary.sav", sep="")) %>%
   setNames(tolower(names(.))) %>% #variables to lower case
   mutate_all(factor) %>% # converting variables into factors
   #Creating geography type variable
-  mutate(areatype = ifelse(substr(code, 1, 3) == "S00", "Scotland", 
-                           ifelse(substr(code, 1, 3) == "S08", "Health board", 
-                                  ifelse(substr(code, 1, 3) == "S12", "Council area", 
-                                         ifelse(substr(code, 1, 3) == "S11", "Alcohol & drug partnership", 
-                                            ifelse(substr(code, 1, 3) == "S99", "HSC locality", 
-                                                ifelse(substr(code, 1, 3) == "S37", "HSC partnership",
-                                                       ifelse(substr(code, 1, 3) == "S02", "Intermediate zone", "Error")))))))) 
+  mutate(areatype = case_when(substr(code, 1, 3) == "S00" ~ "Scotland", 
+                              substr(code, 1, 3) == "S08" ~ "Health board",
+                              substr(code, 1, 3) == "S12" ~ "Council area",
+                              substr(code, 1, 3) == "S11" ~ "Alcohol & drug partnership",
+                              substr(code, 1, 3) == "S99" ~ "HSC locality",
+                              substr(code, 1, 3) == "S37" ~ "HSC partnership",
+                              substr(code, 1, 3) == "S02" ~ "Intermediate zone"))
 
 #TEMPORARY FIX. dealing with change in ca, hb and hscp codes
 geo_lookup$code <- recode(as.character(geo_lookup$code), 
@@ -97,68 +97,67 @@ geo_lookup <- left_join(x=geo_lookup, y=geo_parents, by="code", all.x = TRUE)
 
 ###There are a number of IZ's with the same name, recoding.
 geo_lookup <- geo_lookup %>% 
-  mutate(areaname = ifelse(code == "S02001938", "Woodside-Glasgow City",
-                    ifelse(code == "S02001267", "Woodside-Abeerdeen City",
-                    ifelse(code == "S02002233", "Western Edge-Perth & Kinross",
-                    ifelse(code == "S02001475", "Western Edge-Dundee City",
-                    ifelse(code == "S02001620", "Tollcross-City of Edinburgh",
-                    ifelse(code == "S02001911", "Tollcross-Glasgow City",
-                    ifelse(code == "S02001671", "Muirhouse-City of Edinburgh",
-                    ifelse(code == "S02002137", "Muirhouse-North Lanarkshire",
-                    ifelse(code == "S02002358", "Law-South Lanarkshire",
-                    ifelse(code == "S02001469", "Law-Dundee City",
-                    ifelse(code == "S02002490", "Ladywell-West Lothian",
-                    ifelse(code == "S02002156", "Ladywell-North Lanarkshire",
-                    ifelse(code == "S02001528", "Hillhead-East Dunbartonshire",
-                    ifelse(code == "S02001953", "Hillhead-Glasgow City",
-                    ifelse(code == "S02001249", "City Centre West-Aberdeen City",
-                    ifelse(code == "S02001933", "City Centre West-Glasgow City",
-                    ifelse(code == "S02001250", "City Centre East-Aberdeen City",
-                    ifelse(code == "S02001932", "City Centre East-Glasgow City",
-                    ifelse(code == "S02001448", "City Centre-Dundee City",
-                    ifelse(code == "S02002449", "City Centre-Stirling",
-                    ifelse(code == "S02001307", "Blackburn-Aberdeenshire",
-                    ifelse(code == "S02002496", "Blackburn-West Lothian",
-                           paste(areaname) #no argument
-                    ))))))))))))))))))))))) %>% 
-  mutate(areaname = ifelse(code == "S02001534", "IZ01-East Lothian",
-                    ifelse(code == "S02002460", "IZ01-West Dunbartonshire",
-                    ifelse(code == "S02001535", "IZ02-East Lothian",
-                    ifelse(code == "S02002461", "IZ02-West Dunbartonshire",
-                    ifelse(code == "S02001536", "IZ03-East Lothian",
-                    ifelse(code == "S02002462", "IZ03-West Dunbartonshire",
-                    ifelse(code == "S02001537", "IZ04-East Lothian",
-                    ifelse(code == "S02002463", "IZ04-West Dunbartonshire",
-                    ifelse(code == "S02001538", "IZ05-East Lothian",
-                    ifelse(code == "S02002464", "IZ05-West Dunbartonshire",
-                    ifelse(code == "S02001539", "IZ06-East Lothian",
-                    ifelse(code == "S02002465", "IZ06-West Dunbartonshire",
-                    ifelse(code == "S02001540", "IZ07-East Lothian",
-                    ifelse(code == "S02002466", "IZ07-West Dunbartonshire",
-                    ifelse(code == "S02001541", "IZ08-East Lothian",
-                    ifelse(code == "S02002467", "IZ08-West Dunbartonshire",
-                    ifelse(code == "S02001542", "IZ09-East Lothian",
-                    ifelse(code == "S02002468", "IZ09-West Dunbartonshire",
-                    ifelse(code == "S02001543", "IZ10-East Lothian",
-                    ifelse(code == "S02002469", "IZ10-West Dunbartonshire",
-                    ifelse(code == "S02001544", "IZ11-East Lothian",
-                    ifelse(code == "S02002470", "IZ11-West Dunbartonshire",
-                    ifelse(code == "S02001545", "IZ12-East Lothian",
-                    ifelse(code == "S02002471", "IZ12-West Dunbartonshire",
-                    ifelse(code == "S02001546", "IZ13-East Lothian",
-                    ifelse(code == "S02002472", "IZ13-West Dunbartonshire",
-                    ifelse(code == "S02001547", "IZ14-East Lothian",
-                    ifelse(code == "S02002473", "IZ14-West Dunbartonshire",
-                    ifelse(code == "S02001548", "IZ15-East Lothian",
-                    ifelse(code == "S02002474", "IZ15-West Dunbartonshire",
-                    ifelse(code == "S02001549", "IZ16-East Lothian",
-                    ifelse(code == "S02002475", "IZ16-West Dunbartonshire",
-                    ifelse(code == "S02001550", "IZ17-East Lothian",
-                    ifelse(code == "S02002476", "IZ17-West Dunbartonshire",
-                    ifelse(code == "S02001551", "IZ18-East Lothian",
-                    ifelse(code == "S02002477", "IZ18-West Dunbartonshire",
-                           paste(areaname) #no argument
-                    )))))))))))))))))))))))))))))))))))))
+  mutate(areaname = case_when(
+    code == "S02001938" ~ "Woodside-Glasgow City",
+    code == "S02001938" ~ "Woodside-Glasgow City",
+    code == "S02001267" ~ "Woodside-Abeerdeen City",
+    code == "S02002233" ~ "Western Edge-Perth & Kinross",
+    code == "S02001475" ~ "Western Edge-Dundee City",
+    code == "S02001620" ~ "Tollcross-City of Edinburgh",
+    code == "S02001911" ~ "Tollcross-Glasgow City",
+    code == "S02001671" ~ "Muirhouse-City of Edinburgh",
+    code == "S02002137" ~ "Muirhouse-North Lanarkshire",
+    code == "S02002358" ~ "Law-South Lanarkshire",
+    code == "S02001469" ~ "Law-Dundee City",
+    code == "S02002490" ~ "Ladywell-West Lothian",
+    code == "S02002156" ~ "Ladywell-North Lanarkshire",
+    code == "S02001528" ~ "Hillhead-East Dunbartonshire",
+    code == "S02001953" ~ "Hillhead-Glasgow City",
+    code == "S02001249" ~ "City Centre West-Aberdeen City",
+    code == "S02001933" ~ "City Centre West-Glasgow City",
+    code == "S02001250" ~ "City Centre East-Aberdeen City",
+    code == "S02001932" ~ "City Centre East-Glasgow City",
+    code == "S02001448" ~ "City Centre-Dundee City",
+    code == "S02002449" ~ "City Centre-Stirling",
+    code == "S02001307" ~ "Blackburn-Aberdeenshire",
+    code == "S02002496" ~ "Blackburn-West Lothian",
+    code == "S02001534" ~ "IZ01-East Lothian",
+    code == "S02002460" ~ "IZ01-West Dunbartonshire",
+    code == "S02001535" ~ "IZ02-East Lothian",
+    code == "S02002461" ~ "IZ02-West Dunbartonshire",
+    code == "S02001536" ~ "IZ03-East Lothian",
+    code == "S02002462" ~ "IZ03-West Dunbartonshire",
+    code == "S02001537" ~ "IZ04-East Lothian",
+    code == "S02002463" ~ "IZ04-West Dunbartonshire",
+    code == "S02001538" ~ "IZ05-East Lothian",
+    code == "S02002464" ~ "IZ05-West Dunbartonshire",
+    code == "S02001539" ~ "IZ06-East Lothian",
+    code == "S02002465" ~ "IZ06-West Dunbartonshire",
+    code == "S02001540" ~ "IZ07-East Lothian",
+    code == "S02002466" ~ "IZ07-West Dunbartonshire",
+    code == "S02001541" ~ "IZ08-East Lothian",
+    code == "S02002467" ~ "IZ08-West Dunbartonshire",
+    code == "S02001542" ~ "IZ09-East Lothian",
+    code == "S02002468" ~ "IZ09-West Dunbartonshire",
+    code == "S02001543" ~ "IZ10-East Lothian",
+    code == "S02002469" ~ "IZ10-West Dunbartonshire",
+    code == "S02001544" ~ "IZ11-East Lothian",
+    code == "S02002470" ~ "IZ11-West Dunbartonshire",
+    code == "S02001545" ~ "IZ12-East Lothian",
+    code == "S02002471" ~ "IZ12-West Dunbartonshire",
+    code == "S02001546" ~ "IZ13-East Lothian",
+    code == "S02002472" ~ "IZ13-West Dunbartonshire",
+    code == "S02001547" ~ "IZ14-East Lothian",
+    code == "S02002473" ~ "IZ14-West Dunbartonshire",
+    code == "S02001548" ~ "IZ15-East Lothian",
+    code == "S02002474" ~ "IZ15-West Dunbartonshire",
+    code == "S02001549" ~ "IZ16-East Lothian",
+    code == "S02002475" ~ "IZ16-West Dunbartonshire",
+    code == "S02001550" ~ "IZ17-East Lothian",
+    code == "S02002476" ~ "IZ17-West Dunbartonshire",
+    code == "S02001551" ~ "IZ18-East Lothian",
+    code == "S02002477" ~ "IZ18-West Dunbartonshire",
+    TRUE  ~  paste(areaname))) #Last line for the rest of cases
 
 geo_lookup <- geo_lookup %>% 
   #Creating variable that includeas area name and type for trend plotting
@@ -194,12 +193,18 @@ ind_lookup<- read_csv(paste(lookups, "indicator_lookup.csv", sep = "")) %>%
 ## Indicator data ----
 ###############################################.   
 optdata <- read_csv(paste(basefiles, "All Data for Shiny.csv", sep = ""),
-                    col_types = cols(NUMERATOR = col_number()))
-
-optdata <- optdata %>%
+                    col_types = cols(NUMERATOR = col_number())) %>%
   setNames(tolower(names(.)))%>% #names to lower case
   rename(ind_id = indicator_id, code = geography_code) %>% 
   mutate_if(is.character,factor) #converting characters into factors
+
+# Temporary addition for test tool
+# part_measure <- read_csv("/conf/phip/Projects/Profiles/Data/Indicators/Children and Young People/Raw Data/Prepared Data/ParticipationMeasure.csv") %>% 
+#   mutate(update_date = "1/08/2018") %>% 
+#   rename(measure = rate) %>% 
+#   mutate_if(is.character,factor) #converting characters into factors
+# 
+# optdata <- rbind(optdata, part_measure)
 
 #TEMPORARY FIX. dealing with change in ca, hb and hscp codes
 optdata$code <- as.factor(recode(as.character(optdata$code), 
@@ -240,9 +245,9 @@ optdata$upci[optdata$supression=="Y" & (substr(optdata$type_id,1,2)=='cr' | (sub
 # Scaling measures (0 to 1) in groups by year, area type and indicator. 
 #Does not work well for Scotland totals. TRUE?
 optdata <- optdata %>% group_by(ind_id, year, areatype) %>% 
-  mutate(measure_sc = ifelse(interpret=="H", as.vector(rescale(measure, to=c(1,0))), 
-                             ifelse(interpret=="L", as.vector(rescale(measure, to=c(0,1))),
-                                    0)))  %>%
+  mutate(measure_sc = case_when(interpret=="H"~ as.vector(rescale(measure, to=c(1,0))), 
+                                interpret=="L" ~ as.vector(rescale(measure, to=c(0,1))),
+                                TRUE ~ 0))  %>%
   ungroup()
 
 #Creating variables for topic/profile filters. 
@@ -304,6 +309,21 @@ profile_lookup <- data.frame(profile_domain = c(paste(unique(optdata$profile_dom
 
 saveRDS(profile_lookup, "./data/profile_lookup.rds")
 profile_lookup <- readRDS("./data/profile_lookup.rds") 
+
+###############################################.
+## Technical document ----
+###############################################.
+#This syntax updates the Technical Document table based on an online Google Drive version of the table
+#Run every time you want to refresh the data in the local copy to represent what's in the online copy
+
+definition_table <-read.csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vTzrwAG7IFBjLvxuxUO0vJ7mn2AgilWVA1ZJQ9oVaLOSG4mgkquMKWga8MY5g2OFkFn-3awM_GYaHjL/pub?gid=94312583&single=true&output=csv",
+                            sep = ",", na.strings=c("NA", " ", ""), strip.white = TRUE, stringsAsFactors = FALSE)
+
+definition_table <- as.data.frame(definition_table)
+definition_table$indicator_number <- as.factor(definition_table$indicator_number)
+
+saveRDS(definition_table,"./data/techdoc.rds")
+techdoc <- readRDS("./data/techdoc.rds") 
 
 ###############################################.
 ## Shapefiles ----
@@ -369,9 +389,10 @@ hscp_bound_orig <- readOGR(shapefiles,"SG_NHS_IntegrationAuthority_2018") %>%
 object.size(hscp_bound_orig)
 
 #Substituing codes to old ones. New ones still not in use.
-hscp_bound_orig@data$hiacode <- as.factor(ifelse(hscp_bound_orig@data$hiacode == "S37000032", "S37000014", 
-                                                 ifelse(hscp_bound_orig@data$hiacode == "S37000033", "S37000023",
-                                                        paste0(hscp_bound_orig@data$hiacode))))
+hscp_bound_orig@data$hiacode <- as.factor(case_when(
+  hscp_bound_orig@data$hiacode == "S37000032"~ "S37000014", 
+  hscp_bound_orig@data$hiacode == "S37000033" ~ "S37000023",
+  TRUE ~ paste0(hscp_bound_orig@data$hiacode)))
 
 #Changing the projection to WSG84, the ones leaflet needs.
 proj4string(hscp_bound_orig) #Checking projection
@@ -427,8 +448,8 @@ optdata<- optdata %>%
   mutate_if(is.character,factor) #converting characters into factors
 
 #Merging with indicator and geography information
-optdata <- merge(x=optdata, y=ind_lookup, by="ind_id", all.x = TRUE) 
-optdata <- merge(x=optdata, y=geo_lookup, by="code", all.x = TRUE) 
+optdata <- left_join(x=optdata, y=ind_lookup, by="ind_id") 
+optdata <- left_join(x=optdata, y=geo_lookup, by="code") 
 
 #Apply supressions. NEEDS TO CHECK THAT IT WORKS FINE ONCE WE HAVE A REAL CASE
 # If indicator is presented as standardised rate and suppression required then suppress numerator where count is less than specified value.
@@ -449,9 +470,9 @@ optdata$upci[optdata$supression=="Y" & (substr(optdata$type_id,1,2)=='cr' | (sub
 # Scaling measures (0 to 1) in groups by year, area type and indicator. 
 #Does not work well for Scotland totals. TRUE?
 optdata <- optdata %>% group_by(ind_id, year, areatype) %>% 
-  mutate(measure_sc = ifelse(interpret=="H", as.vector(rescale(measure, to=c(1,0))), 
-                             ifelse(interpret=="L", as.vector(rescale(measure, to=c(0,1))),
-                                    0)))  %>%
+  mutate(measure_sc = case_when(interpret=="H" ~ as.vector(rescale(measure, to=c(1,0))), 
+                                interpret=="L", as.vector(rescale(measure, to=c(0,1))),
+                                TRUE ~ 0)))  %>%
   ungroup()
 
 
@@ -474,16 +495,5 @@ optdata$ind_id <- as.factor(optdata$ind_id )
 saveRDS(optdata, "./data/optdata.rds")
 optdata <- readRDS("./data/optdata.rds") 
 
-#This syntax updates the Technical Document table based on an online Google Drive version of the table
-#Run every time you want to refresh the data in the local copy to represent what's in the online copy
-
-definition_table <-read.csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vTzrwAG7IFBjLvxuxUO0vJ7mn2AgilWVA1ZJQ9oVaLOSG4mgkquMKWga8MY5g2OFkFn-3awM_GYaHjL/pub?gid=94312583&single=true&output=csv",
-                            sep = ",", na.strings=c("NA", " ", ""), strip.white = TRUE, stringsAsFactors = FALSE)
-
-definition_table <- as.data.frame(definition_table)
-definition_table$indicator_number <- as.factor(definition_table$indicator_number)
-
-saveRDS(definition_table,"./data/techdoc.rds")
-techdoc <- readRDS("./data/techdoc.rds") 
 
 ##END
