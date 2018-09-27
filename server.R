@@ -357,13 +357,18 @@ showModal(welcome_modal)
     
     #identify significant differences
     ring <- ring %>%  
-      mutate(flag=ifelse(ring$interpret == "O",'No significance can be calculated',
-                         ifelse(ring$lowci<=ring$comp_m & ring$upci>=ring$comp_m,'Statistically not significantly different from comparator average',
-                                ifelse(ring$lowci > ring$comp_m & ring$interpret == "H",'Statistically significantly better than comparator average',
-                                       ifelse(ring$lowci > ring$comp_m & ring$interpret == "L", 'Statistically significantly worse than comparator average',
-                                              ifelse(ring$upci < ring$comp_m & ring$interpret == "L",'Statistically significantly better than comparator average',
-                                                     ifelse(ring$upci < ring$comp_m & ring$interpret == "H",'Statistically significantly worse than comparator average','Statistically not significantly different from comparator average'))))))) %>%
-      mutate(domain=ifelse(substr(ring$profile_domain1,1,3)==input$profile_ring,substr(ring$profile_domain1,5,nchar(as.vector(profile_domain1))),substr(ring$profile_domain2,5,nchar(as.vector(profile_domain2))))) %>% #identifies correct domain name for title
+      mutate(flag=case_when(
+        ring$interpret == "O" ~ 'No significance can be calculated',
+        ring$lowci<=ring$comp_m & ring$upci>=ring$comp_m ~'Statistically not significantly different from comparator average',
+        ring$lowci > ring$comp_m & ring$interpret == "H" ~'Statistically significantly better than comparator average',
+        ring$lowci > ring$comp_m & ring$interpret == "L" ~ 'Statistically significantly worse than comparator average',
+        ring$upci < ring$comp_m & ring$interpret == "L" ~'Statistically significantly better than comparator average',
+        ring$upci < ring$comp_m & ring$interpret == "H" ~'Statistically significantly worse than comparator average',
+        TRUE ~ 'No significance can be calculated'), 
+        #identifies correct domain name for title
+      domain=case_when(substr(ring$profile_domain1,1,3)==input$profile_ring ~ 
+                         substr(ring$profile_domain1, 5, nchar(as.vector(profile_domain1))),
+                       TRUE ~ substr(ring$profile_domain2,5,nchar(as.vector(profile_domain2))))) %>% 
       select(domain,flag,indicator) %>%
       droplevels()
     
@@ -378,17 +383,23 @@ showModal(welcome_modal)
     
     #group by domain to count total by domain
     ring <- ring %>%  
-      group_by(domain) %>%
-      arrange(domain) %>%
-      mutate(fraction=count/sum(count)) %>%
-      mutate(ymax=cumsum(fraction)) %>%
-      mutate(ymin=c(0,head(ymax,n=-1))) %>%
-      mutate(ind_sum=sum(count)) %>%
-      mutate(bfrac=ifelse(flag =='Statistically significantly better than comparator average',fraction,0)) %>%
-      mutate(bcount=ifelse(flag =='Statistically significantly better than comparator average',count,0)) %>%
+      group_by(domain) %>% arrange(domain) %>%
+      mutate(fraction=count/sum(count),
+             ymax=cumsum(fraction),
+             ymin=c(0,head(ymax,n=-1)),
+             ind_sum=sum(count),
+             bfrac=ifelse(flag =='Statistically significantly better than comparator average',
+                          fraction,0),
+             bcount=ifelse(flag =='Statistically significantly better than comparator average',
+                           count,0)) %>%
       droplevels ()
     
-    fill_df <- data.frame(flag = c ('No significance can be calculated','Statistically not significantly different from comparator average','Statistically significantly better than comparator average','Statistically significantly worse than comparator average'),stringsAsFactors = TRUE)
+    fill_df <- data.frame(flag = c ('No significance can be calculated',
+                                    'Statistically not significantly different from comparator average',
+                                    'Statistically significantly better than comparator average',
+                                    'Statistically significantly worse than comparator average'),
+                          stringsAsFactors = TRUE)
+    
     fillcolours <- c("white","grey88","#4da6ff", "#ffa64d")
     names(fillcolours) <- levels(fill_df$flag)
     fill_colour <- scale_fill_manual(name = "flag",values = fillcolours)
@@ -449,13 +460,17 @@ showModal(welcome_modal)
     
     #identify significant differences
     ring <- ring %>%
-      mutate(flag=ifelse(ring$interpret == "O",'No significance can be calculated',
-                         ifelse(ring$lowci<=ring$comp_m & ring$upci>=ring$comp_m,'Statistically not significantly different from comparator average',
-                                ifelse(ring$lowci > ring$comp_m & ring$interpret == "H", 'Statistically significantly better than comparator average',
-                                       ifelse(ring$lowci > ring$comp_m & ring$interpret == "L", 'Statistically significantly worse than comparator average',
-                                              ifelse(ring$upci < ring$comp_m & ring$interpret == "L",'Statistically significantly better than comparator average',
-                                                     ifelse(ring$upci < ring$comp_m & ring$interpret == "H",'Statistically significantly worse than comparator average','Statistically not significantly different from comparator average'))))))) %>%
-      mutate(domain=ifelse(substr(ring$profile_domain1,1,3)==input$profile_ring,substr(ring$profile_domain1,5,nchar(as.vector(profile_domain1))),substr(ring$profile_domain2,5,nchar(as.vector(profile_domain2))))) %>% #identifies correct domain name for title
+      mutate(flag=case_when(
+        ring$interpret == "O" ~'No significance can be calculated',
+        ring$lowci<=ring$comp_m & ring$upci>=ring$comp_m ~'Statistically not significantly different from comparator average',
+        ring$lowci > ring$comp_m & ring$interpret == "H" ~ 'Statistically significantly better than comparator average',
+        ring$lowci > ring$comp_m & ring$interpret == "L" ~ 'Statistically significantly worse than comparator average',
+        ring$upci < ring$comp_m & ring$interpret == "L" ~'Statistically significantly better than comparator average',
+        ring$upci < ring$comp_m & ring$interpret == "H" ~'Statistically significantly worse than comparator average',
+        TRUE ~ 'Statistically not significantly different from comparator average'),
+      domain=case_when(substr(ring$profile_domain1,1,3)==input$profile_ring ~ 
+                         substr(ring$profile_domain1,5,nchar(as.vector(profile_domain1))),
+                       TRUE ~ substr(ring$profile_domain2,5,nchar(as.vector(profile_domain2))))) %>% #identifies correct domain name for title
       droplevels()
     
     ring <- ring %>%
@@ -657,12 +672,13 @@ showModal(welcome_modal)
     }
     
     #Creating a palette of colours based on statistical significance
-    heat$color <- ifelse(heat$interpret == "O", 'white',
-                         ifelse(heat$lowci <= heat$comp_m & heat$upci >= heat$comp_m,'gray',
-                                ifelse(heat$lowci > heat$comp_m & heat$interpret == "H", 'blue',
-                                       ifelse(heat$lowci > heat$comp_m & heat$interpret == "L", 'red',
-                                              ifelse(heat$upci < heat$comp_m & heat$interpret == "L", 'blue',
-                                                     ifelse(heat$upci < heat$comp_m & heat$interpret == "H", 'red', 'gray'))))))
+    heat$color <- case_when(heat$interpret == "O" ~ 'white',
+                            heat$lowci <= heat$comp_m & heat$upci >= heat$comp_m ~'gray',
+                            heat$lowci > heat$comp_m & heat$interpret == "H" ~ 'blue',
+                            heat$lowci > heat$comp_m & heat$interpret == "L" ~ 'red',
+                            heat$upci < heat$comp_m & heat$interpret == "L" ~ 'blue',
+                            heat$upci < heat$comp_m & heat$interpret == "H" ~ 'red', 
+                            TRUE ~ 'white')
     
     #Tooltip
     heat_tooltip <- paste0(heat$indicator, "<br>", heat$def_period, "<br>",
@@ -872,22 +888,28 @@ showModal(welcome_modal)
       
       #add variable denoting if sign diff between comparator
       bar<-bar %>%
-        mutate(flag=ifelse(bar$interpret == "O",'No significance can be calculated',
-                           ifelse(bar$lowci_chosen<=bar$measure_comp & bar$upci_chosen>=bar$measure_comp,'Not different to comparator',
-                                  ifelse(bar$lowci_chosen > bar$measure_comp & bar$interpret == "H", 'Better than comparator',
-                                         ifelse(bar$lowci_chosen > bar$measure_comp & bar$interpret == "L", 'Worse than comparator',
-                                                ifelse(bar$upci_chosen < bar$measure_comp & bar$interpret == "L", 'Better than comparator',
-                                                       ifelse(bar$upci_chosen < bar$measure_comp & bar$interpret == "H", 'Worse than comparator','Not different to comparator')))))))
+        mutate(flag=case_when(
+          bar$interpret == "O" ~ 'No significance can be calculated',
+          bar$lowci_chosen<=bar$measure_comp & bar$upci_chosen>=bar$measure_comp ~
+            'Not different to comparator',
+          bar$lowci_chosen > bar$measure_comp & bar$interpret == "H" ~ 'Better than comparator',
+          bar$lowci_chosen > bar$measure_comp & bar$interpret == "L" ~ 'Worse than comparator',
+          bar$upci_chosen < bar$measure_comp & bar$interpret == "L" ~ 'Better than comparator',
+          bar$upci_chosen < bar$measure_comp & bar$interpret == "H" ~ 'Worse than comparator',
+          TRUE ~ 'No significance can be calculated'))
       
       #Transposing data so that better is always to the right of plot
       bar <- bar %>%
-        mutate(comp=1)%>%
-        mutate(all=bar$measure/bar$measure_comp) %>%
-        mutate(chosen=bar$measure_chosen/bar$measure_comp) %>%
-        mutate(all2=ifelse(bar$interpret=='L' & bar$measure>bar$measure_comp, -(all-1),
-                           ifelse(bar$interpret=='L' & bar$measure<=bar$measure_comp, (1-all),-(1-all)))) %>%
-        mutate(chosen2=ifelse(bar$interpret=='L' & bar$measure_chosen>bar$measure_comp, -(chosen-1),
-                              ifelse(bar$interpret=='L' & bar$measure_chosen<=bar$measure_comp, (1-chosen),-(1-chosen)))) %>%
+        mutate(comp = 1,
+               all = bar$measure/bar$measure_comp,
+               chosen = bar$measure_chosen/bar$measure_comp,
+               all2=case_when(bar$interpret=='L' & bar$measure>bar$measure_comp ~ -(all-1),
+                              bar$interpret=='L' & bar$measure<=bar$measure_comp ~ 
+                                (1-all), TRUE ~ -(1-all)),
+              chosen2=case_when(bar$interpret=='L' & bar$measure_chosen>bar$measure_comp ~
+                                  -(chosen-1),
+                                bar$interpret=='L' & bar$measure_chosen<=bar$measure_comp ~
+                                  (1-chosen), TRUE ~ -(1-chosen))) %>%
         mutate(comp=0)
       
       #define x axis value to assign as intercept for significance
@@ -1005,12 +1027,14 @@ showModal(welcome_modal)
       bar <- bind_cols(bar %>% mutate(comparator=input$geocomp_bar))
       
       bar<-bar %>%
-        mutate(flag=ifelse(bar$interpret == "O",'NA',
-                           ifelse(bar$lowci_chosen<=bar$measure_comp & bar$upci_chosen>=bar$measure_comp,'NS',
-                                  ifelse(bar$lowci_chosen > bar$measure_comp & bar$interpret == "H", 'Better',
-                                         ifelse(bar$lowci_chosen > bar$measure_comp & bar$interpret == "L", 'Worse',
-                                                ifelse(bar$upci_chosen < bar$measure_comp & bar$interpret == "L", 'Better',
-                                                       ifelse(bar$upci_chosen < bar$measure_comp & bar$interpret == "H", 'Worse','NS')))))))
+        mutate(flag=case_when(
+          bar$interpret == "O" ~'NA',
+          bar$lowci_chosen<=bar$measure_comp & bar$upci_chosen>=bar$measure_comp ~ 'NS',
+          bar$lowci_chosen > bar$measure_comp & bar$interpret == "H" ~ 'Better',
+          bar$lowci_chosen > bar$measure_comp & bar$interpret == "L" ~ 'Worse',
+          bar$upci_chosen < bar$measure_comp & bar$interpret == "L" ~ 'Better',
+          bar$upci_chosen < bar$measure_comp & bar$interpret == "H" ~ 'Worse',
+          TRUE ~ 'NA'))
       
       bar %>%
         select(c(indicator, areaname, areatype, def_period, numerator, measure,
@@ -1377,13 +1401,22 @@ showModal(welcome_modal)
     else { #If data is available then plot it
       
       #Coloring based on if signicantly different from comparator
-      color_pal <- ifelse(rank_bar_data()$interpret == "O", '#ccccff',
-                   ifelse(is.na(rank_bar_data()$lowci) | is.na(rank_bar_data()$upci) | is.na(rank_bar_data()$comp_value) | is.na(rank_bar_data()$measure) |rank_bar_data()$measure == 0, '#ccccff',
-        ifelse(rank_bar_data()$lowci <= rank_bar_data()$comp_value & rank_bar_data()$upci >= rank_bar_data()$comp_value,'#cccccc',
-                     ifelse(rank_bar_data()$lowci > rank_bar_data()$comp_value & rank_bar_data()$interpret == "H", '#4da6ff',
-                           ifelse(rank_bar_data()$lowci > rank_bar_data()$comp_value & rank_bar_data()$interpret == "L", '#ffa64d',
-                                   ifelse(rank_bar_data()$upci < rank_bar_data()$comp_value & rank_bar_data()$interpret == "L", '#4da6ff',
-                                         ifelse(rank_bar_data()$upci < rank_bar_data()$comp_value & rank_bar_data()$interpret == "H", '#ffa64d', '#ccccff')))))))
+      color_pal <- case_when(
+        rank_bar_data()$interpret == "O" ~ '#ccccff',
+        is.na(rank_bar_data()$lowci) | is.na(rank_bar_data()$upci) | 
+          is.na(rank_bar_data()$comp_value) | is.na(rank_bar_data()$measure) |
+          rank_bar_data()$measure == 0 ~ '#ccccff',
+        rank_bar_data()$lowci <= rank_bar_data()$comp_value & 
+          rank_bar_data()$upci >= rank_bar_data()$comp_value ~'#cccccc',
+        rank_bar_data()$lowci > rank_bar_data()$comp_value & 
+          rank_bar_data()$interpret == "H" ~ '#4da6ff',
+        rank_bar_data()$lowci > rank_bar_data()$comp_value & 
+          rank_bar_data()$interpret == "L" ~ '#ffa64d',
+        rank_bar_data()$upci < rank_bar_data()$comp_value & 
+          rank_bar_data()$interpret == "L" ~ '#4da6ff',
+        rank_bar_data()$upci < rank_bar_data()$comp_value & 
+          rank_bar_data()$interpret == "H" ~ '#ffa64d', 
+        TRUE ~ '#ccccff')
 
       # Text for tooltip
       tooltip_rank <- c(paste0(rank_bar_data()$areaname, ": ", rank_bar_data()$measure, "<br>",
@@ -1432,14 +1465,22 @@ showModal(welcome_modal)
   # Function to save plot
   plot_rank_ggplot <- function(){
     #Coloring based on if signicantly different from comparator
-    color_pal <- ifelse(rank_bar_data()$interpret == "O", '#ccccff',
-                        ifelse(is.na(rank_bar_data()$lowci) | is.na(rank_bar_data()$upci) | is.na(rank_bar_data()$comp_value) | is.na(rank_bar_data()$measure) |rank_bar_data()$measure == 0, '#ccccff',
-                               ifelse(rank_bar_data()$lowci <= rank_bar_data()$comp_value & rank_bar_data()$upci >= rank_bar_data()$comp_value,'#cccccc',
-                                      ifelse(rank_bar_data()$lowci > rank_bar_data()$comp_value & rank_bar_data()$interpret == "H", '#4da6ff',
-                                             ifelse(rank_bar_data()$lowci > rank_bar_data()$comp_value & rank_bar_data()$interpret == "L", '#ffa64d',
-                                                    ifelse(rank_bar_data()$upci < rank_bar_data()$comp_value & rank_bar_data()$interpret == "L", '#4da6ff',
-                                                           ifelse(rank_bar_data()$upci < rank_bar_data()$comp_value & rank_bar_data()$interpret == "H", '#ffa64d', '#ccccff')))))))
-    
+    color_pal <- case_when(
+      rank_bar_data()$interpret == "O" ~ '#ccccff',
+      is.na(rank_bar_data()$lowci) | is.na(rank_bar_data()$upci) | 
+        is.na(rank_bar_data()$comp_value) | is.na(rank_bar_data()$measure) |
+        rank_bar_data()$measure == 0~ '#ccccff',
+      rank_bar_data()$lowci <= rank_bar_data()$comp_value & 
+        rank_bar_data()$upci >= rank_bar_data()$comp_value ~ '#cccccc',
+      rank_bar_data()$lowci > rank_bar_data()$comp_value & 
+        rank_bar_data()$interpret == "H" ~ '#4da6ff',
+      rank_bar_data()$lowci > rank_bar_data()$comp_value & 
+        rank_bar_data()$interpret == "L" ~ '#ffa64d',
+      rank_bar_data()$upci < rank_bar_data()$comp_value & 
+        rank_bar_data()$interpret == "L" ~ '#4da6ff',
+      rank_bar_data()$upci < rank_bar_data()$comp_value & 
+        rank_bar_data()$interpret == "H" ~ '#ffa64d', 
+      TRUE ~ '#ccccff')
     
     #Creating a vector with the area names in the order they are going to be plotted
     color_pal <- setNames(color_pal, rank_bar_data()$areaname)
@@ -1624,13 +1665,17 @@ showModal(welcome_modal)
   # Plotting map
   #Function to create color palette based on if signicantly different from comparator
   create_map_palette <- function(){
-    ifelse(poly_map()$interpret == "O", '#ffffff',
-           ifelse(is.na(poly_map()$lowci) | is.na(poly_map()$upci) | is.na(poly_map()$comp_value) | is.na(poly_map()$measure) |poly_map()$measure == 0, '#ffffff',
-                  ifelse(poly_map()$lowci <= poly_map()$comp_value & poly_map()$upci >= poly_map()$comp_value,'#999999',
-                         ifelse(poly_map()$lowci > poly_map()$comp_value & poly_map()$interpret == "H", '#3d99f5',
-                                ifelse(poly_map()$lowci > poly_map()$comp_value & poly_map()$interpret == "L", '#ff9933',
-                                       ifelse(poly_map()$upci < poly_map()$comp_value & poly_map()$interpret == "L", '#3d99f5',
-                                              ifelse(poly_map()$upci < poly_map()$comp_value & poly_map()$interpret == "H", '#ff9933', '#ffffff')))))))
+    case_when(
+      poly_map()$interpret == "O" ~ '#ffffff',
+      is.na(poly_map()$lowci) | is.na(poly_map()$upci) | 
+        is.na(poly_map()$comp_value) | is.na(poly_map()$measure) |
+        poly_map()$measure == 0 ~ '#ffffff',
+      poly_map()$lowci <= poly_map()$comp_value & poly_map()$upci >= poly_map()$comp_value ~'#999999',
+      poly_map()$lowci > poly_map()$comp_value & poly_map()$interpret == "H" ~ '#3d99f5',
+      poly_map()$lowci > poly_map()$comp_value & poly_map()$interpret == "L" ~ '#ff9933',
+      poly_map()$upci < poly_map()$comp_value & poly_map()$interpret == "L" ~ '#3d99f5',
+      poly_map()$upci < poly_map()$comp_value & poly_map()$interpret == "H" ~ '#ff9933', 
+      TRUE ~ '#ffffff')
   }
   
   #Plotting map
