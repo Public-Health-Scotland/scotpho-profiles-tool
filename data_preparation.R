@@ -34,7 +34,7 @@ library(rmapshaper) #for reducing size of shapefiles
 ## Lookups ---- 
 ###############################################.
 # Lookup with all geography codes information.
-geo_lookup<- read_spss(paste(lookups, "code_dictionary.sav", sep="")) %>%
+geo_lookup<- read_spss(paste0(lookups, "code_dictionary.sav")) %>%
   setNames(tolower(names(.))) %>% #variables to lower case
   mutate_all(factor) %>% # converting variables into factors
   #Creating geography type variable
@@ -58,7 +58,7 @@ geo_lookup$areaname <- gsub(" and ", " & ", geo_lookup$areaname)
 geo_lookup$areaname <- gsub(" - ", "-", geo_lookup$areaname)
 
 #Bringing parent geography information
-geo_parents <- read_spss(paste(lookups, "IZtoPartnership_parent_lookup.sav", sep="")) %>% 
+geo_parents <- read_spss(paste0(lookups, "IZtoPartnership_parent_lookup.sav")) %>% 
   setNames(tolower(names(.)))  #variables to lower case
 
 #TEMPORARY FIX. dealing with change in ca, hb and hscp codes
@@ -182,7 +182,7 @@ geo_lookup <- readRDS("./data/geo_lookup.rds")
 ######
 #Indicator information lookup table 
 #Many variables might not be needed
-ind_lookup<- read_csv(paste(lookups, "indicator_lookup.csv", sep = "")) %>% 
+ind_lookup<- read_csv(paste0(lookups, "indicator_lookup.csv")) %>% 
   setNames(tolower(names(.))) %>% #variables to lower case
   select(c(ind_id, indicator, interpret, supression, supress_less_than, 
            type_id, type_definition, domain1, domain2, domain3, 
@@ -192,7 +192,7 @@ ind_lookup<- read_csv(paste(lookups, "indicator_lookup.csv", sep = "")) %>%
 ###############################################.
 ## Indicator data ----
 ###############################################.   
-optdata <- read_csv(paste(basefiles, "All Data for Shiny.csv", sep = ""),
+optdata <- read_csv(paste0(basefiles, "All Data for Shiny.csv"),
                     col_types = cols(NUMERATOR = col_number())) %>%
   setNames(tolower(names(.)))%>% #names to lower case
   rename(ind_id = indicator_id, code = geography_code) %>% 
