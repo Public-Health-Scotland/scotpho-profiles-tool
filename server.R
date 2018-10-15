@@ -158,13 +158,14 @@ showModal(welcome_modal)
   updates_modal <- modalDialog(
     fluidRow(
       column(12,
-             p(tags$div("We are continuously developing our tool", style = "color:0E3E5D; font-size:20px; width: 90%; text-align: left; ")),                 
+             p(tags$div("We are continuously updating and developing our tool", style = "color:0E3E5D; font-size:20px; width: 90%; text-align: left; ")),                 
              br(),
              br(),
-             p(tags$h5("Some new exciting features that have been added to our tool include:", style = "width: 90%; text-align: left; "))),
-      column(12, 
-             tags$ul(tags$li(tags$h5(tags$b("You can now filter by Alcohol and drug partnerships for indicators where data is available")   
-             ))))),
+             #p(tags$h5("Some new exciting features that have been added to our tool include:", style = "width: 90%; text-align: left; "))),
+             p(tags$h5("Recent indicator updates include:", style = "width: 90%; text-align: left; font-weight: bold; "))),
+             column(12, 
+              tags$h5(HTML(paste(techdoc$indicator_name[techdoc$days_since_update<60], collapse='<br>')))
+             )),
     br(),
     p(tags$h5("Thanks for stopping by!")),
     p(tags$h5("For any further questions or other developments you would like to suggest for our current tool, please contact us at", tags$a(href="mailto:ScotPHO@nhs.net", "ScotPHO@nhs.net", class="externallink"), style = "width: 700px")),
@@ -1955,7 +1956,8 @@ showModal(welcome_modal)
   output$table_filtered <- DT::renderDataTable({
     
     DT::datatable(filter_table(),
-                  style = 'bootstrap', rownames = FALSE, options = list(dom = 'tp', columnDefs = list(list(visible=FALSE, targets=c(4,8,9)))), 
+                  style = 'bootstrap', rownames = FALSE, options = list(dom = 'tp', language = list(
+                    zeroRecords = "No records found matching your selection - have you selected a geography? See 'Indicator definitions' under the Info tab for Geographies available."), columnDefs = list(list(visible=FALSE, targets=c(4,8,9)))), 
                   colnames = c("Area code", "Area", "Type", "Indicator", "Year","Period", "Numerator", 
                                "Measure", "Lower CI","Upper CI", "Definition" )
     )
