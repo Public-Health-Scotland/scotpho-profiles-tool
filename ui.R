@@ -797,6 +797,9 @@ tabPanel("Other profiles", value = "others",
                                                 "Historic ScotPHO profiles",  class="externallink"), 
                      " - The old style ScotPHO profiles are currently still accessible via our old profile platform"),
              #Link to GCPH
+             tags$li(class= "li-custom", tags$a(href="http://www.nssdiscovery.scot.nhs.uk/",
+                                                "NSS Discovery",  class="externallink")), 
+             #Link to GCPH
              tags$li(class= "li-custom", tags$a(href="http://www.understandingglasgow.com/",
                                                 "Glasgow Centre for Population Health (GCPH)",  class="externallink")), 
              #Link to Fife
