@@ -20,7 +20,6 @@
 #   Space between buttons
 #   Labels text bigger than other charts, pretty big in general.
 #   Help image bigger than modal window
-#   Not fan of the text at the beginning, also topic: xxx not really adding much
 #   All the ones with “no significance can be calculated” excluded (e.g. Active travel to work), maybe that is not completely desired
 #----------------.
 #Heatmap:  
@@ -73,6 +72,7 @@ library(tidyr) #for string maniupulations in ring plot
 library(shinyjs)
 library(shinydashboard) #for valuebox on techdoc tab
 library(sp)
+library(lubridate)
 
 ###############################################.
 ## Functions ----
@@ -214,6 +214,11 @@ beta_box <- div(style =  "background-color: #ffffcc; padding: 5px; border: 1px s
                                         "here",  class="externallink"), 
       ". We would welcome ", tags$a(href="mailto:ScotPHO@nhs.net", tags$b("any feedback"), 
                                     class="externallink"), " you have on this tool."))
+
+#automating dates
+new_date <- fast_strptime(paste("01",techdoc$last_updated,sep="-"),"%d-%b-%Y")
+#time_between <- as.period(new_date %--% today(), unit="days")
+techdoc <- mutate(techdoc,days_since_update=day(as.period(new_date %--% today(), unit="days")))
 
 # Identify which geographies have data for each indicator
 # indic <- unique(optdata$indicator[!is.na(optdata$measure)])
