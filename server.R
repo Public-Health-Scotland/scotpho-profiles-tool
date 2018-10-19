@@ -1945,7 +1945,7 @@ showModal(welcome_modal)
       } 
       
       table <- filtered_geos %>% subset(select=c("code", "areaname", "areatype", "indicator","year", 
-                                                 "def_period","numerator", "measure", "lowci","upci","type_definition"))
+                                                 "def_period","numerator", "measure", "lowci","upci","type_definition", "data_source", "last_updated", "next_update"))
       
     }
     
@@ -1959,7 +1959,7 @@ showModal(welcome_modal)
                   style = 'bootstrap', rownames = FALSE, options = list(dom = 'tp', language = list(
                     zeroRecords = "No records found matching your selection - have you selected a geography? See 'Indicator definitions' under the Info tab for Geographies available."), columnDefs = list(list(visible=FALSE, targets=c(4,8,9)))), 
                   colnames = c("Area code", "Area", "Type", "Indicator", "Year","Period", "Numerator", 
-                               "Measure", "Lower CI","Upper CI", "Definition" )
+                               "Measure", "Lower CI","Upper CI", "Definition")
     )
   })
   
