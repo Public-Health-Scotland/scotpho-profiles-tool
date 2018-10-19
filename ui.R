@@ -829,9 +829,11 @@ tabPanel("Other profiles", value = "others",
 ##############Footer----    
 ###############################################.
 #Copyright warning
-tags$footer(column(8, "© Scottish Public Health Observatory v2.0 2018"), 
-            column(3, tags$a(href="mailto:ScotPHO@nhs.net", tags$b("Contact us!"), 
+tags$footer(column(6, "© Scottish Public Health Observatory v2.0 2018"), 
+            column(2, tags$a(href="mailto:ScotPHO@nhs.net", tags$b("Contact us!"), 
                               class="externallink", style = "color: white; text-decoration: none")), 
+            column(3, tags$a(href="https://www.scotpho.org.uk/about-us/scotpho-website-policies-and-statements/privacy-and-cookies", tags$b("Privacy & cookies"), 
+                             class="externallink", style = "color: white; text-decoration: none")), 
             column(1, actionLink("twitter_share", label = "Share", icon = icon("twitter"),
                               style= "color:white;", onclick = sprintf("window.open('%s')", 
                               "https://twitter.com/intent/tweet?text=Check%out%ScotPHO's%profile%tool&url=https://scotland.shinyapps.io/ScotPHO_profiles_tool/"))), 
