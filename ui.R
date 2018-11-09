@@ -267,7 +267,7 @@ tabPanel(title = "Summary", icon = icon("adjust"), value = "ring",
          mainPanel(width = 9,
                    h4(textOutput("ring_title"), style="color: black; text-align: left"),
                    h5(textOutput("ring_subtitle"), style="color: black; text-align: left"),
-                   plotOutput("ring_plot", height="auto")
+                   withSpinner(plotOutput("ring_plot", height="auto"))
          )
 ), #Tab panel bracket
 ###############################################.
@@ -322,7 +322,7 @@ tabPanel("Heatmap", icon = icon("list-ul"), value = "heat",
                    bsModal("mod_defs_heat", "Definitions", "defs_heat", htmlOutput('defs_text_heat')),
                    h4(textOutput("heat_title"), style="color: black; text-align: left"),
                    h5(textOutput("heat_subtitle"), style="color: black; text-align: left"),
-                   plotlyOutput("heat_plot")
+                   withSpinner(plotlyOutput("heat_plot"))
         )
   ), #Tab panel bracket
 #####################################################################.
@@ -358,7 +358,7 @@ tabPanel("Barcode", icon = icon("barcode"), value = "barcode",
                    bsModal("mod_defs_bar", "Definitions", "defs_bar", htmlOutput('defs_text_bar')),
                    h4(textOutput("bar_title"), style="color: black; text-align: left"),
                    h5(textOutput("bar_subtitle"), style="color: black; text-align: left"),
-                   uiOutput("ui_bar_plot")
+                   withSpinner(uiOutput("ui_bar_plot"))
          )
 ),
 ###############################################.
@@ -395,7 +395,7 @@ tabPanel("Trend", icon = icon("area-chart"), value = "trend",
          mainPanel(width = 9, #Main panel
           bsModal("mod_defs_trend", "Definitions", "defs_trend", htmlOutput('defs_text_trend')),
           h4(textOutput("title_trend"), style="color: black; text-align: left"),
-          plotlyOutput("trend_plot")
+          withSpinner(plotlyOutput("trend_plot"))
          )
 ), #Tab panel bracket
 ###############################################.
@@ -430,7 +430,7 @@ tabPanel("Rank", icon = icon("signal"), value = "rank",
                    bsModal("mod_defs_rank", "Definitions", "defs_rank", htmlOutput('defs_text_rank')),
                    h4(textOutput("rank_title"), style="color: black; text-align: left"),
                    h5(textOutput("rank_subtitle"), style="color: black; text-align: left"),
-                   plotlyOutput("rank_plot") 
+                   withSpinner(plotlyOutput("rank_plot")) 
          )
 ), #Tab panel bracket
 ###############################################.
@@ -471,7 +471,7 @@ tabPanel("Map", icon = icon("globe"), value = "map",
            bsModal("mod_defs_map", "Definitions", "defs_map", htmlOutput('defs_text_map')),
            h4(textOutput("map_title"), style="color: black; text-align: left"),
            h5(textOutput("map_subtitle"), style="color: black; text-align: left"),
-           leafletOutput("map", width="100%",height="600px")
+           withSpinner(leafletOutput("map", width="100%",height="600px"))
            )
 ), #Tab panel bracket
 

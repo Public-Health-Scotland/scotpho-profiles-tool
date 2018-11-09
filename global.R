@@ -72,7 +72,8 @@ library(tidyr) #for string maniupulations in ring plot
 library(shinyjs)
 library(shinydashboard) #for valuebox on techdoc tab
 library(sp)
-library(lubridate)
+library(lubridate) #for automated list of dates in welcome modal
+library(shinycssloaders) #for loading icons
 
 ###############################################.
 ## Functions ----
