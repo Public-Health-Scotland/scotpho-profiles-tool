@@ -198,13 +198,13 @@ optdata <- read_csv(paste0(basefiles, "All Data for Shiny.csv"),
   rename(ind_id = indicator_id, code = geography_code) %>% 
   mutate_if(is.character,factor) #converting characters into factors
 
-# Temporary addition for test tool
-# part_measure <- read_csv("/conf/phip/Projects/Profiles/Data/Indicators/Children and Young People/Raw Data/Prepared Data/ParticipationMeasure.csv") %>% 
-#   mutate(update_date = "1/08/2018") %>% 
-#   rename(measure = rate) %>% 
-#   mutate_if(is.character,factor) #converting characters into factors
-# 
-# optdata <- rbind(optdata, part_measure)
+# This indicator is not in the old tool, so it's added now
+part_measure <- read_csv("/conf/phip/Projects/Profiles/Data/Indicators/Children and Young People/Raw Data/Prepared Data/ParticipationMeasure.csv") %>%
+  mutate(update_date = "01/11/2018") %>%
+  rename(measure = rate) %>%
+  mutate_if(is.character,factor) #converting characters into factors
+
+optdata <- rbind(optdata, part_measure)
 
 #TEMPORARY FIX. dealing with change in ca, hb and hscp codes
 optdata$code <- as.factor(recode(as.character(optdata$code), 
