@@ -20,9 +20,7 @@ tagList( #needed for shinyjs
              tags$head( #CSS styles
                beta_box,  ##### Feedback box. TAKE OUT AFTER BETA PERIOD
                tags$link(rel="shortcut icon", href="favicon_scotpho.ico"), #Icon for browser tab
-               #Including Google analytics
-               includeScript("google-analytics.js"),
-               #Cookie control
+               #Including Google analytics and Cookie control
                HTML('<script src="https://cc.cdn.civiccomputing.com/8/cookieControl-8.x.min.js"></script>'),
                includeScript("cookie-control.js"),
                #Style sidebars/well panels
