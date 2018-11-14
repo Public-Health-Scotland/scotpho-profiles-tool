@@ -207,16 +207,22 @@ pal_simd_trend <- c('#abd9e9', '#74add1', '#4575b4', '#313695', '#022031', '#FF0
 pal_map <- c('#2c7bb6','#abd9e9', '#ffffbf','#fdae61','#d7191c')
 
 ##########.
-#######
 #Beta version warning/feedback
-beta_box <- div(#style =  "background-color: #ffffcc; padding: 5px; border: 1px solid #000000; margin: 5px;",
-  class="alert alert-warning", style = "margin-bottom: 0",
+beta_box <- div(class="alert alert-warning", style = "margin-bottom: 0",
   HTML('<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>'),
     p(tags$b("Beta version:"), "welcome to our new profile tool. The old version 
       is available ", tags$a(href="https://scotpho.nhsnss.scot.nhs.uk/scotpho/homeAction.do", 
                                         "here",  class="externallink"), 
       ". We would welcome ", tags$a(href="mailto:ScotPHO@nhs.net", tags$b("any feedback"), 
                                     class="externallink"), " you have on this tool.")) 
+##########.
+#Cookie warning
+cookie_box <- div(class="alert alert-info", style = "margin-bottom: 0",
+      "This website places cookies on your device to help us improve our service 
+      to you. To find out more, see our ",
+      tags$a(href='https://www.scotpho.org.uk/about-us/scotpho-website-policies-and-statements/privacy-and-cookies',
+  " Privacy and Cookies"), "statement.",
+      HTML('<a href="#" class="close" data-dismiss="alert" aria-label="close">&check;</a>'))
 
 #automating dates
 new_date <- fast_strptime(paste("01",techdoc$last_updated,sep="-"),"%d-%b-%Y")
