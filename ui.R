@@ -19,10 +19,12 @@ tagList( #needed for shinyjs
            header =         
              tags$head( #CSS styles
                beta_box,  ##### Feedback box. TAKE OUT AFTER BETA PERIOD
+               cookie_box, ##Cookie box
                tags$link(rel="shortcut icon", href="favicon_scotpho.ico"), #Icon for browser tab
                #Including Google analytics and Cookie control
-               HTML('<script src="https://cc.cdn.civiccomputing.com/8/cookieControl-8.x.min.js"></script>'),
-               includeScript("cookie-control.js"),
+               includeScript("google-analytics.js"),
+               # HTML('<script src="https://cc.cdn.civiccomputing.com/8/cookieControl-8.x.min.js"></script>'),
+               # includeScript("cookie-control.js"),
                #Style sidebars/well panels
                tags$style(".well {background-color:#ffffff; border: 0px solid #336699;
                           padding: 5px; box-shadow: none; }",
