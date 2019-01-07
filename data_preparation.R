@@ -198,13 +198,18 @@ optdata <- read_csv(paste0(basefiles, "All Data for Shiny.csv"),
   rename(ind_id = indicator_id, code = geography_code) %>% 
   mutate_if(is.character,factor) #converting characters into factors
 
-# This indicator is not in the old tool, so it's added now
-part_measure <- read_csv("/conf/phip/Projects/Profiles/Data/Indicators/Children and Young People/Raw Data/Prepared Data/ParticipationMeasure.csv") %>%
+# These indicators are not in the old tool, so they are added now
+part_measure <- read_csv("/conf/phip/Projects/Profiles/Data/Indicators/Shiny Data/ParticipationMeasure.csv") %>%
   mutate(update_date = "01/11/2018") %>%
   rename(measure = rate) %>%
   mutate_if(is.character,factor) #converting characters into factors
 
-optdata <- rbind(optdata, part_measure)
+sechand_smok <- read_csv("/conf/phip/Projects/Profiles/Data/Indicators/Shiny Data/SecondhandSmoke_shiny.csv") %>%
+  mutate(update_date = "19/12/2018") %>%
+  rename(measure = rate) %>%
+  mutate_if(is.character,factor) #converting characters into factors
+
+optdata <- rbind(optdata, part_measure, sechand_smok)
 
 #TEMPORARY FIX. dealing with change in ca, hb and hscp codes
 optdata$code <- as.factor(recode(as.character(optdata$code), 
@@ -294,8 +299,24 @@ optdata <- optdata %>%
         ) #negation
       )#subset
 
+################Taking out ADP for alcohol mortality until produced for Alcohol profile, ZB November 2011
+###On next update check whether this still needs running or not.
+
+#count number of distinct indicators at ADP level
+#optdata2 <- optdata %>% filter(areatype=="Alcohol & drug partnership") %>% count(indicator)
+
+#take out ADP level for alcohol-induced mortality
+#optdata3 <- filter(optdata,(areatype != "Alcohol & drug partnership" & indicator != "Alcohol-related mortality"))
+optdata <- optdata[!(optdata$areatype == "Alcohol & drug partnership" & optdata$indicator == "Alcohol-related mortality"), ]  
+#recount number of distinct indicators at ADP level (should be one less)
+#optdata4 <- optdata3 %>% filter(areatype=="Alcohol & drug partnership") %>% count(indicator)  
+
+#check alcohol-related mortality not on the list
+#optdata4 %>% distinct(indicator)
+
 saveRDS(optdata, "./data/optdata.rds")
 optdata <- readRDS("./data/optdata.rds") 
+
 
 ###############################################.
 ## Profile lookup ----
