@@ -1,8 +1,6 @@
 #Code to create ScotPHO's Shiny profile platform
 #In this script include all the server side functions: plots, reactive objects, etc.
 
-#TODO:
-#see global syntax
 ###############################################.
 
 ## Define a server for the Shiny app
@@ -20,9 +18,13 @@ function(input, output, session) {
                                                                                     h5("geographies including NHS boards, council areas and health and social care partnerships.")),
       style = "color:0E3E5D; font-size:20px"),
     br(),
+    fluidRow(infoBox("", p("We would like to hear your views on the ScotPHO website and 
+        Online Profiles Tool. Please, complete our ", 
+                           tags$a(href= "https://www.surveymonkey.co.uk/r/77YZ2LJ", "online survey.",
+                                  style = "color: darkblue;")), 
+                     width = 12, icon = icon("list"), color = "orange", fill = TRUE)),
     br(),
     p(tags$h5("Find out more about how to get the most out of the tool")),
-    #br(),
     actionButton("tour","Take a tour", icon("play-circle")),
     HTML("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"),
     #For when we make any updates in future
