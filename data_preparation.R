@@ -2,21 +2,19 @@
 #This script includes the data manipulation necessary to produce data in the way
 #the Shiny app needs.
 
-#TODO:
-#see global syntax 
-
 ############################.
 ##Filepaths ----
 ############################.
-#server
-lookups <- "/conf/phip/Projects/Profiles/Data/Lookups/"
-basefiles <- "/conf/phip/Projects/Profiles/Data/Scotland Localities/"
-shapefiles <- "/conf/phip/Projects/Profiles/Data/Shapefiles/"
-
-#desktop
-lookups <- "//stats/phip/Projects/Profiles/Data/Lookups/"
-basefiles <- "//stats/phip/Projects/Profiles/Data/Scotland Localities/"
-shapefiles <- "//stats/phip/Projects/Profiles/Data/Shapefiles"
+server_desktop <- "server"
+if (server_desktop == "server") {
+  lookups <- "/conf/phip/Projects/Profiles/Data/Lookups/"
+  basefiles <- "/conf/phip/Projects/Profiles/Data/Scotland Localities/"
+  shapefiles <- "/conf/phip/Projects/Profiles/Data/Shapefiles/"
+} else if (server_desktop == "desktop") {
+  lookups <- "//stats/phip/Projects/Profiles/Data/Lookups/"
+  basefiles <- "//stats/phip/Projects/Profiles/Data/Scotland Localities/"
+  shapefiles <- "//stats/phip/Projects/Profiles/Data/Shapefiles"
+}
 
 ############################.
 ##Packages ----
@@ -209,7 +207,14 @@ sechand_smok <- read_csv("/conf/phip/Projects/Profiles/Data/Indicators/Shiny Dat
   rename(measure = rate) %>%
   mutate_if(is.character,factor) #converting characters into factors
 
-optdata <- rbind(optdata, part_measure, sechand_smok)
+alc_deaths_adp <- read_csv("/conf/phip/Projects/Profiles/Data/Indicators/Shiny Data/alcohol_deaths_ADP_AL.csv") %>%
+  filter(substr(code,1,3) == "S11") %>% #other geographies already in main file
+  mutate(ind_id = 20204) %>% # so it has the same ind number as the H&W one
+  mutate(update_date = "22/09/2017") %>%
+  rename(measure = rate) %>%
+  mutate_if(is.character,factor) #converting characters into factors
+
+optdata <- rbind(optdata, part_measure, sechand_smok, alc_deaths_adp)
 
 #TEMPORARY FIX. dealing with change in ca, hb and hscp codes
 optdata$code <- as.factor(recode(as.character(optdata$code), 
@@ -299,24 +304,8 @@ optdata <- optdata %>%
         ) #negation
       )#subset
 
-################Taking out ADP for alcohol mortality until produced for Alcohol profile, ZB November 2011
-###On next update check whether this still needs running or not.
-
-#count number of distinct indicators at ADP level
-#optdata2 <- optdata %>% filter(areatype=="Alcohol & drug partnership") %>% count(indicator)
-
-#take out ADP level for alcohol-induced mortality
-#optdata3 <- filter(optdata,(areatype != "Alcohol & drug partnership" & indicator != "Alcohol-related mortality"))
-optdata <- optdata[!(optdata$areatype == "Alcohol & drug partnership" & optdata$indicator == "Alcohol-related mortality"), ]  
-#recount number of distinct indicators at ADP level (should be one less)
-#optdata4 <- optdata3 %>% filter(areatype=="Alcohol & drug partnership") %>% count(indicator)  
-
-#check alcohol-related mortality not on the list
-#optdata4 %>% distinct(indicator)
-
 saveRDS(optdata, "./data/optdata.rds")
 optdata <- readRDS("./data/optdata.rds") 
-
 
 ###############################################.
 ## Profile lookup ----
