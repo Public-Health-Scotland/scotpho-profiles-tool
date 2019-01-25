@@ -1,60 +1,6 @@
-#Code to create ScotPHO's Shiny profile platform
-#In this script include packages, functions, datasets and anyting that will be used both by UI and server
-
-# TODO:
-#Data preparation: 
-#   Indicator and geographical info out of main file and use merge/lookups?
-#   Add denominator?
-#----------------.
-#General:
-#   Fix bookmarking - check if server solution in .io ?enableBookmarking
-#   Include reporting functionality
-#   Create user guide
-#   Host in the website and link from here: shapefiles, lookups, etc
-#----------------.
-#Barcode:
-#   Name of the tab
-#   Blank chart
-#   Legend cut in live tool, why not left aligned or centered?
-#   Add compare against time period feature?
-#   Space between buttons
-#   Labels text bigger than other charts, pretty big in general.
-#   Help image bigger than modal window
-#   All the ones with “no significance can be calculated” excluded (e.g. Active travel to work), maybe that is not completely desired
-#----------------.
-#Heatmap:  
-#   name of the tab
-#   Long labels of indicators are an issue  https://github.com/plotly/plotly.js/issues/296#issuecomment-371780321
-#----------------.
-#Time trend: 
-#   Adding numerator/rate tick box?
-#   Improve filtering, dynamic show/hide geolevels depending on indicator
-#   Add functionality to be able to add IZ/localities from different partnerships
-#   To fix long label issue move to have legend as a different chart? 
-#   Or inside same chart try to move legend below chart
-#----------------.
-#Rank chart
-#   Issue with long label names, take them out? put them in the side? in the bars?
-#   Vertical bars instead?
-#----------------.
-#Table:
-#   Add deprivation data to table (maybe with switch or just merging everything)
-#----------------.
-#Map:
-#   Avoid redrawing of map using leafletProxy
-#   Review what to include in tooltip
-#   Show significance against comparator in palette 9? (as in rank?)
-#   Explore pop up graphics when clicking an area (mapview package)
-#   Add intermediate zones to map - issues with size of shp and with simplification
-#   For IZ's maybe something like this: https://isresearchnc.shinyapps.io/CMaps/
-#----------------.
-#Deprivation
-#   Do we want CI's? Error bars? polygon areas for time trends?
-#   Include PAR information and charts (trend and bar)
-#   Add slope of SII to bar chart
-#   Maybe improve a bit the tooltip for RII and SII?
-#   instead of time period dropdown do slider
-#----------------.
+# Code to create ScotPHO's Shiny profile platform
+# In this script include packages, functions, datasets and anyting that will be 
+# used both by UI and server
 
 ############################.
 ##Packages ----
@@ -208,13 +154,19 @@ pal_map <- c('#2c7bb6','#abd9e9', '#ffffbf','#fdae61','#d7191c')
 
 ##########.
 #Beta version warning/feedback
-beta_box <- div(class="alert alert-warning", style = "margin-bottom: 0",
-  HTML('<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>'),
-    p(tags$b("Beta version:"), "welcome to our new profile tool. The old version 
-      is available ", tags$a(href="https://scotpho.nhsnss.scot.nhs.uk/scotpho/homeAction.do", 
-                                        "here",  class="externallink"), 
-      ". We would welcome ", tags$a(href="mailto:ScotPHO@nhs.net", tags$b("any feedback"), 
-                                    class="externallink"), " you have on this tool.")) 
+# beta_box <- div(class="alert alert-warning", style = "margin-bottom: 0",
+#   HTML('<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>'),
+#     p(tags$b("Beta version:"), "welcome to our new profile tool. The old version 
+#       is available ", tags$a(href="https://scotpho.nhsnss.scot.nhs.uk/scotpho/homeAction.do", 
+#                                         "here",  class="externallink"), 
+#       ". We would welcome ", tags$a(href="mailto:ScotPHO@nhs.net", tags$b("any feedback"), 
+#                                     class="externallink"), " you have on this tool.")) 
+
+beta_box <- fluidRow(infoBox("", p(br(), "We would like to hear your views on the ScotPHO website and 
+        Online Profiles Tool. Please, complete our ", 
+                       tags$a(href= "https://www.surveymonkey.co.uk/r/77YZ2LJ", "online survey.",
+                              style = "color: darkblue;")),
+                       width = 12, icon = icon("list"), color = "red", fill = TRUE))
 ##########.
 #Cookie warning
 cookie_box <- div(class="alert alert-info", style = "margin-bottom: 0",
