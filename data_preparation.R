@@ -207,6 +207,19 @@ sechand_smok <- read_csv("/conf/phip/Projects/Profiles/Data/Indicators/Shiny Dat
   rename(measure = rate) %>%
   mutate_if(is.character,factor) #converting characters into factors
 
+alcohol_stays_d11 <- read_csv("/conf/phip/Projects/Profiles/Data/Indicators/Shiny Data/alcohol_stays_dz11.csv") %>%
+  mutate(update_date = "08/02/2019") %>%
+  rename(measure = rate) %>%
+  mutate_if(is.character,factor) #converting characters into factors
+
+alcohol_stays_adp <- read_csv("/conf/phip/Projects/Profiles/Data/Indicators/Shiny Data/alcohol_stays_ADP_AL.csv") %>%
+  filter(substr(code,1,3)=="S11") %>% #selecting only adp level
+  mutate(update_date = "08/02/2019", ind_id = 20203) %>%
+  rename(measure = rate) %>%
+  mutate_if(is.character,factor) #converting characters into factors
+
+alcohol_stays <- rbind(alcohol_stays_d11, alcohol_stays_adp)
+
 alc_deaths_adp <- read_csv("/conf/phip/Projects/Profiles/Data/Indicators/Shiny Data/alcohol_deaths_ADP_AL.csv") %>%
   filter(substr(code,1,3) == "S11") %>% #other geographies already in main file
   mutate(ind_id = 20204) %>% # so it has the same ind number as the H&W one
@@ -214,7 +227,7 @@ alc_deaths_adp <- read_csv("/conf/phip/Projects/Profiles/Data/Indicators/Shiny D
   rename(measure = rate) %>%
   mutate_if(is.character,factor) #converting characters into factors
 
-optdata <- rbind(optdata, part_measure, sechand_smok, alc_deaths_adp)
+optdata <- rbind(optdata, part_measure, sechand_smok, alcohol_stays, alc_deaths_adp)
 
 #TEMPORARY FIX. dealing with change in ca, hb and hscp codes
 optdata$code <- as.factor(recode(as.character(optdata$code), 
