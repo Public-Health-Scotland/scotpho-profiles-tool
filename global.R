@@ -153,21 +153,6 @@ pal_simd_trend <- c('#abd9e9', '#74add1', '#4575b4', '#313695', '#022031', '#FF0
 pal_map <- c('#2c7bb6','#abd9e9', '#ffffbf','#fdae61','#d7191c')
 
 ##########.
-#Beta version warning/feedback
-# beta_box <- div(class="alert alert-warning", style = "margin-bottom: 0",
-#   HTML('<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>'),
-#     p(tags$b("Beta version:"), "welcome to our new profile tool. The old version 
-#       is available ", tags$a(href="https://scotpho.nhsnss.scot.nhs.uk/scotpho/homeAction.do", 
-#                                         "here",  class="externallink"), 
-#       ". We would welcome ", tags$a(href="mailto:ScotPHO@nhs.net", tags$b("any feedback"), 
-#                                     class="externallink"), " you have on this tool.")) 
-
-beta_box <- fluidRow(infoBox("", p(br(), "We would like to hear your views on the ScotPHO website and 
-        Online Profiles Tool. Please, complete our ", 
-                       tags$a(href= "https://www.surveymonkey.co.uk/r/77YZ2LJ", "online survey.",
-                              style = "color: darkblue;")),
-                       width = 12, icon = icon("list"), color = "red", fill = TRUE))
-##########.
 #Cookie warning
 cookie_box <- div(class="alert alert-info", style = "margin-bottom: 0",
       "This website places cookies on your device to help us improve our service 

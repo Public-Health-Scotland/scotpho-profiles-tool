@@ -15,7 +15,6 @@ tagList( #needed for shinyjs
            header =         
              tags$head( #CSS styles
                cookie_box, ##Cookie box
-               beta_box,  ##### Feedback box. TAKE OUT AFTER BETA PERIOD
                tags$link(rel="shortcut icon", href="favicon_scotpho.ico"), #Icon for browser tab
                #Including Google analytics and Cookie control
                includeScript("google-analytics.js"),
@@ -34,8 +33,6 @@ tagList( #needed for shinyjs
                           ".checkbox label, .radio label, .checkbox-bs label, .radio-bs label
                           { line-height: 1.6 }",
                           ".radio-inline {line-height: 2}",
-                          # TEMPORARY for survey period
-                          ".info-box {margin-bottom: 0px}",
                           #Padding and margins of filters and labels
                           ".form-group {margin: 3px}",
                           ".li-custom {margin-bottom: 10px;}", #bullet point list items
