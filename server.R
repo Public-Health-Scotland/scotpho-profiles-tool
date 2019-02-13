@@ -1588,6 +1588,8 @@ showModal(welcome_modal)
       iz_bound <- iz_bound %>% subset(council == input$iz_map)
       
       map_pol <- sp::merge(iz_bound, rank_bar_data(), by='code')
+    } else {
+      map_pol <- NULL
     }
     
   }) 
@@ -1644,11 +1646,11 @@ showModal(welcome_modal)
   
   # If no data or shapefile plot no map available
   output$map_ui <- renderUI({
-    if(is.data.frame(rank_csv()) && nrow(rank_csv()) == 0) {
-      h2("No map available for that geographic level.")
-    } else {
+    # if(poly_map() == NULL) {
+    #   h2("No map available for that geographic level.")
+    # } else {
       withSpinner(leafletOutput("map", width="100%",height="600px"))
-    }
+    # }
   })
   
   #####################.
@@ -2025,8 +2027,8 @@ showModal(welcome_modal)
   })
   
   #Download definitions table for selected indicator
-  
   indicator_definitions <- reactive({ techdoc %>% filter(indicator_name == input$indicator_defined)})
+  
   indicator_csv <- reactive({ format_definitions_csv(indicator_definitions()) })
   output$definitions_by_indicator <- downloadHandler(
     filename ="indicator_definitions.csv",
