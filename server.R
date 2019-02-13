@@ -1311,6 +1311,20 @@ showModal(welcome_modal)
                 choices = areas, selected = "Health board")
   })
   
+  # Years to compare with depending on what data is available
+  output$yearcomp_ui_rank <- renderUI({
+    map_pol <- optdata %>% subset(areatype == input$geotype_rank & 
+                                    indicator==input$indic_rank)
+    
+    years <- c(min(map_pol$year):max(map_pol$year))
+    periods <- c(sort(paste0(unique(map_pol$trend_axis[map_pol$year>=min(map_pol$year) &
+                                                         map_pol$year<=max(map_pol$year)]))))
+    
+    selectInput("yearcomp_rank", "Baseline year", choices = periods,
+                selectize=TRUE)
+  })
+  
+  
   ###############################################.
   # Indicator definitions
   #Subsetting by domain and profile. Profile is fiddly as vector uses abbreviations 
@@ -1327,17 +1341,31 @@ showModal(welcome_modal)
 # Reactive data  
   # Comparator data rank plot. Could be moved inside rank_bar_data
   rank_compar <- reactive({
-    #Fiddly way of selecting period because some cases (e.g. Life expectancy)
-    #might have different periods for the same year, e.g. IZ 2013 is 2011-2015
-    #and HB 2013 is 2012-2014.
-    year_chosen <- unique(optdata$year[optdata$trend_axis == input$year_rank])
-    
-    rank_compar <- optdata %>% subset(year %in% year_chosen & 
-             areatype %in% c("Health board", "Council area", "Scotland") &
-             areaname == input$geocomp_rank &
-             indicator == input$indic_rank) %>% 
-      droplevels()
+
+    if (input$comp_rank == 1){
+      #Fiddly way of selecting period because some cases (e.g. Life expectancy)
+      #might have different periods for the same year, e.g. IZ 2013 is 2011-2015
+      #and HB 2013 is 2012-2014.
+      year_chosen <- unique(optdata$year[optdata$trend_axis == input$year_rank])
+      
+      rank_compar <- optdata %>% subset(year %in% year_chosen & 
+                                          areatype %in% c("Health board", "Council area", "Scotland") &
+                                          areaname == input$geocomp_rank &
+                                          indicator == input$indic_rank) %>% 
+        droplevels()
+      
+    } else if (input$comp_rank == 2) { #if time comparison selected
+      
+      rank_compar <- optdata %>% subset(areatype == input$geotype_map &
+                                         trend_axis == input$yearcomp_map & 
+                                         indicator==input$indic_map) %>% 
+        rename(comp_value = measure, comp_name = areaname) %>% 
+        select(code, comp_value, comp_name) %>% #to allow merging
+        droplevels()
+      
+    }
   })
+  
   
   #Rank plot data based on user input
   rank_bar_data <- reactive({
@@ -1353,10 +1381,11 @@ showModal(welcome_modal)
       
       #Cannot be done in the same pipe operation as it does not work with the areaname mutate
       rank_bar <- rank_bar %>% 
-        mutate(comp_value = rank_compar()$measure) %>% #comparator value and name
-        mutate(comp_name = rank_compar()$areaname) %>% 
-        mutate(lowci_diff = measure - lowci) %>% 
-        mutate(upci_diff = upci - measure) %>% 
+        mutate(comp_value = rank_compar()$measure, #comparator value and name
+               comp_name = case_when(input$comp_rank == 1 ~  rank_compar()$areaname,
+                                     input$comp_rank == 2 ~ rank_compar()$trend_axis),
+               lowci_diff = measure - lowci, 
+               upci_diff = upci - measure) %>% 
         arrange(desc(measure)) # for ranking by value
     }
     else { #if locality or IZ it needs to filter based on the parent area and be the right area type.
@@ -1364,8 +1393,7 @@ showModal(welcome_modal)
         subset(areatype == input$geotype_rank &
                  parent_area == input$loc_iz_rank &
                  trend_axis == input$year_rank &
-                 indicator == input$indic_rank) %>% 
-        droplevels()
+                 indicator == input$indic_rank) %>% droplevels()
       
       #Cannot be done in the same pipe operation as it does not work with the areaname mutate
       rank_bar <-rank_bar %>% 
@@ -1540,8 +1568,8 @@ showModal(welcome_modal)
 # Reactive controls
   #Dynamic selection of the last period available based on indicator selected
   output$year_ui_map <- renderUI({
-    time_period <- sort(unique(optdata$trend_axis[optdata$indicator == input$indic_map  &
-                                                    optdata$areatype == input$geotype_map]))
+    time_period <- sort(unique(optdata$trend_axis[optdata$indicator == input$indic_rank  &
+                                                    optdata$areatype == input$geotype_rank]))
     
     selectInput("year_map", "Time period",
                 choices = time_period, selected = last(time_period))
@@ -1549,7 +1577,7 @@ showModal(welcome_modal)
   
   #Dropdown for geotype based on what data is available for that indicator
   output$geotype_ui_map <- renderUI({
-    areas <- sort(unique(optdata$areatype[optdata$indicator == input$indic_map]))
+    areas <- sort(unique(optdata$areatype[optdata$indicator == input$indic_rank]))
     #taking out areas without shapefiles
     areas <- areas [! areas %in% c("Scotland", "HSC locality", 
                                    "Alcohol & drug partnership")]

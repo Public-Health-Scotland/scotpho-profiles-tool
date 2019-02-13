@@ -96,8 +96,8 @@ tagList( #needed for shinyjs
                #landing-page icons
                ".icon-lp{font-size: 1.3em; padding-right: 4px;}",
                #to avoid red text error messages in the whole app, take out for testing
-               ".shiny-output-error { visibility: hidden; }",
-               ".shiny-output-error:before { visibility: hidden; }",
+               # ".shiny-output-error { visibility: hidden; }",
+               # ".shiny-output-error:before { visibility: hidden; }",
                #External links underlined an open a new tab
                ".externallink{text-decoration: underline;} ",
                ".definitionbox {width:100%; height:100%; text-align:left ;background-color:white;
@@ -397,7 +397,7 @@ tabPanel("Trend", icon = icon("area-chart"), value = "trend",
          )
 ), #Tab panel bracket
 ###############################################.
-## Rank chart ---- 
+## Rank and map ---- 
 ###############################################.
 tabPanel("Rank", icon = icon("signal"), value = "rank",
          sidebarPanel(width=4, #Filter options
@@ -409,8 +409,16 @@ tabPanel("Rank", icon = icon("signal"), value = "rank",
                     selectInput("loc_iz_rank", label = "Partnership for localities/intermediate zones",
                                 choices = partnership_name)),
                   uiOutput("year_ui_rank"), 
-                  selectInput("geocomp_rank", "Comparator", choices = comparator_list,
-                              selectize=TRUE, selected = "Scotland"),
+                  awesomeRadio("comp_rank", label = "Compare against:",
+                               choices = list("Area" = 1, "Time" = 2), 
+                               selected = 1, inline=TRUE, checkbox=TRUE),
+                  conditionalPanel(condition = "input.comp_rank == 1 ",  
+                                   selectInput("geocomp_rank", "Comparator", choices = comparator_list,
+                                               selectize=TRUE, selected = "Scotland")
+                  ),
+                  conditionalPanel(condition = "input.comp_rank == 2 ", 
+                                   uiOutput("yearcomp_ui_rank")
+                  ),
                   awesomeCheckbox("ci_rank", label = "95% confidence intervals", value = FALSE),
                   #Legend
                   p(img(src='signif_better.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
