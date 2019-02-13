@@ -1848,6 +1848,7 @@ showModal(welcome_modal)
       } else {filtered_geo <- optdata %>% filter((areaname %in% input$iz_true & areatype == "Intermediate zone")|
                                                    (areaname %in% input$la_true & areatype == "Council area")|
                                                    (areaname %in% input$hb_true & areatype == "Health board")|
+                                                   (areaname %in% input$adp_true & areatype == "Alcohol & drug partnership")|
                                                    (areaname %in% input$hscl_true & areatype == "HSC locality")|
                                                    (areaname %in% input$hscp_true & areatype == "HSC partnership")|
                                                    (code %in% input$code)
@@ -1874,6 +1875,7 @@ showModal(welcome_modal)
       } else {filtered_geo <- optdata %>% filter((areaname %in% input$iz_true & areatype == "Intermediate zone")|
                                                    (areaname %in% input$la_true & areatype == "Council area")|
                                                    (areaname %in% input$hb_true & areatype == "Health board")|
+                                                   (areaname %in% input$adp_true & areatype == "Alcohol & drug partnership")|
                                                    (areaname %in% input$hscl_true & areatype == "HSC locality")|
                                                    (areaname %in% input$hscp_true & areatype == "HSC partnership")|
                                                    (code %in% input$code)
@@ -1901,6 +1903,7 @@ showModal(welcome_modal)
       } else {filtered_geo <- optdata %>% filter((areaname %in% input$iz_true & areatype == "Intermediate zone")|
                                                    (areaname %in% input$la_true & areatype == "Council area")|
                                                    (areaname %in% input$hb_true & areatype == "Health board")|
+                                                   (areaname %in% input$adp_true & areatype == "Alcohol & drug partnership")|
                                                    (areaname %in% input$hscl_true & areatype == "HSC locality")|
                                                    (areaname %in% input$hscp_true & areatype == "HSC partnership")|
                                                    (code %in% input$code)
@@ -1926,6 +1929,7 @@ showModal(welcome_modal)
       } else {filtered_geo <- optdata %>% filter((areaname %in% input$iz_true & areatype == "Intermediate zone")|
                                                    (areaname %in% input$la_true & areatype == "Council area")|
                                                    (areaname %in% input$hb_true & areatype == "Health board")|
+                                                   (areaname %in% input$adp_true & areatype == "Alcohol & drug partnership")|
                                                    (areaname %in% input$hscl_true & areatype == "HSC locality")|
                                                    (areaname %in% input$hscp_true & areatype == "HSC partnership")|
                                                    (code %in% input$code)
