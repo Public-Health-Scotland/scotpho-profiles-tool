@@ -224,10 +224,6 @@ showModal(welcome_modal)
     updateTabsetPanel(session, "intabset", selected = "rank")
   })
   
-  observeEvent(input$jump_to_map, {
-    updateTabsetPanel(session, "intabset", selected = "map")
-  })
-  
   observeEvent(input$jump_to_simd, {
     updateTabsetPanel(session, "intabset", selected = "simd")
   })
@@ -1313,12 +1309,12 @@ showModal(welcome_modal)
   
   # Years to compare with depending on what data is available
   output$yearcomp_ui_rank <- renderUI({
-    map_pol <- optdata %>% subset(areatype == input$geotype_rank & 
+    rank_data <- optdata %>% subset(areatype == input$geotype_rank & 
                                     indicator==input$indic_rank)
     
-    years <- c(min(map_pol$year):max(map_pol$year))
-    periods <- c(sort(paste0(unique(map_pol$trend_axis[map_pol$year>=min(map_pol$year) &
-                                                         map_pol$year<=max(map_pol$year)]))))
+    years <- c(min(rank_data$year):max(rank_data$year))
+    periods <- c(sort(paste0(unique(rank_data$trend_axis[rank_data$year>=min(rank_data$year) &
+                                                           rank_data$year<=max(rank_data$year)]))))
     
     selectInput("yearcomp_rank", "Baseline year", choices = periods,
                 selectize=TRUE)
@@ -1356,9 +1352,9 @@ showModal(welcome_modal)
       
     } else if (input$comp_rank == 2) { #if time comparison selected
       
-      rank_compar <- optdata %>% subset(areatype == input$geotype_map &
-                                         trend_axis == input$yearcomp_map & 
-                                         indicator==input$indic_map) %>% 
+      rank_compar <- optdata %>% subset(areatype == input$geotype_rank &
+                                         trend_axis == input$yearcomp_rank & 
+                                         indicator==input$indic_rank) %>% 
         rename(comp_value = measure, comp_name = areaname) %>% 
         select(code, comp_value, comp_name) %>% #to allow merging
         droplevels()
@@ -1373,38 +1369,37 @@ showModal(welcome_modal)
     if (input$geotype_rank %in% c("Scotland", "Health board", "Council area", 
                                   "Alcohol & drug partnership", "HSC partnership"))
     {
-      rank_bar <-optdata %>% 
+      rank_bar <- optdata %>% 
         subset(areatype == input$geotype_rank &  
                  trend_axis == input$year_rank &
-                 indicator == input$indic_rank) %>% 
-        droplevels()
-      
-      #Cannot be done in the same pipe operation as it does not work with the areaname mutate
-      rank_bar <- rank_bar %>% 
-        mutate(comp_value = rank_compar()$measure, #comparator value and name
-               comp_name = case_when(input$comp_rank == 1 ~  rank_compar()$areaname,
-                                     input$comp_rank == 2 ~ rank_compar()$trend_axis),
-               lowci_diff = measure - lowci, 
-               upci_diff = upci - measure) %>% 
-        arrange(desc(measure)) # for ranking by value
-    }
-    else { #if locality or IZ it needs to filter based on the parent area and be the right area type.
+                 indicator == input$indic_rank) %>% droplevels()
+    } else { #if locality or IZ it needs to filter based on the parent area and be the right area type.
       rank_bar <-  optdata %>% 
         subset(areatype == input$geotype_rank &
                  parent_area == input$loc_iz_rank &
                  trend_axis == input$year_rank &
                  indicator == input$indic_rank) %>% droplevels()
-      
-      #Cannot be done in the same pipe operation as it does not work with the areaname mutate
-      rank_bar <-rank_bar %>% 
-        mutate(comp_value = rank_compar()$measure) %>% #comparator value and name
-        mutate(comp_name = rank_compar()$areaname) %>% 
-        mutate(lowci_diff = measure - lowci) %>% 
-        mutate(upci_diff = upci - measure) %>% 
+    }
+    
+    if (input$comp_rank == 1) { #for area comparisons
+    rank_bar <- rank_bar %>% 
+      mutate(comp_value = rank_compar()$measure, #comparator value and name
+             comp_name = rank_compar()$areaname,
+             lowci_diff = measure - lowci, 
+             upci_diff = upci - measure) %>% 
+      arrange(desc(measure)) # for ranking by value
+    } else if (input$comp_rank == 2) { #if time comparison selected
+      #This helps to deals with cases of incomplete data, e.g. 2011 has all HB but 2013 not.
+      #Works for those cases where there are more data in the past (comparator)
+      #and one for those which have more data in the present (chosen area)
+      rank_bar <- left_join(x = rank_bar, y = rank_compar(), by = "code") %>% 
+        mutate(lowci_diff = measure - lowci, 
+               upci_diff = upci - measure) %>% 
         arrange(desc(measure)) # for ranking by value
+      
     }
   })
-  
+
   ############################.
   #Title of plot
   output$rank_title <- renderText( paste0(input$indic_rank) )
@@ -1565,44 +1560,12 @@ showModal(welcome_modal)
 ### Map ----
 #####################################. 
 #####################.
-# Reactive controls
-  #Dynamic selection of the last period available based on indicator selected
-  output$year_ui_map <- renderUI({
-    time_period <- sort(unique(optdata$trend_axis[optdata$indicator == input$indic_rank  &
-                                                    optdata$areatype == input$geotype_rank]))
-    
-    selectInput("year_map", "Time period",
-                choices = time_period, selected = last(time_period))
-  })
-  
-  #Dropdown for geotype based on what data is available for that indicator
-  output$geotype_ui_map <- renderUI({
-    areas <- sort(unique(optdata$areatype[optdata$indicator == input$indic_rank]))
-    #taking out areas without shapefiles
-    areas <- areas [! areas %in% c("Scotland", "HSC locality", 
-                                   "Alcohol & drug partnership")]
-    selectInput("geotype_map", label = "Geography level",
-                choices = areas, selected = "Health board")
-  })
-  
-  # Years to compare with depending on what data is available
-  output$yearcomp_ui_map <- renderUI({
-    map_pol <- optdata %>% subset(areatype == input$geotype_map & 
-                                    indicator==input$indic_map)
-    
-    years <- c(min(map_pol$year):max(map_pol$year))
-    periods <- c(sort(paste0(unique(map_pol$trend_axis[map_pol$year>=min(map_pol$year) &
-                                                         map_pol$year<=max(map_pol$year)]))))
-    
-    selectInput("yearcomp_map", "Baseline year", choices = periods,
-                selectize=TRUE)
-  })
-  
+# Reactive controls: it uses the ones from the rank section
   ###############################################.
   # Indicator definitions
   #Subsetting by domain and profile. Profile is fiddly as vector uses abbreviations 
   # so needs to be converted to the names to match techdoc.
-  defs_data_map <- reactive({techdoc %>% subset(input$indic_map == indicator_name)})
+  defs_data_map <- reactive({techdoc %>% subset(input$indic_rank == indicator_name)})
   
   output$defs_text_map <- renderUI({
     
@@ -1611,79 +1574,31 @@ showModal(welcome_modal)
   })
   
   #####################.
-  # Dynamic data
-  # Dataset for comparator chosen by user
-  map_compar <- reactive({
-    
-    if (input$comp_map == 1){
-      #Fiddly way of selecting period because some cases (e.g. Life expectancy)
-      #might have different periods for the same year, e.g. IZ 2013 is 2011-2015
-      #and HB 2013 is 2012-2014.
-      year_chosen <- unique(optdata$year[optdata$trend_axis == input$year_map])
-      
-      map_compar <- optdata %>% subset(year %in% year_chosen & 
-                                         areatype %in% c("Health board", "Council area", "Scotland") &
-                                         areaname == input$geocomp_map &
-                                         indicator == input$indic_map) %>% 
-        droplevels()
-      
-    } else if (input$comp_map == 2) { #if time comparison selected
-      
-      map_compar <- optdata %>% subset(areatype == input$geotype_map &
-                                         trend_axis == input$yearcomp_map & 
-                                         indicator==input$indic_map) %>% 
-        rename(comp_value = measure, comp_name = areaname) %>% 
-        select(code, comp_value, comp_name) %>% #to allow merging
-        droplevels()
-      
-    }
-  }) 
-  
-  #Dataset for area type chosen by user
-  map_chosenarea <- reactive({ 
-    map_chosenarea <- optdata %>% 
-      subset(areatype == input$geotype_map &
-               trend_axis==input$year_map & 
-               indicator==input$indic_map) %>% 
-      droplevels() #dropping missing factor levels to allow merging
-    
-    if (input$comp_map == 1) { #for area comparisons
-      map_chosenarea <- map_chosenarea %>% 
-        mutate(comp_value = map_compar()$measure, #comparator value and name
-               comp_name = map_compar()$areaname) 
-      
-    } else if (input$comp_map == 2) { #if time comparison selected
-      #This helps to deals with cases of incomplete data, e.g. 2011 has all HB but 2013 not.
-      #Works for those cases where there are more data in the past (comparator)
-      #and one for those which have more data in the present (chosen area)
-      map_chosenarea <- left_join(x = map_chosenarea, y = map_compar(), by = "code")
-
-    }
-  }) 
-  
+  # # Dynamic data - uses some of the rank ones
+ 
   #Merging shapefile with dynamic selection of data
   poly_map <- reactive({
-    if (input$geotype_map == "Council area"){
-      map_pol <- sp::merge(ca_bound, map_chosenarea(), by='code')
-    } else if(input$geotype_map == "Health board"){
-      map_pol <- sp::merge(hb_bound, map_chosenarea(), by='code')
-    } else if(input$geotype_map == "HSC partnership"){
-      map_pol <- sp::merge(hscp_bound, map_chosenarea(), by='code')
-    } else if(input$geotype_map == "Intermediate zone"){
+    if (input$geotype_rank == "Council area"){
+      map_pol <- sp::merge(ca_bound, rank_bar_data(), by='code')
+    } else if(input$geotype_rank == "Health board"){
+      map_pol <- sp::merge(hb_bound, rank_bar_data(), by='code')
+    } else if(input$geotype_rank == "HSC partnership"){
+      map_pol <- sp::merge(hscp_bound, rank_bar_data(), by='code')
+    } else if(input$geotype_rank == "Intermediate zone"){
       iz_bound <- iz_bound %>% subset(council == input$iz_map)
       
-      map_pol <- sp::merge(iz_bound, map_chosenarea(), by='code')
+      map_pol <- sp::merge(iz_bound, rank_bar_data(), by='code')
     }
     
   }) 
   
   ############################.
   #Title of plot
-  output$map_title <- renderText( paste0(input$indic_map) )
+  output$map_title <- renderText( paste0(input$indic_rank) )
   
   output$map_subtitle <- renderText({
-    paste0(input$geotype_map, "s compared against ",
-           input$geocomp_map, " - ", input$year_map)
+    paste0(input$geotype_rank, "s compared against ",
+           input$geocomp_rank, " - ", input$year_rank)
   })
   
   #####################.
@@ -1725,6 +1640,15 @@ showModal(welcome_modal)
                   highlightOptions = highlightOptions(color = "white", weight = 2,
                                                       bringToFront = TRUE)
       ) 
+  })
+  
+  # If no data or shapefile plot no map available
+  output$map_ui <- renderUI({
+    if(is.data.frame(rank_csv()) && nrow(rank_csv()) == 0) {
+      h2("No map available for that geographic level.")
+    } else {
+      withSpinner(leafletOutput("map", width="100%",height="600px"))
+    }
   })
   
   #####################.
