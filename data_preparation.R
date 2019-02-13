@@ -239,7 +239,8 @@ optdata$code <- as.factor(recode(as.character(optdata$code),
 update_table <- optdata %>% select(c(ind_id, update_date)) %>% distinct() %>% 
   subset(!is.na(update_date))
 update_table$update_date <- as.Date(update_table$update_date,"%m/%d/%Y")
-update_table <- update_table %>% group_by(ind_id) %>% top_n(1, update_date) %>% ungroup()
+update_table <- update_table %>% group_by(ind_id) %>% top_n(1, update_date) %>% 
+  ungroup() %>% unique()
 
 optdata <- optdata %>% select(-update_date)
 
