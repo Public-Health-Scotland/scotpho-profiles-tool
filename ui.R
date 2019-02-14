@@ -443,12 +443,13 @@ tabPanel("Rank", icon = icon("signal"), value = "rank",
          ), #well pannel bracket
          mainPanel(width = 12, #Main panel
            bsModal("mod_defs_rank", "Definitions", "defs_rank", htmlOutput('defs_text_rank')),
-           column(width = 6, #rank bar
+           column(width = 7, #rank bar
                   h4(textOutput("rank_title"), style="color: black; text-align: left"),  
-                  h5(textOutput("rank_subtitle"), style="color: black; text-align: left"),   
-                  withSpinner(plotlyOutput("rank_plot")) 
+                  h5(textOutput("rank_subtitle"), style="color: black; text-align: left"),  
+                  uiOutput("rank_plot_ui")
+                  # withSpinner(plotlyOutput("rank_plot")) 
            ),
-           column(width = 6, #map
+           column(width = 5, #map
              uiOutput("map_ui")
            )
          ) #main panel bracket

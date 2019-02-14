@@ -691,8 +691,7 @@ showModal(welcome_modal)
       #Layout
       theme(axis.text.x = element_text(angle=90),
             axis.ticks.y=element_blank(), # taking out axis tick marks
-            axis.title.x=element_blank(), #Taking out y axis title
-            axis.title.y=element_blank(), #Taking out y axis title
+            axis.title=element_blank(), #Taking out axis titles
             panel.background = element_blank(),#Blanking background
             legend.position="none", #taking out legend
             text = element_text(size=14) # changing font size
@@ -711,8 +710,7 @@ showModal(welcome_modal)
       # margins needed as long labels don't work well with Plotly
         layout(margin = list(l = 400, t = 50),
              xaxis = list(side = 'top', fixedrange=TRUE), yaxis= list(fixedrange=TRUE),
-             font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif')
-        ) %>%
+             font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif')) %>%
         config(displayModeBar = FALSE, displaylogo = F, collaborate=F, editable =F) # taking out plotly logo and collaborate button
     }
   })
@@ -1289,7 +1287,7 @@ showModal(welcome_modal)
 #### Rank plot ----
 ###############################################.   
 #####################.
-# Reactive controls
+# Reactive controls - used for the map as well.
   #Dropdown for time period based on indicator selection  
   output$year_ui_rank <- renderUI({
     time_period <- sort(unique(optdata$trend_axis[optdata$indicator == input$indic_rank&
@@ -1405,9 +1403,25 @@ showModal(welcome_modal)
   output$rank_title <- renderText( paste0(input$indic_rank) )
   
   output$rank_subtitle <- renderText({
-    paste0(input$geotype_rank, "s compared against ",
-           input$geocomp_rank, " - ",  input$year_rank)
+    case_when(input$comp_rank == 1 ~ paste0(input$geotype_rank, "s compared against ",
+                                            input$geocomp_rank, " - ",  input$year_rank),
+              input$comp_rank == 2 ~ paste0("Changes within ", input$geotype_rank, 
+                                            ": ", input$year_rank, " compared to ", input$yearcomp_rank))
   })
+  
+  ###############################################.
+  # height of the plot
+  # Calculates number of different indicators and then multiplies by pixels per row
+  # it needs the sum at the end as otherwise small domains plots will be too small
+  get_height_dumbbell <- function() {
+    if (input$comp_rank == 1) {#if area comparison, standard length
+      length <- 400
+    } else if (input$comp_rank == 2) {
+      #Obtaining number of areas
+      no_ind <- length(unique(rank_bar_data()$areaname))
+      length <- no_ind * 55 + 50
+    }
+  }
   
   ############################.
   # Creating  plot
@@ -1446,12 +1460,46 @@ showModal(welcome_modal)
       order_areas <- as.vector(rank_bar_data()$areaname)
       
       # General plot and layout, bars with or without error bars will be added after user input
-      p <-   plot_ly(data = rank_bar_data(), x = ~areaname) %>% 
+      rank_plot <- plot_ly(data = rank_bar_data()) 
+      
+      if (input$comp_rank == 1) {
         #Comparator line
-        add_trace(y = ~comp_value, name = ~unique(comp_name), type = 'scatter', mode = 'lines',
-                  line = list(color = '#FF0000'), showlegend = FALSE, hoverinfo="skip") %>% 
-        #Layout
-        layout(annotations = list(), #It needs this because of a buggy behaviour
+        rank_plot <- rank_plot %>% 
+          add_trace(x = ~areaname, y = ~comp_value, name = ~unique(comp_name), type = 'scatter', mode = 'lines',
+                  line = list(color = '#FF0000'), showlegend = FALSE, hoverinfo="skip")
+        
+        #Respond to user input regarding confidence intervals
+        if (input$ci_rank == FALSE) {  
+          #adding bar layer without confidence intervals
+          rank_plot <- rank_plot %>% add_bars(x = ~areaname, y = ~ measure, text=tooltip_rank, hoverinfo="text",
+                          marker = list(color = color_pal))
+          
+        }
+        else{ 
+          #adding bar layer with error bars
+          rank_plot <- rank_plot %>% add_bars(x = ~areaname,y = ~ measure, text=tooltip_rank, hoverinfo="text",
+                         marker = list(color = color_pal), 
+                         error_y = list(type = "data",color='#000000',
+                                        symmetric = FALSE, array = ~upci_diff, arrayminus = ~lowci_diff)) 
+        }
+        
+      } else if (input$comp_rank == 2) {#if time comparison selected, plot dumbbell plot
+        
+        rank_plot <- rank_plot %>% 
+          add_segments(y = ~areaname, yend = ~areaname, x = ~measure, xend = ~comp_value, 
+                       showlegend = FALSE, color = I("gray80"), hoverinfo="skip") %>% 
+          # value of the area in the selected period
+          add_trace(y = ~areaname, x = ~measure, name = ~unique(areaname), type = 'scatter', mode = 'markers',
+                    marker = list(color = color_pal,  
+                                  line = list(color = 'gray', width = 2)), 
+                    showlegend = FALSE, text=tooltip_rank, hoverinfo="text") %>% 
+          # value of the area in the selected baseline period -comparator
+          add_trace(y = ~areaname, x = ~comp_value, name = ~unique(comp_name), type = 'scatter', mode = 'markers',
+                    marker = list(color = 'black'), showlegend = FALSE, hoverinfo="skip") 
+      }
+      
+      #Layout
+      rank_plot %>% layout(annotations = list(), #It needs this because of a buggy behaviour
                yaxis = list(title = ~type_definition, titlefont =list(size=14), 
                             tickfont =list(size=14), fixedrange=TRUE),
                xaxis = list(title = "", tickangle = 270, fixedrange=TRUE,
@@ -1463,22 +1511,15 @@ showModal(welcome_modal)
                hovermode = 'false') %>% # to get hover compare mode as default
         config(displayModeBar = FALSE, displaylogo = F, collaborate=F, editable =F)
       
-      #Respond to user input regarding confidence intervals
-      if (input$ci_rank == FALSE) {  
-        #adding bar layer without confidence intervals
-        p %>%  add_bars(y = ~ measure, text=tooltip_rank, hoverinfo="text",
-                        marker = list(color = color_pal))
-                   
-      }
-      else{ 
-        #adding bar layer with error bars
-        p %>% add_bars(y = ~ measure, text=tooltip_rank, hoverinfo="text",
-                   marker = list(color = color_pal), 
-                   error_y = list(type = "data",color='#000000',
-                     symmetric = FALSE, array = ~upci_diff, arrayminus = ~lowci_diff)) 
-      }
+
     }
   }) 
+  
+  output$rank_plot_ui <- renderUI({
+    
+    
+    withSpinner(plotlyOutput("rank_plot", width = "100%", height = get_height_dumbbell()))
+  })
   
 ############################.
 #Downloading plot and data
@@ -1507,8 +1548,10 @@ showModal(welcome_modal)
     
     #title for rank
     title_rank <- paste0(input$indic_rank)
-    subtitle_rank <-  paste0(input$geotype_rank, "s compared against ",
-                             input$geocomp_rank, " - ",  input$year_rank)
+    subtitle_rank <- case_when(input$comp_rank == 1 ~ paste0(input$geotype_rank, "s compared against ",
+                                input$geocomp_rank, " - ",  input$year_rank),
+                             input$comp_rank == 2 ~ paste0("Changes within ", input$geotype_rank, 
+                                                           ": ", input$year_rank, " compared to ", input$yearcomp_rank))
 
     # General plot and layout, bars with or without error bars will be added after user input
     p <- ggplot(data=rank_bar_data(), aes(y = measure,  x = reorder(areaname, -measure)))+
@@ -1585,11 +1628,12 @@ showModal(welcome_modal)
     } else if(input$geotype_rank == "HSC partnership"){
       map_pol <- sp::merge(hscp_bound, rank_bar_data(), by='code')
     } else if(input$geotype_rank == "Intermediate zone"){
-      iz_bound <- iz_bound %>% subset(council == input$iz_map)
+      # iz_bound <- iz_bound %>% subset(council == input$loc_iz_rank)
       
       map_pol <- sp::merge(iz_bound, rank_bar_data(), by='code')
+      map_pol <- map_pol %>% subset(parent_area == input$loc_iz_rank)
     } else {
-      map_pol <- NULL
+      map_pol <- data.frame(matrix(vector(), 0, 3)) #empty data frame
     }
     
   }) 
@@ -1644,13 +1688,15 @@ showModal(welcome_modal)
       ) 
   })
   
+  # map_nodata <- renderPlotly(plot_nodata())
+  
   # If no data or shapefile plot no map available
   output$map_ui <- renderUI({
-    # if(poly_map() == NULL) {
-    #   h2("No map available for that geographic level.")
-    # } else {
+    if(is.data.frame(poly_map()) && nrow(poly_map()) == 0) {
+      h4("No map available for that geographic level.", style = "color:black")
+    } else {
       withSpinner(leafletOutput("map", width="100%",height="600px"))
-    # }
+    }
   })
   
   #####################.
