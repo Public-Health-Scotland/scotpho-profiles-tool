@@ -1409,23 +1409,9 @@ showModal(welcome_modal)
                                             ": ", input$year_rank, " compared to ", input$yearcomp_rank))
   })
   
-  ###############################################.
-  # height of the plot
-  # Calculates number of different indicators and then multiplies by pixels per row
-  # it needs the sum at the end as otherwise small domains plots will be too small
-  get_height_dumbbell <- function() {
-    if (input$comp_rank == 1) {#if area comparison, standard length
-      length <- 400
-    } else if (input$comp_rank == 2) {
-      #Obtaining number of areas
-      no_ind <- length(unique(rank_bar_data()$areaname))
-      length <- no_ind * 55 + 50
-    }
-  }
-  
   ############################.
   # Creating  plot
-  output$rank_plot <- renderPlotly({
+  plot_rank_charts <- function(){
     
     #If no data available for that period then plot message saying data is missing
     if (is.data.frame(rank_bar_data()) && nrow(rank_bar_data()) == 0)
@@ -1434,12 +1420,23 @@ showModal(welcome_modal)
     }
     else { #If data is available then plot it
       
+      # height of the plot
+      # Calculates number of different indicators and then multiplies by pixels per row
+      # it needs the sum at the end as otherwise small domains plots will be too small
+        if (input$comp_rank == 1) {#if area comparison, standard length
+          height_plot <- 400
+        } else if (input$comp_rank == 2) {
+          #Obtaining number of areas
+          no_ind <- length(unique(rank_bar_data()$areaname))
+          height_plot <- no_ind * 32 + 40
+        }
+
       #Coloring based on if signicantly different from comparator
       color_pal <- case_when(
-        rank_bar_data()$interpret == "O" ~ '#ccccff',
+        rank_bar_data()$interpret == "O" ~ '#999966',
         is.na(rank_bar_data()$lowci) | is.na(rank_bar_data()$upci) | 
           is.na(rank_bar_data()$comp_value) | is.na(rank_bar_data()$measure) |
-          rank_bar_data()$measure == 0 ~ '#ccccff',
+          rank_bar_data()$measure == 0 ~ '#999966',
         rank_bar_data()$lowci <= rank_bar_data()$comp_value & 
           rank_bar_data()$upci >= rank_bar_data()$comp_value ~'#cccccc',
         rank_bar_data()$lowci > rank_bar_data()$comp_value & 
@@ -1451,141 +1448,90 @@ showModal(welcome_modal)
         rank_bar_data()$upci < rank_bar_data()$comp_value & 
           rank_bar_data()$interpret == "H" ~ '#ffa64d', 
         TRUE ~ '#ccccff')
-
-      # Text for tooltip
-      tooltip_rank <- c(paste0(rank_bar_data()$areaname, ": ", rank_bar_data()$measure, "<br>",
-                               input$geocomp_rank, ": ", rank_bar_data()$comp_value))
+      
+      # Text for tooltip - one for each type of chart
+      tooltip_bar <-c(paste0(rank_bar_data()$areaname, ": ", rank_bar_data()$measure, "<br>",
+                             input$geocomp_rank, ": ", rank_bar_data()$comp_value))
+      
+      tooltip_dumbbell <- c(paste0(rank_bar_data()$areaname, "<br>",
+                                   input$year_rank, ": ", rank_bar_data()$measure, "<br>",
+                                   input$yearcomp_rank, ": ", rank_bar_data()$comp_value))
       
       #Creating a vector with the area names in the order they are going to be plotted
       order_areas <- as.vector(rank_bar_data()$areaname)
       
+      ###############################################.
+      # Starting the plot 
       # General plot and layout, bars with or without error bars will be added after user input
-      rank_plot <- plot_ly(data = rank_bar_data()) 
+      rank_plot <- plot_ly(data = rank_bar_data(), height = height_plot) 
       
       if (input$comp_rank == 1) {
         #Comparator line
         rank_plot <- rank_plot %>% 
           add_trace(x = ~areaname, y = ~comp_value, name = ~unique(comp_name), type = 'scatter', mode = 'lines',
-                  line = list(color = '#FF0000'), showlegend = FALSE, hoverinfo="skip")
+                    line = list(color = '#FF0000'), showlegend = FALSE, hoverinfo="skip")
         
         #Respond to user input regarding confidence intervals
         if (input$ci_rank == FALSE) {  
           #adding bar layer without confidence intervals
-          rank_plot <- rank_plot %>% add_bars(x = ~areaname, y = ~ measure, text=tooltip_rank, hoverinfo="text",
-                          marker = list(color = color_pal))
+          rank_plot <- rank_plot %>% add_bars(x = ~areaname, y = ~ measure, text=tooltip_bar, hoverinfo="text",
+                                              marker = list(color = color_pal))
           
         }
-        else{ 
+        else { 
           #adding bar layer with error bars
-          rank_plot <- rank_plot %>% add_bars(x = ~areaname,y = ~ measure, text=tooltip_rank, hoverinfo="text",
-                         marker = list(color = color_pal), 
-                         error_y = list(type = "data",color='#000000',
-                                        symmetric = FALSE, array = ~upci_diff, arrayminus = ~lowci_diff)) 
+          rank_plot <- rank_plot %>% add_bars(x = ~areaname,y = ~ measure, text=tooltip_bar, hoverinfo="text",
+                                              marker = list(color = color_pal), 
+                                              error_y = list(type = "data",color='#000000',
+                                                             symmetric = FALSE, array = ~upci_diff, arrayminus = ~lowci_diff)) 
         }
+        
+        # Adding layout
+        rank_plot %>% layout(annotations = list(), #It needs this because of a buggy behaviour
+                             yaxis = list(title = ~type_definition, titlefont =list(size=14), 
+                                          tickfont =list(size=14), fixedrange=TRUE),
+                             xaxis = list(title = "", tickangle = 270, fixedrange=TRUE,
+                                          tickfont =list(size=13), #axis parameters
+                                          categoryorder="array", #order of plotting
+                                          categoryarray = order_areas),
+                             font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif'),
+                             margin=list(b = 160, t = 5), # to prevent labels getting cut out
+                             hovermode = 'false') %>% # to get hover compare mode as default
+          config(displayModeBar = FALSE, displaylogo = F, collaborate=F, editable =F)
         
       } else if (input$comp_rank == 2) {#if time comparison selected, plot dumbbell plot
         
         rank_plot <- rank_plot %>% 
           add_segments(y = ~areaname, yend = ~areaname, x = ~measure, xend = ~comp_value, 
                        showlegend = FALSE, color = I("gray80"), hoverinfo="skip") %>% 
+          # value of the area in the selected baseline period -comparator
+          add_trace(y = ~areaname, x = ~comp_value, name = ~unique(comp_name), 
+                    type = 'scatter', mode = 'markers', showlegend = FALSE, 
+                    marker = list(color = 'black', size = 10), text=tooltip_dumbbell, hoverinfo="text") %>% 
           # value of the area in the selected period
           add_trace(y = ~areaname, x = ~measure, name = ~unique(areaname), type = 'scatter', mode = 'markers',
-                    marker = list(color = color_pal,  
+                    marker = list(color = color_pal, size = 10,
                                   line = list(color = 'gray', width = 2)), 
-                    showlegend = FALSE, text=tooltip_rank, hoverinfo="text") %>% 
-          # value of the area in the selected baseline period -comparator
-          add_trace(y = ~areaname, x = ~comp_value, name = ~unique(comp_name), type = 'scatter', mode = 'markers',
-                    marker = list(color = 'black'), showlegend = FALSE, hoverinfo="skip") 
+                    showlegend = FALSE, text=tooltip_dumbbell, hoverinfo="text") %>% 
+        # Adding layout
+          layout(xaxis = list(title = ~type_definition, titlefont =list(size=14), 
+                              side = "top", tickfont =list(size=14), fixedrange=TRUE),
+                 yaxis = list(title = "", fixedrange=TRUE,
+                                          tickfont =list(size=13), #axis parameters
+                                          categoryorder="array", #order of plotting
+                                          categoryarray = rev(order_areas)),
+                 font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif'),
+                 margin=list(l = 170, t=30)) %>%  # to prevent labels getting cut out
+          config(displayModeBar = FALSE, displaylogo = F, collaborate=F, editable =F)
+        
       }
-      
-      #Layout
-      rank_plot %>% layout(annotations = list(), #It needs this because of a buggy behaviour
-               yaxis = list(title = ~type_definition, titlefont =list(size=14), 
-                            tickfont =list(size=14), fixedrange=TRUE),
-               xaxis = list(title = "", tickangle = 270, fixedrange=TRUE,
-                            tickfont =list(size=13), #axis parameters
-                            categoryorder="array", #order of plotting
-                            categoryarray = order_areas),
-               font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif'),
-               margin=list(b = 160, t = 5), # to prevent labels getting cut out
-               hovermode = 'false') %>% # to get hover compare mode as default
-        config(displayModeBar = FALSE, displaylogo = F, collaborate=F, editable =F)
-      
-
-    }
-  }) 
+    } # bracket for plot if data
+  } 
   
-  output$rank_plot_ui <- renderUI({
-    
-    
-    withSpinner(plotlyOutput("rank_plot", width = "100%", height = get_height_dumbbell()))
-  })
+  # Calling the renderPlotly object
+  output$rank_plot <- renderPlotly({plot_rank_charts()  }) 
   
-############################.
-#Downloading plot and data
-  # Function to save plot
-  plot_rank_ggplot <- function(){
-    #Coloring based on if signicantly different from comparator
-    color_pal <- case_when(
-      rank_bar_data()$interpret == "O" ~ '#ccccff',
-      is.na(rank_bar_data()$lowci) | is.na(rank_bar_data()$upci) | 
-        is.na(rank_bar_data()$comp_value) | is.na(rank_bar_data()$measure) |
-        rank_bar_data()$measure == 0~ '#ccccff',
-      rank_bar_data()$lowci <= rank_bar_data()$comp_value & 
-        rank_bar_data()$upci >= rank_bar_data()$comp_value ~ '#cccccc',
-      rank_bar_data()$lowci > rank_bar_data()$comp_value & 
-        rank_bar_data()$interpret == "H" ~ '#4da6ff',
-      rank_bar_data()$lowci > rank_bar_data()$comp_value & 
-        rank_bar_data()$interpret == "L" ~ '#ffa64d',
-      rank_bar_data()$upci < rank_bar_data()$comp_value & 
-        rank_bar_data()$interpret == "L" ~ '#4da6ff',
-      rank_bar_data()$upci < rank_bar_data()$comp_value & 
-        rank_bar_data()$interpret == "H" ~ '#ffa64d', 
-      TRUE ~ '#ccccff')
-    
-    #Creating a vector with the area names in the order they are going to be plotted
-    color_pal <- setNames(color_pal, rank_bar_data()$areaname)
-    
-    #title for rank
-    title_rank <- paste0(input$indic_rank)
-    subtitle_rank <- case_when(input$comp_rank == 1 ~ paste0(input$geotype_rank, "s compared against ",
-                                input$geocomp_rank, " - ",  input$year_rank),
-                             input$comp_rank == 2 ~ paste0("Changes within ", input$geotype_rank, 
-                                                           ": ", input$year_rank, " compared to ", input$yearcomp_rank))
-
-    # General plot and layout, bars with or without error bars will be added after user input
-    p <- ggplot(data=rank_bar_data(), aes(y = measure,  x = reorder(areaname, -measure)))+
-      geom_bar(aes(fill=areaname), stat = "identity")+
-      geom_hline(aes(yintercept=comp_value, color="red"))+
-      labs(title=title_rank, subtitle = subtitle_rank,
-           y=unique(rank_bar_data()$type_definition))+
-      scale_fill_manual(values=color_pal, name = "")+
-      scale_y_continuous(expand = c(0, 0), limits=c(0, max(rank_bar_data()$upci)))+
-      #Layout
-      theme(text = element_text(size=11, family="Helvetica Neue,Helvetica,Arial,sans-serif"),
-            axis.text.x = element_text(angle=90, hjust=1), 
-            axis.line.x = element_line(), 
-            axis.ticks = element_blank(),
-            aspect.ratio=0.3,
-            plot.title = element_text(hjust = 0.5), #centering title
-            axis.title.x = element_blank(), #taking out x axis title
-            legend.position = "none", #taking out background from legend
-            panel.grid.major.y = element_line(colour="#F0F0F0"),
-            panel.background = element_blank() #Blanking background
-      )
-    
-    #Respond to user input regarding confidence intervals
-    if (input$ci_rank == FALSE) {  
-      p <- p 
-      
-    } else{ 
-      #adding bar layer with error bars
-      p <-  p +   geom_errorbar(aes(ymin=lowci, ymax=upci), width=.2,
-                                position=position_dodge(.9))
-      
-    }
-  }
-  
+  ###############################################.
   #Downloading data
   rank_csv <- reactive({ format_csv(rank_bar_data()) })
 
@@ -1596,9 +1542,9 @@ showModal(welcome_modal)
   output$download_rankplot <- downloadHandler(
     filename = 'rank.png',
     content = function(file){
-      ggsave(file, plot = plot_rank_ggplot(), device = "png", scale=5, limitsize=FALSE)
+      export(p = plot_rank_charts(), file = file)
     })
-  
+
 #####################################.    
 ### Map ----
 #####################################. 
