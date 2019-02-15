@@ -96,8 +96,8 @@ tagList( #needed for shinyjs
                #landing-page icons
                ".icon-lp{font-size: 1.3em; padding-right: 4px;}",
                #to avoid red text error messages in the whole app, take out for testing
-               # ".shiny-output-error { visibility: hidden; }",
-               # ".shiny-output-error:before { visibility: hidden; }",
+               ".shiny-output-error { visibility: hidden; }",
+               ".shiny-output-error:before { visibility: hidden; }",
                #External links underlined an open a new tab
                ".externallink{text-decoration: underline;} ",
                ".definitionbox {width:100%; height:100%; text-align:left ;background-color:white;
@@ -145,7 +145,7 @@ tabPanel(
     #2nd row of boxes
     fluidRow(
       #Trend plot box
-      column(4, class="landing-page-column",
+      column(6, class="landing-page-column",
              div(class="landing-page-box", 
                  div("Trend", class = "landing-page-box-title"),
                  div(class = "landing-page-icon", style="background-image: url(time_trend.png);
@@ -154,21 +154,21 @@ tabPanel(
                               class="landing-page-button", 
                               icon = icon("arrow-circle-right", "icon-lp")))),
       #Rank plot box
-      column(4, class="landing-page-column",
+      column(6, class="landing-page-column",
              div(class="landing-page-box", 
                  div("Rank", class = "landing-page-box-title"),
                  div(class = "landing-page-icon", style="background-image: url(rank_5.png);
                      background-size: auto 80%; background-position: center; background-repeat: no-repeat; "),
-                 actionButton('jump_to_rank', 'Compare geographical variation for an indicator using a bar chart', 
-                              class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp")))),
-      #Map plot box
-      column(4, class="landing-page-column",
-             div(class="landing-page-box", 
-                 div("Map", class = "landing-page-box-title"),
-                 div(class = "landing-page-icon", style="background-image: url(map_2.png);
-                     background-size: auto 80%; background-position: center; background-repeat: no-repeat; "),
-                 actionButton('jump_to_map', 'Compare geographical variation for an indicator using a map', 
+                 actionButton('jump_to_rank', 'Compare geographical variation for an indicator', 
                               class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp"))))
+      #Map plot box
+      # column(4, class="landing-page-column",
+      #        div(class="landing-page-box", 
+      #            div("Map", class = "landing-page-box-title"),
+      #            div(class = "landing-page-icon", style="background-image: url(map_2.png);
+      #                background-size: auto 80%; background-position: center; background-repeat: no-repeat; "),
+      #            actionButton('jump_to_map', 'Compare geographical variation for an indicator using a map', 
+      #                         class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp"))))
     ),
     fluidRow(h4("Access the data behind the tool and find supporting information")),
     fluidRow(
@@ -432,7 +432,7 @@ tabPanel("Rank", icon = icon("signal"), value = "rank",
                    img(src='signif_worse.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
                    "Worse than comparator", br(),
                    img(src='signif_nocalc2.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
-                   "No differences can be calculated",
+                   "No differences can be calculated", br(),
                    img(src='baseline_year_color.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
                    "Baseline year comparison")
            ),
