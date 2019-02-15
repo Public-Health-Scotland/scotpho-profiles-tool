@@ -5,9 +5,9 @@
 
 ## Define a server for the Shiny app
 function(input, output, session) {
-  ################################################################
+  ################################################################.
   #    Modal ----
-  ################################################################
+  ################################################################.
   #Welcome Modal
   welcome_modal <- modalDialog(
     br(),
@@ -1400,14 +1400,16 @@ showModal(welcome_modal)
 
   ############################.
   #Title of plot
-  output$rank_title <- renderText( paste0(input$indic_rank) )
-  
-  output$rank_subtitle <- renderText({
+  make_rank_subtitle <- function() {
     case_when(input$comp_rank == 1 ~ paste0(input$geotype_rank, "s compared against ",
                                             input$geocomp_rank, " - ",  input$year_rank),
               input$comp_rank == 2 ~ paste0("Changes within ", input$geotype_rank, 
                                             ": ", input$year_rank, " compared to ", input$yearcomp_rank))
-  })
+  }
+  
+  output$rank_title <- renderText( paste0(input$indic_rank) )
+  
+  output$rank_subtitle <- renderText({ make_rank_subtitle()  })
   
   ############################.
   # Creating  plot
@@ -1424,11 +1426,11 @@ showModal(welcome_modal)
       # Calculates number of different indicators and then multiplies by pixels per row
       # it needs the sum at the end as otherwise small domains plots will be too small
         if (input$comp_rank == 1) {#if area comparison, standard length
-          height_plot <- 400
+          height_plot <- 500
         } else if (input$comp_rank == 2) {
           #Obtaining number of areas
           no_ind <- length(unique(rank_bar_data()$areaname))
-          height_plot <- no_ind * 32 + 40
+          height_plot <- no_ind * 25 + 70
         }
 
       #Coloring based on if signicantly different from comparator
@@ -1495,7 +1497,7 @@ showModal(welcome_modal)
                                           categoryorder="array", #order of plotting
                                           categoryarray = order_areas),
                              font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif'),
-                             margin=list(b = 160, t = 5), # to prevent labels getting cut out
+                             margin=list(b = 180, t = 5), # to prevent labels getting cut out
                              hovermode = 'false') %>% # to get hover compare mode as default
           config(displayModeBar = FALSE, displaylogo = F, collaborate=F, editable =F)
         
@@ -1521,11 +1523,11 @@ showModal(welcome_modal)
                                           categoryorder="array", #order of plotting
                                           categoryarray = rev(order_areas)),
                  font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif'),
-                 margin=list(l = 170, t=30)) %>%  # to prevent labels getting cut out
+                 margin=list(l = 170, t=40)) %>%  # to prevent labels getting cut out
           config(displayModeBar = FALSE, displaylogo = F, collaborate=F, editable =F)
         
       }
-    } # bracket for plot if data
+    } # bracket for "plot if data"
   } 
   
   # Calling the renderPlotly object
@@ -1542,7 +1544,10 @@ showModal(welcome_modal)
   output$download_rankplot <- downloadHandler(
     filename = 'rank.png',
     content = function(file){
-      export(p = plot_rank_charts(), file = file)
+      export(p = plot_rank_charts() %>% 
+               layout(title = paste0(input$indic_rank, "<br>", make_rank_subtitle()),
+                      margin = list(t = 180)),
+               file = file)
     })
 
 #####################################.    
@@ -1574,8 +1579,6 @@ showModal(welcome_modal)
     } else if(input$geotype_rank == "HSC partnership"){
       map_pol <- sp::merge(hscp_bound, rank_bar_data(), by='code')
     } else if(input$geotype_rank == "Intermediate zone"){
-      # iz_bound <- iz_bound %>% subset(council == input$loc_iz_rank)
-      
       map_pol <- sp::merge(iz_bound, rank_bar_data(), by='code')
       map_pol <- map_pol %>% subset(parent_area == input$loc_iz_rank)
     } else {
@@ -1584,24 +1587,15 @@ showModal(welcome_modal)
     
   }) 
   
-  ############################.
-  #Title of plot
-  output$map_title <- renderText( paste0(input$indic_rank) )
-  
-  output$map_subtitle <- renderText({
-    paste0(input$geotype_rank, "s compared against ",
-           input$geocomp_rank, " - ", input$year_rank)
-  })
-  
   #####################.
   # Plotting map
   #Function to create color palette based on if signicantly different from comparator
   create_map_palette <- function(){
     case_when(
-      poly_map()$interpret == "O" ~ '#ffffff',
+      poly_map()$interpret == "O" ~ '#999966',
       is.na(poly_map()$lowci) | is.na(poly_map()$upci) | 
         is.na(poly_map()$comp_value) | is.na(poly_map()$measure) |
-        poly_map()$measure == 0 ~ '#ffffff',
+        poly_map()$measure == 0 ~ '#999966',
       poly_map()$lowci <= poly_map()$comp_value & poly_map()$upci >= poly_map()$comp_value ~'#999999',
       poly_map()$lowci > poly_map()$comp_value & poly_map()$interpret == "H" ~ '#3d99f5',
       poly_map()$lowci > poly_map()$comp_value & poly_map()$interpret == "L" ~ '#ff9933',
@@ -1634,8 +1628,6 @@ showModal(welcome_modal)
       ) 
   })
   
-  # map_nodata <- renderPlotly(plot_nodata())
-  
   # If no data or shapefile plot no map available
   output$map_ui <- renderUI({
     if(is.data.frame(poly_map()) && nrow(poly_map()) == 0) {
@@ -1649,11 +1641,17 @@ showModal(welcome_modal)
   # Downloading data
   #Function to create map that can be downloaded
   plot_map_download <- function(){
-    color_map <- create_map_palette() #palette
-    plot(poly_map(), col=color_map)
-    title(paste0(input$indic_map, "\n", input$geotype_map, 
-                 "s compared against ", input$geocomp_map, " - ", input$year_map),
-          cex.main = 3,  line = -1)
+    
+    if(is.data.frame(poly_map()) && nrow(poly_map()) == 0) {
+      plot.new()
+      text(0.5,0.5,"No map available for that geographic level.")
+    } else {
+      color_map <- create_map_palette() #palette
+      title_map <- paste0(input$indic_rank, "\n", make_rank_subtitle())
+      
+      plot(poly_map(), col=color_map)
+      title(title_map, cex.main = 3,  line = -1) # adding title
+    }
   }
   
   
@@ -2043,11 +2041,5 @@ showModal(welcome_modal)
 } #server closing bracket
 
 #########################  END ----
-
-
-
-
-
-
 
 
