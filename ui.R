@@ -432,7 +432,9 @@ tabPanel("Rank", icon = icon("signal"), value = "rank",
                    img(src='signif_worse.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
                    "Worse than comparator", br(),
                    img(src='signif_nocalc2.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
-                   "No differences can be calculated")
+                   "No differences can be calculated",
+                   img(src='baseline_year_color.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
+                   "Baseline year comparison")
            ),
            column(width = 2,
                  actionButton("defs_rank", label="Definitions", icon= icon('info'), class ="down"), 
@@ -446,9 +448,7 @@ tabPanel("Rank", icon = icon("signal"), value = "rank",
            column(width = 7, #rank bar
                   h4(textOutput("rank_title"), style="color: black; text-align: left"),  
                   h5(textOutput("rank_subtitle"), style="color: black; text-align: left"),  
-                  uiOutput("rank_plot_ui")
-                  # withSpinner(plotlyOutput("rank_plot")) 
-           ),
+                  withSpinner(plotlyOutput("rank_plot"))           ),
            column(width = 5, #map
              uiOutput("map_ui")
            )
