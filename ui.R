@@ -363,34 +363,35 @@ tabPanel("Barcode", icon = icon("barcode"), value = "barcode",
 ## Time trend ----
 ###############################################.
 tabPanel("Trend", icon = icon("area-chart"), value = "trend",
-                   sidebarPanel(width=3,
+                   sidebarPanel(width=4,
                           selectInput("indic_trend", "Indicator", choices=indicator_list),
                           awesomeCheckbox("ci_trend", label = "95% confidence intervals", value = FALSE),
                           awesomeCheckbox("colorblind_trend",  
                                           label = "Improved accessibility", value = FALSE),
                           actionButton("defs_trend",label="Definitions", icon= icon('info'), class ="down"),
                           shiny::hr(),
-                          p(tags$b("Select the areas you want to plot.
-                                   You can select multiple areas per geography level")),
-                          selectInput("hbname_trend", "Health board", choices = c("Select health boards" = "", paste(hb_name)),
-                                      multiple=TRUE, selectize=TRUE, selected = ""),
-                          selectInput("scotname_trend", "Scotland", choices = c("", "Scotland"), 
-                                      selectize=TRUE, selected = "Scotland"),
-                          selectInput("caname_trend", "Council area", choices =  c("Select council areas" = "", paste(la_name)),
-                                      multiple=TRUE, selectize=TRUE, selected = ""),
-                          selectInput("adpname_trend", "Alcohol & drug partnership", choices =  c("Select partnerships" = "", paste(adp_name)),
-                                      multiple=TRUE, selectize=TRUE, selected = ""),
-                          selectInput("partname_trend", "HSC partnership", choices =  c("Select partnerships" = "", paste(partnership_name)),
-                                      multiple=TRUE, selectize=TRUE, selected = ""),
-                          selectInput("loc_iz_trend", "To choose a locality or intermediate zone first 
+                          p(tags$b("Select the areas you want to plot. You can select multiple 
+                                   areas per geography level up to five in total")),
+                          awesomeCheckbox("scotname_trend", tags$b("Scotland"), value=TRUE),
+                          column(6,
+                                 selectInput("hbname_trend", "Health board", choices = c("Select health boards" = "", paste(hb_name)),
+                                             multiple=TRUE, selectize=TRUE, selected = ""),
+                                 selectInput("partname_trend", "HSC partnership", choices =  c("Select partnerships" = "", paste(partnership_name)),
+                                             multiple=TRUE, selectize=TRUE, selected = "")),
+                          column(6,
+                            selectInput("caname_trend", "Council area", choices =  c("Select council areas" = "", paste(la_name)),
+                                        multiple=TRUE, selectize=TRUE, selected = ""),
+                            selectInput("adpname_trend", "Alcohol & drug partnership", choices =  c("Select partnerships" = "", paste(adp_name)),
+                                        multiple=TRUE, selectize=TRUE, selected = "")),
+                          selectInput("loc_iz_trend", "To choose a locality or intermediate zone, first 
                                       select an HSC partnership", 
                                       choices = partnership_name),
-                          uiOutput("loc_ui_trend"),
-                          uiOutput("iz_ui_trend"),
+                          column(6, uiOutput("loc_ui_trend")),
+                          column(6,uiOutput("iz_ui_trend")),
                           downloadButton('download_trend', 'Download data', class = "down"),
                           savechart_button('download_trendplot', 'Save chart',  class = "down")
                    ),
-         mainPanel(width = 9, #Main panel
+         mainPanel(width = 8, #Main panel
           bsModal("mod_defs_trend", "Definitions", "defs_trend", htmlOutput('defs_text_trend')),
           h4(textOutput("title_trend"), style="color: black; text-align: left"),
           withSpinner(plotlyOutput("trend_plot"))
