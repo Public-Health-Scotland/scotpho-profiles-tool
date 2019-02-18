@@ -1092,15 +1092,15 @@ showModal(welcome_modal)
     toggleState ("partname_trend", condition= 
                    "HSC partnership" %in%  unique(trend$areatype))
     
+    toggleState ("loc_iz_trend", 
+                 condition = "Intermediate zone" %in%  unique(trend$areatype) |
+                   "HSC locality" %in%  unique(trend$areatype))
+    
     toggleState ("locname_trend", condition= 
                    "HSC locality" %in%  unique(trend$areatype))
     
     toggleState ("izname_trend", condition= 
                    "Intermediate zone" %in%  unique(trend$areatype)) 
-    
-    toggleState ("loc_iz_trend", 
-                 condition = "Intermediate zone" %in%  unique(trend$areatype) |
-                   "HSC locality" %in%  unique(trend$areatype))
     
     toggleState("caname_trend",
                 condition = ("Council area" %in%  unique(trend$areatype)))
@@ -1129,7 +1129,7 @@ showModal(welcome_modal)
     trend <- optdata %>% 
       subset((areaname %in% input$hbname_trend &  areatype == "Health board" |
                areaname %in% input$caname_trend & areatype == "Council area" |
-               areaname %in% input$scotname_trend & areatype == "Scotland"  |
+               input$scotname_trend == TRUE & areatype == "Scotland"  |
                areaname %in% input$adpname_trend  & areatype == "Alcohol & drug partnership" |
                areaname %in% input$locname_trend  & areatype == "HSC locality" |
                areaname %in% input$partname_trend & areatype == "HSC partnership"   |
@@ -1209,18 +1209,19 @@ showModal(welcome_modal)
       
       #Creating time trend plot
       trend_plot <-   plot_ly(data=trend_data(), x=~trend_axis,  y = ~measure, 
-                              text=tooltip_trend, hoverinfo="text",
+                              text=tooltip_trend, hoverinfo="text", height = 600,
                               type = 'scatter', mode = 'lines+markers',
                               color = ~areaname_full, colors = trend_col) %>% 
         #Layout 
         layout(annotations = list(), #It needs this because of a buggy behaviour of Plotly
-               margin = list(b = 160, t=5), #to avoid labels getting cut out
+               margin = list(b = 130, t=5), #to avoid labels getting cut out
                yaxis = list(title = ~type_definition, rangemode="tozero", fixedrange=TRUE,
                             size = 4, titlefont =list(size=14), tickfont =list(size=14)), 
                xaxis = list(title = FALSE, tickfont =list(size=14), tickangle = 270, fixedrange=TRUE),
-               font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif')) %>%  
+               font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif'),
+               legend = list(orientation = 'h', x = 0, y = 1.18)) %>%  
         config(displayModeBar = FALSE, displaylogo = F, collaborate=F, editable =F) # taking out plotly logo and collaborate button
-      
+
       #Adding confidence intervals depending on user input
       if (input$ci_trend == TRUE) {
         trend_plot %>% 
@@ -1248,11 +1249,11 @@ showModal(welcome_modal)
     filename = 'trend.png',
     content = function(file){
       export(p = plot_trend_chart() %>% 
-               layout(title = paste0(input$indic_trend), margin = list(t = 100)), 
+               layout(title = paste0(input$indic_trend), margin = list(t = 140)), 
              file = file)
     })
   
-#####################################.       
+###############################################.       
 #### Rank plot ----
 ###############################################.   
 #####################.
