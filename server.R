@@ -1141,51 +1141,32 @@ showModal(welcome_modal)
     trend <- trend[order(trend$year),] #Needs to be sorted by year for Plotly
   })
   
+  ###############################################.
+  # Clearing filters if no data available at that geographic level 
+  observeEvent(input$indic_trend, {
+    if (!("Health board" %in% unique(trend_data()$areatype)) ) {
+      updateSelectInput(session, "hbname_trend", selected = character(0))
+    }
+    if (!("Council area" %in% unique(trend_data()$areatype)) ) {
+      updateSelectInput(session, "caname_trend", selected = character(0))
+    }
+    if (!("Alcohol & drug partnership" %in% unique(trend_data()$areatype)) ) {
+      updateSelectInput(session, "adpname_trend", selected = character(0))
+    }
+    if (!("HSC locality" %in% unique(trend_data()$areatype)) ) {
+      updateSelectInput(session, "locname_trend", selected = character(0))
+    }
+    if (!("HSC partnership" %in% unique(trend_data()$areatype)) ) {
+      updateSelectInput(session, "partname_trend", selected = character(0))
+    }
+    if (!("Intermediate zone" %in% unique(trend_data()$areatype)) ) {
+      updateSelectInput(session, "izname_trend", selected = character(0))
+    }
+
+  })
+  
 #####################.
 # Creating plot
-  #Function to create palette for trend plot
-  create_trendpalette <- function(){
-    #Creating palette of colors with a tone for each geography type
-    #First obtaining length of each geography type
-    hb_length <- length(input$hbname_trend)
-    ca_length <- length(input$caname_trend)
-    scot_length <- length(input$scotname_trend)
-    adp_length <- length(input$adpname_trend)
-    part_length <- length(input$partname_trend)
-    loc_length <- length(input$locname_trend)
-    iz_length <- length(input$izname_trend)
-    colorblind_length <- hb_length+ca_length+scot_length+adp_length+part_length+
-      loc_length+iz_length
-    
-    #Then creating a gradient scale for each geography type based on its length
-    hb_scale <- scales::seq_gradient_pal("#08519c", "#9ecae1", "Lab")(seq(0,1,length.out=hb_length))
-    ca_scale <- scales::seq_gradient_pal("#006d2c", "#a1d99b", "Lab")(seq(0,1,length.out=ca_length))
-    scot_scale <- scales::seq_gradient_pal("#000000", "#000000", "Lab")(seq(0,1,length.out=scot_length))
-    adp_scale <- scales::seq_gradient_pal("#FF0000", "#ffd6cc", "Lab")(seq(0,1,length.out=adp_length))
-    part_scale <- scales::seq_gradient_pal("#FF0000", "#ffd6cc", "Lab")(seq(0,1,length.out=part_length))
-    loc_scale <- scales::seq_gradient_pal("#dadaeb", "#54278f", "Lab")(seq(0,1,length.out=loc_length))
-    iz_scale <- scales::seq_gradient_pal("#ffff66", "#4d4d00", "Lab")(seq(0,1,length.out=iz_length))
-    colorblind_scale <- scales::seq_gradient_pal("#08306b", "#deebf7", "Lab")(seq(0,1,length.out=colorblind_length))
-    
-    #Then creating vector for each geography type with area names and color
-    scot_cols <- setNames(scot_scale, unique(trend_data()$areaname_full[trend_data()$areatype == "Scotland"]))
-    hb_cols <- setNames(hb_scale, unique(trend_data()$areaname_full[trend_data()$areatype == "Health board"]))
-    ca_cols <- setNames(ca_scale, unique(trend_data()$areaname_full[trend_data()$areatype == "Council area"]))
-    adp_cols <- setNames(adp_scale, unique(trend_data()$areaname_full[trend_data()$areatype == "Alcohol & drug partnership"]))
-    part_cols <- setNames(part_scale, unique(trend_data()$areaname_full[trend_data()$areatype == "HSC partnership"]))
-    loc_cols <- setNames(loc_scale, unique(trend_data()$areaname_full[trend_data()$areatype == "HSC locality"]))
-    iz_cols <- setNames(iz_scale, unique(trend_data()$areaname_full[trend_data()$areatype == "Intermediate zone"]))
-    colorblind_cols <- c(setNames(colorblind_scale, unique(trend_data()$areaname_full)))
-    
-    #Combining them all in the final palette. Using different palette if colour bling option checked
-    if(input$colorblind_trend == FALSE){
-      trend_col <- c(scot_cols, hb_cols, ca_cols, adp_cols, part_cols, loc_cols, iz_cols)
-    }
-    else{
-      trend_col <- colorblind_cols
-    }
-  }
-  
   #####################.
   # titles 
   output$title_trend <- renderText(paste0(input$indic_trend))
@@ -1200,8 +1181,22 @@ showModal(welcome_modal)
     }
     else { #If data is available then plot it
       
-      #Creating palette of colors with a tone for each geography type
-      trend_col <-create_trendpalette()
+      #Creating palette of colors: colorblind proof
+      #First obtaining length of each geography type, if more than 6, then 6, 
+      # this avoids issues. Extra selections will not be plotted
+      trend_length <- ifelse(length(input$scotname_trend)+length(input$hbname_trend)+ length(input$caname_trend)+
+        length(input$adpname_trend)+length(input$partname_trend)+
+        length(input$locname_trend)+length(input$izname_trend) > 6, 6,
+          length(input$scotname_trend)+length(input$hbname_trend)+ length(input$caname_trend)+
+          length(input$adpname_trend)+length(input$partname_trend)+
+          length(input$locname_trend)+length(input$izname_trend))
+      
+      # First define the palette of colours used, then set a named vector, so each color
+      # gets assigned to an area. I think is based on the order in the dataset, which
+      # helps because Scotland is always first so always black.
+      trend_palette <- c("#000000", "#a6cee3", "#1f78b4", "#b2df8a", "#33a02c", "#fb9a99")
+      trend_scale <- c(setNames(trend_palette, unique(trend_data()$areaname_full[1:trend_length])))
+      trend_col <- trend_scale[1:trend_length]
       
       #Text for tooltip
       tooltip_trend <- c(paste0(trend_data()$areaname, "<br>", trend_data()$trend_axis,
@@ -1214,11 +1209,12 @@ showModal(welcome_modal)
                               color = ~areaname_full, colors = trend_col) %>% 
         #Layout 
         layout(annotations = list(), #It needs this because of a buggy behaviour of Plotly
-               margin = list(b = 130, t=5), #to avoid labels getting cut out
+               margin = list(b = 160, t=5), #to avoid labels getting cut out
                yaxis = list(title = ~type_definition, rangemode="tozero", fixedrange=TRUE,
                             size = 4, titlefont =list(size=14), tickfont =list(size=14)), 
                xaxis = list(title = FALSE, tickfont =list(size=14), tickangle = 270, fixedrange=TRUE),
                font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif'),
+               showlegend = TRUE,
                legend = list(orientation = 'h', x = 0, y = 1.18)) %>%  
         config(displayModeBar = FALSE, displaylogo = F, collaborate=F, editable =F) # taking out plotly logo and collaborate button
 
