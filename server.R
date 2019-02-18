@@ -1186,15 +1186,13 @@ showModal(welcome_modal)
     }
   }
   
-  #Title of plot
-
-  
   #####################.
   # titles 
   output$title_trend <- renderText(paste0(input$indic_trend))
-
-#Plot 
-  output$trend_plot <- renderPlotly({
+  
+  #####################.
+  #Plot 
+  plot_trend_chart <- function() {
     #If no data available for that period then plot message saying data is missing
     if (is.data.frame(trend_data()) && nrow(trend_data()) == 0)
     {
@@ -1206,14 +1204,14 @@ showModal(welcome_modal)
       trend_col <-create_trendpalette()
       
       #Text for tooltip
-      tooltip_trend <- c(paste0(trend_data()$areaname, "<br>", trend_data()$year,
+      tooltip_trend <- c(paste0(trend_data()$areaname, "<br>", trend_data()$trend_axis,
                                 "<br>", trend_data()$measure))
       
       #Creating time trend plot
       trend_plot <-   plot_ly(data=trend_data(), x=~trend_axis,  y = ~measure, 
-                text=tooltip_trend, hoverinfo="text",
-                type = 'scatter', mode = 'lines+markers',
-                color = ~areaname_full, colors = trend_col) %>% 
+                              text=tooltip_trend, hoverinfo="text",
+                              type = 'scatter', mode = 'lines+markers',
+                              color = ~areaname_full, colors = trend_col) %>% 
         #Layout 
         layout(annotations = list(), #It needs this because of a buggy behaviour of Plotly
                margin = list(b = 160, t=5), #to avoid labels getting cut out
@@ -1233,49 +1231,12 @@ showModal(welcome_modal)
         trend_plot
       }
     }
-  }) 
+  }
+  # Creating plot for ui side
+  output$trend_plot <- renderPlotly({ plot_trend_chart()  }) 
   
 #####################.
 # Downloading data and plot
-  #Function in ggplot to be able to save chart
-  plot_trend_ggplot <- function(){
-    
-    trend_col <- create_trendpalette() #palette
-
-    #Creating time trend plot
-    trend_plot <- ggplot(data=trend_data(), aes(y = measure,  x = trend_axis, group = areaname_full))+
-      geom_line(aes(color=areaname_full))+
-      geom_point(aes(color=areaname_full))+
-      labs(title=title_wrapper(paste0(input$indic_trend), width = 40), 
-           y = unique(trend_data()$type_definition))+
-      scale_color_manual(values=trend_col, name = "")+
-      #Layout
-      theme(text = element_text(size=11, family="Helvetica Neue,Helvetica,Arial,sans-serif"),
-            axis.text.x = element_text(angle=90),
-            axis.line.x = element_line(),
-            axis.ticks = element_blank(),
-            aspect.ratio=0.3,
-            plot.title = element_text(hjust = 0.5), #centering title
-            axis.title.x = element_blank(), #taking out y axis title
-            legend.key=element_blank(), #taking out background from legend
-            panel.grid.major = element_line(colour="#F0F0F0"),#grid lines
-            panel.background = element_blank() #Blanking background
-      )
-    
-    #Adding confidence intervals depending on user input
-    if (input$ci_trend == TRUE) {
-      trend_plot +
-        geom_ribbon(aes(ymin = lowci, ymax = upci, alpha = 0.2, 
-                        color=areaname_full, fill = areaname_full), 
-                    show.legend=F) +
-        scale_y_continuous(expand = c(0, 2), limits=c(0, max(trend_data()$upci)+ (max(trend_data()$upci)/100)))+
-        scale_fill_manual(values=trend_col, name = "")
-    } else if (input$ci_trend == FALSE) {
-      trend_plot +
-        scale_y_continuous(expand = c(0, 2), limits=c(0, max(trend_data()$measure)+ (max(trend_data()$measure)/100)))
-    }
-  } 
-  
   #Downloading data
   trend_csv <- reactive({ format_csv(trend_data()) })
   
@@ -1286,7 +1247,9 @@ showModal(welcome_modal)
   output$download_trendplot <- downloadHandler(
     filename = 'trend.png',
     content = function(file){
-      ggsave(file, plot = plot_trend_ggplot(), device = "png", scale=6, limitsize=FALSE)
+      export(p = plot_trend_chart() %>% 
+               layout(title = paste0(input$indic_trend), margin = list(t = 100)), 
+             file = file)
     })
   
 #####################################.       
