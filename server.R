@@ -1199,6 +1199,10 @@ showModal(welcome_modal)
       tooltip_trend <- c(paste0(trend_data()$areaname, "<br>", trend_data()$trend_axis,
                                 "<br>", trend_data()$measure))
       
+      # y axis title
+      yaxis_title <- case_when(input$var_plot_trend == "measure" ~ paste0(unique(trend_data()$type_definition)), 
+                               input$var_plot_trend == "numerator" ~ "Number")
+      
       #Creating time trend plot
       trend_plot <- plot_ly(data=trend_data(), x=~trend_axis,  y = ~get(input$var_plot_trend),
                             color = ~areaname_full, colors = trend_col, 
@@ -1208,7 +1212,7 @@ showModal(welcome_modal)
         #Layout 
         layout(annotations = list(), #It needs this because of a buggy behaviour of Plotly
                margin = list(b = 160, t=5), #to avoid labels getting cut out
-               yaxis = list(title = ~type_definition, rangemode="tozero", fixedrange=TRUE,
+               yaxis = list(title = yaxis_title, rangemode="tozero", fixedrange=TRUE,
                             size = 4, titlefont =list(size=14), tickfont =list(size=14)),
                xaxis = list(title = FALSE, tickfont =list(size=14), tickangle = 270, fixedrange=TRUE),
                font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif'),
