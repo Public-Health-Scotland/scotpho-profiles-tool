@@ -1062,22 +1062,23 @@ showModal(welcome_modal)
 # Reactive controls
   #Controls for chart. Dynamic selection of locality and iz.
   output$loc_ui_trend <- renderUI({
-    selectInput("locname_trend", "HSC locality", 
+    selectizeInput("locname_trend", "HSC locality", 
                 choices = c("Select localities" = "", paste(unique(geo_lookup$areaname[
                   geo_lookup$parent_area == input$loc_iz_trend &
                     geo_lookup$areatype == 'HSC locality' ]))),
-                multiple=TRUE, selectize=TRUE, selected = "")
+                multiple=TRUE, selected = "")
   })
 
   output$iz_ui_trend <- renderUI({
-    selectInput("izname_trend", "Intermediate zone", 
+    selectizeInput("izname_trend", "Intermediate zone", 
                 choices = c("Select intermediate zones" = "", 
                             paste(unique(geo_lookup$areaname[
                   geo_lookup$parent_area == input$loc_iz_trend &
                     geo_lookup$areatype == 'Intermediate zone' ]))),
-                multiple=TRUE, selectize=TRUE, selected = "")
+                multiple=TRUE, selected = "")
   })
   
+
   ###############################################.
   # disabling controls if no data available for a type of geography
   
@@ -1107,8 +1108,15 @@ showModal(welcome_modal)
     
     toggleState("hbname_trend",
                 condition = ("Health board" %in%  unique(trend$areatype)))
+    
+    toggleState("var_plot_trend",
+                condition = all(is.na(trend_data()$numerator)) == FALSE)
+    
+    if (all(is.na(trend_data()$numerator)) == TRUE & input$var_plot_trend == "numerator") {
+      updateAwesomeRadio(session, "var_plot_trend", selected = "measure")
+    }
   })
-  
+
   ###############################################.
   # Indicator definitions
   #Subsetting by domain and profile. Profile is fiddly as vector uses abbreviations 
@@ -1135,34 +1143,14 @@ showModal(welcome_modal)
                areaname %in% input$partname_trend & areatype == "HSC partnership"   |
                areaname %in% input$izname_trend & areatype == "Intermediate zone") & 
                indicator == input$indic_trend) %>% 
-      droplevels() 
-    
-    trend$areaname_full <- as.factor(trend$areaname_full)
-    trend <- trend[order(trend$year),] #Needs to be sorted by year for Plotly
-  })
-  
-  ###############################################.
-  # Clearing filters if no data available at that geographic level 
-  observeEvent(input$indic_trend, {
-    if (!("Health board" %in% unique(trend_data()$areatype)) ) {
-      updateSelectInput(session, "hbname_trend", selected = character(0))
-    }
-    if (!("Council area" %in% unique(trend_data()$areatype)) ) {
-      updateSelectInput(session, "caname_trend", selected = character(0))
-    }
-    if (!("Alcohol & drug partnership" %in% unique(trend_data()$areatype)) ) {
-      updateSelectInput(session, "adpname_trend", selected = character(0))
-    }
-    if (!("HSC locality" %in% unique(trend_data()$areatype)) ) {
-      updateSelectInput(session, "locname_trend", selected = character(0))
-    }
-    if (!("HSC partnership" %in% unique(trend_data()$areatype)) ) {
-      updateSelectInput(session, "partname_trend", selected = character(0))
-    }
-    if (!("Intermediate zone" %in% unique(trend_data()$areatype)) ) {
-      updateSelectInput(session, "izname_trend", selected = character(0))
-    }
-
+      droplevels() %>% 
+      mutate(areaname_full = as.factor(areaname_full),
+             # adjusting levels of areatype, so Scotland always plotted as black
+             areatype = factor(areatype,
+                               levels = c("Scotland", "Health board ", "Council area",
+                                          "Alcohol & drug partnership", "HSC partnership",
+                                          "HSC locality", "Intermediate zone"))) %>% 
+      arrange(year, areatype, areaname_full) #Needs to be sorted by year for Plotly
   })
   
 #####################.
@@ -1175,18 +1163,19 @@ showModal(welcome_modal)
   #Plot 
   plot_trend_chart <- function() {
     #If no data available for that period then plot message saying data is missing
-    if (is.data.frame(trend_data()) && nrow(trend_data()) == 0)
+    # Also if numerator is all NA
+    if (is.data.frame(trend_data()) && nrow(trend_data()) == 0  |
+        (all(is.na(trend_data()$numerator)) == TRUE & input$var_plot_trend == "numerator"))
     {
       plot_nodata()
-    }
-    else { #If data is available then plot it
+    } else { #If data is available then plot it
       
       #Creating palette of colors: colorblind proof
       #First obtaining length of each geography type, if more than 6, then 6, 
       # this avoids issues. Extra selections will not be plotted
       trend_length <- ifelse(length(input$scotname_trend)+length(input$hbname_trend)+ length(input$caname_trend)+
         length(input$adpname_trend)+length(input$partname_trend)+
-        length(input$locname_trend)+length(input$izname_trend) > 6, 6,
+        length(input$locname_trend)+length(input$izname_trend) > 12, 12,
           length(input$scotname_trend)+length(input$hbname_trend)+ length(input$caname_trend)+
           length(input$adpname_trend)+length(input$partname_trend)+
           length(input$locname_trend)+length(input$izname_trend))
@@ -1194,32 +1183,41 @@ showModal(welcome_modal)
       # First define the palette of colours used, then set a named vector, so each color
       # gets assigned to an area. I think is based on the order in the dataset, which
       # helps because Scotland is always first so always black.
-      trend_palette <- c("#000000", "#a6cee3", "#1f78b4", "#b2df8a", "#33a02c", "#fb9a99")
-      trend_scale <- c(setNames(trend_palette, unique(trend_data()$areaname_full[1:trend_length])))
+      trend_palette <- c("#000000", "#a6cee3", "#1f78b4", "#b2df8a", "#33a02c", "#fb9a99",
+                         "#e31a1c", "#fdbf6f", "#ff7f00", "#cab2d6", "#6a3d9a", "#b15928")
+      
+      trend_scale <- c(setNames(trend_palette, unique(trend_data()$areaname_full)[1:trend_length]))
       trend_col <- trend_scale[1:trend_length]
+      
+      # Same approach for symbols
+      symbols_palette <-  c('circle', 'diamond', 'circle', 'diamond', 'circle', 'diamond',
+                          'square','triangle-up', 'square','triangle-up', 'square','triangle-up')
+      symbols_scale <- c(setNames(symbols_palette, unique(trend_data()$areaname_full)[1:trend_length]))
+      symbols_trend <- symbols_scale[1:trend_length]
       
       #Text for tooltip
       tooltip_trend <- c(paste0(trend_data()$areaname, "<br>", trend_data()$trend_axis,
                                 "<br>", trend_data()$measure))
       
       #Creating time trend plot
-      trend_plot <-   plot_ly(data=trend_data(), x=~trend_axis,  y = ~measure, 
-                              text=tooltip_trend, hoverinfo="text", height = 600,
-                              type = 'scatter', mode = 'lines+markers',
-                              color = ~areaname_full, colors = trend_col) %>% 
+      trend_plot <- plot_ly(data=trend_data(), x=~trend_axis,  y = ~get(input$var_plot_trend),
+                            color = ~areaname_full, colors = trend_col, 
+                            text=tooltip_trend, hoverinfo="text", height = 600 ) %>% 
+        add_trace(type = 'scatter', mode = 'lines+markers', marker = list(size = 8),
+                  symbol = ~areaname_full, symbols = symbols_trend) %>% 
         #Layout 
         layout(annotations = list(), #It needs this because of a buggy behaviour of Plotly
                margin = list(b = 160, t=5), #to avoid labels getting cut out
                yaxis = list(title = ~type_definition, rangemode="tozero", fixedrange=TRUE,
-                            size = 4, titlefont =list(size=14), tickfont =list(size=14)), 
+                            size = 4, titlefont =list(size=14), tickfont =list(size=14)),
                xaxis = list(title = FALSE, tickfont =list(size=14), tickangle = 270, fixedrange=TRUE),
                font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif'),
                showlegend = TRUE,
-               legend = list(orientation = 'h', x = 0, y = 1.18)) %>%  
+               legend = list(orientation = 'h', x = 0, y = 1.18)) %>%  #legend on top
         config(displayModeBar = FALSE, displaylogo = F, collaborate=F, editable =F) # taking out plotly logo and collaborate button
 
       #Adding confidence intervals depending on user input
-      if (input$ci_trend == TRUE) {
+      if (input$ci_trend == TRUE & input$var_plot_trend != "Numerator") {
         trend_plot %>% 
           add_ribbons(data = trend_data(), ymin = ~lowci, ymax = ~upci, showlegend = F,
                       opacity = 0.2) 
