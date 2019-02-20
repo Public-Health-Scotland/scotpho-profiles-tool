@@ -2014,20 +2014,59 @@ showModal(welcome_modal)
   )
   
   #################################################.
-  ##  Technical Doc Page
-  #################################################
+  ##  Technical Doc Page ----
+  #################################################.
+  # Reactive data
   indicator_selected <- reactive({ filter(techdoc,techdoc$indicator_name==input$indicator_defined)})
   
-  output$indicator <- renderValueBox({
-    #valueBox("Definition", definitions$indicator_definition[definitions$indicator_name==input$indicator_defined], icon = icon ("book"),color = "blue", width = 8)
+  ###############################################.
+  # Reactive filter
+  #Filter indicator list by  profile or by domain 
+  output$indicator_chosen <- renderUI ({
+
+    if (input$profile_defined != "Show all"){
+      indic_selection <- sort(unique(c(as.character(optdata$indicator[grep(input$profile_defined,optdata$profile_domain1)]),
+                                       as.character(optdata$indicator[grep(input$profile_defined,optdata$profile_domain2)] ))))
+    } else if (input$topic_defined != "Show all"){
+      indic_selection <- sort(unique(optdata$indicator[optdata$domain1==input$topic_defined|
+                                                         optdata$domain2==input$topic_defined|
+                                                         optdata$domain3==input$topic_defined]))
+    } else { 
+      indic_selection <- indicator_list
+      }
     
-    valueBox(tags$p(indicator_selected()$indicator_name, style="color: white; font-size: 30px; font-weight: bold;"), HTML(paste("<b>","Indicator number:","</b>",indicator_selected()$indicator_number,br(),"<b>","Profile:","</b>",indicator_selected()$profile,br(),
-                                                                                                                                "<b>","Domain:","</b>",indicator_selected()$domain)), icon = icon ("book"),color = "blue")
-    
-  })
-  #  valueBox(tags$p(techdoc$indicator_name[techdoc$indicator_name==input$indicator_defined], style="color: white; font-size: 30px; font-weight: bold;"), HTML(paste("<b>","Indicator number:","</b>",techdoc$indicator_number[techdoc$indicator_name==input$indicator_defined],br(),"<b>","Profile:","</b>",techdoc$profile[techdoc$indicator_name==input$indicator_defined])), icon = icon ("book"),color = "blue")
+    selectizeInput("indicator_defined", label = "Select indicator to see technical information for",
+                   width = "510px", choices = indic_selection, 
+                   selected = character(0), multiple=TRUE, 
+                   options = list(placeholder = "Select your indicator of interest", maxItems = 1)) 
+  }) 
   
-  #  })
+  #To keep it simple, when you change profile, reset topic and vice versa.
+  observeEvent(input$profile_defined, { 
+    if (input$topic_defined != "Show all" && input$profile_defined != "Show all"){ 
+      updateSelectizeInput(session,"topic_defined", label = "Or by domain",
+                           choices = topic_list_filter, selected = "Show all")
+    }
+  })
+  
+  observeEvent(input$topic_defined, { 
+    if (input$profile_defined != "Show all" && input$topic_defined != "Show all"){ 
+      updateSelectizeInput(session,"profile_defined", label = "Filter by profile",
+                           choices = profile_list_filter, selected = "Show all")
+    }
+  })
+  
+  ###############################################.
+  # Creating text and titles for info
+  # Title box
+  output$indicator <- renderValueBox({
+
+    valueBox(tags$p(indicator_selected()$indicator_name, style="color: white; font-size: 30px; font-weight: bold;"), 
+             HTML(paste("<b>","Profile:","</b>",indicator_selected()$profile,br(),
+                        "<b>","Domain:","</b>",indicator_selected()$domain)), icon = icon ("book"),color = "blue")
+  })
+
+  # Text for all metadata parts of the indicator
   output$definition <- renderText ({indicator_selected()$indicator_definition })
   output$rationale <- renderText ({ indicator_selected()$inclusion_rationale})
   output$source <- renderText ({indicator_selected()$data_source})
@@ -2052,34 +2091,12 @@ showModal(welcome_modal)
   output$supporting_info <- renderText ({indicator_selected()$supporting_information})
   output$next_update <- renderText ({indicator_selected()$next_update})
   
-  #Filter indicator list by  profile or by domain
-  profile_filtered_list <- reactive({ sort(unique(c(as.character(optdata$indicator[grep(input$profile_defined,optdata$profile_domain1)]),as.character(optdata$indicator[grep(input$profile_defined,optdata$profile_domain2)] )))) })
-  topic_filtered_list <- reactive({ sort(unique(optdata$indicator[optdata$domain1==input$topic_defined|optdata$domain2==input$topic_defined|optdata$domain3==input$topic_defined])) })
-  
-  output$indicator_chosen <- renderUI ({ 
-    if (input$profile_defined != "Show all"){ selectizeInput("indicator_defined", label = "Select indicator to see technical information for",
-                                                             width = "510px", choices = profile_filtered_list(), selected = character(0), multiple=TRUE, options = list(placeholder = "Select your indicator of interest", maxItems = 1)) 
-    } else if (input$topic_defined != "Show all"){ selectizeInput("indicator_defined", label = "Select indicator to see technical information for",
-                                                                  width = "510px", choices = topic_filtered_list(), selected = character(0), multiple=TRUE, options = list(placeholder = "Select your indicator of interest", maxItems = 1)) 
-      
-    } else {selectizeInput("indicator_defined", label = "Select indicator to see technical information for",
-                           width = "510px", choices = indicator_list, selected = character(0), multiple=TRUE, options = list(placeholder = "Select your indicator of interest", maxItems = 1))}
-  }) 
-  
-  #To keep it simple, when you change profile, reset topic and vice versa.
-  observeEvent(input$profile_defined, { 
-    if (input$topic_defined != "Show all" && input$profile_defined != "Show all"){ updateSelectizeInput(session,"topic_defined", label = "Or by Topic",
-                                                                                                        choices = topic_list_filter, selected = "Show all")}
-  })
-  observeEvent(input$topic_defined, { 
-    if (input$profile_defined != "Show all" && input$topic_defined != "Show all"){ updateSelectizeInput(session,"profile_defined", label = "Filter by Profile",
-                                                                                                        choices = profile_list_filter, selected = "Show all")}
-  })
-  
+
+  ###############################################.
   #Download definitions table for selected indicator
-  
   indicator_definitions <- reactive({ techdoc %>% filter(indicator_name == input$indicator_defined)})
   indicator_csv <- reactive({ format_definitions_csv(indicator_definitions()) })
+  
   output$definitions_by_indicator <- downloadHandler(
     filename ="indicator_definitions.csv",
     content = function(file) {
@@ -2087,9 +2104,9 @@ showModal(welcome_modal)
                 file, row.names=FALSE) } 
   )
   
-  ########################
-  #Re-open Modal
-  ########################
+  ########################.
+  #Re-open Modal ----
+  ########################.
   
   observeEvent(input$openModal, {
     showModal(

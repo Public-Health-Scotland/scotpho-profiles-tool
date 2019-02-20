@@ -96,8 +96,8 @@ tagList( #needed for shinyjs
                #landing-page icons
                ".icon-lp{font-size: 1.3em; padding-right: 4px;}",
                #to avoid red text error messages in the whole app, take out for testing
-               ".shiny-output-error { visibility: hidden; }",
-               ".shiny-output-error:before { visibility: hidden; }",
+               # ".shiny-output-error { visibility: hidden; }",
+               # ".shiny-output-error:before { visibility: hidden; }",
                #External links underlined an open a new tab
                ".externallink{text-decoration: underline;} ",
                ".definitionbox {width:100%; height:100%; text-align:left ;background-color:white;
@@ -621,28 +621,24 @@ navbarMenu("Info", icon = icon("info-circle"),
            tabPanel("Indicator definitions", value = "definition",
                     #Sidepanel for filtering data
                     fluidRow(
-                      column(width = 5, offset= 1, #align="center"#style="margin-left:0.5%; margin-right:0.5%",
-                             #fluidRow(
+                      column(width = 5, offset= 1,
                              p("Indicator definitions and technical information", style = "font-weight: bold; color: black;"),
-                             div(style="display:inline-block",selectizeInput("profile_defined", label = "Filter by Profile",
-                                                                             width = "250px", choices = profile_list_filter, selected = "Show all", multiple=FALSE)),
-                             div(style="display:inline-block", selectizeInput("topic_defined", label = "Or by Topic",
-                                                                              width = "250px", choices = topic_list_filter, selected = "Show all", multiple=FALSE)),
-                             br(),
-                             uiOutput("indicator_chosen"),
-                             #selectizeInput("indicator_defined", label = "Select indicator to see technical information for",
-                             #              width = "510px", choices = indicator_list, selected = character(0), multiple=TRUE, options = list(placeholder = "Select your indicator of interest", maxItems = 1)),
-                             br(),br()
+                             div(style="display:inline-block",
+                                 selectizeInput("profile_defined", label = "Filter by Profile",
+                                                width = "250px", choices = profile_list_filter, 
+                                                selected = "Show all", multiple=FALSE)),
+                             div(style="display:inline-block", 
+                                 selectizeInput("topic_defined", label = "Or by Topic",
+                                                width = "250px", choices = topic_list_filter, 
+                                                selected = "Show all", multiple=FALSE)),
+                             uiOutput("indicator_chosen")
                       ), # column bracket 
                       column(width=6,
                              br(), br(), br(),
-                             # div(style="display:inline-block", downloadButton("definitions_by_profile", 'Download selected profile definitions', class = "down")),
-                             #div(style="display:inline-block", downloadButton("definitions_by_domain", 'Download selected topic definitions', class = "down")),
-                             br(), br(), downloadButton("definitions_by_indicator", 'Download indicator definition', class = "down")
+                             downloadButton("definitions_by_indicator", 
+                                            'Download indicator definition', class = "down")
                       )#column bracket
-                      
                     ), #fluidRow bracket
-                    
                     fluidRow(      
                       column(width=10, offset=1,
                              useShinydashboard(),
@@ -723,10 +719,7 @@ navbarMenu("Info", icon = icon("info-circle"),
                                    h5(textOutput("next_update")))
                              ) #conditional Panel bracket 
                       )  #column bracket
-                      
-                      # )#column bracket
                     )#fluidRow bracket
-                    
            ), #Tab panel bracket             
 ###############################################.             
 ##############Resources----    
