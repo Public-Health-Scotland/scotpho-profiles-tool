@@ -1782,235 +1782,192 @@ showModal(welcome_modal)
   
   #####################################.      
   #### Table ----
-  #####################################.      
+  #####################################. 
+  # Reactive data for IZ and locality filters
   #Filter iz_list and hscl list by parent area selection
-  interzone_filtered <- reactive({ sort(parent_iz_list$areaname[parent_iz_list$parent_area==input$iz_parent]) })
-  hsclocality_filtered <- reactive({ sort(parent_hscl_list$areaname[parent_hscl_list$parent_area==input$hscl_parent]) })
+  interzone_filtered <- reactive({ 
+    sort(parent_iz_list$areaname[parent_iz_list$parent_area==input$iz_parent]) 
+    })
   
+  hsclocality_filtered <- reactive({ 
+    sort(parent_hscl_list$areaname[parent_hscl_list$parent_area==input$hscl_parent]) 
+    })
+  
+  ###############################################.
+  # Reactive filters 
   #Filter IZ's by Parent area
   
   output$iz_filtered <- renderUI ({ 
-    if (input$iz_parent == "Show all"){ selectizeInput("iz_true", label = NULL,
-                                                       width = "229px", choices = intzone_name, selected = NULL, multiple=TRUE, options = list(maxOptions = 1300, placeholder = "Select or type specific intermediate zone")) 
-    } else {selectizeInput("iz_true", label = NULL,
-                           width = "229px", choices = interzone_filtered(), selected = NULL, multiple=TRUE, options = list(placeholder = "Select or type specific intermediate zone"))}
+    
+    if (input$iz_parent == "Show all"){ 
+      choices_selected <- intzone_name
+    } else { # if a partnership selected reduce the list of IZs shown
+      choices_selected <- interzone_filtered()
+    }
+    
+    selectizeInput("iz_true", label = NULL, width = "229px", choices = choices_selected, 
+                   selected = NULL, multiple=TRUE, options = list(maxOptions = 1300, 
+                      placeholder = "Select or type specific intermediate zone"))
   }) 
   
+  #Filter HSCL's by parent area
+  output$hscl_filtered <- renderUI ({ 
+    if (input$hscl_parent == "Show all"){ 
+      choices_selected <- locality_name
+    } else {  # if a partnership selected reduce the list of localities shown
+      choices_selected <- hsclocality_filtered()
+    }
+    selectizeInput(
+      "hscl_true", label = NULL, width = "229px", choices = choices_selected, 
+      selected = NULL, multiple=TRUE, options = 
+        list(placeholder = "Select or type specific HSC locality"))
+  }) 
+  
+  #########.
+  #Clearing and modifying inputs through observes
   #select all IZ's belonging to a certain parent-area
   observe({
     if (input$iz_parent_all == "FALSE")
-      return(if (input$iz_parent == "Show all"){ updateSelectizeInput(session,"iz_true", label = NULL,
-                                                                      choices = intzone_name, selected = character(0), options = list(maxOptions = 1300, placeholder = "Select or type specific intermediate zone")) 
-      } else {updateSelectizeInput(session,"iz_true", label = NULL,
-                                   choices = interzone_filtered(), selected = character(0), options = list(placeholder = "Select or type specific intermediate zone")) })
+      return(if (input$iz_parent == "Show all"){ 
+        
+        updateSelectizeInput(session,"iz_true", label = NULL,
+          choices = intzone_name, selected = character(0), 
+          options = list(maxOptions = 1300, 
+                       placeholder = "Select or type specific intermediate zone")) 
+      } else {
+        updateSelectizeInput(
+          session,"iz_true", label = NULL, choices = interzone_filtered(), 
+          selected = character(0), options = 
+            list(placeholder = "Select or type specific intermediate zone")) 
+        }
+      ) #return bracket
     
     isolate({
-      updateSelectizeInput(session, "iz_true", label = NULL,
-                           choices = intzone_name, selected = interzone_filtered(), options = list(placeholder = "Select or type specific intermediate zone")) })
-  })
+      updateSelectizeInput(
+        session, "iz_true", label = NULL, choices = intzone_name, 
+        selected = interzone_filtered(), options = 
+          list(placeholder = "Select or type specific intermediate zone")) })
+  })#end of observe
   
-  #when you change initial filter, clear the second list of geographies anc checkbox
+  #when you change initial filter, clear the second list of geographies and checkbox
   observeEvent(input$iz_parent, {
-    updateCheckboxInput(session, "iz_parent_all", label = NULL, value = FALSE)
-    if (input$iz_parent == "Show all"){ selectizeInput("iz_true", label = NULL,
-                                                       width = "229px", choices = intzone_name, selected = NULL, multiple=TRUE, options = list(maxOptions = 1300, placeholder = "Select or type specific intermediate zone")) 
-    } else {selectizeInput("iz_true", label = NULL,
-                           choices = interzone_filtered(), selected = character(0), multiple=TRUE, options = list(placeholder = "Select or type specific intermediate zone"))}
     
+    updateCheckboxInput(session, "iz_parent_all", label = NULL, value = FALSE)
+    
+    if (input$iz_parent == "Show all"){ 
+      selectizeInput(
+        "iz_true", label = NULL, width = "229px", 
+        choices = intzone_name, selected = NULL, multiple=TRUE, options = 
+          list(maxOptions = 1300, placeholder = "Select or type specific intermediate zone")) 
+    } else {
+      selectizeInput(
+        "iz_true", label = NULL, choices = interzone_filtered(), 
+        selected = character(0), multiple=TRUE, options =
+          list(placeholder = "Select or type specific intermediate zone"))
+      }
   })
   
-  #Filter HSCL's by parent area
-  
-  output$hscl_filtered <- renderUI ({ 
-    if (input$hscl_parent == "Show all"){ selectizeInput("hscl_true", label = NULL,
-                                                         width = "229px", choices = locality_name, selected = NULL, multiple=TRUE, options = list(maxOptions = 1300, placeholder = "Select or type specific HSC locality")) 
-    } else {selectizeInput("hscl_true", label = NULL,
-                           width = "229px", choices = hsclocality_filtered(), selected = NULL, multiple=TRUE, options = list(placeholder = "Select or type specific HSC locality"))}
-  }) 
-  
+
   #select all IZ's belonging to a certain parent-area
   observe({
     if (input$hscl_parent_all == "FALSE")
-      return(if (input$hscl_parent == "Show all"){ updateSelectizeInput(session,"hscl_true", label = NULL,
-                                                                        choices = locality_name, selected = character(0), options = list(maxOptions = 1300, placeholder = "Select or type specific HSC locality")) 
-      } else {updateSelectizeInput(session,"hscl_true", label = NULL,
-                                   choices = hsclocality_filtered(), selected = character(0), options = list(placeholder = "Select or type specific HSC locality"))})
+      return(if (input$hscl_parent == "Show all"){ 
+        updateSelectizeInput(
+          session,"hscl_true", label = NULL,choices = locality_name, 
+          selected = character(0), options = 
+            list(maxOptions = 1300, placeholder = "Select or type specific HSC locality")) 
+      } else {
+        updateSelectizeInput(
+          session,"hscl_true", label = NULL, choices = hsclocality_filtered(), 
+          selected = character(0), options = 
+            list(placeholder = "Select or type specific HSC locality"))
+        }
+      ) #return bracket
     
     isolate({
-      updateSelectizeInput(session, "hscl_true", label = NULL,
-                           choices = locality_name, selected = hsclocality_filtered(),options = list(placeholder = "Select or type specific HSC locality")) })
-  })
+      updateSelectizeInput(
+        session, "hscl_true", label = NULL, choices = locality_name, 
+        selected = hsclocality_filtered(), options = 
+          list(placeholder = "Select or type specific HSC locality")) 
+      })
+  }) #end of observe
   
   #when you change initial filter, clear the second list of geographies anc checkbox
   observeEvent(input$hscl_parent, {
     updateCheckboxInput(session, "hscl_parent_all", label = NULL, value = FALSE)
-    if (input$hscl_parent == "Show all"){ selectizeInput("hscl_true", label = NULL,
-                                                         width = "229px", choices = locality_name, selected = NULL, multiple=TRUE, options = list(maxOptions = 1300, placeholder = "Select or type specific HSC locality")) 
-    } else {selectizeInput("hscl_true", label = NULL,
-                           choices = hsclocality_filtered(), selected = character(0), multiple=TRUE, options = list(placeholder = "Select or type specific HSC locality"))}
     
+    if (input$hscl_parent == "Show all"){ 
+      selectizeInput(
+        "hscl_true", label = NULL, width = "229px", choices = locality_name, 
+        selected = NULL, multiple=TRUE, options = 
+          list(maxOptions = 1300, placeholder = "Select or type specific HSC locality")) 
+    } else {
+      selectizeInput(
+        "hscl_true", label = NULL, choices = hsclocality_filtered(), 
+        selected = character(0), multiple=TRUE, options = 
+          list(placeholder = "Select or type specific HSC locality"))
+      }
   })
-  
   
   #to clear choices when boxes are unticked/radio button is changed
-  observeEvent(input$iz=="FALSE", {
+  observeEvent(input$iz=="FALSE", { #for IZs
     updateCheckboxInput(session, "iz_parent_all", label = NULL, value = FALSE)
     updateSelectizeInput(session, "iz_true", label = NULL,
-                         choices = intzone_name, selected = character(0), options = list(placeholder = "Select or type specific intermediate zone")) 
-    updateSelectizeInput(session, "iz_parent", label = "Filter list by HSC partnership", selected = "Show all")})
+                         choices = intzone_name, selected = character(0), options = 
+                           list(placeholder = "Select or type specific intermediate zone")) 
+    updateSelectizeInput(session, "iz_parent", label = "Filter list by HSC partnership", 
+                         selected = "Show all")
+    })
   
-  observeEvent(input$la=="FALSE", {
-    updateSelectizeInput(session, "la_true", label = NULL,
-                         choices = la_name, selected = character(0), options = list(placeholder = "Select or type specific council area")) })
-  observeEvent(input$hb=="FALSE", {
+  observeEvent(input$la=="FALSE", {#for CAs
+    updateSelectizeInput(session, "la_true", label = NULL, choices = la_name, 
+                         selected = character(0), options = 
+                           list(placeholder = "Select or type specific council area")) 
+    })
+  
+  observeEvent(input$hb=="FALSE", { #for HBs
     updateSelectizeInput(session, "hb_true", label = NULL,
-                         choices = hb_name, selected = character(0), options = list(placeholder = "Select or type specific health board")) })
-  observeEvent(input$hscl=="FALSE", {
+                         choices = hb_name, selected = character(0),
+                         options = list(placeholder = "Select or type specific health board")) 
+    })
+  
+  observeEvent(input$hscl=="FALSE", { #for localities
     updateSelectizeInput(session, "hscl_true", label = NULL,
-                         choices = locality_name, selected = character(0), options = list(placeholder = "Select or type specific HSC locality"))
-    updateSelectizeInput(session, "hscl_parent", label = "Filter list by HSC partnership", selected = "Show all")})
-  observeEvent(input$hscp=="FALSE", {
+                         choices = locality_name, selected = character(0), options = 
+                           list(placeholder = "Select or type specific HSC locality"))
+    
+    updateSelectizeInput(session, "hscl_parent", label = "Filter list by HSC partnership",
+                         selected = "Show all")
+    })
+  
+  observeEvent(input$hscp=="FALSE", { #for hsc partnerships
     updateSelectizeInput(session, "hscp_true", label = NULL,
-                         choices = partnership_name, selected = character(0), options = list(placeholder = "Select or type specific HSC partnership")) })
-  observeEvent(input$adp=="FALSE", {
+                         choices = partnership_name, selected = character(0), options = 
+                           list(placeholder = "Select or type specific HSC partnership"))
+    })
+  
+  observeEvent(input$adp=="FALSE", { #for ADPs
     updateSelectizeInput(session, "adp_true", label = NULL,
-                         choices = adp_name, selected = character(0), options = list(placeholder = "Select or type specific ADP")) })
-  observeEvent(input$product_filter, {
+                         choices = adp_name, selected = character(0), options = 
+                           list(placeholder = "Select or type specific ADP")) 
+    })
+  
+  observeEvent(input$product_filter, { # for indicator/topic/profile filters
     updateSelectizeInput(session,"indicator_filter", label = NULL,
-                         choices = indicator_list, selected = character(0),
-                         options = list(maxOptions = 1000, placeholder = "Click or type indicators to filter by"))
-    updateSelectizeInput(session,"topic_filter", label = NULL, choices = topic_list, selected = NULL,
-                         options = list(maxOptions = 1000, placeholder = "Click or type domains to filter by"))
-    updateSelectizeInput(session,"profile_filter", label = NULL, choices = profile_list, selected = NULL,
-                         options = list(maxOptions = 1000, placeholder = "Click or type profiles to filter by"))
+                         choices = indicator_list, selected = character(0), options = 
+                           list(maxOptions = 1000,
+                                placeholder = "Click or type indicators to filter by"))
     
+    updateSelectizeInput(session,"topic_filter", label = NULL, choices = topic_list, 
+                         selected = NULL, options = 
+                           list(maxOptions = 1000, 
+                                placeholder = "Click or type domains to filter by"))
+    
+    updateSelectizeInput(session,"profile_filter", label = NULL, choices = profile_list, 
+                         selected = NULL, options = 
+                           list(maxOptions = 1000, 
+                                placeholder = "Click or type profiles to filter by"))
   })
-  
-  filter_table <- reactive ({
-    
-    #if list of indicators selected
-    if (!is.null(input$indicator_filter)) { 
-      if (input$all_data == TRUE) {
-        filtered_geos <- optdata %>%  filter(year>=input$date_from[1] & year<=input$date_from[2]) %>% 
-          filter(indicator %in% input$indicator_filter)
-      } else {filtered_geo <- optdata %>% filter((areaname %in% input$iz_true & areatype == "Intermediate zone")|
-                                                   (areaname %in% input$la_true & areatype == "Council area")|
-                                                   (areaname %in% input$hb_true & areatype == "Health board")|
-                                                   (areaname %in% input$adp_true & areatype == "Alcohol & drug partnership")|
-                                                   (areaname %in% input$hscl_true & areatype == "HSC locality")|
-                                                   (areaname %in% input$hscp_true & areatype == "HSC partnership")|
-                                                   (code %in% input$code)
-      ) %>% filter(year>=input$date_from[1] & year<=input$date_from[2]) %>% filter(indicator %in% input$indicator_filter)
-      
-      filtered_geo2 <- if (input$scotland == TRUE) {
-        optdata %>% filter(areaname == "Scotland") %>% filter(year>=input$date_from[1] & year<=input$date_from[2]) %>% 
-          filter(indicator %in% input$indicator_filter)
-        
-      }      
-      
-      filtered_geos <- rbind(filtered_geo,filtered_geo2)
-      
-      }
-      
-      table <- filtered_geos %>% subset(select=c("code", "areaname", "areatype", "indicator","year", 
-                                                 "def_period","numerator", "measure", "lowci","upci","type_definition"))
-      
-      #if list of domains selected
-    } else if (!is.null(input$topic_filter)) { 
-      if (input$all_data == TRUE) {
-        filtered_geos <- optdata %>%  filter(year>=input$date_from[1] & year<=input$date_from[2]) %>% 
-          filter((domain1 %in% input$topic_filter)|(domain2 %in% input$topic_filter)|(domain3 %in% input$topic_filter))
-      } else {filtered_geo <- optdata %>% filter((areaname %in% input$iz_true & areatype == "Intermediate zone")|
-                                                   (areaname %in% input$la_true & areatype == "Council area")|
-                                                   (areaname %in% input$hb_true & areatype == "Health board")|
-                                                   (areaname %in% input$adp_true & areatype == "Alcohol & drug partnership")|
-                                                   (areaname %in% input$hscl_true & areatype == "HSC locality")|
-                                                   (areaname %in% input$hscp_true & areatype == "HSC partnership")|
-                                                   (code %in% input$code)
-      ) %>% filter(year>=input$date_from[1] & year<=input$date_from[2]) %>% 
-        filter((domain1 %in% input$topic_filter)|(domain2 %in% input$topic_filter)|(domain3 %in% input$topic_filter))
-      
-      filtered_geo2 <- if (input$scotland == TRUE) {
-        optdata %>% filter(areaname == "Scotland") %>% filter(year>=input$date_from[1] & year<=input$date_from[2]) %>% 
-          filter((domain1 %in% input$topic_filter)|(domain2 %in% input$topic_filter)|(domain3 %in% input$topic_filter))
-        
-      }  
-      
-      filtered_geos <- rbind(filtered_geo,filtered_geo2)
-      
-      } 
-      
-      table <- filtered_geos %>% subset(select=c("code", "areaname", "areatype", "indicator","year", 
-                                                 "def_period","numerator", "measure", "lowci","upci","type_definition"))
-      
-      #if list of profiles selected    
-    } else if (!is.null(input$profile_filter)) { 
-      if (input$all_data == TRUE) {
-        filtered_geos <- optdata %>%  filter(year>=input$date_from[1] & year<=input$date_from[2]) %>% 
-          filter((grepl((paste("^",input$profile_filter,sep="",collapse="|")),profile_domain1))|(grepl((paste("^",input$profile_filter,sep="",collapse="|")),profile_domain2)))
-      } else {filtered_geo <- optdata %>% filter((areaname %in% input$iz_true & areatype == "Intermediate zone")|
-                                                   (areaname %in% input$la_true & areatype == "Council area")|
-                                                   (areaname %in% input$hb_true & areatype == "Health board")|
-                                                   (areaname %in% input$adp_true & areatype == "Alcohol & drug partnership")|
-                                                   (areaname %in% input$hscl_true & areatype == "HSC locality")|
-                                                   (areaname %in% input$hscp_true & areatype == "HSC partnership")|
-                                                   (code %in% input$code)
-      ) %>% filter(year>=input$date_from[1] & year<=input$date_from[2]) %>% 
-        filter((grepl((paste("^",input$profile_filter,sep="",collapse="|")),profile_domain1))|(grepl((paste("^",input$profile_filter,sep="",collapse="|")),profile_domain2)))
-      
-      filtered_geo2 <- if (input$scotland == TRUE) {
-        optdata %>% filter(areaname == "Scotland") %>% filter(year>=input$date_from[1] & year<=input$date_from[2]) %>% 
-          filter((grepl((paste("^",input$profile_filter,sep="",collapse="|")),profile_domain1))|(grepl((paste("^",input$profile_filter,sep="",collapse="|")),profile_domain2)))
-        
-      }
-      
-      filtered_geos <- rbind(filtered_geo,filtered_geo2)
-      
-      } 
-      
-      table <- filtered_geos %>% subset(select=c("code", "areaname", "areatype", "indicator","year", 
-                                                 "def_period","numerator", "measure", "lowci","upci","type_definition"))
-    } else { 
-      if (input$all_data == TRUE) {
-        filtered_geos <- optdata %>%  filter(year>=input$date_from[1] & year<=input$date_from[2])
-        
-      } else {filtered_geo <- optdata %>% filter((areaname %in% input$iz_true & areatype == "Intermediate zone")|
-                                                   (areaname %in% input$la_true & areatype == "Council area")|
-                                                   (areaname %in% input$hb_true & areatype == "Health board")|
-                                                   (areaname %in% input$adp_true & areatype == "Alcohol & drug partnership")|
-                                                   (areaname %in% input$hscl_true & areatype == "HSC locality")|
-                                                   (areaname %in% input$hscp_true & areatype == "HSC partnership")|
-                                                   (code %in% input$code)
-      ) %>% filter(year>=input$date_from[1] & year<=input$date_from[2])
-      
-      filtered_geo2 <- if (input$scotland == TRUE) {
-        optdata %>% filter(areaname == "Scotland") %>% filter(year>=input$date_from[1] & year<=input$date_from[2])
-        
-      }
-      
-      filtered_geos <- rbind(filtered_geo,filtered_geo2)
-      
-      } 
-      
-      table <- filtered_geos %>% subset(select=c("code", "areaname", "areatype", "indicator","year", 
-                                                 "def_period","numerator", "measure", "lowci","upci","type_definition", "data_source", "last_updated", "next_update"))
-      
-    }
-    
-    
-  })
-  
-  #display table based on selection made by user on indicator tab
-  output$table_filtered <- DT::renderDataTable({
-    
-    DT::datatable(filter_table(),
-                  style = 'bootstrap', rownames = FALSE, options = list(dom = 'tp', language = list(
-                    zeroRecords = "No records found matching your selection - have you selected a geography? See 'Indicator definitions' under the Info tab for Geographies available."), columnDefs = list(list(visible=FALSE, targets=c(4,8,9)))), 
-                  colnames = c("Area code", "Area", "Type", "Indicator", "Year","Period", "Numerator", 
-                               "Measure", "Lower CI","Upper CI", "Definition")
-    )
-  })
-  
   
   #Clearing all user inputs to default
   observeEvent(input$clear, {
@@ -2049,8 +2006,169 @@ showModal(welcome_modal)
     
   })
   
+  ###############################################.
+  # Preparing reactive data for table output
+  filter_table <- reactive ({
+    
+    #if list of indicators selected
+    if (!is.null(input$indicator_filter)) { 
+      if (input$all_data == TRUE) {
+        filtered_geos <- optdata %>%  
+          filter(year>=input$date_from[1] & year<=input$date_from[2] & 
+                   indicator %in% input$indicator_filter)
+      } else {
+        filtered_geo <- optdata %>% 
+          filter((areaname %in% input$iz_true & areatype == "Intermediate zone")|
+                   (areaname %in% input$la_true & areatype == "Council area")|
+                   (areaname %in% input$hb_true & areatype == "Health board")|
+                   (areaname %in% input$adp_true & areatype == "Alcohol & drug partnership")|
+                   (areaname %in% input$hscl_true & areatype == "HSC locality")|
+                   (areaname %in% input$hscp_true & areatype == "HSC partnership")|
+                   (code %in% input$code)) %>% 
+          filter(year>=input$date_from[1] & year<=input$date_from[2] & 
+                   indicator %in% input$indicator_filter)
+        
+        filtered_geo2 <- if (input$scotland == TRUE) {
+          optdata %>% filter(areaname == "Scotland" &
+                               (year>=input$date_from[1] & year<=input$date_from[2]) &
+                               indicator %in% input$indicator_filter)
+        }      
+        
+        filtered_geos <- rbind(filtered_geo, filtered_geo2)
+        
+      }
+      
+      table <- filtered_geos %>% select(code, areaname, areatype, indicator, year, 
+                                        def_period, numerator, measure, lowci, upci, type_definition)
+      
+      #if list of domains selected
+    } else if (!is.null(input$topic_filter)) { 
+      if (input$all_data == TRUE) {
+        filtered_geos <- optdata %>%  
+          filter(year>=input$date_from[1] & year<=input$date_from[2] &
+                   (domain1 %in% input$topic_filter|domain2 %in% input$topic_filter|
+                      domain3 %in% input$topic_filter))
+        
+      } else {
+        
+        filtered_geo <- optdata %>% 
+          filter((areaname %in% input$iz_true & areatype == "Intermediate zone")|
+                   (areaname %in% input$la_true & areatype == "Council area")|
+                   (areaname %in% input$hb_true & areatype == "Health board")|
+                   (areaname %in% input$adp_true & areatype == "Alcohol & drug partnership")|
+                   (areaname %in% input$hscl_true & areatype == "HSC locality")|
+                   (areaname %in% input$hscp_true & areatype == "HSC partnership")|
+                   code %in% input$code) %>% 
+          filter(year>=input$date_from[1] & year<=input$date_from[2] & 
+                   (domain1 %in% input$topic_filter|domain2 %in% input$topic_filter|
+                      domain3 %in% input$topic_filter))
+        
+        filtered_geo2 <- if (input$scotland == TRUE) {
+          optdata %>% 
+            filter(areaname == "Scotland" & 
+                     year>=input$date_from[1] & year<=input$date_from[2] & 
+                     (domain1 %in% input$topic_filter|domain2 %in% input$topic_filter|
+                        domain3 %in% input$topic_filter))
+        }  
+        
+        # Merging together Scotland and other areas selected
+        filtered_geos <- rbind(filtered_geo, filtered_geo2)
+        
+      } #end of else statement
+      
+      table <- filtered_geos %>% 
+        select(code, areaname, areatype, indicator, year, def_period, numerator, 
+               measure, lowci, upci, type_definition)
+      
+      #if list of profiles selected    
+    } else if (!is.null(input$profile_filter)) { 
+      if (input$all_data == TRUE) {
+        filtered_geos <- optdata %>%  
+          filter(year>=input$date_from[1] & year<=input$date_from[2]) %>% 
+          filter((grepl((paste("^",input$profile_filter,sep="",collapse="|")),
+                        profile_domain1))|(grepl((paste("^",input$profile_filter,sep="",collapse="|")),
+                                                 profile_domain2)))
+      } else {
+        filtered_geo <- optdata %>% 
+          filter((areaname %in% input$iz_true & areatype == "Intermediate zone")|
+                   (areaname %in% input$la_true & areatype == "Council area")|
+                   (areaname %in% input$hb_true & areatype == "Health board")|
+                   (areaname %in% input$adp_true & areatype == "Alcohol & drug partnership")|
+                   (areaname %in% input$hscl_true & areatype == "HSC locality")|
+                   (areaname %in% input$hscp_true & areatype == "HSC partnership")|
+                   (code %in% input$code)) %>% 
+          filter(year>=input$date_from[1] & year<=input$date_from[2]) %>% 
+          filter((grepl((paste("^",input$profile_filter,sep="",collapse="|")),
+                        profile_domain1))|
+                   (grepl((paste("^",input$profile_filter,sep="",collapse="|")),
+                          profile_domain2)))
+        
+        filtered_geo2 <- if (input$scotland == TRUE) {
+          optdata %>% 
+            filter(areaname == "Scotland" &
+                     year>=input$date_from[1] & year<=input$date_from[2]) %>% 
+            filter((grepl((paste("^",input$profile_filter,sep="",collapse="|")),
+                          profile_domain1))|(grepl((paste("^",input$profile_filter,sep="",collapse="|")),
+                                                   profile_domain2)))
+          
+        }
+        # Merging together Scotland and other areas selected
+        filtered_geos <- rbind(filtered_geo,filtered_geo2)
+        
+      } 
+      
+      table <- filtered_geos %>% 
+        select(code, areaname, areatype, indicator, year, def_period, numerator, 
+               measure, lowci, upci, type_definition)
+      
+      if (input$all_data == TRUE) {
+        filtered_geos <- optdata %>%  
+          filter(year>=input$date_from[1] & year<=input$date_from[2])
+        
+      } else {
+        filtered_geo <- optdata %>% 
+          filter((areaname %in% input$iz_true & areatype == "Intermediate zone")|
+                   (areaname %in% input$la_true & areatype == "Council area")|
+                   (areaname %in% input$hb_true & areatype == "Health board")|
+                   (areaname %in% input$adp_true & areatype == "Alcohol & drug partnership")|
+                   (areaname %in% input$hscl_true & areatype == "HSC locality")|
+                   (areaname %in% input$hscp_true & areatype == "HSC partnership")|
+                   (code %in% input$code)) %>% 
+          filter(year>=input$date_from[1] & year<=input$date_from[2])
+        
+        filtered_geo2 <- if (input$scotland == TRUE) {
+          optdata %>% 
+            filter(areaname == "Scotland" &
+                  year>=input$date_from[1] & year<=input$date_from[2])
+          
+        }
+        # Merging together Scotland and other areas selected
+        filtered_geos <- rbind(filtered_geo,filtered_geo2)
+        
+      } 
+      
+      table <- filtered_geos %>% 
+        select(code, areaname, areatype, indicator, year, def_period, numerator, 
+               measure, lowci, upci, type_definition)
+      
+    } #end of the whole if statement
+    
+    
+  })
   
-  #Downloading data in csv format
+  #display table based on selection made by user on indicator tab
+  output$table_filtered <- DT::renderDataTable({
+    
+    DT::datatable(filter_table(),
+                  style = 'bootstrap', rownames = FALSE, options = list(dom = 'tp', language = list(
+                    zeroRecords = "No records found matching your selection - have you selected a geography? See 'Indicator definitions' under the Info tab for Geographies available."), columnDefs = list(list(visible=FALSE, targets=c(4,8,9)))), 
+                  colnames = c("Area code", "Area", "Type", "Indicator", "Year","Period", "Numerator", 
+                               "Measure", "Lower CI","Upper CI", "Definition")
+    )
+  })
+  
+  ###############################################.
+  # Downloading data in csv format
   table_csv <- reactive({ format_csv(filter_table()) })
   
   #The filters the user applies in the data table will determine what data they download - indicator tab table

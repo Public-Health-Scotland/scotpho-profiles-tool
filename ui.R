@@ -96,8 +96,8 @@ tagList( #needed for shinyjs
                #landing-page icons
                ".icon-lp{font-size: 1.3em; padding-right: 4px;}",
                #to avoid red text error messages in the whole app, take out for testing
-               # ".shiny-output-error { visibility: hidden; }",
-               # ".shiny-output-error:before { visibility: hidden; }",
+               ".shiny-output-error { visibility: hidden; }",
+               ".shiny-output-error:before { visibility: hidden; }",
                #External links underlined an open a new tab
                ".externallink{text-decoration: underline;} ",
                ".definitionbox {width:100%; height:100%; text-align:left ;background-color:white;
