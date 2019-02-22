@@ -5,9 +5,9 @@
 
 ## Define a server for the Shiny app
 function(input, output, session) {
-  ################################################################
+  ################################################################.
   #    Modal ----
-  ################################################################
+  ################################################################.
   #Welcome Modal
   welcome_modal <- modalDialog(
     br(),
@@ -222,10 +222,6 @@ showModal(welcome_modal)
   
   observeEvent(input$jump_to_rank, {
     updateTabsetPanel(session, "intabset", selected = "rank")
-  })
-  
-  observeEvent(input$jump_to_map, {
-    updateTabsetPanel(session, "intabset", selected = "map")
   })
   
   observeEvent(input$jump_to_simd, {
@@ -695,8 +691,7 @@ showModal(welcome_modal)
       #Layout
       theme(axis.text.x = element_text(angle=90),
             axis.ticks.y=element_blank(), # taking out axis tick marks
-            axis.title.x=element_blank(), #Taking out y axis title
-            axis.title.y=element_blank(), #Taking out y axis title
+            axis.title=element_blank(), #Taking out axis titles
             panel.background = element_blank(),#Blanking background
             legend.position="none", #taking out legend
             text = element_text(size=14) # changing font size
@@ -715,8 +710,7 @@ showModal(welcome_modal)
       # margins needed as long labels don't work well with Plotly
         layout(margin = list(l = 400, t = 50),
              xaxis = list(side = 'top', fixedrange=TRUE), yaxis= list(fixedrange=TRUE),
-             font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif')
-        ) %>%
+             font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif')) %>%
         config(displayModeBar = FALSE, displaylogo = F, collaborate=F, editable =F) # taking out plotly logo and collaborate button
     }
   })
@@ -1293,7 +1287,7 @@ showModal(welcome_modal)
 #### Rank plot ----
 ###############################################.   
 #####################.
-# Reactive controls
+# Reactive controls - used for the map as well.
   #Dropdown for time period based on indicator selection  
   output$year_ui_rank <- renderUI({
     time_period <- sort(unique(optdata$trend_axis[optdata$indicator == input$indic_rank&
@@ -1311,6 +1305,20 @@ showModal(welcome_modal)
                 choices = areas, selected = "Health board")
   })
   
+  # Years to compare with depending on what data is available
+  output$yearcomp_ui_rank <- renderUI({
+    rank_data <- optdata %>% subset(areatype == input$geotype_rank & 
+                                    indicator==input$indic_rank)
+    
+    years <- c(min(rank_data$year):max(rank_data$year))
+    periods <- c(sort(paste0(unique(rank_data$trend_axis[rank_data$year>=min(rank_data$year) &
+                                                           rank_data$year<=max(rank_data$year)]))))
+    
+    selectInput("yearcomp_rank", "Baseline year", choices = periods,
+                selectize=TRUE)
+  })
+  
+  
   ###############################################.
   # Indicator definitions
   #Subsetting by domain and profile. Profile is fiddly as vector uses abbreviations 
@@ -1327,17 +1335,31 @@ showModal(welcome_modal)
 # Reactive data  
   # Comparator data rank plot. Could be moved inside rank_bar_data
   rank_compar <- reactive({
-    #Fiddly way of selecting period because some cases (e.g. Life expectancy)
-    #might have different periods for the same year, e.g. IZ 2013 is 2011-2015
-    #and HB 2013 is 2012-2014.
-    year_chosen <- unique(optdata$year[optdata$trend_axis == input$year_rank])
-    
-    rank_compar <- optdata %>% subset(year %in% year_chosen & 
-             areatype %in% c("Health board", "Council area", "Scotland") &
-             areaname == input$geocomp_rank &
-             indicator == input$indic_rank) %>% 
-      droplevels()
+
+    if (input$comp_rank == 1){
+      #Fiddly way of selecting period because some cases (e.g. Life expectancy)
+      #might have different periods for the same year, e.g. IZ 2013 is 2011-2015
+      #and HB 2013 is 2012-2014.
+      year_chosen <- unique(optdata$year[optdata$trend_axis == input$year_rank])
+      
+      rank_compar <- optdata %>% subset(year %in% year_chosen & 
+                                          areatype %in% c("Health board", "Council area", "Scotland") &
+                                          areaname == input$geocomp_rank &
+                                          indicator == input$indic_rank) %>% 
+        droplevels()
+      
+    } else if (input$comp_rank == 2) { #if time comparison selected
+      
+      rank_compar <- optdata %>% subset(areatype == input$geotype_rank &
+                                         trend_axis == input$yearcomp_rank & 
+                                         indicator==input$indic_rank) %>% 
+        rename(comp_value = measure, comp_name = areaname) %>% 
+        select(code, comp_value, comp_name) %>% #to allow merging
+        droplevels()
+      
+    }
   })
+  
   
   #Rank plot data based on user input
   rank_bar_data <- reactive({
@@ -1345,50 +1367,53 @@ showModal(welcome_modal)
     if (input$geotype_rank %in% c("Scotland", "Health board", "Council area", 
                                   "Alcohol & drug partnership", "HSC partnership"))
     {
-      rank_bar <-optdata %>% 
+      rank_bar <- optdata %>% 
         subset(areatype == input$geotype_rank &  
                  trend_axis == input$year_rank &
-                 indicator == input$indic_rank) %>% 
-        droplevels()
-      
-      #Cannot be done in the same pipe operation as it does not work with the areaname mutate
-      rank_bar <- rank_bar %>% 
-        mutate(comp_value = rank_compar()$measure) %>% #comparator value and name
-        mutate(comp_name = rank_compar()$areaname) %>% 
-        mutate(lowci_diff = measure - lowci) %>% 
-        mutate(upci_diff = upci - measure) %>% 
-        arrange(desc(measure)) # for ranking by value
-    }
-    else { #if locality or IZ it needs to filter based on the parent area and be the right area type.
+                 indicator == input$indic_rank) %>% droplevels()
+    } else { #if locality or IZ it needs to filter based on the parent area and be the right area type.
       rank_bar <-  optdata %>% 
         subset(areatype == input$geotype_rank &
                  parent_area == input$loc_iz_rank &
                  trend_axis == input$year_rank &
-                 indicator == input$indic_rank) %>% 
-        droplevels()
-      
-      #Cannot be done in the same pipe operation as it does not work with the areaname mutate
-      rank_bar <-rank_bar %>% 
-        mutate(comp_value = rank_compar()$measure) %>% #comparator value and name
-        mutate(comp_name = rank_compar()$areaname) %>% 
-        mutate(lowci_diff = measure - lowci) %>% 
-        mutate(upci_diff = upci - measure) %>% 
+                 indicator == input$indic_rank) %>% droplevels()
+    }
+    
+    if (input$comp_rank == 1) { #for area comparisons
+    rank_bar <- rank_bar %>% 
+      mutate(comp_value = rank_compar()$measure, #comparator value and name
+             comp_name = rank_compar()$areaname,
+             lowci_diff = measure - lowci, 
+             upci_diff = upci - measure) %>% 
+      arrange(desc(measure)) # for ranking by value
+    } else if (input$comp_rank == 2) { #if time comparison selected
+      #This helps to deals with cases of incomplete data, e.g. 2011 has all HB but 2013 not.
+      #Works for those cases where there are more data in the past (comparator)
+      #and one for those which have more data in the present (chosen area)
+      rank_bar <- left_join(x = rank_bar, y = rank_compar(), by = "code") %>% 
+        mutate(lowci_diff = measure - lowci, 
+               upci_diff = upci - measure) %>% 
         arrange(desc(measure)) # for ranking by value
+      
     }
   })
-  
+
   ############################.
   #Title of plot
+  make_rank_subtitle <- function() {
+    case_when(input$comp_rank == 1 ~ paste0(input$geotype_rank, "s compared against ",
+                                            input$geocomp_rank, " - ",  input$year_rank),
+              input$comp_rank == 2 ~ paste0("Changes within ", input$geotype_rank, 
+                                            ": ", input$year_rank, " compared to ", input$yearcomp_rank))
+  }
+  
   output$rank_title <- renderText( paste0(input$indic_rank) )
   
-  output$rank_subtitle <- renderText({
-    paste0(input$geotype_rank, "s compared against ",
-           input$geocomp_rank, " - ",  input$year_rank)
-  })
+  output$rank_subtitle <- renderText({ make_rank_subtitle()  })
   
   ############################.
   # Creating  plot
-  output$rank_plot <- renderPlotly({
+  plot_rank_charts <- function(){
     
     #If no data available for that period then plot message saying data is missing
     if (is.data.frame(rank_bar_data()) && nrow(rank_bar_data()) == 0)
@@ -1397,12 +1422,23 @@ showModal(welcome_modal)
     }
     else { #If data is available then plot it
       
+      # height of the plot
+      # Calculates number of different indicators and then multiplies by pixels per row
+      # it needs the sum at the end as otherwise small domains plots will be too small
+        if (input$comp_rank == 1) {#if area comparison, standard length
+          height_plot <- 500
+        } else if (input$comp_rank == 2) {
+          #Obtaining number of areas
+          no_ind <- length(unique(rank_bar_data()$areaname))
+          height_plot <- no_ind * 25 + 70
+        }
+
       #Coloring based on if signicantly different from comparator
       color_pal <- case_when(
-        rank_bar_data()$interpret == "O" ~ '#ccccff',
+        rank_bar_data()$interpret == "O" ~ '#999966',
         is.na(rank_bar_data()$lowci) | is.na(rank_bar_data()$upci) | 
           is.na(rank_bar_data()$comp_value) | is.na(rank_bar_data()$measure) |
-          rank_bar_data()$measure == 0 ~ '#ccccff',
+          rank_bar_data()$measure == 0 ~ '#999966',
         rank_bar_data()$lowci <= rank_bar_data()$comp_value & 
           rank_bar_data()$upci >= rank_bar_data()$comp_value ~'#cccccc',
         rank_bar_data()$lowci > rank_bar_data()$comp_value & 
@@ -1414,112 +1450,90 @@ showModal(welcome_modal)
         rank_bar_data()$upci < rank_bar_data()$comp_value & 
           rank_bar_data()$interpret == "H" ~ '#ffa64d', 
         TRUE ~ '#ccccff')
-
-      # Text for tooltip
-      tooltip_rank <- c(paste0(rank_bar_data()$areaname, ": ", rank_bar_data()$measure, "<br>",
-                               input$geocomp_rank, ": ", rank_bar_data()$comp_value))
+      
+      # Text for tooltip - one for each type of chart
+      tooltip_bar <-c(paste0(rank_bar_data()$areaname, ": ", rank_bar_data()$measure, "<br>",
+                             input$geocomp_rank, ": ", rank_bar_data()$comp_value))
+      
+      tooltip_dumbbell <- c(paste0(rank_bar_data()$areaname, "<br>",
+                                   input$year_rank, ": ", rank_bar_data()$measure, "<br>",
+                                   input$yearcomp_rank, ": ", rank_bar_data()$comp_value))
       
       #Creating a vector with the area names in the order they are going to be plotted
       order_areas <- as.vector(rank_bar_data()$areaname)
       
+      ###############################################.
+      # Starting the plot 
       # General plot and layout, bars with or without error bars will be added after user input
-      p <-   plot_ly(data = rank_bar_data(), x = ~areaname) %>% 
+      rank_plot <- plot_ly(data = rank_bar_data(), height = height_plot) 
+      
+      if (input$comp_rank == 1) {
         #Comparator line
-        add_trace(y = ~comp_value, name = ~unique(comp_name), type = 'scatter', mode = 'lines',
-                  line = list(color = '#FF0000'), showlegend = FALSE, hoverinfo="skip") %>% 
-        #Layout
-        layout(annotations = list(), #It needs this because of a buggy behaviour
-               yaxis = list(title = ~type_definition, titlefont =list(size=14), 
-                            tickfont =list(size=14), fixedrange=TRUE),
-               xaxis = list(title = "", tickangle = 270, fixedrange=TRUE,
-                            tickfont =list(size=13), #axis parameters
-                            categoryorder="array", #order of plotting
-                            categoryarray = order_areas),
-               font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif'),
-               margin=list(b = 160, t = 5), # to prevent labels getting cut out
-               hovermode = 'false') %>% # to get hover compare mode as default
-        config(displayModeBar = FALSE, displaylogo = F, collaborate=F, editable =F)
-      
-      #Respond to user input regarding confidence intervals
-      if (input$ci_rank == FALSE) {  
-        #adding bar layer without confidence intervals
-        p %>%  add_bars(y = ~ measure, text=tooltip_rank, hoverinfo="text",
-                        marker = list(color = color_pal))
-                   
+        rank_plot <- rank_plot %>% 
+          add_trace(x = ~areaname, y = ~comp_value, name = ~unique(comp_name), type = 'scatter', mode = 'lines',
+                    line = list(color = '#FF0000'), showlegend = FALSE, hoverinfo="skip")
+        
+        #Respond to user input regarding confidence intervals
+        if (input$ci_rank == FALSE) {  
+          #adding bar layer without confidence intervals
+          rank_plot <- rank_plot %>% add_bars(x = ~areaname, y = ~ measure, text=tooltip_bar, hoverinfo="text",
+                                              marker = list(color = color_pal))
+          
+        }
+        else { 
+          #adding bar layer with error bars
+          rank_plot <- rank_plot %>% add_bars(x = ~areaname,y = ~ measure, text=tooltip_bar, hoverinfo="text",
+                                              marker = list(color = color_pal), 
+                                              error_y = list(type = "data",color='#000000',
+                                                             symmetric = FALSE, array = ~upci_diff, arrayminus = ~lowci_diff)) 
+        }
+        
+        # Adding layout
+        rank_plot %>% layout(annotations = list(), #It needs this because of a buggy behaviour
+                             yaxis = list(title = ~type_definition, titlefont =list(size=14), 
+                                          tickfont =list(size=14), fixedrange=TRUE),
+                             xaxis = list(title = "", tickangle = 270, fixedrange=TRUE,
+                                          tickfont =list(size=13), #axis parameters
+                                          categoryorder="array", #order of plotting
+                                          categoryarray = order_areas),
+                             font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif'),
+                             margin=list(b = 180, t = 5), # to prevent labels getting cut out
+                             hovermode = 'false') %>% # to get hover compare mode as default
+          config(displayModeBar = FALSE, displaylogo = F, collaborate=F, editable =F)
+        
+      } else if (input$comp_rank == 2) {#if time comparison selected, plot dumbbell plot
+        
+        rank_plot <- rank_plot %>% 
+          add_segments(y = ~areaname, yend = ~areaname, x = ~measure, xend = ~comp_value, 
+                       showlegend = FALSE, color = I("gray80"), hoverinfo="skip") %>% 
+          # value of the area in the selected baseline period -comparator
+          add_trace(y = ~areaname, x = ~comp_value, name = ~unique(comp_name), 
+                    type = 'scatter', mode = 'markers', showlegend = FALSE, 
+                    marker = list(color = 'black', size = 10), text=tooltip_dumbbell, hoverinfo="text") %>% 
+          # value of the area in the selected period
+          add_trace(y = ~areaname, x = ~measure, name = ~unique(areaname), type = 'scatter', mode = 'markers',
+                    marker = list(color = color_pal, size = 10,
+                                  line = list(color = 'gray', width = 2)), 
+                    showlegend = FALSE, text=tooltip_dumbbell, hoverinfo="text") %>% 
+        # Adding layout
+          layout(xaxis = list(title = ~type_definition, titlefont =list(size=14), 
+                              side = "top", tickfont =list(size=14), fixedrange=TRUE),
+                 yaxis = list(title = "", fixedrange=TRUE,
+                                          tickfont =list(size=13), #axis parameters
+                                          categoryorder="array", #order of plotting
+                                          categoryarray = rev(order_areas)),
+                 font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif'),
+                 margin=list(l = 170, t=40)) %>%  # to prevent labels getting cut out
+          config(displayModeBar = FALSE, displaylogo = F, collaborate=F, editable =F)
+        
       }
-      else{ 
-        #adding bar layer with error bars
-        p %>% add_bars(y = ~ measure, text=tooltip_rank, hoverinfo="text",
-                   marker = list(color = color_pal), 
-                   error_y = list(type = "data",color='#000000',
-                     symmetric = FALSE, array = ~upci_diff, arrayminus = ~lowci_diff)) 
-      }
-    }
-  }) 
+    } # bracket for "plot if data"
+  } 
   
-############################.
-#Downloading plot and data
-  # Function to save plot
-  plot_rank_ggplot <- function(){
-    #Coloring based on if signicantly different from comparator
-    color_pal <- case_when(
-      rank_bar_data()$interpret == "O" ~ '#ccccff',
-      is.na(rank_bar_data()$lowci) | is.na(rank_bar_data()$upci) | 
-        is.na(rank_bar_data()$comp_value) | is.na(rank_bar_data()$measure) |
-        rank_bar_data()$measure == 0~ '#ccccff',
-      rank_bar_data()$lowci <= rank_bar_data()$comp_value & 
-        rank_bar_data()$upci >= rank_bar_data()$comp_value ~ '#cccccc',
-      rank_bar_data()$lowci > rank_bar_data()$comp_value & 
-        rank_bar_data()$interpret == "H" ~ '#4da6ff',
-      rank_bar_data()$lowci > rank_bar_data()$comp_value & 
-        rank_bar_data()$interpret == "L" ~ '#ffa64d',
-      rank_bar_data()$upci < rank_bar_data()$comp_value & 
-        rank_bar_data()$interpret == "L" ~ '#4da6ff',
-      rank_bar_data()$upci < rank_bar_data()$comp_value & 
-        rank_bar_data()$interpret == "H" ~ '#ffa64d', 
-      TRUE ~ '#ccccff')
-    
-    #Creating a vector with the area names in the order they are going to be plotted
-    color_pal <- setNames(color_pal, rank_bar_data()$areaname)
-    
-    #title for rank
-    title_rank <- paste0(input$indic_rank)
-    subtitle_rank <-  paste0(input$geotype_rank, "s compared against ",
-                             input$geocomp_rank, " - ",  input$year_rank)
-
-    # General plot and layout, bars with or without error bars will be added after user input
-    p <- ggplot(data=rank_bar_data(), aes(y = measure,  x = reorder(areaname, -measure)))+
-      geom_bar(aes(fill=areaname), stat = "identity")+
-      geom_hline(aes(yintercept=comp_value, color="red"))+
-      labs(title=title_rank, subtitle = subtitle_rank,
-           y=unique(rank_bar_data()$type_definition))+
-      scale_fill_manual(values=color_pal, name = "")+
-      scale_y_continuous(expand = c(0, 0), limits=c(0, max(rank_bar_data()$upci)))+
-      #Layout
-      theme(text = element_text(size=11, family="Helvetica Neue,Helvetica,Arial,sans-serif"),
-            axis.text.x = element_text(angle=90, hjust=1), 
-            axis.line.x = element_line(), 
-            axis.ticks = element_blank(),
-            aspect.ratio=0.3,
-            plot.title = element_text(hjust = 0.5), #centering title
-            axis.title.x = element_blank(), #taking out x axis title
-            legend.position = "none", #taking out background from legend
-            panel.grid.major.y = element_line(colour="#F0F0F0"),
-            panel.background = element_blank() #Blanking background
-      )
-    
-    #Respond to user input regarding confidence intervals
-    if (input$ci_rank == FALSE) {  
-      p <- p 
-      
-    } else{ 
-      #adding bar layer with error bars
-      p <-  p +   geom_errorbar(aes(ymin=lowci, ymax=upci), width=.2,
-                                position=position_dodge(.9))
-      
-    }
-  }
+  # Calling the renderPlotly object
+  output$rank_plot <- renderPlotly({plot_rank_charts()  }) 
   
+  ###############################################.
   #Downloading data
   rank_csv <- reactive({ format_csv(rank_bar_data()) })
 
@@ -1530,51 +1544,22 @@ showModal(welcome_modal)
   output$download_rankplot <- downloadHandler(
     filename = 'rank.png',
     content = function(file){
-      ggsave(file, plot = plot_rank_ggplot(), device = "png", scale=5, limitsize=FALSE)
+      export(p = plot_rank_charts() %>% 
+               layout(title = paste0(input$indic_rank, "<br>", make_rank_subtitle()),
+                      margin = list(t = 180)),
+               file = file)
     })
-  
+
 #####################################.    
 ### Map ----
 #####################################. 
 #####################.
-# Reactive controls
-  #Dynamic selection of the last period available based on indicator selected
-  output$year_ui_map <- renderUI({
-    time_period <- sort(unique(optdata$trend_axis[optdata$indicator == input$indic_map  &
-                                                    optdata$areatype == input$geotype_map]))
-    
-    selectInput("year_map", "Time period",
-                choices = time_period, selected = last(time_period))
-  })
-  
-  #Dropdown for geotype based on what data is available for that indicator
-  output$geotype_ui_map <- renderUI({
-    areas <- sort(unique(optdata$areatype[optdata$indicator == input$indic_map]))
-    #taking out areas without shapefiles
-    areas <- areas [! areas %in% c("Scotland", "HSC locality", 
-                                   "Alcohol & drug partnership")]
-    selectInput("geotype_map", label = "Geography level",
-                choices = areas, selected = "Health board")
-  })
-  
-  # Years to compare with depending on what data is available
-  output$yearcomp_ui_map <- renderUI({
-    map_pol <- optdata %>% subset(areatype == input$geotype_map & 
-                                    indicator==input$indic_map)
-    
-    years <- c(min(map_pol$year):max(map_pol$year))
-    periods <- c(sort(paste0(unique(map_pol$trend_axis[map_pol$year>=min(map_pol$year) &
-                                                         map_pol$year<=max(map_pol$year)]))))
-    
-    selectInput("yearcomp_map", "Baseline year", choices = periods,
-                selectize=TRUE)
-  })
-  
+# Reactive controls: it uses the ones from the rank section
   ###############################################.
   # Indicator definitions
   #Subsetting by domain and profile. Profile is fiddly as vector uses abbreviations 
   # so needs to be converted to the names to match techdoc.
-  defs_data_map <- reactive({techdoc %>% subset(input$indic_map == indicator_name)})
+  defs_data_map <- reactive({techdoc %>% subset(input$indic_rank == indicator_name)})
   
   output$defs_text_map <- renderUI({
     
@@ -1583,90 +1568,34 @@ showModal(welcome_modal)
   })
   
   #####################.
-  # Dynamic data
-  # Dataset for comparator chosen by user
-  map_compar <- reactive({
-    
-    if (input$comp_map == 1){
-      #Fiddly way of selecting period because some cases (e.g. Life expectancy)
-      #might have different periods for the same year, e.g. IZ 2013 is 2011-2015
-      #and HB 2013 is 2012-2014.
-      year_chosen <- unique(optdata$year[optdata$trend_axis == input$year_map])
-      
-      map_compar <- optdata %>% subset(year %in% year_chosen & 
-                                         areatype %in% c("Health board", "Council area", "Scotland") &
-                                         areaname == input$geocomp_map &
-                                         indicator == input$indic_map) %>% 
-        droplevels()
-      
-    } else if (input$comp_map == 2) { #if time comparison selected
-      
-      map_compar <- optdata %>% subset(areatype == input$geotype_map &
-                                         trend_axis == input$yearcomp_map & 
-                                         indicator==input$indic_map) %>% 
-        rename(comp_value = measure, comp_name = areaname) %>% 
-        select(code, comp_value, comp_name) %>% #to allow merging
-        droplevels()
-      
-    }
-  }) 
-  
-  #Dataset for area type chosen by user
-  map_chosenarea <- reactive({ 
-    map_chosenarea <- optdata %>% 
-      subset(areatype == input$geotype_map &
-               trend_axis==input$year_map & 
-               indicator==input$indic_map) %>% 
-      droplevels() #dropping missing factor levels to allow merging
-    
-    if (input$comp_map == 1) { #for area comparisons
-      map_chosenarea <- map_chosenarea %>% 
-        mutate(comp_value = map_compar()$measure, #comparator value and name
-               comp_name = map_compar()$areaname) 
-      
-    } else if (input$comp_map == 2) { #if time comparison selected
-      #This helps to deals with cases of incomplete data, e.g. 2011 has all HB but 2013 not.
-      #Works for those cases where there are more data in the past (comparator)
-      #and one for those which have more data in the present (chosen area)
-      map_chosenarea <- left_join(x = map_chosenarea, y = map_compar(), by = "code")
-
-    }
-  }) 
-  
+  # # Dynamic data - uses some of the rank ones
+ 
   #Merging shapefile with dynamic selection of data
   poly_map <- reactive({
-    if (input$geotype_map == "Council area"){
-      map_pol <- sp::merge(ca_bound, map_chosenarea(), by='code')
-    } else if(input$geotype_map == "Health board"){
-      map_pol <- sp::merge(hb_bound, map_chosenarea(), by='code')
-    } else if(input$geotype_map == "HSC partnership"){
-      map_pol <- sp::merge(hscp_bound, map_chosenarea(), by='code')
-    } else if(input$geotype_map == "Intermediate zone"){
-      iz_bound <- iz_bound %>% subset(council == input$iz_map)
-      
-      map_pol <- sp::merge(iz_bound, map_chosenarea(), by='code')
+    if (input$geotype_rank == "Council area"){
+      map_pol <- sp::merge(ca_bound, rank_bar_data(), by='code')
+    } else if(input$geotype_rank == "Health board"){
+      map_pol <- sp::merge(hb_bound, rank_bar_data(), by='code')
+    } else if(input$geotype_rank == "HSC partnership"){
+      map_pol <- sp::merge(hscp_bound, rank_bar_data(), by='code')
+    } else if(input$geotype_rank == "Intermediate zone"){
+      map_pol <- sp::merge(iz_bound, rank_bar_data(), by='code')
+      map_pol <- map_pol %>% subset(parent_area == input$loc_iz_rank)
+    } else {
+      map_pol <- data.frame(matrix(vector(), 0, 3)) #empty data frame
     }
     
   }) 
-  
-  ############################.
-  #Title of plot
-  output$map_title <- renderText( paste0(input$indic_map) )
-  
-  output$map_subtitle <- renderText({
-    paste0(input$geotype_map, "s compared against ",
-           input$geocomp_map, " - ", input$year_map)
-  })
   
   #####################.
   # Plotting map
   #Function to create color palette based on if signicantly different from comparator
   create_map_palette <- function(){
     case_when(
-      poly_map()$interpret == "O" ~ '#ffffff',
+      poly_map()$interpret == "O" ~ '#999966',
       is.na(poly_map()$lowci) | is.na(poly_map()$upci) | 
         is.na(poly_map()$comp_value) | is.na(poly_map()$measure) |
-        poly_map()$measure == 0 ~ '#ffffff',
+        poly_map()$measure == 0 ~ '#999966',
       poly_map()$lowci <= poly_map()$comp_value & poly_map()$upci >= poly_map()$comp_value ~'#999999',
       poly_map()$lowci > poly_map()$comp_value & poly_map()$interpret == "H" ~ '#3d99f5',
       poly_map()$lowci > poly_map()$comp_value & poly_map()$interpret == "L" ~ '#ff9933',
@@ -1699,15 +1628,30 @@ showModal(welcome_modal)
       ) 
   })
   
+  # If no data or shapefile plot no map available
+  output$map_ui <- renderUI({
+    if(is.data.frame(poly_map()) && nrow(poly_map()) == 0) {
+      h4("No map available for that geographic level.", style = "color:black")
+    } else {
+      withSpinner(leafletOutput("map", width="100%",height="600px"))
+    }
+  })
+  
   #####################.
   # Downloading data
   #Function to create map that can be downloaded
   plot_map_download <- function(){
-    color_map <- create_map_palette() #palette
-    plot(poly_map(), col=color_map)
-    title(paste0(input$indic_map, "\n", input$geotype_map, 
-                 "s compared against ", input$geocomp_map, " - ", input$year_map),
-          cex.main = 3,  line = -1)
+    
+    if(is.data.frame(poly_map()) && nrow(poly_map()) == 0) {
+      plot.new()
+      text(0.5,0.5,"No map available for that geographic level.")
+    } else {
+      color_map <- create_map_palette() #palette
+      title_map <- paste0(input$indic_rank, "\n", make_rank_subtitle())
+      
+      plot(poly_map(), col=color_map)
+      title(title_map, cex.main = 3,  line = -1) # adding title
+    }
   }
   
   
@@ -2077,8 +2021,8 @@ showModal(welcome_modal)
   })
   
   #Download definitions table for selected indicator
-  
   indicator_definitions <- reactive({ techdoc %>% filter(indicator_name == input$indicator_defined)})
+  
   indicator_csv <- reactive({ format_definitions_csv(indicator_definitions()) })
   output$definitions_by_indicator <- downloadHandler(
     filename ="indicator_definitions.csv",
@@ -2101,11 +2045,5 @@ showModal(welcome_modal)
 } #server closing bracket
 
 #########################  END ----
-
-
-
-
-
-
 
 
