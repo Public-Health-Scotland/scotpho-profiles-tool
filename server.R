@@ -1109,12 +1109,30 @@ showModal(welcome_modal)
     toggleState("hbname_trend",
                 condition = ("Health board" %in%  unique(trend$areatype)))
     
+    # Disabling numerator/rate radio buttons if no numerator available
     toggleState("var_plot_trend",
                 condition = all(is.na(trend_data()$numerator)) == FALSE)
     
+    # if moving to one indicator without numerator, switch to rate
     if (all(is.na(trend_data()$numerator)) == TRUE & input$var_plot_trend == "numerator") {
       updateAwesomeRadio(session, "var_plot_trend", selected = "measure")
     }
+    
+  })
+
+  # Disabling and unchecking CI option if numerator selected or no cis available
+  # Observe with multiple events code from here: https://stackoverflow.com/questions/34731975/how-to-listen-for-more-than-one-event-expression-within-a-shiny-eventreactive-ha
+  observeEvent({
+                input$var_plot_trend 
+                input$indic_trend}, {
+  # Disabling and unchecking CI option if numerator selected or no cis available
+  if (input$var_plot_trend == "numerator" | (all(is.na(trend_data()$upci)) == TRUE)) {
+    disable("ci_trend")
+    updateAwesomeCheckbox(session, "ci_trend", value = FALSE)
+  } else if (input$var_plot_trend == "measure") {
+    enable("ci_trend")
+  }
+
   })
 
   ###############################################.
