@@ -96,8 +96,8 @@ tagList( #needed for shinyjs
                #landing-page icons
                ".icon-lp{font-size: 1.3em; padding-right: 4px;}",
                #to avoid red text error messages in the whole app, take out for testing
-               ".shiny-output-error { visibility: hidden; }",
-               ".shiny-output-error:before { visibility: hidden; }",
+               # ".shiny-output-error { visibility: hidden; }",
+               # ".shiny-output-error:before { visibility: hidden; }",
                #External links underlined an open a new tab
                ".externallink{text-decoration: underline;} ",
                ".definitionbox {width:100%; height:100%; text-align:left ;background-color:white;
@@ -115,25 +115,17 @@ tabPanel(
     fluidRow(h3("Welcome to the ScotPHO profiles", style="margin-top:0px;")),
     fluidRow(h4("Explore data by profile or domain area", style="margin-top:0px; ")),
     fluidRow(
-      #Ring plot box
-      column(4, class="landing-page-column",
+      #Heatmap and tile plot box
+      column(6, class="landing-page-column",
              div(class="landing-page-box", 
                  div("Profile summary", class = "landing-page-box-title"),
-                 div(class = "landing-page-icon", style="background-image: url(donut_10.png);
-                     background-size: auto 80%; background-position: center; background-repeat: no-repeat; "),
-                 actionButton('jump_to_ring', 'A high level view of an area across a suit of indicators', 
-                              class="landing-page-button", 
-                              icon = icon("arrow-circle-right", "icon-lp")))),
-      #Heat map box
-      column(4, class="landing-page-column",
-             div(class="landing-page-box",
-                 div("Topic summary: Heatmap", class = "landing-page-box-title"),
                  div(class = "landing-page-icon", style="background-image: url(heatmap_2.png);
                      background-size: auto 80%; background-position: center; background-repeat: no-repeat; "),
-                 actionButton('jump_to_heat', 'Explore how indicators for a topic area have changed over time', 
-                              class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp")))),
+                 actionButton('jump_to_summary', 'A high level view of an area across a suit of indicators', 
+                              class="landing-page-button", 
+                              icon = icon("arrow-circle-right", "icon-lp")))),
       #Barcode plot box
-      column(4, class="landing-page-column",
+      column(6, class="landing-page-column",
              div(class="landing-page-box", 
                  div("Topic summary: Barcode", class = "landing-page-box-title"),
                  div(class = "landing-page-icon", style="background-image: url(barcode_3.png);
@@ -227,7 +219,7 @@ tabPanel(
 ###############################################.
 ## Ring plot ----
 ###############################################.
-tabPanel(title = "Summary", icon = icon("adjust"), value = "ring",
+tabPanel(title = "Not used", icon = icon("adjust"), value = "ring",
          sidebarPanel(width=3,
                       actionButton("help_ring", label="Help", icon= icon('question-circle'), class ="down"),
                       selectInput("profile_ring", "Profile", choices= profile_list, multiple=FALSE, selected = "HWB"),
@@ -269,9 +261,9 @@ tabPanel(title = "Summary", icon = icon("adjust"), value = "ring",
          )
 ), #Tab panel bracket
 ###############################################.
-## Heat map ----
+## Summary ----
 ###############################################.
-tabPanel("Heatmap", icon = icon("list-ul"), value = "heat",
+tabPanel("Summary", icon = icon("list-ul"), value = "summary",
          wellPanel( #Filter options
            column(2,
                   selectInput("profile_heat", "Profile", choices = profile_list),
@@ -320,7 +312,8 @@ tabPanel("Heatmap", icon = icon("list-ul"), value = "heat",
                    bsModal("mod_defs_heat", "Definitions", "defs_heat", htmlOutput('defs_text_heat')),
                    h4(textOutput("heat_title"), style="color: black; text-align: left"),
                    h5(textOutput("heat_subtitle"), style="color: black; text-align: left"),
-                   withSpinner(plotlyOutput("heat_plot"))
+                   withSpinner(plotlyOutput("heat_hwb"))
+                   # withSpinner(plotlyOutput("heat_plot"))
         )
   ), #Tab panel bracket
 #####################################################################.

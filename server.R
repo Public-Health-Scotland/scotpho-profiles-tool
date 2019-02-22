@@ -204,12 +204,9 @@ showModal(welcome_modal)
   ###############################################.
   # Creating events that take you to different tabs
   # activated when pressing buttons from the landing page
-  observeEvent(input$jump_to_ring, {
-    updateTabsetPanel(session, "intabset", selected = "ring")
-  })
-  
-  observeEvent(input$jump_to_heat, {
-    updateTabsetPanel(session, "intabset", selected = "heat")
+
+  observeEvent(input$jump_to_summary, {
+    updateTabsetPanel(session, "intabset", selected = "summary")
   })
   
   observeEvent(input$jump_to_barcode, {
@@ -564,8 +561,8 @@ showModal(welcome_modal)
                                    & geo_lookup$parent_area == input$loc_iz_heat])
       }
 
-    selectInput("geoname_heat", "Select your area", choices = areas_heat,
-                selectize=TRUE, selected = "")
+    selectizeInput("geoname_heat", "Select your area", 
+                   choices = areas_heat, selected = "")
 
   })
   
@@ -582,8 +579,7 @@ showModal(welcome_modal)
     
     years <- c(min(heat_chosenarea()$year):max(heat_chosenarea()$year))
     
-    selectInput("yearcomp_heat", "Baseline year", choices = years,
-                selectize=TRUE)
+    selectizeInput("yearcomp_heat", "Baseline year", choices = years)
   })
   
   #####################.
@@ -591,28 +587,23 @@ showModal(welcome_modal)
   #Heatmap data for the chosen area. Filtering based on user input values.
   heat_chosenarea <- reactive({ 
       optdata %>% 
-      subset(areaname == input$geoname_heat &
-              areatype == input$geotype_heat &
+        subset(areaname == input$geoname_heat &
+                areatype == input$geotype_heat &
                !(indicator %in% c("Mid-year population estimate - all ages", "Quit attempts")) &
                (substr(profile_domain1, 1, 3) == input$profile_heat |
-                  substr(profile_domain2, 1, 3) == input$profile_heat) &
-               (substr(profile_domain1, 5, nchar(as.vector(profile_domain1))) == input$topic_heat |
-                  substr(profile_domain2, 5, nchar(as.vector(profile_domain2))) == input$topic_heat)) 
-    
+                  substr(profile_domain2, 1, 3) == input$profile_heat)) 
   })
   
   #Select comparator based on years available for area selected.
   heat_chosencomp <- reactive({ 
     
-    if (input$comp_heat == 1){
+    if (input$comp_heat == 1){ #if area comparison selected
       heat_chosencomp <- optdata %>% 
         subset(areaname == input$geocomp_heat &
                  indicator != "Mid-year population estimate - all ages" &
                  areatype %in% c("Health board", "Council area", "Scotland") &
                  (substr(profile_domain1, 1, 3) == input$profile_heat |
-                    substr(profile_domain2, 1, 3) == input$profile_heat) &
-                 (substr(profile_domain1, 5, nchar(as.vector(profile_domain1))) == input$topic_heat |
-                    substr(profile_domain2, 5, nchar(as.vector(profile_domain2))) == input$topic_heat)) %>% 
+                    substr(profile_domain2, 1, 3) == input$profile_heat)) %>% 
         select(c(year, indicator, measure)) %>% 
         rename(comp_m=measure) 
     } else if (input$comp_heat == 2) { #if time comparison selected
@@ -620,7 +611,6 @@ showModal(welcome_modal)
         subset(year == input$yearcomp_heat) %>% 
         select(c(indicator, measure)) %>% 
         rename(comp_m=measure) 
-      
     }
     
   })
@@ -648,16 +638,15 @@ showModal(welcome_modal)
   
   # Calculates number of different indicators and then multiplies by pixels per row
   # it needs the sum at the end as otherwise small domains plots will be too small
-  get_height_heat <- function() {
-    
-    #Obtaining number of indicators
-    no_ind <- unique(heat_chosenarea()$indicator)
-    length <- length(no_ind) * 50 + 125
+  # get_height_heat <- function() {
+  # 
+  #   #Obtaining number of indicators
+  #   no_ind <- unique(heat_chosenarea()$indicator)
+  #   length <- length(no_ind) * 30 + 125
+  # 
+  # }
   
-  }
-
-  #Function to create ggplot, then used in renderPlot and ggsave
-  plot_heat <- function(){
+  heat_data <- reactive({
     
     #Merging comparator and chosen area
     if (input$comp_heat == 1){
@@ -668,21 +657,46 @@ showModal(welcome_modal)
         droplevels()
     }
     
-    #Creating a palette of colours based on statistical significance
-    heat$color <- case_when(heat$interpret == "O" ~ 'white',
-                            heat$lowci <= heat$comp_m & heat$upci >= heat$comp_m ~'gray',
-                            heat$lowci > heat$comp_m & heat$interpret == "H" ~ 'blue',
-                            heat$lowci > heat$comp_m & heat$interpret == "L" ~ 'red',
-                            heat$upci < heat$comp_m & heat$interpret == "L" ~ 'blue',
-                            heat$upci < heat$comp_m & heat$interpret == "H" ~ 'red', 
-                            TRUE ~ 'white')
+    heat <- heat %>%  
+      #Creating a palette of colours based on statistical significance
+      mutate(color = case_when(heat$interpret == "O" ~ 'white',
+                               heat$lowci <= heat$comp_m & heat$upci >= heat$comp_m ~'gray',
+                               heat$lowci > heat$comp_m & heat$interpret == "H" ~ 'blue',
+                               heat$lowci > heat$comp_m & heat$interpret == "L" ~ 'red',
+                               heat$upci < heat$comp_m & heat$interpret == "L" ~ 'blue',
+                               heat$upci < heat$comp_m & heat$interpret == "H" ~ 'red', 
+                               TRUE ~ 'white'),
+             #identifies correct domain name for title
+             domain = as.factor(case_when(
+               substr(heat$profile_domain1,1,3)==input$profile_heat ~
+                 substr(heat$profile_domain1, 5, nchar(as.vector(profile_domain1))),
+               TRUE ~ substr(heat$profile_domain2, 5, nchar(as.vector(profile_domain2))))))
+    
+  })
+
+  #Function to create ggplot, then used in renderPlot and ggsave
+  plot_heat <- function(domain_plot){
+    #If no data available for that period then plot message saying data is missing
+    if (is.data.frame(heat_chosenarea()) && nrow(heat_chosenarea()) == 0)
+    {
+      plot_nodata()
+      } else { #If data is available then plot it
+    heat <- heat_data() %>% subset(domain == domain_plot)
+
+    get_height_heat <- function() {
+      
+      #Obtaining number of indicators
+      no_ind <- unique(heat$indicator)
+      length <- length(no_ind) * 30 + 125
+      
+    }
     
     #Tooltip
     heat_tooltip <- paste0(heat$indicator, "<br>", heat$def_period, "<br>",
                            heat$type_definition, "<br>", heat$measure)
     
     # Plotting data
-    ggplot(heat, aes(x = year, y = indicator, fill = color,
+    heat_p <- ggplot(heat, aes(x = year, y = indicator, fill = color,
                      text= heat_tooltip)) +
       geom_tile(color = "black") +
       geom_text(aes(label = round(measure, 0)), size =3) +
@@ -701,25 +715,119 @@ showModal(welcome_modal)
             legend.position="none", #taking out legend
             text = element_text(size=14) # changing font size
       )
-  }
-  
-  output$heat_plot <- renderPlotly({
-    #If no data available for that period then plot message saying data is missing
-    if (is.data.frame(heat_chosenarea()) && nrow(heat_chosenarea()) == 0)
-    {
-      plot_nodata()
-    }
-    else { #If data is available then plot it
-    #Converting ggplot into a Plotly object
-      ggplotly(plot_heat(), tooltip=c("text"), height = get_height_heat()) %>%
-      # margins needed as long labels don't work well with Plotly
+    
+
+      #Converting ggplot into a Plotly object
+      ggplotly(heat_p, tooltip=c("text"), height= get_height_heat()) %>%
+        # margins needed as long labels don't work well with Plotly
         layout(margin = list(l = 400, t = 50),
-             xaxis = list(side = 'top', fixedrange=TRUE), yaxis= list(fixedrange=TRUE),
-             font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif')
+               xaxis = list(side = 'top', fixedrange=TRUE), yaxis= list(fixedrange=TRUE),
+               font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif')
         ) %>%
         config(displayModeBar = FALSE, displaylogo = F, collaborate=F, editable =F) # taking out plotly logo and collaborate button
     }
+  }
+  
+  
+  output$heat_hwb <- renderPlotly({
+    
+    list_domains <- c("Behaviours", "Social care & housing", "Environment", "Life expectancy & mortality", 
+      "Women's & children's health", "Immunisations & screening", "Economy", 
+      "Crime", "Mental health", "Ill health & injury", "Education")
+    
+    heat_beha <- plot_heat("Behaviours")
+    heat_soccare <- plot_heat("Social care & housing")
+    heat_envirom <- plot_heat("Environment")
+    heat_lifexp <- plot_heat("Life expectancy & mortality")
+    heat_women <- plot_heat("Women's & children's health")
+    heat_immun <- plot_heat("Immunisations & screening")
+    heat_econom <- plot_heat("Economy")
+    heat_crime <- plot_heat("Crime")
+    heat_mh <- plot_heat("Mental health")
+    heat_injury <- plot_heat("Ill health & injury")
+    heat_education <- plot_heat("Education")
+    
+    
+    
+    subplot(heat_beha, heat_soccare, heat_envirom, heat_lifexp,heat_women,
+            heat_immun,heat_econom,heat_crime,heat_mh,heat_injury,heat_education,
+            nrows = 11, shareX = TRUE)
+    
   })
+  
+  # plot_heat <- function(){
+  #   
+  #   #Merging comparator and chosen area
+  #   if (input$comp_heat == 1){
+  #     heat <- left_join(x = heat_chosenarea(), y = heat_chosencomp(), by=c("indicator", "year")) %>% 
+  #       droplevels()
+  #   } else if (input$comp_heat == 2) {
+  #     heat <- left_join(x = heat_chosenarea(), y = heat_chosencomp(), by=c("indicator")) %>% 
+  #       droplevels()
+  #   }
+  #   
+  #   heat <- heat %>%  
+  #     #Creating a palette of colours based on statistical significance
+  #     mutate(color = case_when(heat$interpret == "O" ~ 'white',
+  #                              heat$lowci <= heat$comp_m & heat$upci >= heat$comp_m ~'gray',
+  #                              heat$lowci > heat$comp_m & heat$interpret == "H" ~ 'blue',
+  #                              heat$lowci > heat$comp_m & heat$interpret == "L" ~ 'red',
+  #                              heat$upci < heat$comp_m & heat$interpret == "L" ~ 'blue',
+  #                              heat$upci < heat$comp_m & heat$interpret == "H" ~ 'red', 
+  #                              TRUE ~ 'white'),
+  #            #identifies correct domain name for title
+  #            domain = as.factor(case_when(
+  #              substr(heat$profile_domain1,1,3)==input$profile_heat ~
+  #                substr(heat$profile_domain1, 5, nchar(as.vector(profile_domain1))),
+  #              TRUE ~ substr(heat$profile_domain2, 5, nchar(as.vector(profile_domain2)))))) %>% 
+  #     #reorders factors this way the chart prints indicators alphabetically within domain groupings
+  #     arrange(domain, indicator, year) %>% 
+  #     mutate(indicator = factor(indicator, levels = unique(indicator)))
+  #   # heat$indicator <- factor(heat$indicator, levels = unique(heat$indicator))
+  #   
+  #   #Tooltip
+  #   heat_tooltip <- paste0(heat$indicator, "<br>", heat$def_period, "<br>",
+  #                          heat$type_definition, "<br>", heat$measure)
+  #   
+  #   # Plotting data
+  #   ggplot(heat, aes(x = year, y = indicator, fill = color,
+  #                    text= heat_tooltip)) +
+  #     geom_tile(color = "black") +
+  #     geom_text(aes(label = round(measure, 0)), size =3) +
+  #     ylim(rev(levels(heat$indicator))) + #to order with A on top
+  #     #Another step needed to make the palette of colours for the tile work
+  #     scale_fill_manual(name = "Legend", labels = c("Significantly better", "Not significantly different", "Significantly worse", "Significance is not calculated"),
+  #                       values = c(blue = "#4da6ff", gray = "gray88", red = "#ffa64d", white = "#ffffff")) +
+  #     #Giving the right dimensions to the plot
+  #     scale_x_continuous(position = "top", breaks=seq(from = min(heat$year), to = max(heat$year), by =1)) +
+  #     #Layout
+  #     theme(axis.text.x = element_text(angle=90),
+  #           axis.ticks.y=element_blank(), # taking out axis tick marks
+  #           axis.title.x=element_blank(), #Taking out y axis title
+  #           axis.title.y=element_blank(), #Taking out y axis title
+  #           panel.background = element_blank(),#Blanking background
+  #           legend.position="none", #taking out legend
+  #           text = element_text(size=14) # changing font size
+  #     )
+  # }
+  
+  # output$heat_plot <- renderPlotly({
+  #   #If no data available for that period then plot message saying data is missing
+  #   if (is.data.frame(heat_chosenarea()) && nrow(heat_chosenarea()) == 0)
+  #   {
+  #     plot_nodata()
+  #   }
+  #   else { #If data is available then plot it
+  #   #Converting ggplot into a Plotly object
+  #     ggplotly(plot_heat(), tooltip=c("text"), height = get_height_heat()) %>%
+  #     # margins needed as long labels don't work well with Plotly
+  #       layout(margin = list(l = 400, t = 50),
+  #            xaxis = list(side = 'top', fixedrange=TRUE), yaxis= list(fixedrange=TRUE),
+  #            font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif')
+  #       ) %>%
+  #       config(displayModeBar = FALSE, displaylogo = F, collaborate=F, editable =F) # taking out plotly logo and collaborate button
+  #   }
+  # })
   
   #####################.
   # Downloading controls
