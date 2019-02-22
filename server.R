@@ -681,7 +681,7 @@ showModal(welcome_modal)
     {
       plot_nodata()
       } else { #If data is available then plot it
-    heat <- heat_data() %>% subset(domain == domain_plot)
+    heat <- heat_data() %>% subset(domain == domain_plot) %>% droplevels()
 
     get_height_heat <- function() {
       
@@ -705,7 +705,8 @@ showModal(welcome_modal)
       scale_fill_manual(name = "Legend", labels = c("Significantly better", "Not significantly different", "Significantly worse", "Significance is not calculated"),
                         values = c(blue = "#4da6ff", gray = "gray88", red = "#ffa64d", white = "#ffffff")) +
       #Giving the right dimensions to the plot
-      scale_x_continuous(position = "top", breaks=seq(from = min(heat$year), to = max(heat$year), by =1)) +
+      scale_x_continuous(position = "top", breaks=seq(from = min(heat_data()$year), 
+                                                      to = 2018, by =1)) + #max(heat_data()$year)
       #Layout
       theme(axis.text.x = element_text(angle=90),
             axis.ticks.y=element_blank(), # taking out axis tick marks
@@ -716,44 +717,82 @@ showModal(welcome_modal)
             text = element_text(size=14) # changing font size
       )
     
-
       #Converting ggplot into a Plotly object
       ggplotly(heat_p, tooltip=c("text"), height= get_height_heat()) %>%
         # margins needed as long labels don't work well with Plotly
-        layout(margin = list(l = 400, t = 50),
+        layout(margin = list(l = 400, t = 50, b =0),
                xaxis = list(side = 'top', fixedrange=TRUE), yaxis= list(fixedrange=TRUE),
-               font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif')
-        ) %>%
+               font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif')) %>%
         config(displayModeBar = FALSE, displaylogo = F, collaborate=F, editable =F) # taking out plotly logo and collaborate button
     }
   }
   
+  output$heat_hwb_beha <- renderPlotly({ plot_heat("Behaviours")})
+  output$heat_hwb_socare <- renderPlotly({ plot_heat("Social care & housing")})
+  output$heat_hwb_env <- renderPlotly({ plot_heat("Environment")})
+  output$heat_hwb_lifexp <- renderPlotly({ plot_heat("Life expectancy & mortality")})
+  output$heat_hwb_women <- renderPlotly({ plot_heat("Women's & children's health")})
+  output$heat_hwb_imm <- renderPlotly({ plot_heat("Immunisations & screening")})
+  output$heat_hwb_econ <- renderPlotly({ plot_heat("Economy")})
+  output$heat_hwb_crime <- renderPlotly({ plot_heat("Crime")})
+  output$heat_hwb_mh <- renderPlotly({ plot_heat("Mental health")})
+  output$heat_hwb_injury <- renderPlotly({ plot_heat("Ill health & injury")})
+  output$heat_hwb_educ <- renderPlotly({ plot_heat("Education")})
   
-  output$heat_hwb <- renderPlotly({
     
-    list_domains <- c("Behaviours", "Social care & housing", "Environment", "Life expectancy & mortality", 
-      "Women's & children's health", "Immunisations & screening", "Economy", 
-      "Crime", "Mental health", "Ill health & injury", "Education")
-    
-    heat_beha <- plot_heat("Behaviours")
-    heat_soccare <- plot_heat("Social care & housing")
-    heat_envirom <- plot_heat("Environment")
-    heat_lifexp <- plot_heat("Life expectancy & mortality")
-    heat_women <- plot_heat("Women's & children's health")
-    heat_immun <- plot_heat("Immunisations & screening")
-    heat_econom <- plot_heat("Economy")
-    heat_crime <- plot_heat("Crime")
-    heat_mh <- plot_heat("Mental health")
-    heat_injury <- plot_heat("Ill health & injury")
-    heat_education <- plot_heat("Education")
-    
-    
-    
-    subplot(heat_beha, heat_soccare, heat_envirom, heat_lifexp,heat_women,
-            heat_immun,heat_econom,heat_crime,heat_mh,heat_injury,heat_education,
-            nrows = 11, shareX = TRUE)
-    
+  output$heat_hwb <- renderUI({
+    tagList(
+    h3("Behaviours", style="color: black; text-align: center"),
+    withSpinner(plotlyOutput("heat_hwb_beha", height = "auto")),
+    h3("Social care & housing", style="color: black; text-align: center"),
+    withSpinner(plotlyOutput("heat_hwb_socare", height = "auto")),
+    h3("Environment", style="color: black; text-align: center"),
+    withSpinner(plotlyOutput("heat_hwb_env", height = "auto")),
+    h3("Life expectancy & mortality", style="color: black; text-align: center"),
+    withSpinner(plotlyOutput("heat_hwb_lifexp", height = "auto")),
+    h3("Women's & children's health", style="color: black; text-align: center"),
+    withSpinner(plotlyOutput("heat_hwb_women", height = "auto")),
+    h3("Immunisations & screening", style="color: black; text-align: center"),
+    withSpinner(plotlyOutput("heat_hwb_imm", height = "auto")),
+    h3("Economy", style="color: black; text-align: center"),
+    withSpinner(plotlyOutput("heat_hwb_econ", height = "auto")),
+    h3("Crime", style="color: black; text-align: center"),
+    withSpinner(plotlyOutput("heat_hwb_crime", height = "auto")),
+    h3("Mental health", style="color: black; text-align: center"),
+    withSpinner(plotlyOutput("heat_hwb_mh", height = "auto")),
+    h3("Ill health & injury", style="color: black; text-align: center"),
+    withSpinner(plotlyOutput("heat_hwb_injury", height = "auto")),
+    h3("Education", style="color: black; text-align: center"),
+    withSpinner(plotlyOutput("heat_hwb_educ", height = "auto"))
+    )
   })
+
+  
+  # output$heat_hwb <- renderPlotly({
+  #   
+  #   list_domains <- c("Behaviours", "Social care & housing", "Environment", "Life expectancy & mortality", 
+  #     "Women's & children's health", "Immunisations & screening", "Economy", 
+  #     "Crime", "Mental health", "Ill health & injury", "Education")
+  #   
+  #   heat_beha <- plot_heat("Behaviours")
+  #   heat_soccare <- plot_heat("Social care & housing")
+  #   heat_envirom <- plot_heat("Environment")
+  #   heat_lifexp <- plot_heat("Life expectancy & mortality")
+  #   heat_women <- plot_heat("Women's & children's health")
+  #   heat_immun <- plot_heat("Immunisations & screening")
+  #   heat_econom <- plot_heat("Economy")
+  #   heat_crime <- plot_heat("Crime")
+  #   heat_mh <- plot_heat("Mental health")
+  #   heat_injury <- plot_heat("Ill health & injury")
+  #   heat_education <- plot_heat("Education")
+  #   
+  #   
+  #   
+  #   subplot(heat_beha, heat_soccare, heat_envirom, heat_lifexp,heat_women,
+  #           heat_immun,heat_econom,heat_crime,heat_mh,heat_injury,heat_education,
+  #           nrows = 11, shareX = TRUE)
+  #   
+  # })
   
   # plot_heat <- function(){
   #   

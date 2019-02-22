@@ -312,7 +312,8 @@ tabPanel("Summary", icon = icon("list-ul"), value = "summary",
                    bsModal("mod_defs_heat", "Definitions", "defs_heat", htmlOutput('defs_text_heat')),
                    h4(textOutput("heat_title"), style="color: black; text-align: left"),
                    h5(textOutput("heat_subtitle"), style="color: black; text-align: left"),
-                   withSpinner(plotlyOutput("heat_hwb"))
+                   uiOutput("heat_hwb")
+                   # withSpinner(plotlyOutput("heat_hwb"))
                    # withSpinner(plotlyOutput("heat_plot"))
         )
   ), #Tab panel bracket
