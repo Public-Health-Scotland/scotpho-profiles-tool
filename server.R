@@ -1266,7 +1266,7 @@ showModal(welcome_modal)
     content = function(file){
       export(p = plot_trend_chart() %>% 
                layout(title = paste0(input$indic_trend), margin = list(t = 140)), 
-             file = file)
+             file = file, zoom = 3)
     })
   
 ###############################################.       
