@@ -20,6 +20,12 @@ library(shinydashboard) #for valuebox on techdoc tab
 library(sp)
 library(lubridate) #for automated list of dates in welcome modal
 library(shinycssloaders) #for loading icons
+library(webshot) #to download plotly charts
+# As well as webshot phantomjs is needed l to download Plotly charts
+# https://github.com/rstudio/shinyapps-package-dependencies/pull/180
+if (is.null(suppressMessages(webshot:::find_phantom()))) {
+  webshot::install_phantomjs()
+  }
 
 ###############################################.
 ## Functions ----
