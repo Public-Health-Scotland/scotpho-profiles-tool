@@ -245,266 +245,84 @@ showModal(welcome_modal)
     updateTabsetPanel(session, "intabset", selected = "others")
   })
   
-  ###############################################.        
-  #### Profile Summary (ring plot) ----
-  ###############################################.   
-  
-  ## Profile Summary (ring) help pop-up modal dialog - still need to create image file.
-  observeEvent(input$help_ring, {
-    showModal(modalDialog(
-      title = "How to use this chart",
-      p(img(src="help_ring.png",height=600)),size = "l",
-      easyClose = TRUE, fade=FALSE
-    ))
-  })
-  
-  ## REACTIVE CONTROLS
-  # Reactive controls for areatype depending on profile selected
-  output$geotype_ui_ring <- renderUI({
-    areas <- areatype_profile[[names(profile_list[unname(profile_list) == input$profile_ring])]]
-    
-    selectInput("geotype_ring", "Geography level", choices=areas,
-                selected = "Health board")
-  })
-  
-  # Reactive controls for profile summary:area name depending on areatype selected
-  output$geoname_ui_ring <- renderUI({
-    areas_ring <- if (input$geotype_ring %in% c("Health board", "Council area", "HSC partnership", "Alcohol & drug partnership"))
-    {
-      sort(geo_lookup$areaname[geo_lookup$areatype == input$geotype_ring])
-    } else {
-      sort(geo_lookup$areaname[geo_lookup$areatype == input$geotype_ring
-                               & geo_lookup$parent_area == input$loc_iz_ring])
-    }
-    selectInput("geoname_ring", "Select your area", choices = areas_ring,
-                selectize=TRUE, selected = "Health board")
-  })
-  
-  # Years to compare with depending on what data is available
-  output$yearcomp_ui_ring <- renderUI({
-    ring_years <- optdata %>%
-      subset (areaname == input$geoname_ring &
-                domain1 != "Population" &   #exclude population indicators
-                areatype  == input$geotype_ring) %>% #not sure this is strictly neccessary?
-      select(year) %>%
-      droplevels()
-    years <- c(min(ring_years$year):max(ring_years$year))
-    selectInput("yearcomp_ring", "Baseline year", choices = years,selectize=TRUE, selected = "2011")
-  })
-  
-
-  ## DATA SELECTIONS
-  # Ring data for the chosen area. Filtering based on user input values.
-  ring_chosenarea <- reactive({ 
-    optdata %>%
-      group_by(indicator) %>%
-      mutate(max_year=max(year))%>%
-      subset ((year==max_year) &
-                areaname == input$geoname_ring &
-                domain1 != "Population" &  #exclude population indicators
-                (substr(profile_domain1, 1, 3) == input$profile_ring |
-                   substr(profile_domain2, 1, 3) == input$profile_ring) &
-                areatype  == input$geotype_ring) %>%
-      droplevels()
-  })
-  
-  #Select comparator based on years available for area selected.
-  ring_chosencomp <- reactive({   
-    #filter data to create series for chosen comparator
-    if(input$comp_ring == 1){
-      ring_chosencomp <- optdata %>%
-        group_by(indicator) %>%
-        mutate(max_year=max(year))%>%
-        subset (year==max_year &
-                  areaname == input$geocomp_ring &
-                  domain1 != "Population" &
-                  (substr(profile_domain1, 1, 3) == input$profile_ring |
-                     substr(profile_domain2, 1, 3) == input$profile_ring) &
-                  areatype %in% c("Health board", "Council area", "Scotland")) %>% 
-        select(c(indicator, measure, year, areatype)) %>% 
-        rename(comp_m =measure,comp_areatype=areatype) %>% 
-        droplevels()
-    }else if(input$comp_ring==2){
-      ring_chosencomp <- optdata %>%
-        group_by(indicator) %>%
-        subset (year==input$yearcomp_ring &
-                  areaname == input$geoname_ring &
-                  domain1 != "Population" &
-                  (substr(profile_domain1, 1, 3) == input$profile_ring |
-                     substr(profile_domain2, 1, 3) == input$profile_ring) &
-                  areatype %in% c("Health board", "Council area", "Scotland")) %>% 
-        select(c(indicator, measure)) %>% 
-        rename(comp_m =measure) %>% 
-        droplevels()
-    }
-  })
-  
-  ## RING PLOT FUNCTION
-  plot_ring <- function(){   
-    
-    #Merging comparator and chosen area
-    if (input$comp_ring == 1){
-      ring <- merge(x=ring_chosenarea(), y=ring_chosencomp(), by=c("indicator", "year"))
-    } else if (input$comp_ring == 2) {
-      ring <- merge(x=ring_chosenarea(), y=ring_chosencomp(), by=c("indicator"), all.x = TRUE)
-    }
-    
-    #identify significant differences
-    ring <- ring %>%  
-      mutate(flag=case_when(
-        ring$interpret == "O" ~ 'No significance can be calculated',
-        ring$lowci<=ring$comp_m & ring$upci>=ring$comp_m ~'Statistically not significantly different from comparator average',
-        ring$lowci > ring$comp_m & ring$interpret == "H" ~'Statistically significantly better than comparator average',
-        ring$lowci > ring$comp_m & ring$interpret == "L" ~ 'Statistically significantly worse than comparator average',
-        ring$upci < ring$comp_m & ring$interpret == "L" ~'Statistically significantly better than comparator average',
-        ring$upci < ring$comp_m & ring$interpret == "H" ~'Statistically significantly worse than comparator average',
-        TRUE ~ 'No significance can be calculated'), 
-        #identifies correct domain name for title
-      domain=case_when(substr(ring$profile_domain1,1,3)==input$profile_ring ~ 
-                         substr(ring$profile_domain1, 5, nchar(as.vector(profile_domain1))),
-                       TRUE ~ substr(ring$profile_domain2,5,nchar(as.vector(profile_domain2))))) %>% 
-      select(domain,flag,indicator) %>%
-      droplevels()
-    
-    #reorder flag factors levels to get correct order in chart
-    ring$flag <- factor(ring$flag, levels=c("Statistically significantly better than comparator average","Statistically not significantly different from comparator average","Statistically significantly worse than comparator average","No significance can be calculated"))
-    
-    #group and count idicators within a domain by significance
-    ring <- ring %>%
-      group_by(domain,flag) %>%
-      count(indicator) %>%
-      summarise(count=sum(n))
-    
-    #group by domain to count total by domain
-    ring <- ring %>%  
-      group_by(domain) %>% arrange(domain) %>%
-      mutate(fraction=count/sum(count),
-             ymax=cumsum(fraction),
-             ymin=c(0,head(ymax,n=-1)),
-             ind_sum=sum(count),
-             bfrac=ifelse(flag =='Statistically significantly better than comparator average',
-                          fraction,0),
-             bcount=ifelse(flag =='Statistically significantly better than comparator average',
-                           count,0)) %>%
-      droplevels ()
-    
-    fill_df <- data.frame(flag = c ('No significance can be calculated',
-                                    'Statistically not significantly different from comparator average',
-                                    'Statistically significantly better than comparator average',
-                                    'Statistically significantly worse than comparator average'),
-                          stringsAsFactors = TRUE)
-    
-    fillcolours <- c("white","grey88","#4da6ff", "#ffa64d")
-    names(fillcolours) <- levels(fill_df$flag)
-    fill_colour <- scale_fill_manual(name = "flag",values = fillcolours)
-
-    ggplot(ring, aes(fill=flag, ymax=ymax, ymin=ymin, xmax=4.5, xmin=1.5)) +
-      geom_rect(colour='#555555') +
-      geom_label(data=ring, label.size = NA, aes(label =paste(count), x = 3, y = (ymin + ymax)/2),show.legend = F,size = 7, colour='#555555') +
-      fill_colour +
-      theme(
-        axis.text=element_blank(), # taking out x axis labels
-        axis.title = element_blank(),
-        text = element_text(family="Helvetica Neue,Helvetica,Arial,sans-serif",colour ='#555555'),
-        #plot.title = element_text(face = "bold",size=17),
-        #plot.subtitle = element_text(size=16,margin=margin(0,0,20,0,unit="pt")),
-        axis.ticks=element_blank(), # taking out x axis tick marks
-        legend.position = "none",
-        panel.background = element_blank(),#Blanking background
-        panel.border = element_blank())+ #remove frame round plot plot
-      facet_wrap(~ring$domain,labeller = label_wrap_gen(multi_line = TRUE)) +
-      coord_polar(theta="y") +
-      theme(
-        strip.text.x = element_text(size=14,colour='#555555',family="Helvetica Neue,Helvetica,Arial,sans-serif"),
-        strip.background = element_blank())+
-      xlim(c(0,4.5))
-  }
-  
-  # titles 
-  #create title and subtitle variables
-  output$ring_title <- renderText({
-    paste0(names(profile_list[unname(profile_list) == input$profile_ring])," profile")
-  })
-  
-  output$ring_subtitle <- renderText({
-    if(input$comp_ring == 1){
-      paste0(input$geoname_ring," (",input$geotype_ring,") compared against ",
-             input$geocomp_ring)
-    } else if(input$comp_ring==2){
-      paste0("Changes within ",input$geoname_ring,": latest data available",
-             " compared to ", input$yearcomp_ring)
-    }
-  })
-  
-  #Render plot in app and resize 
-  output$ring_plot <- renderPlot({
-    plot_ring()
-  }, height = function() {
-    session$clientData$output_ring_plot_width
-  })
-  
-  # Defined data file to down
-  ring_csv <- reactive({
-    #Merging comparator and chosen area
-    if (input$comp_ring == 1){
-      ring <- merge(x = ring_chosenarea(), y = ring_chosencomp(), by=c("indicator", "year"))
-    } else if (input$comp_ring == 2) {
-      ring <- merge(x = ring_chosenarea(), y = ring_chosencomp(), by=c("indicator"), all.x = TRUE)
-    }
-    
-    #identify significant differences
-    ring <- ring %>%
-      mutate(flag=case_when(
-        ring$interpret == "O" ~'No significance can be calculated',
-        ring$lowci<=ring$comp_m & ring$upci>=ring$comp_m ~'Statistically not significantly different from comparator average',
-        ring$lowci > ring$comp_m & ring$interpret == "H" ~ 'Statistically significantly better than comparator average',
-        ring$lowci > ring$comp_m & ring$interpret == "L" ~ 'Statistically significantly worse than comparator average',
-        ring$upci < ring$comp_m & ring$interpret == "L" ~'Statistically significantly better than comparator average',
-        ring$upci < ring$comp_m & ring$interpret == "H" ~'Statistically significantly worse than comparator average',
-        TRUE ~ 'Statistically not significantly different from comparator average'),
-      domain=case_when(substr(ring$profile_domain1,1,3)==input$profile_ring ~ 
-                         substr(ring$profile_domain1,5,nchar(as.vector(profile_domain1))),
-                       TRUE ~ substr(ring$profile_domain2,5,nchar(as.vector(profile_domain2))))) %>% #identifies correct domain name for title
-      droplevels()
-    
-    ring <- ring %>%
-      arrange(domain, flag) %>%
-      select(c(domain, flag, indicator, areaname, areatype, def_period, numerator, measure,
-               lowci, upci, type_definition, comp_m, comp_areatype)) %>%
-      rename(lower_confidence_interval=lowci, upper_confidence_interval=upci,
-             latest_period = def_period, definition = type_definition, comparator_measure = comp_m, difference=flag,comparator_geo=comp_areatype)
-  })
-  
-  # Download data file
-  output$download_ring <- downloadHandler( filename =  'ring_data.csv',
-                                           content = function(file) { write.csv(ring_csv(), file, row.names=FALSE) })
- # Downloading chart
-  output$download_ringplot <- downloadHandler(
-    filename = 'Profile_summary.png',
-    content = function(file){
-      if(input$comp_ring == 1){
-        ggsave(file, plot = plot_ring()
-               +ggtitle(label=paste0(names(profile_list[unname(profile_list) == input$profile_ring])," profile"),
-                        subtitle =paste0(input$geoname_ring," (",input$geotype_ring,") compared against ",input$geocomp_ring)),
-               device = "png",height = 15,width=15, limitsize=FALSE)
-      } else if(input$comp_ring==2){
-        ggsave(file, plot = plot_ring()
-               +ggtitle(label=paste0(names(profile_list[unname(profile_list) == input$profile_ring])," profile"),
-                        subtitle =paste0("Changes within ",input$geoname_ring,": latest data available"," compared to ", input$yearcomp_ring)),
-               device = "png",height = 15,width=15, limitsize=FALSE)
-      }
-    })
-  
+ 
   ###############################################.
   ## Summary ----
   ###############################################.
   
-  plot_profile_summary <- function() {
+  # plot_profile_summary <- function() {
+  #   
+  #   # only selecting maximum year for each indicator
+  #   prof_sum_data <- heat_data() %>% group_by(indicator) %>% top_n(1, year) %>% 
+  #     ungroup() %>% droplevels()
+  #   # creating variables used to define palette indicating if significantly different or not
+  #   prof_sum_data <- prof_sum_data %>% 
+  #     mutate(sign_colour = 
+  #              case_when(prof_sum_data$interpret == "O" ~ 'white',
+  #                        is.na(prof_sum_data$lowci) | is.na(prof_sum_data$upci) | 
+  #                          is.na(prof_sum_data$comp_m) | is.na(prof_sum_data$measure) |
+  #                          prof_sum_data$measure == 0 ~ 'white',
+  #                        prof_sum_data$lowci <= prof_sum_data$comp_m & 
+  #                          prof_sum_data$upci >= prof_sum_data$comp_m ~'gray',
+  #                        prof_sum_data$lowci > prof_sum_data$comp_m & 
+  #                          prof_sum_data$interpret == "H" ~ 'blue',
+  #                        prof_sum_data$lowci > prof_sum_data$comp_m & 
+  #                          prof_sum_data$interpret == "L" ~ 'red',
+  #                        prof_sum_data$upci < prof_sum_data$comp_m & 
+  #                          prof_sum_data$interpret == "L" ~ 'blue',
+  #                        prof_sum_data$upci < prof_sum_data$comp_m & 
+  #                          prof_sum_data$interpret == "H" ~ 'red', 
+  #                        TRUE ~ 'white'),
+  #            # Tooltip
+  #            tooltip_summary = c(paste0(prof_sum_data$def_period, "<br>",
+  #                                       input$geoname_heat, ": ", prof_sum_data$measure, "<br>",
+  #                                        input$geocomp_heat, ": ", prof_sum_data$comp_m, "<br>",
+  #                                       prof_sum_data$type_definition)))
+  #   
+  # 
+  #   
+  #   # eliminating both axis
+  #   axis_layout <- list(title = "", fixedrange=TRUE, zeroline = FALSE, showline = FALSE,
+  #                       showticklabels = FALSE, showgrid = FALSE)
+  #   
+  #   # defining plot function
+  #   make_summary_plot <- . %>% 
+  #     plot_ly( y = ~as.character(indicator),  text = ~indicator, color = ~sign_colour, 
+  #              colors=  c(blue = "#4da6ff", gray = "gray88", red = "#ffa64d", white = "#ffffff"),
+  #              height = 1000, width = 1200) %>% 
+  #     add_bars(x =1, showlegend= FALSE, width = 0.9, 
+  #              text=~tooltip_summary, hoverinfo="text",
+  #              marker = list(line= list(color="black", width = 0.5))) %>% 
+  #     # adding indicator name at center of each bar
+  #     add_text(x =0.5, textposition = 'middle-center', showlegend= FALSE, hoverinfo="skip",
+  #              textfont = list(color='black')) %>% 
+  #     add_annotations(text = ~unique(domain), x = 0.05, y = 1.1, yref = "paper",
+  #                     xref = "paper", xanchor = "left", yanchor = "top", showarrow = FALSE,
+  #                     font = list(size = 15)) %>%
+  #     layout(title = "Health and Wellbeing", yaxis = axis_layout, xaxis = axis_layout,
+  #            margin = list(b= 50 , t=40, l = 0, r = 0),
+  #            font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif')) %>% # to get hover compare mode as default
+  #     config(displayModeBar = FALSE, displaylogo = F, collaborate=F, editable =F)
+  #   
+  #   
+  #   prof_sum_data  %>%
+  #     group_by(domain) %>% 
+  #     do(p = make_summary_plot(.)) %>%
+  #     subplot(nrows = 4, shareX = TRUE, margin = c(0, 0, 0.015, 0.015))   
+  # }
+  
+  profile_summary_data <- reactive({
+    heat_data() %>% group_by(indicator) %>% top_n(1, year) %>% 
+      ungroup() %>% droplevels()
+  })
+  
+  
+  plot_profile_summary <- function(domainchosen) {
     
     # only selecting maximum year for each indicator
-    prof_sum_data <- heat_data() %>% group_by(indicator) %>% top_n(1, year) %>% 
-      ungroup() %>% droplevels()
-    # creating variables used to define palette indicating if significantly different or not
+    prof_sum_data <- profile_summary_data() %>% subset(domain == domainchosen) %>% droplevels()
+    
+   # creating variables used to define palette indicating if significantly different or not
     prof_sum_data <- prof_sum_data %>% 
       mutate(sign_colour = 
                case_when(prof_sum_data$interpret == "O" ~ 'white',
@@ -521,46 +339,93 @@ showModal(welcome_modal)
                            prof_sum_data$interpret == "L" ~ 'blue',
                          prof_sum_data$upci < prof_sum_data$comp_m & 
                            prof_sum_data$interpret == "H" ~ 'red', 
-                         TRUE ~ 'white'),
-             # Tooltip
-             tooltip_summary = c(paste0(prof_sum_data$def_period, "<br>",
-                                        input$geoname_heat, ": ", prof_sum_data$measure, "<br>",
-                                         input$geocomp_heat, ": ", prof_sum_data$comp_m, "<br>",
-                                        prof_sum_data$type_definition)))
-    
+                         TRUE ~ 'white'))
+   # Tooltip
+    if (input$comp_heat == 1) {#depending if time or area comparison
+      tooltip_summary <-  c(paste0(prof_sum_data$trend_axis, "<br>",
+                                   input$geoname_heat, ": ", prof_sum_data$measure, "  ||  ",
+                                   input$geocomp_heat, ": ", prof_sum_data$comp_m, "<br>",
+                                   prof_sum_data$type_definition))
+    } else if (input$comp_heat == 2) {
+      tooltip_summary <-  c(paste0(prof_sum_data$trend_axis, ": ",
+                                   prof_sum_data$measure, "<br>",
+                                   "Baseline period: ", prof_sum_data$comp_m, "<br>",
+                                   prof_sum_data$type_definition))
+    } 
 
-    
     # eliminating both axis
     axis_layout <- list(title = "", fixedrange=TRUE, zeroline = FALSE, showline = FALSE,
                         showticklabels = FALSE, showgrid = FALSE)
     
+    height_plot <- 38*nrow(prof_sum_data)+10 # height of the plot depends on number indicators
+    
     # defining plot function
-    make_summary_plot <- . %>% 
-      plot_ly( y = ~as.character(indicator),  text = ~indicator, color = ~sign_colour, 
+    plot_ly(prof_sum_data, y = ~as.character(indicator),   color = ~sign_colour, 
                colors=  c(blue = "#4da6ff", gray = "gray88", red = "#ffa64d", white = "#ffffff"),
-               height = 1000, width = 1200) %>% 
-      add_bars(x =1, showlegend= FALSE, width = 0.9, 
-               text=~tooltip_summary, hoverinfo="text",
+               height = height_plot, width = 320 ) %>% 
+      add_bars(x =1, showlegend= FALSE, width=1, hoverinfo="skip",
                marker = list(line= list(color="black", width = 0.5))) %>% 
       # adding indicator name at center of each bar
-      add_text(x =0.5, textposition = 'middle-center', showlegend= FALSE, hoverinfo="skip",
-               textfont = list(color='black')) %>% 
-      add_annotations(text = ~unique(domain), x = 0.05, y = 1.1, yref = "paper",
-                      xref = "paper", xanchor = "left", yanchor = "top", showarrow = FALSE,
-                      font = list(size = 15)) %>%
-      layout(title = "Health and Wellbeing", yaxis = axis_layout, xaxis = axis_layout,
-             margin = list(b= 50 , t=40, l = 0, r = 0),
+      add_text(text = ~indicator, x =0.5,  showlegend= FALSE, textfont = list(color='black'), 
+               hoverinfo="text", hovertext = tooltip_summary) %>% 
+      layout(yaxis = axis_layout, xaxis = axis_layout,
+             margin = list(b= 10 , t=0, l = 0, r = 0),
              font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif')) %>% # to get hover compare mode as default
       config(displayModeBar = FALSE, displaylogo = F, collaborate=F, editable =F)
-    
-    
-    prof_sum_data  %>%
-      group_by(domain) %>% 
-      do(p = make_summary_plot(.)) %>%
-      subplot(nrows = 4, shareX = TRUE, margin = c(0, 0, 0.015, 0.015))   
+ 
   }
   
-  output$profile_summary <- renderPlotly({ plot_profile_summary() })
+  ###############################################.
+  # Creating output plots for each domain of each profile 
+  # Charts for Health and wellbeing profile
+  output$summ_hwb_beha <- renderPlotly({ plot_profile_summary("Behaviours")})
+  output$summ_hwb_socare <- renderPlotly({ plot_profile_summary("Social care & housing")})
+  output$summ_hwb_env <- renderPlotly({ plot_profile_summary("Environment")})
+  output$summ_hwb_lifexp <- renderPlotly({ plot_profile_summary("Life expectancy & mortality")})
+  output$summ_hwb_women <- renderPlotly({ plot_profile_summary("Women's & children's health")})
+  output$summ_hwb_imm <- renderPlotly({ plot_profile_summary("Immunisations & screening")})
+  output$summ_hwb_econ <- renderPlotly({ plot_profile_summary("Economy")})
+  output$summ_hwb_crime <- renderPlotly({ plot_profile_summary("Crime")})
+  output$summ_hwb_mh <- renderPlotly({ plot_profile_summary("Mental health")})
+  output$summ_hwb_injury <- renderPlotly({ plot_profile_summary("Ill health & injury")})
+  output$summ_hwb_educ <- renderPlotly({ plot_profile_summary("Education")})
+  # Charts for Children and young people profile
+  output$summ_cyp_active <- renderPlotly({ plot_profile_summary("Active")})
+  output$summ_cyp_health <- renderPlotly({ plot_profile_summary("Healthy")})
+  output$summ_cyp_safe <- renderPlotly({ plot_profile_summary("Safe")})
+  output$summ_cyp_includ <- renderPlotly({ plot_profile_summary("Included")})
+  output$summ_cyp_nurt <- renderPlotly({ plot_profile_summary("Nurtured")})
+  output$summ_cyp_achiev <- renderPlotly({ plot_profile_summary("Achieving")})
+  output$summ_cyp_respon <- renderPlotly({ plot_profile_summary("Responsible")})
+  # Charts for Alcohol profile
+  output$summ_alc_env <- renderPlotly({ plot_profile_summary("Environment")})
+  output$summ_alc_serv <- renderPlotly({ plot_profile_summary("Services")})
+  output$summ_alc_commsaf <- renderPlotly({ plot_profile_summary("Community safety")})
+  output$summ_alc_family <- renderPlotly({ plot_profile_summary("CAPSM/Families")})
+  output$summ_alc_preval <- renderPlotly({ plot_profile_summary("Prevalence")})
+  output$summ_alc_health <- renderPlotly({ plot_profile_summary("Health")})
+  # Charts for Drugs profile
+  output$summ_drg_env <- renderPlotly({ plot_profile_summary("Environment")})
+  output$summ_drg_serv <- renderPlotly({ plot_profile_summary("Services")})
+  output$summ_drg_commsaf <- renderPlotly({ plot_profile_summary("Community safety")})
+  output$summ_drg_family <- renderPlotly({ plot_profile_summary("CAPSM/Families")})
+  output$summ_drg_preval <- renderPlotly({ plot_profile_summary("Prevalence")})
+  output$summ_drg_health <- renderPlotly({ plot_profile_summary("Health")})
+  output$summ_drg_data <- renderPlotly({ plot_profile_summary("Data quality")})
+  # Charts for mental health profile
+  output$summ_men_fem <- renderPlotly({ plot_profile_summary("Female adult")})
+  output$summ_men_male <- renderPlotly({ plot_profile_summary("Male adult")})
+  output$summ_men_cyp <- renderPlotly({ plot_profile_summary("CYP Mental Health")})
+  # Charts for Tobacco profile
+  output$summ_tob_school <- renderPlotly({ plot_profile_summary("Smoking in school children")})
+  output$summ_tob_cess <- renderPlotly({ plot_profile_summary("Smoking cessation & smoking cessation products")})
+  output$summ_tob_attrib <- renderPlotly({ plot_profile_summary("Smoking attributable deaths & diseases")})
+  output$summ_tob_pregn <- renderPlotly({ plot_profile_summary("Smoking during and post pregnancy")})
+  output$summ_tob_preval <- renderPlotly({ plot_profile_summary("Adult prevalence")})
+  output$summ_tob_retail <- renderPlotly({ plot_profile_summary("Retailer information")})
+  # Charts for population profile
+  output$summ_pop_pop <- renderPlotly({ plot_profile_summary("Population")})
+
 
   ###############################################.        
   #### Heatmap ----
@@ -792,7 +657,8 @@ showModal(welcome_modal)
         config(displayModeBar = FALSE, displaylogo = F, collaborate=F, editable =F) # taking out plotly logo and collaborate button
     }
   }
-  
+  ###############################################.
+  # Creating output plots for each domain of each profile 
   output$heat_hwb_beha <- renderPlotly({ plot_heat("Behaviours")})
   output$heat_hwb_socare <- renderPlotly({ plot_heat("Social care & housing")})
   output$heat_hwb_env <- renderPlotly({ plot_heat("Environment")})
@@ -805,12 +671,152 @@ showModal(welcome_modal)
   output$heat_hwb_injury <- renderPlotly({ plot_heat("Ill health & injury")})
   output$heat_hwb_educ <- renderPlotly({ plot_heat("Education")})
   
-    
+  ###############################################.
+  # This will create a reactive user interface depending on type of visualization 
+  # and profile selected
   output$heat_hwb <- renderUI({
     
     if (input$chart_summary == "Snapshot") {
-      withSpinner(plotlyOutput("profile_summary"))
-      
+      if (input$profile_heat == "HWB") {
+        tagList(#Health and Wellbeing profile
+          column(4,
+                 h5("Behaviours", style="color: black; text-align: center; font-weight: bold;"),
+                 withSpinner(plotlyOutput("summ_hwb_beha", height = "auto")),
+                 h5("Social care & housing", style="color: black; text-align: center; font-weight: bold;"),
+                 withSpinner(plotlyOutput("summ_hwb_socare", height = "auto")),
+                 h5("Environment", style="color: black; text-align: center; font-weight: bold;"),
+                 withSpinner(plotlyOutput("summ_hwb_env", height = "auto")),
+                 h5("Life expectancy & mortality", style="color: black; text-align: center; font-weight: bold;"),
+                 withSpinner(plotlyOutput("summ_hwb_lifexp", height = "auto"))
+          ),
+          column(4,
+                 h5("Women's & children's health", style="color: black; text-align: center; font-weight: bold;"),
+                 withSpinner(plotlyOutput("summ_hwb_women", height = "auto")),
+                 h5("Immunisations & screening", style="color: black; text-align: center; font-weight: bold;"),
+                 withSpinner(plotlyOutput("summ_hwb_imm", height = "auto")),
+                 h5("Economy", style="color: black; text-align: center; font-weight: bold;"),
+                 withSpinner(plotlyOutput("summ_hwb_econ", height = "auto")),
+                 h5("Crime", style="color: black; text-align: center; font-weight: bold;"),
+                 withSpinner(plotlyOutput("summ_hwb_crime", height = "auto"))
+          ),
+          column(4,
+                 h5("Mental health", style="color: black; text-align: center; font-weight: bold;"),
+                 withSpinner(plotlyOutput("summ_hwb_mh", height = "auto")),
+                 h5("Ill health & injury", style="color: black; text-align: center; font-weight: bold;"),
+                 withSpinner(plotlyOutput("summ_hwb_injury", height = "auto")),
+                 h5("Education", style="color: black; text-align: center; font-weight: bold;"),
+                 withSpinner(plotlyOutput("summ_hwb_educ", height = "auto"))
+          )
+        ) #taglist bracket
+      } else if (input$profile_heat == "CYP") {
+        tagList(#Children and young people profile
+          column(4,
+                 h5("Active", style="color: black; text-align: center; font-weight: bold;"),
+                 withSpinner(plotlyOutput("summ_cyp_active", height = "auto")),
+                 h5("Healthy", style="color: black; text-align: center; font-weight: bold;"),
+                 withSpinner(plotlyOutput("summ_cyp_health", height = "auto"))
+          ),
+          column(4,
+                 h5("Included", style="color: black; text-align: center; font-weight: bold;"),
+                 withSpinner(plotlyOutput("summ_cyp_includ", height = "auto")),
+                 h5("Nurtured", style="color: black; text-align: center; font-weight: bold;"),
+                 withSpinner(plotlyOutput("summ_cyp_nurt", height = "auto")),
+                 h5("Safe", style="color: black; text-align: center; font-weight: bold;"),
+                 withSpinner(plotlyOutput("summ_cyp_safe", height = "auto"))
+          ),
+          column(4,
+                 h5("Achieving", style="color: black; text-align: center; font-weight: bold;"),
+                 withSpinner(plotlyOutput("summ_cyp_achiev", height = "auto")),
+                 h5("Responsible", style="color: black; text-align: center; font-weight: bold;"),
+                 withSpinner(plotlyOutput("summ_cyp_respon", height = "auto"))
+          )
+        )# taglist bracket
+      } else if (input$profile_heat == "ALC") {
+        tagList(#Alcohol profile
+          column(4,
+                 h5("Environment", style="color: black; text-align: center; font-weight: bold;"),
+                 withSpinner(plotlyOutput("summ_alc_env", height = "auto")),
+                 h5("Services", style="color: black; text-align: center; font-weight: bold;"),
+                 withSpinner(plotlyOutput("summ_alc_serv", height = "auto"))
+          ),
+          column(4,
+                 h5("Community safety", style="color: black; text-align: center; font-weight: bold;"),
+                 withSpinner(plotlyOutput("summ_alc_commsaf", height = "auto")),
+                 h5("CAPSM/Families", style="color: black; text-align: center; font-weight: bold;"),
+                 withSpinner(plotlyOutput("summ_alc_family", height = "auto"))
+          ),
+          column(4,
+                 h5("Prevalence", style="color: black; text-align: center; font-weight: bold;"),
+                 withSpinner(plotlyOutput("summ_alc_preval", height = "auto")),
+                 h5("Health", style="color: black; text-align: center; font-weight: bold;"),
+                 withSpinner(plotlyOutput("summ_alc_health", height = "auto"))
+          )
+        )#taglist bracket
+      } else if (input$profile_heat == "DRG") {
+        tagList(#Drugs profile
+          column(4,
+                 h5("Environment", style="color: black; text-align: center; font-weight: bold;"),
+                 withSpinner(plotlyOutput("summ_drg_env", height = "auto")),
+                 h5("Services", style="color: black; text-align: center; font-weight: bold;"),
+                 withSpinner(plotlyOutput("summ_drg_serv", height = "auto")),
+                 h5("Data quality", style="color: black; text-align: center; font-weight: bold;"),
+                 withSpinner(plotlyOutput("summ_drg_dat", height = "auto"))
+          ),
+          column(4,
+                 h5("Community safety", style="color: black; text-align: center; font-weight: bold;"),
+                 withSpinner(plotlyOutput("summ_drg_commsaf", height = "auto")),
+                 h5("CAPSM/Families", style="color: black; text-align: center; font-weight: bold;"),
+                 withSpinner(plotlyOutput("summ_drg_family", height = "auto"))
+          ),
+          column(4,
+                 h5("Prevalence", style="color: black; text-align: center; font-weight: bold;"),
+                 withSpinner(plotlyOutput("summ_drg_preval", height = "auto")),
+                 h5("Health", style="color: black; text-align: center; font-weight: bold;"),
+                 withSpinner(plotlyOutput("summ_drg_health", height = "auto"))
+          )
+        )#taglist bracket
+      } else if (input$profile_heat == "MEN") {
+        tagList(#Mental Health profile
+          column(4,
+                 h5("Female adult", style="color: black; text-align: center; font-weight: bold;"),
+                 withSpinner(plotlyOutput("summ_men_fem", height = "auto"))
+          ),
+          column(4,
+                 h5("Male adult", style="color: black; text-align: center; font-weight: bold;"),
+                 withSpinner(plotlyOutput("summ_men_male", height = "auto"))
+          ),
+          column(4,
+                 h5("CYP Mental Health", style="color: black; text-align: center; font-weight: bold;"),
+                 withSpinner(plotlyOutput("summ_men_cyp", height = "auto"))
+          )
+        )#taglist bracket
+      } else if (input$profile_heat == "TOB") {
+        tagList(#Tobacco profile
+          column(4,
+                 h5("Smoking in school children", style="color: black; text-align: center; font-weight: bold;"),
+                 withSpinner(plotlyOutput("summ_tob_school", height = "auto")),
+                 h5("Smoking cessation & smoking cessation products", style="color: black; text-align: center; font-weight: bold;"),
+                 withSpinner(plotlyOutput("summ_tob_cess", height = "auto"))
+          ),
+          column(4,
+                 h5("Smoking attributable deaths & diseases", style="color: black; text-align: center; font-weight: bold;"),
+                 withSpinner(plotlyOutput("summ_tob_attrib", height = "auto")),
+                 h5("Smoking during and post pregnancy", style="color: black; text-align: center; font-weight: bold;"),
+                 withSpinner(plotlyOutput("summ_tob_pregn", height = "auto"))
+          ),
+          column(4,
+                 h5("Adult prevalence", style="color: black; text-align: center; font-weight: bold;"),
+                 withSpinner(plotlyOutput("summ_tob_preval", height = "auto")),
+                 h5("Retailer information", style="color: black; text-align: center; font-weight: bold;"),
+                 withSpinner(plotlyOutput("summ_tob_retail", height = "auto"))
+          )
+        )#taglist bracket
+      } else if (input$profile_heat == "POP") {
+        tagList(#Population profile
+          h5("Population", style="color: black; text-align: center; font-weight: bold;"),
+          withSpinner(plotlyOutput("summ_pop_pop", height = "auto"))
+        )#taglist bracket
+      }
     } else if (input$chart_summary == "Trend") {
       tagList(
         h3("Behaviours", style="color: black; text-align: center"),

@@ -215,62 +215,17 @@ tabPanel(
   )#Fluidrow bracket
 ) #main Panel bracket
   ),# tab panel bracket
-
-###############################################.
-## Ring plot ----
-###############################################.
-tabPanel(title = "Not used", icon = icon("adjust"), value = "ring",
-         sidebarPanel(width=3,
-                      actionButton("help_ring", label="Help", icon= icon('question-circle'), class ="down"),
-                      selectInput("profile_ring", "Profile", choices= profile_list, multiple=FALSE, selected = "HWB"),
-                      uiOutput("geotype_ui_ring"),
-                      conditionalPanel(#Conditional panel for extra dropdown for localities & IZ
-                        condition = "input.geotype_ring== 'HSC locality' | input.geotype_ring == 'Intermediate zone' ",
-                        selectInput("loc_iz_ring", label = "Partnership for localities/intermediate zones",
-                                    choices = partnership_name)
-                      ),
-                      uiOutput("geoname_ui_ring"),
-                      br(),
-                      p("This visualisation allows you to compare one area to another area or the same area over time"),
-                      awesomeRadio("comp_ring", label = "Compare against",
-                                   choices = list("Area" = 1, "Time" = 2),
-                                   selected = 1, inline=TRUE, checkbox=TRUE),
-                      conditionalPanel(condition = "input.comp_ring == 1 ",
-                                       selectInput("geocomp_ring", "Compare with", choices = comparator_list,
-                                                   selectize=TRUE, selected = "Scotland")
-                      ),
-                      conditionalPanel(condition = "input.comp_ring == 2 ",
-                                       uiOutput("yearcomp_ui_ring")),
-                      #Legend
-                      br(),
-                      p(img(src='signif_better.png', height=18, style="padding-right: 2px; vertical-align:middle"), 
-                        "Better than comparator", br(),
-                        img(src='non_signif.png', height=18, style="padding-right: 2px; vertical-align:middle"), 
-                        "Not different to comparator", br(),
-                        img(src='signif_worse.png', height=18, style="padding-right: 2px; vertical-align:middle"), 
-                        "Worse than comparator", br(),
-                        img(src='signif_nocalc.png', height=18, style="padding-right: 2px; vertical-align:middle"), 
-                        "No differences can be calculated"), 
-                      downloadButton('download_ring', 'Download data', class = "down"),
-                      savechart_button('download_ringplot', 'Save chart',  class = "down")
-         ),
-         mainPanel(width = 9,
-                   h4(textOutput("ring_title"), style="color: black; text-align: left"),
-                   h5(textOutput("ring_subtitle"), style="color: black; text-align: left"),
-                   withSpinner(plotOutput("ring_plot", height="auto"))
-         )
-), #Tab panel bracket
 ###############################################.
 ## Summary ----
 ###############################################.
 tabPanel("Summary", icon = icon("list-ul"), value = "summary",
          wellPanel( #Filter options
-           column(2,
+           column(3,
                   selectInput("profile_heat", "Profile", choices = profile_list),
                   radioGroupButtons("chart_summary", label= "", status = "primary",
                                     choices = c("Snapshot", "Trend"), justified = TRUE)
            ),
-           column(3,
+           column(2,
                   uiOutput("geotype_ui_heat"),
                   conditionalPanel(#Conditional panel for extra dropdown for localities & IZ
                     condition = "input.geotype_heat== 'HSC locality' | input.geotype_heat == 'Intermediate zone' ",
