@@ -494,6 +494,73 @@ showModal(welcome_modal)
                device = "png",height = 15,width=15, limitsize=FALSE)
       }
     })
+  
+  ###############################################.
+  ## Summary ----
+  ###############################################.
+  
+  plot_profile_summary <- function() {
+    
+    # only selecting maximum year for each indicator
+    prof_sum_data <- heat_data() %>% group_by(indicator) %>% top_n(1, year) %>% 
+      ungroup() %>% droplevels()
+    # creating variables used to define palette indicating if significantly different or not
+    prof_sum_data <- prof_sum_data %>% 
+      mutate(sign_colour = 
+               case_when(prof_sum_data$interpret == "O" ~ 'white',
+                         is.na(prof_sum_data$lowci) | is.na(prof_sum_data$upci) | 
+                           is.na(prof_sum_data$comp_m) | is.na(prof_sum_data$measure) |
+                           prof_sum_data$measure == 0 ~ 'white',
+                         prof_sum_data$lowci <= prof_sum_data$comp_m & 
+                           prof_sum_data$upci >= prof_sum_data$comp_m ~'gray',
+                         prof_sum_data$lowci > prof_sum_data$comp_m & 
+                           prof_sum_data$interpret == "H" ~ 'blue',
+                         prof_sum_data$lowci > prof_sum_data$comp_m & 
+                           prof_sum_data$interpret == "L" ~ 'red',
+                         prof_sum_data$upci < prof_sum_data$comp_m & 
+                           prof_sum_data$interpret == "L" ~ 'blue',
+                         prof_sum_data$upci < prof_sum_data$comp_m & 
+                           prof_sum_data$interpret == "H" ~ 'red', 
+                         TRUE ~ 'white'),
+             # Tooltip
+             tooltip_summary = c(paste0(prof_sum_data$def_period, "<br>",
+                                        input$geoname_heat, ": ", prof_sum_data$measure, "<br>",
+                                         input$geocomp_heat, ": ", prof_sum_data$comp_m, "<br>",
+                                        prof_sum_data$type_definition)))
+    
+
+    
+    # eliminating both axis
+    axis_layout <- list(title = "", fixedrange=TRUE, zeroline = FALSE, showline = FALSE,
+                        showticklabels = FALSE, showgrid = FALSE)
+    
+    # defining plot function
+    make_summary_plot <- . %>% 
+      plot_ly( y = ~as.character(indicator),  text = ~indicator, color = ~sign_colour, 
+               colors=  c(blue = "#4da6ff", gray = "gray88", red = "#ffa64d", white = "#ffffff"),
+               height = 1000, width = 1200) %>% 
+      add_bars(x =1, showlegend= FALSE, width = 0.9, 
+               text=~tooltip_summary, hoverinfo="text",
+               marker = list(line= list(color="black", width = 0.5))) %>% 
+      # adding indicator name at center of each bar
+      add_text(x =0.5, textposition = 'middle-center', showlegend= FALSE, hoverinfo="skip",
+               textfont = list(color='black')) %>% 
+      add_annotations(text = ~unique(domain), x = 0.05, y = 1.1, yref = "paper",
+                      xref = "paper", xanchor = "left", yanchor = "top", showarrow = FALSE,
+                      font = list(size = 15)) %>%
+      layout(title = "Health and Wellbeing", yaxis = axis_layout, xaxis = axis_layout,
+             margin = list(b= 50 , t=40, l = 0, r = 0),
+             font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif')) %>% # to get hover compare mode as default
+      config(displayModeBar = FALSE, displaylogo = F, collaborate=F, editable =F)
+    
+    
+    prof_sum_data  %>%
+      group_by(domain) %>% 
+      do(p = make_summary_plot(.)) %>%
+      subplot(nrows = 4, shareX = TRUE, margin = c(0, 0, 0.015, 0.015))   
+  }
+  
+  output$profile_summary <- renderPlotly({ plot_profile_summary() })
 
   ###############################################.        
   #### Heatmap ----
@@ -696,9 +763,8 @@ showModal(welcome_modal)
                            heat$type_definition, "<br>", heat$measure)
     
     # Plotting data
-    heat_p <- ggplot(heat, aes(x = year, y = indicator, fill = color,
-                     text= heat_tooltip)) +
-      geom_tile(color = "black") +
+    heat_p <- ggplot(heat, aes(x = year, y = indicator, fill = color)) +
+      geom_tile(color = "black", text= heat_tooltip) +
       geom_text(aes(label = round(measure, 0)), size =3) +
       ylim(rev(levels(heat$indicator))) + #to order with A on top
       #Another step needed to make the palette of colours for the tile work
@@ -741,30 +807,37 @@ showModal(welcome_modal)
   
     
   output$heat_hwb <- renderUI({
-    tagList(
-    h3("Behaviours", style="color: black; text-align: center"),
-    withSpinner(plotlyOutput("heat_hwb_beha", height = "auto")),
-    h3("Social care & housing", style="color: black; text-align: center"),
-    withSpinner(plotlyOutput("heat_hwb_socare", height = "auto")),
-    h3("Environment", style="color: black; text-align: center"),
-    withSpinner(plotlyOutput("heat_hwb_env", height = "auto")),
-    h3("Life expectancy & mortality", style="color: black; text-align: center"),
-    withSpinner(plotlyOutput("heat_hwb_lifexp", height = "auto")),
-    h3("Women's & children's health", style="color: black; text-align: center"),
-    withSpinner(plotlyOutput("heat_hwb_women", height = "auto")),
-    h3("Immunisations & screening", style="color: black; text-align: center"),
-    withSpinner(plotlyOutput("heat_hwb_imm", height = "auto")),
-    h3("Economy", style="color: black; text-align: center"),
-    withSpinner(plotlyOutput("heat_hwb_econ", height = "auto")),
-    h3("Crime", style="color: black; text-align: center"),
-    withSpinner(plotlyOutput("heat_hwb_crime", height = "auto")),
-    h3("Mental health", style="color: black; text-align: center"),
-    withSpinner(plotlyOutput("heat_hwb_mh", height = "auto")),
-    h3("Ill health & injury", style="color: black; text-align: center"),
-    withSpinner(plotlyOutput("heat_hwb_injury", height = "auto")),
-    h3("Education", style="color: black; text-align: center"),
-    withSpinner(plotlyOutput("heat_hwb_educ", height = "auto"))
-    )
+    
+    if (input$chart_summary == "Snapshot") {
+      withSpinner(plotlyOutput("profile_summary"))
+      
+    } else if (input$chart_summary == "Trend") {
+      tagList(
+        h3("Behaviours", style="color: black; text-align: center"),
+        withSpinner(plotlyOutput("heat_hwb_beha", height = "auto")),
+        h3("Social care & housing", style="color: black; text-align: center"),
+        withSpinner(plotlyOutput("heat_hwb_socare", height = "auto")),
+        h3("Environment", style="color: black; text-align: center"),
+        withSpinner(plotlyOutput("heat_hwb_env", height = "auto")),
+        h3("Life expectancy & mortality", style="color: black; text-align: center"),
+        withSpinner(plotlyOutput("heat_hwb_lifexp", height = "auto")),
+        h3("Women's & children's health", style="color: black; text-align: center"),
+        withSpinner(plotlyOutput("heat_hwb_women", height = "auto")),
+        h3("Immunisations & screening", style="color: black; text-align: center"),
+        withSpinner(plotlyOutput("heat_hwb_imm", height = "auto")),
+        h3("Economy", style="color: black; text-align: center"),
+        withSpinner(plotlyOutput("heat_hwb_econ", height = "auto")),
+        h3("Crime", style="color: black; text-align: center"),
+        withSpinner(plotlyOutput("heat_hwb_crime", height = "auto")),
+        h3("Mental health", style="color: black; text-align: center"),
+        withSpinner(plotlyOutput("heat_hwb_mh", height = "auto")),
+        h3("Ill health & injury", style="color: black; text-align: center"),
+        withSpinner(plotlyOutput("heat_hwb_injury", height = "auto")),
+        h3("Education", style="color: black; text-align: center"),
+        withSpinner(plotlyOutput("heat_hwb_educ", height = "auto"))
+      )
+    }
+    
   })
 
   
@@ -893,6 +966,7 @@ showModal(welcome_modal)
                          ), 
                device = "png", scale=4, limitsize=FALSE)
       })
+
     
 ##############################################.
 ## Barcode ----

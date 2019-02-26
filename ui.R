@@ -267,7 +267,8 @@ tabPanel("Summary", icon = icon("list-ul"), value = "summary",
          wellPanel( #Filter options
            column(2,
                   selectInput("profile_heat", "Profile", choices = profile_list),
-                  uiOutput("topic_ui_heat")
+                  radioGroupButtons("chart_summary", label= "", status = "primary",
+                                    choices = c("Snapshot", "Trend"), justified = TRUE)
            ),
            column(3,
                   uiOutput("geotype_ui_heat"),
@@ -313,8 +314,6 @@ tabPanel("Summary", icon = icon("list-ul"), value = "summary",
                    h4(textOutput("heat_title"), style="color: black; text-align: left"),
                    h5(textOutput("heat_subtitle"), style="color: black; text-align: left"),
                    uiOutput("heat_hwb")
-                   # withSpinner(plotlyOutput("heat_hwb"))
-                   # withSpinner(plotlyOutput("heat_plot"))
         )
   ), #Tab panel bracket
 #####################################################################.
