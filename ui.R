@@ -220,30 +220,29 @@ tabPanel(
 ###############################################.
 tabPanel("Summary", icon = icon("list-ul"), value = "summary",
          wellPanel( #Filter options
-           column(3,
-                  selectInput("profile_heat", "Profile", choices = profile_list),
-                  radioGroupButtons("chart_summary", label= "", status = "primary",
-                                    choices = c("Snapshot", "Trend"), justified = TRUE)
-           ),
            column(2,
-                  uiOutput("geotype_ui_heat"),
+                  selectInput("profile_summary", "Profile", choices = profile_list),
+                  actionButton("help_summary",label="Help", icon= icon('question-circle'), class ="down")
+           ),
+           column(3,
+                  uiOutput("geotype_ui_summary"),
                   conditionalPanel(#Conditional panel for extra dropdown for localities & IZ
-                    condition = "input.geotype_heat== 'HSC locality' | input.geotype_heat == 'Intermediate zone' ",
-                    selectInput("loc_iz_heat", label = "Partnership for localities/intermediate zones",
+                    condition = "input.geotype_summary== 'HSC locality' | input.geotype_summary == 'Intermediate zone' ",
+                    selectInput("loc_iz_summary", label = "Partnership for localities/intermediate zones",
                                 choices = partnership_name)
                   ),
-                  uiOutput("geoname_ui_heat")
+                  uiOutput("geoname_ui_summary")
            ),
            column(2,
-                  awesomeRadio("comp_heat", label = "Compare against",
+                  awesomeRadio("comp_summary", label = "Compare against",
                                choices = list("Area" = 1, "Time" = 2), 
                                selected = 1, inline=TRUE, checkbox = TRUE),
-                  conditionalPanel(condition = "input.comp_heat == 1 ",  
-                                   selectInput("geocomp_heat", "Compare with", choices = comparator_list,
+                  conditionalPanel(condition = "input.comp_summary == 1 ",  
+                                   selectInput("geocomp_summary", "Compare with", choices = comparator_list,
                                                selectize=TRUE, selected = "Scotland")
                   ),
-                  conditionalPanel(condition = "input.comp_heat == 2 ", 
-                                   uiOutput("yearcomp_ui_heat")
+                  conditionalPanel(condition = "input.comp_summary == 2 ", 
+                                   uiOutput("yearcomp_ui_summary")
                   ) 
            ),
            column(3,
@@ -258,17 +257,19 @@ tabPanel("Summary", icon = icon("list-ul"), value = "summary",
                     "No differences can be calculated")
            ),
            column(2,
-                  actionButton("help_heat",label="Help", icon= icon('question-circle'), class ="down"),
-                  actionButton("defs_heat",label="Definitions", icon= icon('info'), class ="down"),
-                  downloadButton('download_heat', 'Download data', class = "down"),
-                  savechart_button('download_heatplot', 'Save chart',  class = "down")
-           )
-         ),
+                  actionButton("defs_summary",label="Definitions", icon= icon('info'), class ="down"),
+                  downloadButton('download_summary', 'Download data', class = "down"),
+                  savechart_button('download_summaryplot', 'Save chart',  class = "down")
+           ),
+           div(radioGroupButtons("chart_summary", label= "", status = "primary", 
+                             choices = c("Snapshot", "Trend"), justified = TRUE),
+               style = "width:50%; margin-left: 25%") # centering div
+         ), #well panel bracket
          mainPanel(width = 12,
-                   bsModal("mod_defs_heat", "Definitions", "defs_heat", htmlOutput('defs_text_heat')),
-                   h4(textOutput("heat_title"), style="color: black; text-align: left"),
-                   h5(textOutput("heat_subtitle"), style="color: black; text-align: left"),
-                   uiOutput("heat_hwb")
+                   bsModal("mod_defs_summary", "Definitions", "defs_summary", htmlOutput('defs_text_summary')),
+                   h4(textOutput("summary_title"), style="color: black; text-align: left"),
+                   h5(textOutput("summary_subtitle"), style="color: black; text-align: left"),
+                   uiOutput("summary_ui_plots")
         )
   ), #Tab panel bracket
 #####################################################################.
