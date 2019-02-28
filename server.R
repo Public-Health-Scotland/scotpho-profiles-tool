@@ -388,6 +388,24 @@ showModal(welcome_modal)
   })
   
   #####################.
+  # titles 
+  #create title and subtitle variables
+  output$summary_title <- renderText({
+    paste0(names(profile_list[unname(profile_list) == input$profile_summary]),
+           " profile")
+  })
+  
+  output$summary_subtitle <- renderText({
+    if(input$comp_summary == 1){
+      paste0(input$geoname_summary," (",input$geotype_summary,") compared against ",
+             input$geocomp_summary)
+    } else if(input$comp_summary==2){
+      paste0("Changes within ",input$geoname_summary,": latest data available",
+             " compared to ", input$yearcomp_summary)
+    }
+  })
+  
+  #####################.
   # Downloading controls
   # Downloading data
   summary_csv <- reactive({ 
@@ -406,18 +424,25 @@ showModal(welcome_modal)
   output$download_summaryplot <- downloadHandler(
     filename = 'heatmap.png',
     content = function(file){
-      ggsave(file, plot = plot_heat()+ 
-               ggtitle(paste0(names(profile_list[unname(profile_list) == input$profile_summary]),
-                              " profile: "),
-                       subtitle =       if(input$comp_heat == 1){
-                         paste0(input$geoname_heat," (",input$geotype_heat,") compared against ",
-                                input$geocomp_heat)
-                       } else if(input$comp_heat==2){
-                         paste0("Changes within ",input$geoname_heat,": latest data available",
-                                " compared to ", input$yearcomp_heat)
-                       }
-               ), 
-             device = "png", scale=4, limitsize=FALSE)
+      if (input$chart_summary == "Snapshot") {
+        export(p = plot_snapshot_download() %>% 
+                    layout(title = paste0(input$profile_summary), 
+                           margin = list(t = 140)), 
+               file = file, zoom = 3)
+      } else if (input$chart_summary == "Trend") {
+        ggsave(file, plot = plot_heat()+
+                 ggtitle(paste0(names(profile_list[unname(profile_list) == input$profile_summary]),
+                                " profile: "),
+                         subtitle =       if(input$comp_heat == 1){
+                           paste0(input$geoname_heat," (",input$geotype_heat,") compared against ",
+                                  input$geocomp_heat)
+                         } else if(input$comp_heat==2){
+                           paste0("Changes within ",input$geoname_heat,": latest data available",
+                                  " compared to ", input$yearcomp_heat)
+                         }
+                 ),
+               device = "png", scale=4, limitsize=FALSE)     
+      }
     })
   
   
@@ -429,7 +454,7 @@ showModal(welcome_modal)
     summary_data() %>% group_by(indicator) %>% top_n(1, year) %>% 
       ungroup() %>% droplevels() %>% 
       # Indicator names in two lines, but without splitting words
-      # It split both sides of the cut point and identify if a word has been cur
+      # It split both sides of the cut point and identify if a word has been cut
       mutate(indicator = as.character(indicator), # needed for plot and substring
              pluschars = substring(indicator, 35),
              underchars = substring(indicator, 1, 34),
@@ -446,68 +471,6 @@ showModal(welcome_modal)
                          TRUE ~ paste0(underchars, unfinished_word, "<br>", plus_minus_unfinished)))
   })
   
-  
-  # plot_profile_summary <- function() {
-  #   
-  #   # only selecting maximum year for each indicator
-  #   prof_sum_data <- summary_data() %>% group_by(indicator) %>% top_n(1, year) %>% 
-  #     ungroup() %>% droplevels()
-  #   # creating variables used to define palette indicating if significantly different or not
-  #   prof_sum_data <- prof_sum_data %>% 
-  #     mutate(sign_colour = 
-  #              case_when(prof_sum_data$interpret == "O" ~ 'white',
-  #                        is.na(prof_sum_data$lowci) | is.na(prof_sum_data$upci) | 
-  #                          is.na(prof_sum_data$comp_m) | is.na(prof_sum_data$measure) |
-  #                          prof_sum_data$measure == 0 ~ 'white',
-  #                        prof_sum_data$lowci <= prof_sum_data$comp_m & 
-  #                          prof_sum_data$upci >= prof_sum_data$comp_m ~'gray',
-  #                        prof_sum_data$lowci > prof_sum_data$comp_m & 
-  #                          prof_sum_data$interpret == "H" ~ 'blue',
-  #                        prof_sum_data$lowci > prof_sum_data$comp_m & 
-  #                          prof_sum_data$interpret == "L" ~ 'red',
-  #                        prof_sum_data$upci < prof_sum_data$comp_m & 
-  #                          prof_sum_data$interpret == "L" ~ 'blue',
-  #                        prof_sum_data$upci < prof_sum_data$comp_m & 
-  #                          prof_sum_data$interpret == "H" ~ 'red', 
-  #                        TRUE ~ 'white'),
-  #            # Tooltip
-  #            tooltip_summary = c(paste0(prof_sum_data$def_period, "<br>",
-  #                                       input$geoname_summary, ": ", prof_sum_data$measure, "<br>",
-  #                                        input$geocomp_summary, ": ", prof_sum_data$comp_m, "<br>",
-  #                                       prof_sum_data$type_definition)))
-  #   
-  # 
-  #   
-  #   # eliminating both axis
-  #   axis_layout <- list(title = "", fixedrange=TRUE, zeroline = FALSE, showline = FALSE,
-  #                       showticklabels = FALSE, showgrid = FALSE)
-  #   
-  #   # defining plot function
-  #   make_summary_plot <- . %>% 
-  #     plot_ly( y = ~as.character(indicator),  text = ~indicator, color = ~sign_colour, 
-  #              colors=  c(blue = "#4da6ff", gray = "gray88", red = "#ffa64d", white = "#ffffff"),
-  #              height = 1000, width = 1200) %>% 
-  #     add_bars(x =1, showlegend= FALSE, width = 0.9, 
-  #              text=~tooltip_summary, hoverinfo="text",
-  #              marker = list(line= list(color="black", width = 0.5))) %>% 
-  #     # adding indicator name at center of each bar
-  #     add_text(x =0.5, textposition = 'middle-center', showlegend= FALSE, hoverinfo="skip",
-  #              textfont = list(color='black')) %>% 
-  #     add_annotations(text = ~unique(domain), x = 0.05, y = 1.1, yref = "paper",
-  #                     xref = "paper", xanchor = "left", yanchor = "top", showarrow = FALSE,
-  #                     font = list(size = 15)) %>%
-  #     layout(title = "Health and Wellbeing", yaxis = axis_layout, xaxis = axis_layout,
-  #            margin = list(b= 50 , t=40, l = 0, r = 0),
-  #            font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif')) %>% # to get hover compare mode as default
-  #     config(displayModeBar = FALSE, displaylogo = F, collaborate=F, editable =F)
-  #   
-  #   
-  #   prof_sum_data  %>%
-  #     group_by(domain) %>% 
-  #     do(p = make_summary_plot(.)) %>%
-  #     subplot(nrows = 4, shareX = TRUE, margin = c(0, 0, 0.015, 0.015))   
-  # }
-  
   ###############################################.
   # Function that creates a snapshot plot for a domain 
   plot_profile_summary <- function(domainchosen) {
@@ -515,6 +478,12 @@ showModal(welcome_modal)
     # only selecting maximum year for each indicator
     prof_snap_data <- snapshot_data() %>% subset(domain == domainchosen) %>% 
       droplevels() 
+    
+    #If no data available for that period then plot message saying data is missing
+    if (is.data.frame(prof_snap_data) && nrow(prof_snap_data) == 0)
+    {
+      plot_nodata()
+    } else { 
 
    # Tooltip
     if (input$comp_summary == 1) {#depending if time or area comparison
@@ -549,6 +518,7 @@ showModal(welcome_modal)
              margin = list(b= 10 , t=5, l = 5, r = 0),
              font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif')) %>% # to get hover compare mode as default
       config(displayModeBar = FALSE, displaylogo = F, collaborate=F, editable =F)
+    }
  
   }
   
@@ -602,28 +572,56 @@ showModal(welcome_modal)
   output$summ_tob_retail <- renderPlotly({ plot_profile_summary("Retailer information")})
   # Charts for population profile
   output$summ_pop_pop <- renderPlotly({ plot_profile_summary("Population")})
+  
+###############################################.
+  # Function that creates a snapshot plot ready for download
+  plot_snapshot_download <- function() {
+    
+    # Tooltip
+    if (input$comp_summary == 1) {#depending if time or area comparison
+      tooltip_summary <-  c(paste0(snapshot_data()$trend_axis, "<br>",
+                                   input$geoname_summary, ": ", snapshot_data()$measure, "  ||  ",
+                                   input$geocomp_summary, ": ", snapshot_data()$comp_m, "<br>",
+                                   snapshot_data()$type_definition))
+    } else if (input$comp_summary == 2) {
+      tooltip_summary <-  c(paste0(snapshot_data()$trend_axis, ": ",
+                                   snapshot_data()$measure, "<br>",
+                                   "Baseline period: ", snapshot_data()$comp_m, "<br>",
+                                   snapshot_data()$type_definition))
+    } 
+    
+    # eliminating both axis
+    axis_layout <- list(title = "", fixedrange=TRUE, zeroline = FALSE, showline = FALSE,
+                        showticklabels = FALSE, showgrid = FALSE)
 
+    # defining plot function
+    make_snapshot_plot <- . %>%
+      plot_ly( y = ~indicator,  text = ~indicator, color = ~color,
+               colors=  c(blue = "#4da6ff", gray = "gray88", red = "#ffa64d", white = "#ffffff"),
+               height = 1000, width = 1200) %>%
+      add_bars(x =1, showlegend= FALSE, width=1, 
+               hoverinfo="text", hovertext = tooltip_summary,
+               marker = list(line= list(color="black", width = 0.5))) %>% 
+      # adding indicator name at center of each bar
+      add_text(text = ~indic_multiline, x =0.5,  showlegend= FALSE, 
+               textfont = list(color='black'), hoverinfo="skip" ) %>% 
+      add_annotations(text = ~unique(domain), x = 0.05, y = 1.1, yref = "paper",
+                      xref = "paper", xanchor = "left", yanchor = "top", showarrow = FALSE,
+                      font = list(size = 15)) %>%
+      layout(yaxis = axis_layout, xaxis = axis_layout,
+             margin = list(b= 10 , t=5, l = 5, r = 0),
+             font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif')) %>% # to get hover compare mode as default
+      config(displayModeBar = FALSE, displaylogo = F, collaborate=F, editable =F)
+
+    snapshot_data()  %>%
+      group_by(domain) %>%
+      do(p = make_snapshot_plot(.)) %>%
+      subplot(nrows = 4, shareX = TRUE, margin = c(0, 0, 0.015, 0.015))
+  }
+  
   ###############################################.        
   #### Heatmap ----
-  ###############################################.   
-  #####################.
-  # titles 
-  #create title and subtitle variables
-  output$summary_title <- renderText({
-    paste0(names(profile_list[unname(profile_list) == input$profile_summary]),
-                       " profile")
-  })
-  
-  output$summary_subtitle <- renderText({
-    if(input$comp_summary == 1){
-      paste0(input$geoname_summary," (",input$geotype_summary,") compared against ",
-             input$geocomp_summary)
-    } else if(input$comp_summary==2){
-      paste0("Changes within ",input$geoname_summary,": latest data available",
-           " compared to ", input$yearcomp_summary)
-    }
-  })
-  
+  ###############################################.  
   #####################.
   #Heatmap plot
   
@@ -689,6 +687,7 @@ showModal(welcome_modal)
         config(displayModeBar = FALSE, displaylogo = F, collaborate=F, editable =F) # taking out plotly logo and collaborate button
     }
   }
+  
   ###############################################.
   # Creating output plots for each domain of each profile 
   output$heat_hwb_beha <- renderPlotly({ plot_heat("Behaviours")})
