@@ -2009,14 +2009,22 @@ showModal(welcome_modal)
   ###############################################.
   # Preparing reactive data for table output
   filter_table <- reactive ({
-    
+    if (is.null(input$indicator_filter) & is.null(input$indicator_filter) & 
+        is.null(input$indicator_filter)) {
+      # if no data selected create empty dataset to avoid app crashing
+      table <- data.frame(code = factor(), areaname = factor(), areatype = factor(), 
+                          indicator = factor(), year = double(), 
+                          def_period = factor(), numerator =double(), measure =double(), 
+                          lowci =double(), upci=double(), type_definition = factor())
+
     #if list of indicators selected
-    if (!is.null(input$indicator_filter)) { 
-      if (input$all_data == TRUE) {
+    } else {
+      if (!is.null(input$indicator_filter)) { 
+        if (input$all_data == TRUE) {
         filtered_geos <- optdata %>%  
           filter(year>=input$date_from[1] & year<=input$date_from[2] & 
                    indicator %in% input$indicator_filter)
-      } else {
+        } else {
         filtered_geo <- optdata %>% 
           filter((areaname %in% input$iz_true & areatype == "Intermediate zone")|
                    (areaname %in% input$la_true & areatype == "Council area")|
@@ -2037,9 +2045,6 @@ showModal(welcome_modal)
         filtered_geos <- rbind(filtered_geo, filtered_geo2)
         
       }
-      
-      table <- filtered_geos %>% select(code, areaname, areatype, indicator, year, 
-                                        def_period, numerator, measure, lowci, upci, type_definition)
       
       #if list of domains selected
     } else if (!is.null(input$topic_filter)) { 
@@ -2075,10 +2080,6 @@ showModal(welcome_modal)
         filtered_geos <- rbind(filtered_geo, filtered_geo2)
         
       } #end of else statement
-      
-      table <- filtered_geos %>% 
-        select(code, areaname, areatype, indicator, year, def_period, numerator, 
-               measure, lowci, upci, type_definition)
       
       #if list of profiles selected    
     } else if (!is.null(input$profile_filter)) { 
@@ -2116,11 +2117,7 @@ showModal(welcome_modal)
         filtered_geos <- rbind(filtered_geo,filtered_geo2)
         
       } 
-      
-      table <- filtered_geos %>% 
-        select(code, areaname, areatype, indicator, year, def_period, numerator, 
-               measure, lowci, upci, type_definition)
-      
+      # if all available geographies checkbox checked
       if (input$all_data == TRUE) {
         filtered_geos <- optdata %>%  
           filter(year>=input$date_from[1] & year<=input$date_from[2])
@@ -2147,12 +2144,11 @@ showModal(welcome_modal)
         
       } 
       
-      table <- filtered_geos %>% 
-        select(code, areaname, areatype, indicator, year, def_period, numerator, 
-               measure, lowci, upci, type_definition)
-      
-    } #end of the whole if statement
+    } #end of the else if statement
     
+    table <- filtered_geos %>% select(code, areaname, areatype, indicator, year, 
+                                      def_period, numerator, measure, lowci, upci, type_definition)
+    } #end of the whole if statement
     
   })
   
@@ -2161,7 +2157,10 @@ showModal(welcome_modal)
     
     DT::datatable(filter_table(),
                   style = 'bootstrap', rownames = FALSE, options = list(dom = 'tp', language = list(
-                    zeroRecords = "No records found matching your selection - have you selected a geography? See 'Indicator definitions' under the Info tab for Geographies available."), columnDefs = list(list(visible=FALSE, targets=c(4,8,9)))), 
+                    zeroRecords = "No records found matching your selection - 
+                    have you selected a geography and at least one indicator/domain/profile? 
+                    See 'Indicator definitions' under the Info tab for Geographies available."), 
+                    columnDefs = list(list(visible=FALSE, targets=c(4,8,9)))), 
                   colnames = c("Area code", "Area", "Type", "Indicator", "Year","Period", "Numerator", 
                                "Measure", "Lower CI","Upper CI", "Definition")
     )
