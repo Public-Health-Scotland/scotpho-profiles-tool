@@ -421,35 +421,32 @@ showModal(welcome_modal)
       write.csv(summary_csv(), file, row.names=FALSE) })
   
   # Downloading chart  
-  output$download_summaryplot <- downloadHandler(
-    filename = 'heatmap.png',
-    content = function(file){
-      if (input$chart_summary == "Snapshot") {
-        export(p = plot_snapshot_download() %>% 
-                    layout(title = paste0(input$profile_summary), 
-                           margin = list(t = 140)), 
-               file = file, zoom = 3)
-      } else if (input$chart_summary == "Trend") {
-        ggsave(file, plot = plot_heat()+
-                 ggtitle(paste0(names(profile_list[unname(profile_list) == input$profile_summary]),
-                                " profile: "),
-                         subtitle =       if(input$comp_heat == 1){
-                           paste0(input$geoname_heat," (",input$geotype_heat,") compared against ",
-                                  input$geocomp_heat)
-                         } else if(input$comp_heat==2){
-                           paste0("Changes within ",input$geoname_heat,": latest data available",
-                                  " compared to ", input$yearcomp_heat)
-                         }
-                 ),
-               device = "png", scale=4, limitsize=FALSE)     
-      }
-    })
-  
+  # output$download_summaryplot <- downloadHandler(
+  #   filename = 'heatmap.png',
+  #   content = function(file){
+  #     if (input$chart_summary == "Snapshot") {
+  # 
+  #       export(p = plot_snapshot_download(), file = file, zoom = 1)
+  #     } else if (input$chart_summary == "Trend") {
+  #       ggsave(file, plot = plot_heat()+
+  #                ggtitle(paste0(names(profile_list[unname(profile_list) == input$profile_summary]),
+  #                               " profile: "),
+  #                        subtitle =       if(input$comp_heat == 1){
+  #                          paste0(input$geoname_heat," (", input$geotype_heat, ") compared against ",
+  #                                 input$geocomp_heat)
+  #                        } else if(input$comp_heat==2){
+  #                          paste0("Changes within ",input$geoname_heat,": latest data available",
+  #                                 " compared to ", input$yearcomp_heat)
+  #                        }
+  #                ),
+  #              device = "png", scale=4, limitsize=FALSE)     
+  #     }
+  #   })
   
   ###############################################.
   ## Snapshot  ----
   ###############################################. 
-  # reactive dataset
+  # Reactive dataset
   snapshot_data <- reactive({
     summary_data() %>% group_by(indicator) %>% top_n(1, year) %>% 
       ungroup() %>% droplevels() %>% 
@@ -573,52 +570,6 @@ showModal(welcome_modal)
   # Charts for population profile
   output$summ_pop_pop <- renderPlotly({ plot_profile_summary("Population")})
   
-###############################################.
-  # Function that creates a snapshot plot ready for download
-  plot_snapshot_download <- function() {
-    
-    # Tooltip
-    if (input$comp_summary == 1) {#depending if time or area comparison
-      tooltip_summary <-  c(paste0(snapshot_data()$trend_axis, "<br>",
-                                   input$geoname_summary, ": ", snapshot_data()$measure, "  ||  ",
-                                   input$geocomp_summary, ": ", snapshot_data()$comp_m, "<br>",
-                                   snapshot_data()$type_definition))
-    } else if (input$comp_summary == 2) {
-      tooltip_summary <-  c(paste0(snapshot_data()$trend_axis, ": ",
-                                   snapshot_data()$measure, "<br>",
-                                   "Baseline period: ", snapshot_data()$comp_m, "<br>",
-                                   snapshot_data()$type_definition))
-    } 
-    
-    # eliminating both axis
-    axis_layout <- list(title = "", fixedrange=TRUE, zeroline = FALSE, showline = FALSE,
-                        showticklabels = FALSE, showgrid = FALSE)
-
-    # defining plot function
-    make_snapshot_plot <- . %>%
-      plot_ly( y = ~indicator,  text = ~indicator, color = ~color,
-               colors=  c(blue = "#4da6ff", gray = "gray88", red = "#ffa64d", white = "#ffffff"),
-               height = 1000, width = 1200) %>%
-      add_bars(x =1, showlegend= FALSE, width=1, 
-               hoverinfo="text", hovertext = tooltip_summary,
-               marker = list(line= list(color="black", width = 0.5))) %>% 
-      # adding indicator name at center of each bar
-      add_text(text = ~indic_multiline, x =0.5,  showlegend= FALSE, 
-               textfont = list(color='black'), hoverinfo="skip" ) %>% 
-      add_annotations(text = ~unique(domain), x = 0.05, y = 1.1, yref = "paper",
-                      xref = "paper", xanchor = "left", yanchor = "top", showarrow = FALSE,
-                      font = list(size = 15)) %>%
-      layout(yaxis = axis_layout, xaxis = axis_layout,
-             margin = list(b= 10 , t=5, l = 5, r = 0),
-             font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif')) %>% # to get hover compare mode as default
-      config(displayModeBar = FALSE, displaylogo = F, collaborate=F, editable =F)
-
-    snapshot_data()  %>%
-      group_by(domain) %>%
-      do(p = make_snapshot_plot(.)) %>%
-      subplot(nrows = 4, shareX = TRUE, margin = c(0, 0, 0.015, 0.015))
-  }
-  
   ###############################################.        
   #### Heatmap ----
   ###############################################.  
@@ -709,7 +660,7 @@ showModal(welcome_modal)
     
     if (input$chart_summary == "Snapshot") {
       if (input$profile_summary == "HWB") {
-        tagList(#Health and Wellbeing profile
+       tagList(#Health and Wellbeing profile
           column(4,
                  h5("Behaviours", style="color: black; text-align: center; font-weight: bold;"),
                  div(align = "center", withSpinner(plotlyOutput("summ_hwb_beha", height = "auto"))),

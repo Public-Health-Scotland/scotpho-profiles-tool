@@ -52,7 +52,7 @@ tagList( #needed for shinyjs
                           .col-md-11, .col-lg-11, .col-xs-12, .col-sm-12, .col-md-12, .col-lg-12 {
                           padding-left: 5px; padding-right: 5px;}",
                           #Style for download buttons
-                          ".down{background-color:#4da6ff; color: white; background-image:none; min-width: 22vh;
+                          ".down{background-color:#4da6ff; color: white; background-image:none; min-width: 23vh;
                           font-size: 14px; padding: 5px 10px; margin-top: 5px; margin-left: 3px}",
                           #landing page boxes
                           ".landing-page-box {width:100%; height:100%; min-height:22vh; background-color:white;
@@ -221,8 +221,7 @@ tabPanel(
 tabPanel("Summary", icon = icon("list-ul"), value = "summary",
          wellPanel( #Filter options
            column(2,
-                  selectInput("profile_summary", "Profile", choices = profile_list),
-                  actionButton("help_summary",label="Help", icon= icon('question-circle'), class ="down")
+                  selectInput("profile_summary", "Profile", choices = profile_list)
            ),
            column(3,
                   uiOutput("geotype_ui_summary"),
@@ -257,9 +256,10 @@ tabPanel("Summary", icon = icon("list-ul"), value = "summary",
                     "No differences can be calculated")
            ),
            column(2,
+                  actionButton("help_summary",label="Help", icon= icon('question-circle'), class ="down"),
                   actionButton("defs_summary",label="Definitions", icon= icon('info'), class ="down"),
-                  downloadButton('download_summary', 'Download data', class = "down"),
-                  savechart_button('download_summaryplot', 'Save chart',  class = "down")
+                  downloadButton('download_summary', 'Download data', class = "down")
+                  # savechart_button('download_summaryplot', 'Save chart',  class = "down")
            ),
            div(radioGroupButtons("chart_summary", label= "", status = "primary", 
                              choices = c("Snapshot", "Trend"), justified = TRUE),
@@ -269,7 +269,7 @@ tabPanel("Summary", icon = icon("list-ul"), value = "summary",
                    bsModal("mod_defs_summary", "Definitions", "defs_summary", htmlOutput('defs_text_summary')),
                    h4(textOutput("summary_title"), style="color: black; text-align: left"),
                    h5(textOutput("summary_subtitle"), style="color: black; text-align: left"),
-                   uiOutput("summary_ui_plots")
+                   div(id="div_down", uiOutput("summary_ui_plots"))
         )
   ), #Tab panel bracket
 #####################################################################.
