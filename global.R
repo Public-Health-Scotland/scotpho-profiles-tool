@@ -75,6 +75,18 @@ plot_nodata <- function() {
     config( displayModeBar = FALSE) # taking out plotly logo and collaborate button
 }
 
+#Function to create plot when no data available for ggplot visuals
+plot_nodata_gg <- function() {
+  ggplot()+
+    xlab("No data available")+
+    scale_x_discrete(position = "top")+
+    theme(panel.background = element_blank(),
+          axis.title.x=element_text(size=12, colour ='#555555'))
+    }
+
+
+
+
 ###############################################.
 ## Data ----
 ###############################################.    
