@@ -373,7 +373,8 @@ tabPanel("Barcode", icon = icon("barcode"), value = "barcode",
                   uiOutput("ui_spine_legend_areatype"),
                   uiOutput("ui_spine_legend_comparator"))),
          mainPanel(
-           withSpinner(uiOutput("ui_spine_plot"))
+           column(12,
+           withSpinner(uiOutput("ui_spine_plot")))
            #withSpinner(plotOutput("spine_plot", height="auto"))
          )
 ), #Tab panel bracket
