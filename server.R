@@ -874,26 +874,26 @@ showModal(welcome_modal)
       #add variable denoting if sign diff between comparator
       spine<-spine %>%
         mutate(flag=case_when(
-          spine$interpret == "O" ~ 'No significance can be calculated',
-          spine$lowci_chosen<=spine$measure_comp & spine$upci_chosen>=spine$measure_comp ~
+          interpret == "O" ~ 'No significance can be calculated',
+          lowci_chosen<=measure_comp & upci_chosen>=measure_comp ~
             'Not different to comparator',
-          spine$lowci_chosen > spine$measure_comp & spine$interpret == "H" ~ 'Better than comparator',
-          spine$lowci_chosen > spine$measure_comp & spine$interpret == "L" ~ 'Worse than comparator',
-          spine$upci_chosen < spine$measure_comp & spine$interpret == "L" ~ 'Better than comparator',
-          spine$upci_chosen < spine$measure_comp & spine$interpret == "H" ~ 'Worse than comparator',
+          lowci_chosen > measure_comp & interpret == "H" ~ 'Better than comparator',
+          lowci_chosen > measure_comp & interpret == "L" ~ 'Worse than comparator',
+          upci_chosen < measure_comp & interpret == "L" ~ 'Better than comparator',
+          upci_chosen < measure_comp & interpret == "H" ~ 'Worse than comparator',
           TRUE ~ 'No significance can be calculated'))
       
       #Transposing data so that better is always to the right hand side of plot
       spine <- spine %>%
         mutate(comp = 1,
-               all = spine$measure/spine$measure_comp,
-               chosen = spine$measure_chosen/spine$measure_comp,
-               all2=case_when(spine$interpret=='L' & spine$measure>spine$measure_comp ~ -(all-1),
-                              spine$interpret=='L' & spine$measure<=spine$measure_comp ~ 
+               all = measure/measure_comp,
+               chosen = measure_chosen/measure_comp,
+               all2=case_when(interpret=='L' & measure>measure_comp ~ -(all-1),
+                              interpret=='L' & measure<=measure_comp ~ 
                                 (1-all), TRUE ~ -(1-all)),
-               chosen2=case_when(spine$interpret=='L' & spine$measure_chosen>spine$measure_comp ~
+               chosen2=case_when(interpret=='L' & measure_chosen>measure_comp ~
                                    -(chosen-1),
-                                 spine$interpret=='L' & spine$measure_chosen<=spine$measure_comp ~
+                                 interpret=='L' & measure_chosen<=measure_comp ~
                                    (1-chosen), TRUE ~ -(1-chosen))) %>%
         mutate(comp=0)
       
@@ -1021,12 +1021,12 @@ showModal(welcome_modal)
       
       spine<-spine %>%
         mutate(flag=case_when(
-          spine$interpret == "O" ~'NA',
-          spine$lowci_chosen<= spine$measure_comp & spine$upci_chosen>=spine$measure_comp ~ 'NS',
-          spine$lowci_chosen > spine$measure_comp & spine$interpret == "H" ~ 'Better',
-          spine$lowci_chosen > spine$measure_comp & spine$interpret == "L" ~ 'Worse',
-          spine$upci_chosen < spine$measure_comp & spine$interpret == "L" ~ 'Better',
-          spine$upci_chosen < spine$measure_comp & spine$interpret == "H" ~ 'Worse',
+          interpret == "O" ~'NA',
+          lowci_chosen<= measure_comp & upci_chosen>=measure_comp ~ 'NS',
+          lowci_chosen > measure_comp & interpret == "H" ~ 'Better',
+          lowci_chosen > measure_comp & interpret == "L" ~ 'Worse',
+          upci_chosen < measure_comp & interpret == "L" ~ 'Better',
+          upci_chosen < measure_comp & interpret == "H" ~ 'Worse',
           TRUE ~ 'NA'))
       
       spine %>%
