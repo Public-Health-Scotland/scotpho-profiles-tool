@@ -375,8 +375,7 @@ tabPanel("Barcode", icon = icon("barcode"), value = "barcode",
          mainPanel(
            column(12,
            withSpinner(uiOutput("ui_spine_plot")))
-           #withSpinner(plotOutput("spine_plot", height="auto"))
-         )
+          )
 ), #Tab panel bracket
 ###############################################.
 ## Time trend ----
