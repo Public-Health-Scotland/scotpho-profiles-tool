@@ -405,6 +405,261 @@ showModal(welcome_modal)
     }
   })
   
+  ###############################################.
+  # This will create a reactive user interface depending on type of visualization 
+  # and profile selected
+  output$summary_ui_plots <- renderUI({
+    
+    if (input$chart_summary == "Snapshot") {
+      if (input$profile_summary == "HWB") {
+        tagList(#Health and Wellbeing profile
+          column(4,
+                 h5("Behaviours", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_hwb_beha", height = "auto"))),
+                 h5("Social care & housing", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_hwb_socare", height = "auto"))),
+                 h5("Environment", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_hwb_env", height = "auto"))),
+                 h5("Life expectancy & mortality", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_hwb_lifexp", height = "auto")))
+          ),
+          column(4,
+                 h5("Women's & children's health", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_hwb_women", height = "auto"))),
+                 h5("Immunisations & screening", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_hwb_imm", height = "auto"))),
+                 h5("Economy", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_hwb_econ", height = "auto"))),
+                 h5("Crime", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_hwb_crime", height = "auto")))
+          ),
+          column(4,
+                 h5("Mental health", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_hwb_mh", height = "auto"))),
+                 h5("Ill health & injury", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_hwb_injury", height = "auto"))),
+                 h5("Education", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_hwb_educ", height = "auto")))
+          )
+        ) #taglist bracket
+      } else if (input$profile_summary == "CYP") {
+        tagList(#Children and young people profile
+          column(4,
+                 h5("Active", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_cyp_active", height = "auto"))),
+                 h5("Healthy", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_cyp_health", height = "auto")))
+          ),
+          column(4,
+                 h5("Included", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_cyp_includ", height = "auto"))),
+                 h5("Nurtured", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_cyp_nurt", height = "auto"))),
+                 h5("Safe", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_cyp_safe", height = "auto")))
+          ),
+          column(4,
+                 h5("Achieving", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_cyp_achiev", height = "auto"))),
+                 h5("Responsible", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_cyp_respon", height = "auto")))
+          )
+        )# taglist bracket
+      } else if (input$profile_summary == "ALC") {
+        tagList(#Alcohol profile
+          column(4,
+                 h5("Environment", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_alc_env", height = "auto"))),
+                 h5("Services", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_alc_serv", height = "auto")))
+          ),
+          column(4,
+                 h5("Community safety", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_alc_commsaf", height = "auto"))),
+                 h5("CAPSM/Families", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_alc_family", height = "auto")))
+          ),
+          column(4,
+                 h5("Prevalence", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_alc_preval", height = "auto"))),
+                 h5("Health", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_alc_health", height = "auto")))
+          )
+        )#taglist bracket
+      } else if (input$profile_summary == "DRG") {
+        tagList(#Drugs profile
+          column(4,
+                 h5("Environment", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_drg_env", height = "auto"))),
+                 h5("Services", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_drg_serv", height = "auto"))),
+                 h5("Data quality", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_drg_dat", height = "auto")))
+          ),
+          column(4,
+                 h5("Community safety", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_drg_commsaf", height = "auto"))),
+                 h5("CAPSM/Families", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_drg_family", height = "auto")))
+          ),
+          column(4,
+                 h5("Prevalence", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_drg_preval", height = "auto"))),
+                 h5("Health", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_drg_health", height = "auto")))
+          )
+        )#taglist bracket
+      } else if (input$profile_summary == "MEN") {
+        tagList(#Mental Health profile
+          column(4,
+                 h5("Female adult", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_men_fem", height = "auto")))
+          ),
+          column(4,
+                 h5("Male adult", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_men_male", height = "auto")))
+          ),
+          column(4,
+                 h5("CYP Mental Health", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_men_cyp", height = "auto")))
+          )
+        )#taglist bracket
+      } else if (input$profile_summary == "TOB") {
+        tagList(#Tobacco profile
+          column(4,
+                 h5("Smoking in school children", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_tob_school", height = "auto"))),
+                 h5("Smoking cessation & smoking cessation products", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_tob_cess", height = "auto")))
+          ),
+          column(4,
+                 h5("Smoking attributable deaths & diseases", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_tob_attrib", height = "auto"))),
+                 h5("Smoking during and post pregnancy", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_tob_pregn", height = "auto")))
+          ),
+          column(4,
+                 h5("Adult prevalence", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_tob_preval", height = "auto"))),
+                 h5("Retailer information", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_tob_retail", height = "auto")))
+          )
+        )#taglist bracket
+      } else if (input$profile_summary == "POP") {
+        tagList(#Population profile
+          h5("Population", style="color: black; text-align: center; font-weight: bold;"),
+          div(align = "center", withSpinner(plotlyOutput("summ_pop_pop", height = "auto")))
+        )#taglist bracket
+      }
+    } else if (input$chart_summary == "Trend") { #IF SELECTED HEATMAP
+      if (input$profile_summary == "HWB") {
+        tagList(#Health and Wellbeing profile
+          h5("Behaviours", style="color: black; text-align: center; font-weight: bold;"),
+          withSpinner(plotlyOutput("heat_hwb_beha", height = "auto")),
+          h5("Social care & housing", style="color: black; text-align: center; font-weight: bold;"),
+          withSpinner(plotlyOutput("heat_hwb_socare", height = "auto")),
+          h5("Environment", style="color: black; text-align: center; font-weight: bold;"),
+          withSpinner(plotlyOutput("heat_hwb_env", height = "auto")),
+          h5("Life expectancy & mortality", style="color: black; text-align: center; font-weight: bold;"),
+          withSpinner(plotlyOutput("heat_hwb_lifexp", height = "auto")),
+          h5("Women's & children's health", style="color: black; text-align: center; font-weight: bold;"),
+          withSpinner(plotlyOutput("heat_hwb_women", height = "auto")),
+          h5("Immunisations & screening", style="color: black; text-align: center; font-weight: bold;"),
+          withSpinner(plotlyOutput("heat_hwb_imm", height = "auto")),
+          h5("Economy", style="color: black; text-align: center; font-weight: bold;"),
+          withSpinner(plotlyOutput("heat_hwb_econ", height = "auto")),
+          h5("Crime", style="color: black; text-align: center; font-weight: bold;"),
+          withSpinner(plotlyOutput("heat_hwb_crime", height = "auto")),
+          h5("Mental health", style="color: black; text-align: center; font-weight: bold;"),
+          withSpinner(plotlyOutput("heat_hwb_mh", height = "auto")),
+          h5("Ill health & injury", style="color: black; text-align: center; font-weight: bold;"),
+          withSpinner(plotlyOutput("heat_hwb_injury", height = "auto")),
+          h5("Education", style="color: black; text-align: center; font-weight: bold;"),
+          withSpinner(plotlyOutput("heat_hwb_educ", height = "auto"))
+        )
+      } else if (input$profile_summary == "CYP") {
+        tagList(#Children and young people profile
+          h5("Active", style="color: black; text-align: center; font-weight: bold;"),
+          div(align = "center", withSpinner(plotlyOutput("heat_cyp_active", height = "auto"))),
+          h5("Healthy", style="color: black; text-align: center; font-weight: bold;"),
+          div(align = "center", withSpinner(plotlyOutput("heat_cyp_health", height = "auto"))),
+          h5("Included", style="color: black; text-align: center; font-weight: bold;"),
+          div(align = "center", withSpinner(plotlyOutput("heat_cyp_includ", height = "auto"))),
+          h5("Nurtured", style="color: black; text-align: center; font-weight: bold;"),
+          div(align = "center", withSpinner(plotlyOutput("heat_cyp_nurt", height = "auto"))),
+          h5("Safe", style="color: black; text-align: center; font-weight: bold;"),
+          div(align = "center", withSpinner(plotlyOutput("heat_cyp_safe", height = "auto"))),
+          h5("Achieving", style="color: black; text-align: center; font-weight: bold;"),
+          div(align = "center", withSpinner(plotlyOutput("heat_cyp_achiev", height = "auto"))),
+          h5("Responsible", style="color: black; text-align: center; font-weight: bold;"),
+          div(align = "center", withSpinner(plotlyOutput("heat_cyp_respon", height = "auto")))
+        )# taglist bracket
+      } else if (input$profile_summary == "ALC") {
+        tagList(#Alcohol profile
+          h5("Environment", style="color: black; text-align: center; font-weight: bold;"),
+          div(align = "center", withSpinner(plotlyOutput("heat_alc_env", height = "auto"))),
+          h5("Services", style="color: black; text-align: center; font-weight: bold;"),
+          div(align = "center", withSpinner(plotlyOutput("heat_alc_serv", height = "auto"))),
+          h5("Community safety", style="color: black; text-align: center; font-weight: bold;"),
+          div(align = "center", withSpinner(plotlyOutput("heat_alc_commsaf", height = "auto"))),
+          h5("CAPSM/Families", style="color: black; text-align: center; font-weight: bold;"),
+          div(align = "center", withSpinner(plotlyOutput("heat_alc_family", height = "auto"))),
+          h5("Prevalence", style="color: black; text-align: center; font-weight: bold;"),
+          div(align = "center", withSpinner(plotlyOutput("heat_alc_preval", height = "auto"))),
+          h5("Health", style="color: black; text-align: center; font-weight: bold;"),
+          div(align = "center", withSpinner(plotlyOutput("heat_alc_health", height = "auto")))
+        )#taglist bracket
+      } else if (input$profile_summary == "DRG") {
+        tagList(#Drugs profile
+          h5("Environment", style="color: black; text-align: center; font-weight: bold;"),
+          div(align = "center", withSpinner(plotlyOutput("heat_drg_env", height = "auto"))),
+          h5("Services", style="color: black; text-align: center; font-weight: bold;"),
+          div(align = "center", withSpinner(plotlyOutput("heat_drg_serv", height = "auto"))),
+          h5("Data quality", style="color: black; text-align: center; font-weight: bold;"),
+          div(align = "center", withSpinner(plotlyOutput("heat_drg_dat", height = "auto"))),
+          h5("Community safety", style="color: black; text-align: center; font-weight: bold;"),
+          div(align = "center", withSpinner(plotlyOutput("heat_drg_commsaf", height = "auto"))),
+          h5("CAPSM/Families", style="color: black; text-align: center; font-weight: bold;"),
+          div(align = "center", withSpinner(plotlyOutput("heat_drg_family", height = "auto"))),
+          h5("Prevalence", style="color: black; text-align: center; font-weight: bold;"),
+          div(align = "center", withSpinner(plotlyOutput("heat_drg_preval", height = "auto"))),
+          h5("Health", style="color: black; text-align: center; font-weight: bold;"),
+          div(align = "center", withSpinner(plotlyOutput("heat_drg_health", height = "auto")))
+        )#taglist bracket
+      } else if (input$profile_summary == "MEN") {
+        tagList(#Mental Health profile
+          h5("Female adult", style="color: black; text-align: center; font-weight: bold;"),
+          div(align = "center", withSpinner(plotlyOutput("heat_men_fem", height = "auto"))),
+          h5("Male adult", style="color: black; text-align: center; font-weight: bold;"),
+          div(align = "center", withSpinner(plotlyOutput("heat_men_male", height = "auto"))),
+          h5("CYP Mental Health", style="color: black; text-align: center; font-weight: bold;"),
+          div(align = "center", withSpinner(plotlyOutput("heat_men_cyp", height = "auto")))
+        )#taglist bracket
+      } else if (input$profile_summary == "TOB") {
+        tagList(#Tobacco profile
+          h5("Smoking in school children", style="color: black; text-align: center; font-weight: bold;"),
+          div(align = "center", withSpinner(plotlyOutput("heat_tob_school", height = "auto"))),
+          h5("Smoking cessation & smoking cessation products", style="color: black; text-align: center; font-weight: bold;"),
+          div(align = "center", withSpinner(plotlyOutput("heat_tob_cess", height = "auto"))),
+          h5("Smoking attributable deaths & diseases", style="color: black; text-align: center; font-weight: bold;"),
+          div(align = "center", withSpinner(plotlyOutput("heat_tob_attrib", height = "auto"))),
+          h5("Smoking during and post pregnancy", style="color: black; text-align: center; font-weight: bold;"),
+          div(align = "center", withSpinner(plotlyOutput("heat_tob_pregn", height = "auto"))),
+          h5("Adult prevalence", style="color: black; text-align: center; font-weight: bold;"),
+          div(align = "center", withSpinner(plotlyOutput("heat_tob_preval", height = "auto"))),
+          h5("Retailer information", style="color: black; text-align: center; font-weight: bold;"),
+          div(align = "center", withSpinner(plotlyOutput("heat_tob_retail", height = "auto")))
+        )#taglist bracket
+      } else if (input$profile_summary == "POP") {
+        tagList(#Population profile
+          h5("Population", style="color: black; text-align: center; font-weight: bold;"),
+          div(align = "center", withSpinner(plotlyOutput("heat_pop_pop", height = "auto")))
+        )#taglist bracket
+      }
+    } # end of if else == "Trend"
+    
+  })
+  
   #####################.
   # Downloading controls
   # Downloading data
@@ -575,42 +830,33 @@ showModal(welcome_modal)
   ###############################################.  
   #####################.
   #Heatmap plot
-  
-  # Calculates number of different indicators and then multiplies by pixels per row
-  # it needs the sum at the end as otherwise small domains plots will be too small
-  # get_height_heat <- function() {
-  # 
-  #   #Obtaining number of indicators
-  #   no_ind <- unique(summary_chosen_area()$indicator)
-  #   length <- length(no_ind) * 30 + 125
-  # 
-  # }
-  
-  
-  #Function to create ggplot, then used in renderPlot and ggsave
+  #Function to create ggplot, then used in renderPlot
   plot_heat <- function(domain_plot){
+    heat <- summary_data() %>% subset(domain == domain_plot) %>% droplevels()
+    
     #If no data available for that period then plot message saying data is missing
-    if (is.data.frame(summary_chosen_area()) && nrow(summary_chosen_area()) == 0)
+    if (is.data.frame(heat) && nrow(heat) == 0)
     {
       plot_nodata()
       } else { #If data is available then plot it
-    heat <- summary_data() %>% subset(domain == domain_plot) %>% droplevels()
+   
 
-    get_height_heat <- function() {
-      
+    # Calculates number of different indicators and then multiplies by pixels per row
+    # it needs the sum at the end as otherwise small domains plots will be too small
       #Obtaining number of indicators
-      no_ind <- unique(heat$indicator)
-      length <- length(no_ind) * 30 + 125
-      
-    }
+        
+      get_height_heat <- function() {
+        no_ind <- unique(heat$indicator)
+        height_plot <- length(no_ind) * 33 + 50
+      }
     
     #Tooltip
     heat_tooltip <- paste0(heat$indicator, "<br>", heat$def_period, "<br>",
                            heat$type_definition, "<br>", heat$measure)
     
     # Plotting data
-    heat_p <- ggplot(heat, aes(x = year, y = indicator, fill = color)) +
-      geom_tile(color = "black", text= heat_tooltip) +
+    heat_p <- ggplot(heat, aes(x = year, y = indicator, fill = color, text = heat_tooltip)) +
+      geom_tile(color = "black") +
       geom_text(aes(label = round(measure, 0)), size =3) +
       ylim(rev(levels(heat$indicator))) + #to order with A on top
       #Another step needed to make the palette of colours for the tile work
@@ -652,285 +898,43 @@ showModal(welcome_modal)
   output$heat_hwb_mh <- renderPlotly({ plot_heat("Mental health")})
   output$heat_hwb_injury <- renderPlotly({ plot_heat("Ill health & injury")})
   output$heat_hwb_educ <- renderPlotly({ plot_heat("Education")})
+  # Charts for Children and young people profile
+  output$heat_cyp_active <- renderPlotly({ plot_heat("Active")})
+  output$heat_cyp_health <- renderPlotly({ plot_heat("Healthy")})
+  output$heat_cyp_safe <- renderPlotly({ plot_heat("Safe")})
+  output$heat_cyp_includ <- renderPlotly({ plot_heat("Included")})
+  output$heat_cyp_nurt <- renderPlotly({ plot_heat("Nurtured")})
+  output$heat_cyp_achiev <- renderPlotly({ plot_heat("Achieving")})
+  output$heat_cyp_respon <- renderPlotly({ plot_heat("Responsible")})
+  # Charts for Alcohol profile
+  output$heat_alc_env <- renderPlotly({ plot_heat("Environment")})
+  output$heat_alc_serv <- renderPlotly({ plot_heat("Services")})
+  output$heat_alc_commsaf <- renderPlotly({ plot_heat("Community safety")})
+  output$heat_alc_family <- renderPlotly({ plot_heat("CAPSM/Families")})
+  output$heat_alc_preval <- renderPlotly({ plot_heat("Prevalence")})
+  output$heat_alc_health <- renderPlotly({ plot_heat("Health")})
+  # Charts for Drugs profile
+  output$heat_drg_env <- renderPlotly({ plot_heat("Environment")})
+  output$heat_drg_serv <- renderPlotly({ plot_heat("Services")})
+  output$heat_drg_commsaf <- renderPlotly({ plot_heat("Community safety")})
+  output$heat_drg_family <- renderPlotly({ plot_heat("CAPSM/Families")})
+  output$heat_drg_preval <- renderPlotly({ plot_heat("Prevalence")})
+  output$heat_drg_health <- renderPlotly({ plot_heat("Health")})
+  output$heat_drg_data <- renderPlotly({ plot_heat("Data quality")})
+  # Charts for mental health profile
+  output$heat_men_fem <- renderPlotly({ plot_heat("Female adult")})
+  output$heat_men_male <- renderPlotly({ plot_heat("Male adult")})
+  output$heat_men_cyp <- renderPlotly({ plot_heat("CYP Mental Health")})
+  # Charts for Tobacco profile
+  output$heat_tob_school <- renderPlotly({ plot_heat("Smoking in school children")})
+  output$heat_tob_cess <- renderPlotly({ plot_heat("Smoking cessation & smoking cessation products")})
+  output$heat_tob_attrib <- renderPlotly({ plot_heat("Smoking attributable deaths & diseases")})
+  output$heat_tob_pregn <- renderPlotly({ plot_heat("Smoking during and post pregnancy")})
+  output$heat_tob_preval <- renderPlotly({ plot_heat("Adult prevalence")})
+  output$heat_tob_retail <- renderPlotly({ plot_heat("Retailer information")})
+  # Charts for population profile
+  output$heat_pop_pop <- renderPlotly({ plot_heat("Population")})
   
-  ###############################################.
-  # This will create a reactive user interface depending on type of visualization 
-  # and profile selected
-  output$summary_ui_plots <- renderUI({
-    
-    if (input$chart_summary == "Snapshot") {
-      if (input$profile_summary == "HWB") {
-       tagList(#Health and Wellbeing profile
-          column(4,
-                 h5("Behaviours", style="color: black; text-align: center; font-weight: bold;"),
-                 div(align = "center", withSpinner(plotlyOutput("summ_hwb_beha", height = "auto"))),
-                 h5("Social care & housing", style="color: black; text-align: center; font-weight: bold;"),
-                 div(align = "center", withSpinner(plotlyOutput("summ_hwb_socare", height = "auto"))),
-                 h5("Environment", style="color: black; text-align: center; font-weight: bold;"),
-                 div(align = "center", withSpinner(plotlyOutput("summ_hwb_env", height = "auto"))),
-                 h5("Life expectancy & mortality", style="color: black; text-align: center; font-weight: bold;"),
-                 div(align = "center", withSpinner(plotlyOutput("summ_hwb_lifexp", height = "auto")))
-          ),
-          column(4,
-                 h5("Women's & children's health", style="color: black; text-align: center; font-weight: bold;"),
-                 div(align = "center", withSpinner(plotlyOutput("summ_hwb_women", height = "auto"))),
-                 h5("Immunisations & screening", style="color: black; text-align: center; font-weight: bold;"),
-                 div(align = "center", withSpinner(plotlyOutput("summ_hwb_imm", height = "auto"))),
-                 h5("Economy", style="color: black; text-align: center; font-weight: bold;"),
-                 div(align = "center", withSpinner(plotlyOutput("summ_hwb_econ", height = "auto"))),
-                 h5("Crime", style="color: black; text-align: center; font-weight: bold;"),
-                 div(align = "center", withSpinner(plotlyOutput("summ_hwb_crime", height = "auto")))
-          ),
-          column(4,
-                 h5("Mental health", style="color: black; text-align: center; font-weight: bold;"),
-                 div(align = "center", withSpinner(plotlyOutput("summ_hwb_mh", height = "auto"))),
-                 h5("Ill health & injury", style="color: black; text-align: center; font-weight: bold;"),
-                 div(align = "center", withSpinner(plotlyOutput("summ_hwb_injury", height = "auto"))),
-                 h5("Education", style="color: black; text-align: center; font-weight: bold;"),
-                 div(align = "center", withSpinner(plotlyOutput("summ_hwb_educ", height = "auto")))
-          )
-        ) #taglist bracket
-      } else if (input$profile_summary == "CYP") {
-        tagList(#Children and young people profile
-          column(4,
-                 h5("Active", style="color: black; text-align: center; font-weight: bold;"),
-                 div(align = "center", withSpinner(plotlyOutput("summ_cyp_active", height = "auto"))),
-                 h5("Healthy", style="color: black; text-align: center; font-weight: bold;"),
-                 div(align = "center", withSpinner(plotlyOutput("summ_cyp_health", height = "auto")))
-          ),
-          column(4,
-                 h5("Included", style="color: black; text-align: center; font-weight: bold;"),
-                 div(align = "center", withSpinner(plotlyOutput("summ_cyp_includ", height = "auto"))),
-                 h5("Nurtured", style="color: black; text-align: center; font-weight: bold;"),
-                 div(align = "center", withSpinner(plotlyOutput("summ_cyp_nurt", height = "auto"))),
-                 h5("Safe", style="color: black; text-align: center; font-weight: bold;"),
-                 div(align = "center", withSpinner(plotlyOutput("summ_cyp_safe", height = "auto")))
-          ),
-          column(4,
-                 h5("Achieving", style="color: black; text-align: center; font-weight: bold;"),
-                 div(align = "center", withSpinner(plotlyOutput("summ_cyp_achiev", height = "auto"))),
-                 h5("Responsible", style="color: black; text-align: center; font-weight: bold;"),
-                 div(align = "center", withSpinner(plotlyOutput("summ_cyp_respon", height = "auto")))
-          )
-        )# taglist bracket
-      } else if (input$profile_summary == "ALC") {
-        tagList(#Alcohol profile
-          column(4,
-                 h5("Environment", style="color: black; text-align: center; font-weight: bold;"),
-                 div(align = "center", withSpinner(plotlyOutput("summ_alc_env", height = "auto"))),
-                 h5("Services", style="color: black; text-align: center; font-weight: bold;"),
-                 div(align = "center", withSpinner(plotlyOutput("summ_alc_serv", height = "auto")))
-          ),
-          column(4,
-                 h5("Community safety", style="color: black; text-align: center; font-weight: bold;"),
-                 div(align = "center", withSpinner(plotlyOutput("summ_alc_commsaf", height = "auto"))),
-                 h5("CAPSM/Families", style="color: black; text-align: center; font-weight: bold;"),
-                 div(align = "center", withSpinner(plotlyOutput("summ_alc_family", height = "auto")))
-          ),
-          column(4,
-                 h5("Prevalence", style="color: black; text-align: center; font-weight: bold;"),
-                 div(align = "center", withSpinner(plotlyOutput("summ_alc_preval", height = "auto"))),
-                 h5("Health", style="color: black; text-align: center; font-weight: bold;"),
-                 div(align = "center", withSpinner(plotlyOutput("summ_alc_health", height = "auto")))
-          )
-        )#taglist bracket
-      } else if (input$profile_summary == "DRG") {
-        tagList(#Drugs profile
-          column(4,
-                 h5("Environment", style="color: black; text-align: center; font-weight: bold;"),
-                 div(align = "center", withSpinner(plotlyOutput("summ_drg_env", height = "auto"))),
-                 h5("Services", style="color: black; text-align: center; font-weight: bold;"),
-                 div(align = "center", withSpinner(plotlyOutput("summ_drg_serv", height = "auto"))),
-                 h5("Data quality", style="color: black; text-align: center; font-weight: bold;"),
-                 div(align = "center", withSpinner(plotlyOutput("summ_drg_dat", height = "auto")))
-          ),
-          column(4,
-                 h5("Community safety", style="color: black; text-align: center; font-weight: bold;"),
-                 div(align = "center", withSpinner(plotlyOutput("summ_drg_commsaf", height = "auto"))),
-                 h5("CAPSM/Families", style="color: black; text-align: center; font-weight: bold;"),
-                 div(align = "center", withSpinner(plotlyOutput("summ_drg_family", height = "auto")))
-          ),
-          column(4,
-                 h5("Prevalence", style="color: black; text-align: center; font-weight: bold;"),
-                 div(align = "center", withSpinner(plotlyOutput("summ_drg_preval", height = "auto"))),
-                 h5("Health", style="color: black; text-align: center; font-weight: bold;"),
-                 div(align = "center", withSpinner(plotlyOutput("summ_drg_health", height = "auto")))
-          )
-        )#taglist bracket
-      } else if (input$profile_summary == "MEN") {
-        tagList(#Mental Health profile
-          column(4,
-                 h5("Female adult", style="color: black; text-align: center; font-weight: bold;"),
-                 div(align = "center", withSpinner(plotlyOutput("summ_men_fem", height = "auto")))
-          ),
-          column(4,
-                 h5("Male adult", style="color: black; text-align: center; font-weight: bold;"),
-                 div(align = "center", withSpinner(plotlyOutput("summ_men_male", height = "auto")))
-          ),
-          column(4,
-                 h5("CYP Mental Health", style="color: black; text-align: center; font-weight: bold;"),
-                 div(align = "center", withSpinner(plotlyOutput("summ_men_cyp", height = "auto")))
-          )
-        )#taglist bracket
-      } else if (input$profile_summary == "TOB") {
-        tagList(#Tobacco profile
-          column(4,
-                 h5("Smoking in school children", style="color: black; text-align: center; font-weight: bold;"),
-                 div(align = "center", withSpinner(plotlyOutput("summ_tob_school", height = "auto"))),
-                 h5("Smoking cessation & smoking cessation products", style="color: black; text-align: center; font-weight: bold;"),
-                 div(align = "center", withSpinner(plotlyOutput("summ_tob_cess", height = "auto")))
-          ),
-          column(4,
-                 h5("Smoking attributable deaths & diseases", style="color: black; text-align: center; font-weight: bold;"),
-                 div(align = "center", withSpinner(plotlyOutput("summ_tob_attrib", height = "auto"))),
-                 h5("Smoking during and post pregnancy", style="color: black; text-align: center; font-weight: bold;"),
-                 div(align = "center", withSpinner(plotlyOutput("summ_tob_pregn", height = "auto")))
-          ),
-          column(4,
-                 h5("Adult prevalence", style="color: black; text-align: center; font-weight: bold;"),
-                 div(align = "center", withSpinner(plotlyOutput("summ_tob_preval", height = "auto"))),
-                 h5("Retailer information", style="color: black; text-align: center; font-weight: bold;"),
-                 div(align = "center", withSpinner(plotlyOutput("summ_tob_retail", height = "auto")))
-          )
-        )#taglist bracket
-      } else if (input$profile_summary == "POP") {
-        tagList(#Population profile
-          h5("Population", style="color: black; text-align: center; font-weight: bold;"),
-          div(align = "center", withSpinner(plotlyOutput("summ_pop_pop", height = "auto")))
-        )#taglist bracket
-      }
-    } else if (input$chart_summary == "Trend") {
-      tagList(
-        h3("Behaviours", style="color: black; text-align: center"),
-        withSpinner(plotlyOutput("heat_hwb_beha", height = "auto")),
-        h3("Social care & housing", style="color: black; text-align: center"),
-        withSpinner(plotlyOutput("heat_hwb_socare", height = "auto")),
-        h3("Environment", style="color: black; text-align: center"),
-        withSpinner(plotlyOutput("heat_hwb_env", height = "auto")),
-        h3("Life expectancy & mortality", style="color: black; text-align: center"),
-        withSpinner(plotlyOutput("heat_hwb_lifexp", height = "auto")),
-        h3("Women's & children's health", style="color: black; text-align: center"),
-        withSpinner(plotlyOutput("heat_hwb_women", height = "auto")),
-        h3("Immunisations & screening", style="color: black; text-align: center"),
-        withSpinner(plotlyOutput("heat_hwb_imm", height = "auto")),
-        h3("Economy", style="color: black; text-align: center"),
-        withSpinner(plotlyOutput("heat_hwb_econ", height = "auto")),
-        h3("Crime", style="color: black; text-align: center"),
-        withSpinner(plotlyOutput("heat_hwb_crime", height = "auto")),
-        h3("Mental health", style="color: black; text-align: center"),
-        withSpinner(plotlyOutput("heat_hwb_mh", height = "auto")),
-        h3("Ill health & injury", style="color: black; text-align: center"),
-        withSpinner(plotlyOutput("heat_hwb_injury", height = "auto")),
-        h3("Education", style="color: black; text-align: center"),
-        withSpinner(plotlyOutput("heat_hwb_educ", height = "auto"))
-      )
-    }
-    
-  })
-
-  
-  # output$heat_hwb <- renderPlotly({
-  #   
-  #   list_domains <- c("Behaviours", "Social care & housing", "Environment", "Life expectancy & mortality", 
-  #     "Women's & children's health", "Immunisations & screening", "Economy", 
-  #     "Crime", "Mental health", "Ill health & injury", "Education")
-  #   
-  #   heat_beha <- plot_heat("Behaviours")
-  #   heat_soccare <- plot_heat("Social care & housing")
-  #   heat_envirom <- plot_heat("Environment")
-  #   heat_lifexp <- plot_heat("Life expectancy & mortality")
-  #   heat_women <- plot_heat("Women's & children's health")
-  #   heat_immun <- plot_heat("Immunisations & screening")
-  #   heat_econom <- plot_heat("Economy")
-  #   heat_crime <- plot_heat("Crime")
-  #   heat_mh <- plot_heat("Mental health")
-  #   heat_injury <- plot_heat("Ill health & injury")
-  #   heat_education <- plot_heat("Education")
-  #   
-  #   
-  #   
-  #   subplot(heat_beha, heat_soccare, heat_envirom, heat_lifexp,heat_women,
-  #           heat_immun,heat_econom,heat_crime,heat_mh,heat_injury,heat_education,
-  #           nrows = 11, shareX = TRUE)
-  #   
-  # })
-  
-  # plot_heat <- function(){
-  #   
-  #   #Merging comparator and chosen area
-  #   if (input$comp_heat == 1){
-  #     heat <- left_join(x = summary_chosen_area(), y = summary_chosencomp(), by=c("indicator", "year")) %>% 
-  #       droplevels()
-  #   } else if (input$comp_heat == 2) {
-  #     heat <- left_join(x = summary_chosen_area(), y = summary_chosencomp(), by=c("indicator")) %>% 
-  #       droplevels()
-  #   }
-  #   
-  #   heat <- heat %>%  
-  #     #Creating a palette of colours based on statistical significance
-  #     mutate(color = case_when(heat$interpret == "O" ~ 'white',
-  #                              heat$lowci <= heat$comp_m & heat$upci >= heat$comp_m ~'gray',
-  #                              heat$lowci > heat$comp_m & heat$interpret == "H" ~ 'blue',
-  #                              heat$lowci > heat$comp_m & heat$interpret == "L" ~ 'red',
-  #                              heat$upci < heat$comp_m & heat$interpret == "L" ~ 'blue',
-  #                              heat$upci < heat$comp_m & heat$interpret == "H" ~ 'red', 
-  #                              TRUE ~ 'white'),
-  #            #identifies correct domain name for title
-  #            domain = as.factor(case_when(
-  #              substr(heat$profile_domain1,1,3)==input$profile_summary ~
-  #                substr(heat$profile_domain1, 5, nchar(as.vector(profile_domain1))),
-  #              TRUE ~ substr(heat$profile_domain2, 5, nchar(as.vector(profile_domain2)))))) %>% 
-  #     #reorders factors this way the chart prints indicators alphabetically within domain groupings
-  #     arrange(domain, indicator, year) %>% 
-  #     mutate(indicator = factor(indicator, levels = unique(indicator)))
-  #   # heat$indicator <- factor(heat$indicator, levels = unique(heat$indicator))
-  #   
-  #   #Tooltip
-  #   heat_tooltip <- paste0(heat$indicator, "<br>", heat$def_period, "<br>",
-  #                          heat$type_definition, "<br>", heat$measure)
-  #   
-  #   # Plotting data
-  #   ggplot(heat, aes(x = year, y = indicator, fill = color,
-  #                    text= heat_tooltip)) +
-  #     geom_tile(color = "black") +
-  #     geom_text(aes(label = round(measure, 0)), size =3) +
-  #     ylim(rev(levels(heat$indicator))) + #to order with A on top
-  #     #Another step needed to make the palette of colours for the tile work
-  #     scale_fill_manual(name = "Legend", labels = c("Significantly better", "Not significantly different", "Significantly worse", "Significance is not calculated"),
-  #                       values = c(blue = "#4da6ff", gray = "gray88", red = "#ffa64d", white = "#ffffff")) +
-  #     #Giving the right dimensions to the plot
-  #     scale_x_continuous(position = "top", breaks=seq(from = min(heat$year), to = max(heat$year), by =1)) +
-  #     #Layout
-  #     theme(axis.text.x = element_text(angle=90),
-  #           axis.ticks.y=element_blank(), # taking out axis tick marks
-  #           axis.title.x=element_blank(), #Taking out y axis title
-  #           axis.title.y=element_blank(), #Taking out y axis title
-  #           panel.background = element_blank(),#Blanking background
-  #           legend.position="none", #taking out legend
-  #           text = element_text(size=14) # changing font size
-  #     )
-  # }
-  
-  # output$heat_plot <- renderPlotly({
-  #   #If no data available for that period then plot message saying data is missing
-  #   if (is.data.frame(summary_chosen_area()) && nrow(summary_chosen_area()) == 0)
-  #   {
-  #     plot_nodata()
-  #   }
-  #   else { #If data is available then plot it
-  #   #Converting ggplot into a Plotly object
-  #     ggplotly(plot_heat(), tooltip=c("text"), height = get_height_heat()) %>%
-  #     # margins needed as long labels don't work well with Plotly
-  #       layout(margin = list(l = 400, t = 50),
-  #            xaxis = list(side = 'top', fixedrange=TRUE), yaxis= list(fixedrange=TRUE),
-  #            font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif')
-  #       ) %>%
-  #       config(displayModeBar = FALSE, displaylogo = F, collaborate=F, editable =F) # taking out plotly logo and collaborate button
-  #   }
-  # })
-  
-
-    
 ##############################################.
 ## Barcode ----
 ###############################################.

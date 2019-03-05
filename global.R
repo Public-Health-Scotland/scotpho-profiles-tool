@@ -57,7 +57,7 @@ title_wrapper <- function(x, ...)
 
 #Function to create plot when no data available
 plot_nodata <- function() {
-  text_na <- list(x = 5, y = 5, text = "No data available" ,
+  text_na <- list(x = 5, y = 5, text = "No data available" , size = 20,
                   xref = "x", yref = "y",  showarrow = FALSE)
   
   plot_ly() %>%

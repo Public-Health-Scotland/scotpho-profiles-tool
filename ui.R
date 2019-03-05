@@ -269,7 +269,7 @@ tabPanel("Summary", icon = icon("list-ul"), value = "summary",
                    bsModal("mod_defs_summary", "Definitions", "defs_summary", htmlOutput('defs_text_summary')),
                    h4(textOutput("summary_title"), style="color: black; text-align: left"),
                    h5(textOutput("summary_subtitle"), style="color: black; text-align: left"),
-                   div(id="div_down", uiOutput("summary_ui_plots"))
+                   uiOutput("summary_ui_plots")
         )
   ), #Tab panel bracket
 #####################################################################.
