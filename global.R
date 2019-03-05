@@ -81,7 +81,7 @@ plot_nodata_gg <- function() {
     xlab("No data available")+
     scale_x_discrete(position = "top")+
     theme(panel.background = element_blank(),
-          axis.title.x=element_text(size=12, colour ='#555555'))
+          axis.title.x=element_text(size=20, colour ='#555555'))
     }
 
 
