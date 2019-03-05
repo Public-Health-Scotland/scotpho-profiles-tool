@@ -145,7 +145,7 @@ tabPanel(
     #2nd row of boxes
     fluidRow(
       #Trend plot box
-      column(4, class="landing-page-column",
+      column(6, class="landing-page-column",
              div(class="landing-page-box", 
                  div("Trend", class = "landing-page-box-title"),
                  div(class = "landing-page-icon", style="background-image: url(time_trend.png);
@@ -154,21 +154,21 @@ tabPanel(
                               class="landing-page-button", 
                               icon = icon("arrow-circle-right", "icon-lp")))),
       #Rank plot box
-      column(4, class="landing-page-column",
+      column(6, class="landing-page-column",
              div(class="landing-page-box", 
                  div("Rank", class = "landing-page-box-title"),
                  div(class = "landing-page-icon", style="background-image: url(rank_5.png);
                      background-size: auto 80%; background-position: center; background-repeat: no-repeat; "),
-                 actionButton('jump_to_rank', 'Compare geographical variation for an indicator using a bar chart', 
-                              class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp")))),
-      #Map plot box
-      column(4, class="landing-page-column",
-             div(class="landing-page-box", 
-                 div("Map", class = "landing-page-box-title"),
-                 div(class = "landing-page-icon", style="background-image: url(map_2.png);
-                     background-size: auto 80%; background-position: center; background-repeat: no-repeat; "),
-                 actionButton('jump_to_map', 'Compare geographical variation for an indicator using a map', 
+                 actionButton('jump_to_rank', 'Compare geographical variation for an indicator', 
                               class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp"))))
+      #Map plot box
+      # column(4, class="landing-page-column",
+      #        div(class="landing-page-box", 
+      #            div("Map", class = "landing-page-box-title"),
+      #            div(class = "landing-page-icon", style="background-image: url(map_2.png);
+      #                background-size: auto 80%; background-position: center; background-repeat: no-repeat; "),
+      #            actionButton('jump_to_map', 'Compare geographical variation for an indicator using a map', 
+      #                         class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp"))))
     ),
     fluidRow(h4("Access the data behind the tool and find supporting information")),
     fluidRow(
@@ -363,116 +363,100 @@ tabPanel("Barcode", icon = icon("barcode"), value = "barcode",
 ## Time trend ----
 ###############################################.
 tabPanel("Trend", icon = icon("area-chart"), value = "trend",
-                   sidebarPanel(width=3,
+                   sidebarPanel(width=4,
                           selectInput("indic_trend", "Indicator", choices=indicator_list),
-                          awesomeCheckbox("ci_trend", label = "95% confidence intervals", value = FALSE),
-                          awesomeCheckbox("colorblind_trend",  
-                                          label = "Improved accessibility", value = FALSE),
-                          actionButton("defs_trend",label="Definitions", icon= icon('info'), class ="down"),
+                          div(title= "Display the rate/percentage data or the raw numbers.",
+                              awesomeRadio("var_plot_trend", label =NULL, inline = TRUE, 
+                                            choices = c("Rate/Percentage" = "measure", 
+                                                   "Numerator" = "numerator"))),
+                          div(title="Show or hide the 95% confidence intervals for the data selected.", # tooltip
+                            awesomeCheckbox("ci_trend", label = "95% confidence intervals", value = FALSE)),
+                          actionButton("defs_trend", label="Definitions", icon= icon('info'), class ="down"),
                           shiny::hr(),
-                          p(tags$b("Select the areas you want to plot.
-                                   You can select multiple areas per geography level")),
-                          selectInput("hbname_trend", "Health board", choices = c("Select health boards" = "", paste(hb_name)),
-                                      multiple=TRUE, selectize=TRUE, selected = ""),
-                          selectInput("scotname_trend", "Scotland", choices = c("", "Scotland"), 
-                                      selectize=TRUE, selected = "Scotland"),
-                          selectInput("caname_trend", "Council area", choices =  c("Select council areas" = "", paste(la_name)),
-                                      multiple=TRUE, selectize=TRUE, selected = ""),
-                          selectInput("adpname_trend", "Alcohol & drug partnership", choices =  c("Select partnerships" = "", paste(adp_name)),
-                                      multiple=TRUE, selectize=TRUE, selected = ""),
-                          selectInput("partname_trend", "HSC partnership", choices =  c("Select partnerships" = "", paste(partnership_name)),
-                                      multiple=TRUE, selectize=TRUE, selected = ""),
-                          selectInput("loc_iz_trend", "To choose a locality or intermediate zone first 
-                                      select an HSC partnership", 
-                                      choices = partnership_name),
-                          uiOutput("loc_ui_trend"),
-                          uiOutput("iz_ui_trend"),
+                          p(tags$b("Select the areas you want to plot. You can select multiple 
+                                   areas for each type of geography.")),
+                          awesomeCheckbox("scotname_trend", tags$b("Scotland"), value=TRUE),
+                          column(6,
+                                 selectizeInput("hbname_trend", "Health board", choices = c("Select health boards" = "", paste(hb_name)),
+                                             multiple=TRUE, selected = ""),
+                                 selectizeInput("partname_trend", "HSC partnership", choices =  c("Select partnerships" = "", paste(partnership_name)),
+                                             multiple=TRUE, selected = "")),
+                          column(6,
+                            selectizeInput("caname_trend", "Council area", choices =  c("Select council areas" = "", paste(la_name)),
+                                        multiple=TRUE, selected = ""),
+                            selectizeInput("adpname_trend", "Alcohol & drug partnership", choices =  c("Select partnerships" = "", paste(adp_name)),
+                                        multiple=TRUE, selected = "")),
+                          selectInput("loc_iz_trend", "To choose a locality or intermediate zone, first 
+                                      select an HSC partnership", choices = partnership_name),
+                          column(6, uiOutput("loc_ui_trend")),
+                          column(6,uiOutput("iz_ui_trend")),
                           downloadButton('download_trend', 'Download data', class = "down"),
                           savechart_button('download_trendplot', 'Save chart',  class = "down")
                    ),
-         mainPanel(width = 9, #Main panel
+         mainPanel(width = 8, #Main panel
           bsModal("mod_defs_trend", "Definitions", "defs_trend", htmlOutput('defs_text_trend')),
           h4(textOutput("title_trend"), style="color: black; text-align: left"),
           withSpinner(plotlyOutput("trend_plot"))
          )
 ), #Tab panel bracket
 ###############################################.
-## Rank chart ---- 
+## Rank and map ---- 
 ###############################################.
 tabPanel("Rank", icon = icon("signal"), value = "rank",
-         sidebarPanel(width=4, #Filter options
-                  selectInput("indic_rank", "Indicator", choices=indicator_list),
-                  actionButton("defs_rank", label="Definitions", icon= icon('info'), class ="down"),
-                  uiOutput("geotype_ui_rank"),
-                  conditionalPanel( #Conditional panel for extra dropdown for localities & IZ
-                    condition = "input.geotype_rank == 'HSC locality' | input.geotype_rank == 'Intermediate zone' ",
-                    selectInput("loc_iz_rank", label = "Partnership for localities/intermediate zones",
-                                choices = partnership_name)),
+         wellPanel(#Filter options
+           column(width = 4,
+                 selectInput("indic_rank", "Indicator", choices=indicator_list),
+                 uiOutput("geotype_ui_rank"),
+                 conditionalPanel( #Conditional panel for extra dropdown for localities & IZ
+                   condition = "input.geotype_rank == 'HSC locality' | input.geotype_rank == 'Intermediate zone' ",
+                   selectInput("loc_iz_rank", label = "Partnership for localities/intermediate zones",
+                               choices = partnership_name))
+                 ),
+           column(width = 3,
                   uiOutput("year_ui_rank"), 
-                  selectInput("geocomp_rank", "Comparator", choices = comparator_list,
-                              selectize=TRUE, selected = "Scotland"),
-                  awesomeCheckbox("ci_rank", label = "95% confidence intervals", value = FALSE),
-                  #Legend
-                  p(img(src='signif_better.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
-                    "Better than comparator", br(),
-                    img(src='non_signif.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
-                    "Not different to comparator", br(),
-                    img(src='signif_worse.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
-                    "Worse than comparator", br(),
-                    img(src='signif_nocalc2.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
-                    "No differences can be calculated"),
-                  downloadButton('download_rank', 'Download data', class = "down"),
-                  savechart_button('download_rankplot', 'Save chart', class = "down")
-         ),
-         mainPanel(width = 8, #Main panel
-                   bsModal("mod_defs_rank", "Definitions", "defs_rank", htmlOutput('defs_text_rank')),
-                   h4(textOutput("rank_title"), style="color: black; text-align: left"),
-                   h5(textOutput("rank_subtitle"), style="color: black; text-align: left"),
-                   withSpinner(plotlyOutput("rank_plot")) 
-         )
-), #Tab panel bracket
-###############################################.
-###########Map ----
-###############################################.
-tabPanel("Map", icon = icon("globe"), value = "map",
-         sidebarPanel(    
-           selectInput("indic_map", "Indicator", choices=indicator_map_list),
-           actionButton("defs_map", label="Definitions", icon= icon('info'), class ="down"),
-           uiOutput("geotype_ui_map"),
-           conditionalPanel(#Conditional panel for extra dropdown for localities & IZ
-             condition = "input.geotype_bar== 'HSC locality' | input.geotype_map == 'Intermediate zone' ",
-             selectInput("iz_map", label = "Council for intermediate zones", choices = la_name)),
-           uiOutput("year_ui_map"),
-           awesomeRadio("comp_map", label = "Compare against:",
-                        choices = list("Area" = 1, "Time" = 2), 
-                        selected = 1, inline=TRUE, checkbox=TRUE),
-           conditionalPanel(condition = "input.comp_map == 1 ",  
-                            selectInput("geocomp_map", "Comparator", choices = comparator_list,
-                                        selectize=TRUE, selected = "Scotland")
+                  awesomeRadio("comp_rank", label = "Compare against:",
+                               choices = list("Area" = 1, "Time" = 2), 
+                               selected = 1, inline=TRUE, checkbox=TRUE),
+                  conditionalPanel(condition = "input.comp_rank == 1 ",  
+                                   selectInput("geocomp_rank", "Comparator", choices = comparator_list,
+                                               selectize=TRUE, selected = "Scotland")
+                  ),
+                  conditionalPanel(condition = "input.comp_rank == 2 ", 
+                                   uiOutput("yearcomp_ui_rank")
+                  )
            ),
-           conditionalPanel(condition = "input.comp_map == 2 ", 
-                            uiOutput("yearcomp_ui_map")
+           column(width = 3,
+                 awesomeCheckbox("ci_rank", label = "95% confidence intervals", value = FALSE),
+                 #Legend
+                 p(img(src='signif_better.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
+                   "Better than comparator", br(),
+                   img(src='non_signif.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
+                   "Not different to comparator", br(),
+                   img(src='signif_worse.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
+                   "Worse than comparator", br(),
+                   img(src='signif_nocalc2.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
+                   "No differences can be calculated", br(),
+                   img(src='baseline_year_color.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
+                   "Baseline year comparison")
            ),
-           #Legend
-           p(img(src='signif_better.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
-             "Better than comparator", br(),
-             img(src='non_signif.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
-             "Not different to comparator", br(),
-             img(src='signif_worse.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
-             "Worse than comparator", br(),
-             img(src='signif_nocalc.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
-             "No differences can be calculated"),
-           downloadButton('download_map', 'Download data', class = "down"),
-           savechart_button('download_mapplot', 'Save map', class = "down")
-         ), 
-         mainPanel( #Main panel
-           bsModal("mod_defs_map", "Definitions", "defs_map", htmlOutput('defs_text_map')),
-           h4(textOutput("map_title"), style="color: black; text-align: left"),
-           h5(textOutput("map_subtitle"), style="color: black; text-align: left"),
-           withSpinner(leafletOutput("map", width="100%",height="600px"))
+           column(width = 2,
+                 actionButton("defs_rank", label="Definitions", icon= icon('info'), class ="down"), 
+                 downloadButton('download_rank', 'Download data', class = "down"),
+                 savechart_button('download_rankplot', 'Save chart', class = "down"),
+                 savechart_button('download_mapplot', 'Save map', class = "down")
            )
+         ), #well pannel bracket
+         mainPanel(width = 12, #Main panel
+           bsModal("mod_defs_rank", "Definitions", "defs_rank", htmlOutput('defs_text_rank')),
+           column(width = 7, #rank bar
+                  h4(textOutput("rank_title"), style="color: black; text-align: left"),  
+                  h5(textOutput("rank_subtitle"), style="color: black; text-align: left"),  
+                  withSpinner(plotlyOutput("rank_plot"))           ),
+           column(width = 5, #map
+             uiOutput("map_ui")
+           )
+         ) #main panel bracket
 ), #Tab panel bracket
-
 ###############################################.
 ## Data ----
 ###############################################.
