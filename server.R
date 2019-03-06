@@ -2009,8 +2009,8 @@ showModal(welcome_modal)
   ###############################################.
   # Preparing reactive data for table output
   filter_table <- reactive ({
-    if (is.null(input$indicator_filter) & is.null(input$indicator_filter) & 
-        is.null(input$indicator_filter)) {
+    if (is.null(input$indicator_filter) & is.null(input$topic_filter) & 
+        is.null(input$profile_filter)) {
       # if no data selected create empty dataset to avoid app crashing
       table <- data.frame(code = factor(), areaname = factor(), areatype = factor(), 
                           indicator = factor(), year = double(), 
@@ -2268,17 +2268,6 @@ showModal(welcome_modal)
       write.csv(indicator_csv(),
                 file, row.names=FALSE) } 
   )
-  
-  ########################.
-  #Re-open Modal ----
-  ########################.
-  
-  observeEvent(input$openModal, {
-    showModal(
-      welcome_modal
-    )
-  })
-  
   
 } #server closing bracket
 
