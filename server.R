@@ -453,8 +453,6 @@ showModal(welcome_modal)
         axis.text=element_blank(), # taking out x axis labels
         axis.title = element_blank(),
         text = element_text(family="Helvetica Neue,Helvetica,Arial,sans-serif",colour ='#555555'),
-        #plot.title = element_text(face = "bold",size=17),
-        #plot.subtitle = element_text(size=16,margin=margin(0,0,20,0,unit="pt")),
         axis.ticks=element_blank(), # taking out x axis tick marks
         legend.position = "none",
         panel.background = element_blank(),#Blanking background
@@ -981,7 +979,6 @@ showModal(welcome_modal)
         geom_text(data=data_labels, aes(x=x_chosen,y=1.5,label=round(chosen_lab,digits=0)),
                   check_overlap = TRUE,size=5,colour = "#009999",vjust=1, hjust=0) + #label for chosenarea - teal
         geom_text(data=data_labels, aes(x=x_comp,y=-0.6,label=round(comp_lab,digits=0)),
-                  #          check_overlap = TRUE,size=5,colour = "#e5769b",vjust=0, hjust=1) + #label for comparator
                   check_overlap = TRUE,size=5,colour = "#990000",vjust=0, hjust=1) + #label for comparator - red
         xlab("Worse  <-------------------->  Better")+
         scale_x_discrete(position = "top") +
@@ -1002,7 +999,6 @@ showModal(welcome_modal)
           axis.text=element_blank(), # taking out x axis labels
           axis.ticks=element_blank(),
           panel.background = element_rect(fill="grey95"))+ # azure background
-        #panel.border = element_blank())+ #remove frame round plot plot
         facet_wrap(~indicator + type_definition + trend_axis, # fields to facet on
                    nrow=ind_count,ncol=1,                   # how many rows  and colums to include
                    scales="fixed",                          # fix scale so can compare % diff down column
