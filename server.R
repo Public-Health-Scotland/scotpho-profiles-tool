@@ -741,101 +741,93 @@ showModal(welcome_modal)
                device = "png", scale=4, limitsize=FALSE)
       })
     
-##############################################.
-## Barcode ----
-###############################################.
+    ##############################################.
+    ## Spine/Barcode ----
+    ###############################################.    
+    
+    ###############################################.
+    # Indicator definitions
+    # Subsetting by domain and profile. Profile is fiddly as vector uses abbreviations 
+    # so needs to be converted to the names to match techdoc.
+    defs_data_spine <- reactive({techdoc %>% subset(grepl(input$topic_spine, domain) &
+                                                      grepl(names(profile_list[unname(profile_list) == input$profile_spine]),
+                                                            profile))})
+    
+    output$defs_text_spine <- renderUI({
+      
+      HTML(paste(sprintf("<b><u>%s</b></u> <br> %s ", defs_data_spine()$indicator_name, 
+                         defs_data_spine()$indicator_definition), collapse = "<br><br>"))
+    })
+    
+    ############################################.
+    ## Reactive controls
+    
+    # Reactive controls for domain depending on profile
+    output$topic_ui_spine <- renderUI({
+      domain_list <- sort(profile_lookup$domain[profile_lookup$profile == input$profile_spine])
+      selectInput("topic_spine", "Domain", choices = domain_list, selected='')
+    })
+    
+    # Reactive controls for areatype depending on profile selected
+    output$geotype_ui_spine <- renderUI({
+      areas <- areatype_profile[[names(profile_list[unname(profile_list) == input$profile_spine])]]
+      areas <- areas [! areas %in% c("Scotland")]
+      selectInput("geotype_spine", "Geography level", choices=areas,
+                  selected = "Health board")
+    })        
+    
+    # Reactive controls for spinecode:area name depending on areatype selected
+    output$geoname_ui_spine <- renderUI({
+      areas_spine <- if (input$geotype_spine %in% c("Health board", "Council area", 
+                                                    "Alcohol & drug partnership", "HSC partnership"))
+      {
+        sort(geo_lookup$areaname[geo_lookup$areatype == input$geotype_spine])
+      } else {
+        sort(geo_lookup$areaname[geo_lookup$areatype == input$geotype_spine
+                                 & geo_lookup$parent_area == input$loc_iz_spine])
+      }
+      selectInput("geoname_spine", "Select your area", choices = areas_spine, selectize=TRUE, selected = "")
+    })
     
     # Barcode help pop-up
-    observeEvent(input$help_bar, {
+    observeEvent(input$help_spine, {
       showModal(modalDialog(
         title = "How to use this chart",
         p(img(src="help_barcode2.png",height=600)),size = "l",
         easyClose = TRUE, fade=FALSE
       ))
-    })
+    })  
     
-    ###############################################.
-    # Indicator definitions
-    #Subsetting by domain and profile. Profile is fiddly as vector uses abbreviations 
-    # so needs to be converted to the names to match techdoc.
-    defs_data_bar <- reactive({techdoc %>% subset(grepl(input$topic_bar, domain) &
-                                                     grepl(names(profile_list[unname(profile_list) == input$profile_bar]),
-                                                           profile))})
+    ############################################.
+    ## Spine Data
     
-    output$defs_text_bar <- renderUI({
-      
-      HTML(paste(sprintf("<b><u>%s</b></u> <br> %s ", defs_data_bar()$indicator_name, 
-                         defs_data_bar()$indicator_definition), collapse = "<br><br>"))
-    })
-    
-    #####################.
-    # Reactive controls
-    # Reactive controls for areatype depending on profile selected
-    output$geotype_ui_bar <- renderUI({
-      
-      areas <- areatype_profile[[names(profile_list[unname(profile_list) == input$profile_bar])]]
-
-      areas <- areas [! areas %in% c("Scotland")]
-      
-      selectInput("geotype_bar", "Geography level", choices=areas,
-                  selected = "Health board")
-      
-    })
-    
-    # Reactive controls for domain depending on profile
-    output$topic_ui_bar <- renderUI({
-      
-      domain_list <- sort(profile_lookup$domain[profile_lookup$profile == input$profile_bar])
-      
-      selectInput("topic_bar", "Domain", choices = domain_list, selected='')
-      
-    })
-    
-    # Reactive controls for barcode:area name depending on areatype selected
-    output$geoname_ui_bar <- renderUI({
-      
-      areas_bar <- if (input$geotype_bar %in% c("Health board", "Council area", 
-                                                  "Alcohol & drug partnership", "HSC partnership"))
-      {
-        sort(geo_lookup$areaname[geo_lookup$areatype == input$geotype_bar])
-      } else {
-        sort(geo_lookup$areaname[geo_lookup$areatype == input$geotype_bar
-                                 & geo_lookup$parent_area == input$loc_iz_bar])
-      }
-      
-      selectInput("geoname_bar", "Select your area", choices = areas_bar, selectize=TRUE, selected = "")
-      
-    })
-    
-#####################.
-# Reactive data
     #Barcode all area data
-    bar_allareas <- reactive({
+    spine_allareas <- reactive({
       
       optdata %>%
         group_by (indicator) %>%
         mutate(max_year = max(year))%>%
         subset (year == max_year &
-                  (substr(profile_domain1, 1, 3) == input$profile_bar |
-                     substr(profile_domain2, 1, 3) == input$profile_bar) &
-                  (substr(profile_domain1, 5, nchar(as.vector(profile_domain1))) == input$topic_bar |
-                     substr(profile_domain2, 5, nchar(as.vector(profile_domain2))) == input$topic_bar) &
-                  areatype  == input$geotype_bar &
+                  (substr(profile_domain1, 1, 3) == input$profile_spine |
+                     substr(profile_domain2, 1, 3) == input$profile_spine) &
+                  (substr(profile_domain1, 5, nchar(as.vector(profile_domain1))) == input$topic_spine |
+                     substr(profile_domain2, 5, nchar(as.vector(profile_domain2))) == input$topic_spine) &
+                  areatype  == input$geotype_spine &
                   !(indicator %in% c("Mid-year population estimate - all ages", "Quit attempts")))
     })
     
     #Barcode data for the chosen area. Filtering based on user input values.
-    bar_chosenarea <- reactive({
+    spine_chosenarea <- reactive({
       optdata %>%
         group_by (indicator) %>%
         mutate(max_year=max(year))%>%
         subset (year == max_year &
-                  areaname == input$geoname_bar &
-                  (substr(profile_domain1, 1, 3) == input$profile_bar |
-                     substr(profile_domain2, 1, 3) == input$profile_bar) &
-                  (substr(profile_domain1, 5, nchar(as.vector(profile_domain1))) == input$topic_bar |
-                     substr(profile_domain2, 5, nchar(as.vector(profile_domain2))) == input$topic_bar) &
-                  areatype  == input$geotype_bar &
+                  areaname == input$geoname_spine &
+                  (substr(profile_domain1, 1, 3) == input$profile_spine |
+                     substr(profile_domain2, 1, 3) == input$profile_spine) &
+                  (substr(profile_domain1, 5, nchar(as.vector(profile_domain1))) == input$topic_spine |
+                     substr(profile_domain2, 5, nchar(as.vector(profile_domain2))) == input$topic_spine) &
+                  areatype  == input$geotype_spine &
                   !(indicator %in% c("Mid-year population estimate - all ages", "Quit attempts"))) %>%
         select(c(indicator, measure, lowci, upci)) %>%
         rename(measure_chosen= measure, lowci_chosen=lowci, upci_chosen= upci) %>%
@@ -843,104 +835,106 @@ showModal(welcome_modal)
     })
     
     #Select comparator based on years available for area selected.
-    bar_chosencomp <- reactive({
+    spine_chosencomp <- reactive({
       
       optdata %>%
         group_by (indicator) %>%
         mutate(max_year=max(year))%>%
         subset (year==max_year &
-                  areaname == input$geocomp_bar &
+                  areaname == input$geocomp_spine &
                   areatype %in% c("Health board", "Council area", "Scotland") &
-                  (substr(profile_domain1, 1, 3) == input$profile_bar |
-                     substr(profile_domain2, 1, 3) == input$profile_bar) &
-                  (substr(profile_domain1, 5, nchar(as.vector(profile_domain1))) == input$topic_bar |
-                     substr(profile_domain2, 5, nchar(as.vector(profile_domain2))) == input$topic_bar) &
+                  (substr(profile_domain1, 1, 3) == input$profile_spine |
+                     substr(profile_domain2, 1, 3) == input$profile_spine) &
+                  (substr(profile_domain1, 5, nchar(as.vector(profile_domain1))) == input$topic_spine |
+                     substr(profile_domain2, 5, nchar(as.vector(profile_domain2))) == input$topic_spine) &
                   !(indicator %in% c("Mid-year population estimate - all ages", "Quit attempts"))) %>%
         select(c(indicator, measure)) %>%
         rename(measure_comp =measure) %>%
         droplevels()
       
-    })
-#####################.
-# Creating plot    
+    })        
+    
+    #####################.
+    # Creating Spine plot 
+    
     #Dynamically set height of bars
-    bar_plot_height<- function(){
-      (nrow(bar_chosenarea())*70+120)
+    spine_plot_height<- function(){
+      (nrow(spine_chosenarea())*50+70)
     }
     
     # Create barcode plot function
-    plot_barcode <- function(){
+    plot_spine <- function(){
       
-      ind_count <- length(unique(bar_allareas()$ind_id)) #facet_wrap requires how many chart rows to render
+      ind_count <- length(unique(spine_allareas()$ind_id)) #facet_wrap requires how many chart rows to render
       
       #Merging comparator and chosen area
-      bar <- merge(bar_allareas(), bar_chosencomp(), by=c("indicator"))
-      bar <- left_join(bar, bar_chosenarea(), by=c("indicator"))
+      spine <- merge(spine_allareas(), spine_chosencomp(), by=c("indicator"))
+      spine <- left_join(spine, spine_chosenarea(), by=c("indicator"))
       
       #add variable denoting if sign diff between comparator
-      bar<-bar %>%
+      spine<-spine %>%
         mutate(flag=case_when(
-          bar$interpret == "O" ~ 'No significance can be calculated',
-          bar$lowci_chosen<=bar$measure_comp & bar$upci_chosen>=bar$measure_comp ~
+          interpret == "O" ~ 'No significance can be calculated',
+          lowci_chosen<=measure_comp & upci_chosen>=measure_comp ~
             'Not different to comparator',
-          bar$lowci_chosen > bar$measure_comp & bar$interpret == "H" ~ 'Better than comparator',
-          bar$lowci_chosen > bar$measure_comp & bar$interpret == "L" ~ 'Worse than comparator',
-          bar$upci_chosen < bar$measure_comp & bar$interpret == "L" ~ 'Better than comparator',
-          bar$upci_chosen < bar$measure_comp & bar$interpret == "H" ~ 'Worse than comparator',
+          lowci_chosen > measure_comp & interpret == "H" ~ 'Better than comparator',
+          lowci_chosen > measure_comp & interpret == "L" ~ 'Worse than comparator',
+          upci_chosen < measure_comp & interpret == "L" ~ 'Better than comparator',
+          upci_chosen < measure_comp & interpret == "H" ~ 'Worse than comparator',
           TRUE ~ 'No significance can be calculated'))
       
-      #Transposing data so that better is always to the right of plot
-      bar <- bar %>%
+      #Transposing data so that better is always to the right hand side of plot
+      spine <- spine %>%
         mutate(comp = 1,
-               all = bar$measure/bar$measure_comp,
-               chosen = bar$measure_chosen/bar$measure_comp,
-               all2=case_when(bar$interpret=='L' & bar$measure>bar$measure_comp ~ -(all-1),
-                              bar$interpret=='L' & bar$measure<=bar$measure_comp ~ 
+               all = measure/measure_comp,
+               chosen = measure_chosen/measure_comp,
+               all2=case_when(interpret=='L' & measure>measure_comp ~ -(all-1),
+                              interpret=='L' & measure<=measure_comp ~ 
                                 (1-all), TRUE ~ -(1-all)),
-              chosen2=case_when(bar$interpret=='L' & bar$measure_chosen>bar$measure_comp ~
-                                  -(chosen-1),
-                                bar$interpret=='L' & bar$measure_chosen<=bar$measure_comp ~
-                                  (1-chosen), TRUE ~ -(1-chosen))) %>%
+               chosen2=case_when(interpret=='L' & measure_chosen>measure_comp ~
+                                   -(chosen-1),
+                                 interpret=='L' & measure_chosen<=measure_comp ~
+                                   (1-chosen), TRUE ~ -(1-chosen))) %>%
         mutate(comp=0)
       
       #define x axis value to assign as intercept for significance
-      minx <- min(bar$all2)-0.1
+      minx <- min(spine$all2)-0.1
       
       #generate labels for comp and chosen bars
-      data_labels <- bar %>%
+      data_labels <- spine %>%
         select(indicator, measure_comp, measure_chosen, chosen2, comp, type_definition,trend_axis, code) %>%
         group_by(indicator, type_definition, trend_axis, code) %>%
         summarise(comp_lab=measure_comp[1], chosen_lab=measure_chosen[1],
                   x_chosen=chosen2[1], x_comp = comp[1])%>%
         droplevels()
       
-      bar_data <- bind_rows(bar %>% mutate(y=0),
-                             bar %>% mutate(y=1))
+      spine_data <- bind_rows(spine %>% mutate(y=0),
+                              spine %>% mutate(y=1))
       
       #Chart title text & subtitle
-      areatype_name <- input$geotype_bar
-      chosenarea_name <- input$geoname_bar
-      comparea_name <- input$geocomp_bar
-
+      areatype_name <- input$geotype_spine
+      chosenarea_name <- input$geoname_spine
+      comparea_name <- input$geocomp_spine
+    
       #Create colour scale for lines & legend key.
-      #468961 (green-selected) #e5769b (pink-comparator)
-      colour_lines <-  scale_colour_manual(" ",values= setNames(c("black","#468961","#e5769b"), c(areatype_name, chosenarea_name, comparea_name)))
-      
+      colour_lines <-  scale_colour_manual(" ",values= setNames(c("black","#009999","#990000"), c(areatype_name, chosenarea_name, comparea_name)))
+    
       #Create fill colour scheme for significance.
       fill_df <- data.frame(flag = c ('No significance can be calculated','Not different to comparator','Better than comparator','Worse than comparator'),stringsAsFactors = TRUE)
       fillcolours <- c("#4da6ff","white","grey88","#ffa64d")
       names(fillcolours) <- levels(fill_df$flag)
       colour_points <- scale_fill_manual(name = "flag",values = fillcolours)
       
-      ggplot(bar_data, aes(x = all2, y = y, group=code, colour=areatype))+
-        geom_line(alpha=0.4)+
+      ggplot(spine_data, aes(x = all2, y = y, group=code, colour=areatype))+
+        geom_line(alpha=0.6)+
         geom_line(aes(x = chosen2, colour=chosenarea_name), size=1) + #line for picked area
         geom_line(aes(x = comp, colour=comparea_name), size=1) + #line for comparator
         geom_point(aes(fill=flag, shape=flag, x= minx, y=0.5),size=8,colour="grey40") +
         geom_text(data=data_labels, aes(x=x_chosen,y=1.5,label=round(chosen_lab,digits=0)),
-                  check_overlap = TRUE,size=5,colour = "#468961",vjust=1, hjust=0) + #label for chosenarea
+                  check_overlap = TRUE,size=5,colour = "#009999",vjust=1, hjust=0) + #label for chosenarea - teal
         geom_text(data=data_labels, aes(x=x_comp,y=-0.6,label=round(comp_lab,digits=0)),
-                  check_overlap = TRUE,size=5,colour = "#e576b9",vjust=0, hjust=1) + #label for comparator
+                  #          check_overlap = TRUE,size=5,colour = "#e5769b",vjust=0, hjust=1) + #label for comparator
+                  check_overlap = TRUE,size=5,colour = "#990000",vjust=0, hjust=1) + #label for comparator - red
         xlab("Worse  <-------------------->  Better")+
         scale_x_discrete(position = "top") +
         colour_lines+
@@ -952,82 +946,90 @@ showModal(welcome_modal)
           axis.title.x=element_text(size=12, colour ='#555555',hjust=0.6), #x axis title contains better/worse
           text = element_text(family="Arial"),
           legend.direction = "vertical",
-          legend.position="top",
+          legend.justification = "top",
           legend.key = element_rect(colour = NA, fill = NA),
           legend.text = element_text(size=14,colour ='#555555', hjust=-1),
           legend.title = element_blank(),
+          panel.grid = element_blank(),
           axis.text=element_blank(), # taking out x axis labels
-          axis.ticks=element_blank(), # taking out x axis tick marks
-          panel.background = element_blank(),#Blanking background
-          panel.border = element_blank())+ #remove frame round plot plot
+          axis.ticks=element_blank(),
+          panel.background = element_rect(fill="grey95"))+ # azure background
+        #panel.border = element_blank())+ #remove frame round plot plot
         facet_wrap(~indicator + type_definition + trend_axis, # fields to facet on
-                   nrow=ind_count,ncol=1,                   # how many rows and colums to include
+                   nrow=ind_count,ncol=1,                   # how many rows  and colums to include
                    scales="fixed",                          # fix scale so can compare % diff down column
                    labeller = label_wrap_gen(multi_line = TRUE), # allow labels to wrap 
                    strip.position="left")+                    # swap strip text to appear on left
         theme(strip.text.y = element_text(size=14,colour ='#555555', angle = 180, hjust = 0), #adjust font & rotation
               strip.switch.pad.wrap = unit(-1, "cm"), # reducing white space between strip panel & chart
-              strip.placement = "outside",            # formatting again to try and limit white space
-              strip.background = element_blank())     # no background colour on strip panel
-    }
+              strip.placement = "outside",  # formatting again to try and limit white space
+              strip.background = element_rect(fill="grey95"))           # change colour of facet wrap background
+    }        
     
-    # Render plot
-    output$bar_plot <- renderPlot({
-      plot_barcode()
+    
+
+    # Render spine plot - inlucde if statement for situations where no data available
+    output$spine_plot <- renderPlot({
+      if(is.data.frame(spine_chosenarea()) && nrow(spine_chosenarea())==0)
+      {plot_nodata_gg()}
+      else {plot_spine()}
     })
+    
     
     # Resize plot height for display in app
-    output$ui_bar_plot <-renderUI({
-      plotOutput("bar_plot", height=bar_plot_height(), width="100%")
+    output$ui_spine_plot <-renderUI({
+      plotOutput("spine_plot", height=spine_plot_height(), width="100%")
     })
     
+
     #Create text output for responsive plot legend
     #legend - selected area - green
-    output$ui_bar_legend_selected <- renderUI({
-      img(src='bar_legend_selected.jpg', height=18, style="padding-right: 2px; vertical-align:middle",paste(input$geoname_bar,sep = ""))
+    output$ui_spine_legend_selected <- renderUI({
+      img(src='spine_legend_selected.jpg', height=18, style="padding-right: 2px; vertical-align:middle",paste(input$geoname_spine,sep = ""))
     }) 
     
     #legend - comparator - pink
-    output$ui_bar_legend_comparator <- renderUI({
-      img(src='bar_legend_comparator.jpg', height=18, style="padding-right: 2px; vertical-align:middle",paste(input$geocomp_bar))
+    output$ui_spine_legend_comparator <- renderUI({
+      img(src='spine_legend_comparator.jpg', height=18, style="padding-right: 2px; vertical-align:middle",paste(input$geocomp_spine))
     })
     
     #legend - area type - grey bars
-    output$ui_bar_legend_areatype <- renderUI({
-      img(src='bar_legend_areatype.jpg', height=18, style="padding-right: 2px; vertical-align:middle",paste(input$geotype_bar))
+    output$ui_spine_legend_areatype <- renderUI({
+      img(src='bar_legend_areatype.jpg', height=18, style="padding-right: 2px; vertical-align:middle",paste(input$geotype_spine))
     }) 
     
-    output$bar_title <- renderText({
-      paste(names(profile_list[unname(profile_list) == input$profile_bar]),
-            " profile: ", input$topic_bar,sep="")
+    output$spine_title <- renderText({
+      paste(names(profile_list[unname(profile_list) == input$profile_spine]),
+            " profile: ", input$topic_spine,sep="")
     })
     
-    output$bar_subtitle <- renderText({
-      paste(input$geoname_bar," (",input$geotype_bar,") compared against ",input$geocomp_bar,sep="")
-    })
+    output$spine_subtitle <- renderText({
+      paste(input$geoname_spine," (",input$geotype_spine,") compared against ",input$geocomp_spine,sep="")
+    })    
     
-#####################.
-# Downloading plot and data  
-    # Defined data file to download
-    bar_csv <- reactive({
+    #####################.
+    # Downloading spine plot and data  
+    # Define data file to download
+    
+    spine_csv <- reactive({
       
       #Merging comparator and chosen area
-      bar <- merge(bar_allareas(), bar_chosencomp(), by=c("indicator"))
-      bar <- left_join(bar, bar_chosenarea(), by=c("indicator"))
-      bar <- bind_cols(bar %>% mutate(topic=input$topic_bar))
-      bar <- bind_cols(bar %>% mutate(comparator=input$geocomp_bar))
+      spine <- merge(spine_allareas(), spine_chosencomp(), by=c("indicator"))
+      spine <- left_join(spine, spine_chosenarea(), by=c("indicator"))
+      spine <- bind_cols(spine %>% mutate(topic=input$topic_spine))
+      spine <- bind_cols(spine %>% mutate(comparator=input$geocomp_spine))
       
-      bar<-bar %>%
+      spine<-spine %>%
         mutate(flag=case_when(
-          bar$interpret == "O" ~'NA',
-          bar$lowci_chosen<=bar$measure_comp & bar$upci_chosen>=bar$measure_comp ~ 'NS',
-          bar$lowci_chosen > bar$measure_comp & bar$interpret == "H" ~ 'Better',
-          bar$lowci_chosen > bar$measure_comp & bar$interpret == "L" ~ 'Worse',
-          bar$upci_chosen < bar$measure_comp & bar$interpret == "L" ~ 'Better',
-          bar$upci_chosen < bar$measure_comp & bar$interpret == "H" ~ 'Worse',
+          interpret == "O" ~'NA',
+          lowci_chosen<= measure_comp & upci_chosen>=measure_comp ~ 'NS',
+          lowci_chosen > measure_comp & interpret == "H" ~ 'Better',
+          lowci_chosen > measure_comp & interpret == "L" ~ 'Worse',
+          upci_chosen < measure_comp & interpret == "L" ~ 'Better',
+          upci_chosen < measure_comp & interpret == "H" ~ 'Worse',
           TRUE ~ 'NA'))
       
-      bar %>%
+      spine %>%
         select(c(indicator, areaname, areatype, def_period, numerator, measure,
                  lowci, upci, type_definition, topic, measure_comp, comparator, flag)) %>%
         rename(lower_confidence_interval=lowci, upper_confidence_interval=upci,
@@ -1035,20 +1037,20 @@ showModal(welcome_modal)
       
     })
     
-    # Download barcode data
-    output$download_bar <- downloadHandler( filename =  'barcode_data.csv',
-                                             content = function(file) { write.csv(bar_csv(), file, row.names=FALSE) })
+    # Download spine data
+    output$download_spine <- downloadHandler( filename =  'spinechart_data.csv',
+                                              content = function(file) { write.csv(spine_csv(), file, row.names=FALSE) })
     
     # Downloading chart  
-    output$download_barplot <- downloadHandler(
-      filename = 'barcode.png',
+    output$download_spineplot <- downloadHandler(
+      filename = 'spine.png',
       content = function(file){
-        ggsave(file, plot = plot_barcode()
-               +ggtitle(label=paste(names(profile_list[unname(profile_list) == input$profile_bar])," profile: ", input$topic_bar,sep=""),
-                    subtitle =paste(input$geoname_bar," (",input$geotype_bar,") compared against ",input$geocomp_bar,sep="")),
+        ggsave(file, plot = plot_spine()
+               +ggtitle(label=paste(names(profile_list[unname(profile_list) == input$profile_spine])," profile: ", input$topic_spine,sep=""),
+                        subtitle =paste(input$geoname_spine," (",input$geotype_spine,") compared against ",input$geocomp_spine,sep="")),
                device = "png",width=15, limitsize=FALSE)
       })
-
+    
 ###############################################.        
 #### Time trend plot ----
 ###############################################.  
