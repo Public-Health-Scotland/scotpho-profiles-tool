@@ -21,7 +21,7 @@ function(input, output, session) {
                   social care partnerships.")),
       style = "color:0E3E5D; font-size:20px"),
     br(),
-    p(tags$h5("Find out more about how to get the most out of the tool")),
+    p(tags$h5("Learn more about the tool or get started")),
     actionButton("tour","Take a tour", icon("play-circle")),
     HTML("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"),
     #For when we make any updates in future
