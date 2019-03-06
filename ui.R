@@ -157,19 +157,11 @@ tabPanel(
       column(6, class="landing-page-column",
              div(class="landing-page-box", 
                  div("Rank", class = "landing-page-box-title"),
-                 div(class = "landing-page-icon", style="background-image: url(rank_5.png);
+                 div(class = "landing-page-icon", style="background-image: url(maprank.png);
                      background-size: auto 80%; background-position: center; background-repeat: no-repeat; "),
                  actionButton('jump_to_rank', 'Compare geographical variation for an indicator', 
                               class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp"))))
-      #Map plot box
-      # column(4, class="landing-page-column",
-      #        div(class="landing-page-box", 
-      #            div("Map", class = "landing-page-box-title"),
-      #            div(class = "landing-page-icon", style="background-image: url(map_2.png);
-      #                background-size: auto 80%; background-position: center; background-repeat: no-repeat; "),
-      #            actionButton('jump_to_map', 'Compare geographical variation for an indicator using a map', 
-      #                         class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp"))))
-    ),
+    ), # end of second row
     fluidRow(h4("Access the data behind the tool and find supporting information")),
     fluidRow(
       #Table box 
