@@ -1915,7 +1915,7 @@ showModal(welcome_modal)
     updateSelectizeInput(session, "iz_true", label = NULL,
                          choices = intzone_name, selected = character(0), options = 
                            list(placeholder = "Select or type specific intermediate zone")) 
-    updateSelectizeInput(session, "iz_parent", label = "Filter list by HSC partnership", 
+    updateSelectizeInput(session, "iz_parent", label = "Filter intermediate zone list by HSC partnership", 
                          selected = "Show all")
     })
   
@@ -1936,7 +1936,7 @@ showModal(welcome_modal)
                          choices = locality_name, selected = character(0), options = 
                            list(placeholder = "Select or type specific HSC locality"))
     
-    updateSelectizeInput(session, "hscl_parent", label = "Filter list by HSC partnership",
+    updateSelectizeInput(session, "hscl_parent", label = "Filter locality list by HSC partnership",
                          selected = "Show all")
     })
   

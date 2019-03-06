@@ -558,7 +558,7 @@ tabPanel("Data", icon = icon("table"), value = "table",
                     # Panel for intermediate zone selections
                     awesomeCheckbox("iz",label = "Intermediate zone", value = FALSE),
                     conditionalPanel(condition = "input.iz == true",
-                                     selectizeInput("iz_parent", label = "Filter IZ list by HSC partnership",
+                                     selectizeInput("iz_parent", label = "Filter intermediate zone list by HSC partnership",
                                                     choices = parent_geo_list, selected = "Show all", multiple=FALSE),
                                      # if they haven't selected all, show tickbox so they can select all izs of parent area
                                      conditionalPanel(condition = "input.iz_parent != 'Show all'",
