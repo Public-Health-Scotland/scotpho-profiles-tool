@@ -14,11 +14,14 @@ function(input, output, session) {
     p(img(src="scotpho_reduced.png", height=100)),
     br(),
     br(),
-    p(tags$h4("Welcome to the ScotPHO Profiles Tool"), tags$br(),tags$br(),tags$div(h5("This interactive tool provides access to a range of public health related indicators at different"),
-                                                                                    h5("geographies including NHS boards, council areas and health and social care partnerships.")),
+    p(tags$h4("Welcome to the ScotPHO Profiles Tool"), tags$br(),tags$br(),
+      tags$div(h5("This interactive tool provides access to a range of public 
+                  health related indicators at different"),
+               h5("geographies including NHS boards, council areas and health and 
+                  social care partnerships.")),
       style = "color:0E3E5D; font-size:20px"),
     br(),
-    p(tags$h5("Find out more about how to get the most out of the tool")),
+    p(tags$h5("Learn more about the tool or get started")),
     actionButton("tour","Take a tour", icon("play-circle")),
     HTML("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"),
     #For when we make any updates in future
@@ -35,18 +38,27 @@ showModal(welcome_modal)
   first_modal <- modalDialog(
     fluidRow( 
       column(12,
-             p(tags$div(" To begin, select the visualisation you want to see", style = "color:0E3E5D; font-size:20px; width: 90%; text-align: left;")),
-             br(), tags$h5("There are different ways to navigate around the tool.", style = "width: 90%; text-align: left; " ), br(), br())), 
+             p(tags$div(" To begin, select the visualisation you want to see", 
+                        style = "color:0E3E5D; font-size:20px; width: 90%; text-align: left;")),
+             br(), tags$h5("There are different ways to navigate around the tool.", 
+                           style = "width: 90%; text-align: left; " ), br(), br())), 
     fluidRow(
-      column(5, offset=1,tags$h5("You can select visualisations via the tabs at the top of the page")),
+      column(5, offset=1,tags$h5("You can select visualisations via the tabs at 
+                                 the top of the page")),
       column(3, br(), img(src="tabs_select.png", height=43, width=400))),
     fluidRow(
-      column(6, br(), br(), br(), br(), tags$a(img(src="landing_select.png", height=150, width=250, align="right"))),
-      column(4, br(), br(), br(),br(),  br(), br(), br(), br(), tags$h5("Or select to view a visualisation using the option buttons shown on the Home Page"))),
+      column(6, br(), br(), br(), br(), 
+             tags$a(img(src="landing_select.png", height=150, width=250, align="right"))),
+      column(4, br(), br(), br(),br(),  br(), br(), br(), br(), 
+             tags$h5("Or select to view a visualisation using the option buttons 
+                     shown on the Home Page"))),
     fluidRow(
-      column(5, offset=1,  br(), br(), br(), br(), br(), h5("To return to the profiles Home Page at any point just click on the house button at the top of the page."),
+      column(5, offset=1,  br(), br(), br(), br(), br(), 
+             h5("To return to the profiles Home Page at any point just click on 
+                the house button at the top of the page."),
              h5("Clicking on the ScotPHO logo will take you to the main ScotPHO website.")),
-      column(3,br(),br(), br(), br(), br(), br(), br(), img(src="home_select.png", height=50, width=300))
+      column(3,br(),br(), br(), br(), br(), br(), br(), 
+             img(src="home_select.png", height=50, width=300))
     ),
     br(),
     br(),
@@ -66,18 +78,25 @@ showModal(welcome_modal)
   second_modal <- modalDialog(
     fluidRow(
       column(12,
-             p(tags$div("Next use the menus to select the data you want to see", style = "color:0E3E5D; font-size:20px; width: 90%; text-align: left; ")),                 
+             p(tags$div("Next use the menus to select the data you want to see", 
+                        style = "color:0E3E5D; font-size:20px; width: 90%; text-align: left; ")),                 
              br(),
              br(),
-             p(tags$h5("Some of our visualisations allow you to look at a predefined set of indicators related to a particular domain or profile e.g. ‘health and wellbeing’ or ‘children and young people’,
-                       while others are designed to look at a single indicator in more detail. Using menus next to a visualisation you can select the area you are interested in and the time period.", style = "width: 90%; text-align: left; "))),
+             p(tags$h5("Some of our visualisations allow you to look at a predefined 
+                        set of indicators related to a particular domain or profile 
+                        e.g. ‘health and wellbeing’ or ‘children and young people’,
+                       while others are designed to look at a single indicator in 
+                       more detail. Using menus next to a visualisation you can select 
+                       the area you are interested in and the time period.", 
+                       style = "width: 90%; text-align: left; "))),
       column(6,
              br(),
              br(),
              br(),
              br(),
              br(),
-             tags$h5("Use the drop-down menus to select filters of interest",  style="width:300px; "),
+             tags$h5("Use the drop-down menus to select filters of interest",  
+                     style="width:300px; "),
              p(tags$a(img(src="select_indic_single.png", height=200, width=300))),
              br()
       ),
@@ -86,13 +105,17 @@ showModal(welcome_modal)
              br(),
              br(),
              p(tags$a(img(src="select_indicator.png", height=180, width=260))),
-             p(tags$h5("Some fields may allow for multiple entries and most fields can be searched by typing into the field, as well as scrolling down the list of options", style = "width: 350px")),
+             p(tags$h5("Some fields may allow for multiple entries and most fields 
+                       can be searched by typing into the field, as well as scrolling 
+                       down the list of options", style = "width: 350px")),
              p(tags$a(img(src="type_select.png", height=180, width=260))),
              br()
       )),
     br(),
-    p(tags$h5("For more information about geographic areas within Scotland, please refer to" , tags$a(href="http://statistics.gov.scot/home", "statistics.gov.scot.", 
-                                                                                                      class="externallink"))),
+    p(tags$h5("For more information about geographic areas within Scotland, 
+              please refer to" , 
+              tags$a(href="http://statistics.gov.scot/home", "statistics.gov.scot.", 
+                     class="externallink"))),
     br(),
     actionButton("back1","Back", icon("backward")),
     HTML("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"),
@@ -113,15 +136,19 @@ showModal(welcome_modal)
   third_modal <- modalDialog(
     fluidRow(
       column(12,
-             p(tags$div("Finally, save the visualisation or download data", style = "color:0E3E5D; font-size:20px; width: 90%; text-align: left; ")),                 
+             p(tags$div("Finally, save the visualisation or download data", 
+                        style = "color:0E3E5D; font-size:20px; width: 90%; text-align: left; ")),                 
              br(),
              br(),
-             p(tags$h5("Our tool allows you to download the visualisation images and the data behind them.", style = "width: 90%; text-align: left; "))),
+             p(tags$h5("Our tool allows you to download the visualisation 
+                       images and the data behind them.", 
+                       style = "width: 90%; text-align: left; "))),
       column(6,
              br(),
              br(),
              br(),
-             tags$h5("Charts displayed can be saved by clicking on the ‘Save chart’ button",  style="width:300px; "),
+             tags$h5("Charts displayed can be saved by clicking on the 
+                     ‘Save chart’ button",  style="width:300px; "),
              p(tags$a(img(src="save_chart2.png", height=60, width=230))),
              br()
       ),
@@ -129,12 +156,15 @@ showModal(welcome_modal)
              br(),
              br(),
              br(),
-             p(tags$h5("The raw data used to draw a chart can also be downloaded in csv format", style = "width: 350px")),
+             p(tags$h5("The raw data used to draw a chart can also be downloaded 
+                       in csv format", style = "width: 350px")),
              p(tags$a(img(src="save.png", height=60, width=230))),
              br()
       )),
     br(),
-    p(tags$h5("The ", tags$b("'Table'")," tab within our tool allows users to quickly and easily download larger selections of data covering multiple area or multiple indicators.", style = "width: 750px")),
+    p(tags$h5("The ", tags$b("'Table'")," tab within our tool allows users to 
+              quickly and easily download larger selections of data covering 
+              multiple area or multiple indicators.", style = "width: 750px")),
     br(),
     actionButton("back2","Back", icon("backward")),
     HTML("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"),
@@ -150,21 +180,27 @@ showModal(welcome_modal)
   
   observeEvent(input$back3,  {showModal(third_modal) })
 
-  #"See latest updates" Modal window - Activate if Update is carried out once rolled out live to users
+  #"See latest updates" Modal window - Activate if Update is carried out once 
+  # rolled out live to users
   updates_modal <- modalDialog(
     fluidRow(
       column(12,
-             p(tags$div("We are continuously updating and developing our tool", style = "color:0E3E5D; font-size:20px; width: 90%; text-align: left; ")),                 
+             p(tags$div("We are continuously updating and developing our tool", 
+                        style = "color:0E3E5D; font-size:20px; width: 90%; text-align: left; ")),                 
              br(),
              br(),
-             #p(tags$h5("Some new exciting features that have been added to our tool include:", style = "width: 90%; text-align: left; "))),
-             p(tags$h5("Recent indicator updates include:", style = "width: 90%; text-align: left; font-weight: bold; "))),
+             p(tags$h5("Recent indicator updates include:", 
+                       style = "width: 90%; text-align: left; font-weight: bold; "))),
              column(12, 
-              tags$h5(HTML(paste(techdoc$indicator_name[techdoc$days_since_update<60], collapse='<br>')))
+              tags$h5(HTML(paste(techdoc$indicator_name[techdoc$days_since_update<60], 
+                                 collapse='<br>')))
              )),
     br(),
     p(tags$h5("Thanks for stopping by!")),
-    p(tags$h5("For any further questions or other developments you would like to suggest for our current tool, please contact us at", tags$a(href="mailto:ScotPHO@nhs.net", "ScotPHO@nhs.net", class="externallink"), style = "width: 700px")),
+    p(tags$h5("For any further questions or other developments you would like to 
+              suggest for our current tool, please contact us at", 
+              tags$a(href="mailto:ScotPHO@nhs.net", "ScotPHO@nhs.net", class="externallink"), 
+              style = "width: 700px")),
     br(),
     actionButton("updatesreturn","Back", icon("backward")),
     HTML("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"),
@@ -180,17 +216,29 @@ showModal(welcome_modal)
   fourth_modal <- modalDialog(
     fluidRow(
       column(12,
-             p(tags$div("Please note", style = "color:0E3E5D; font-size:20px; width: 90%; text-align: left; ")))),          
+             p(tags$div("Please note", style = "color:0E3E5D; font-size:20px; 
+                        width: 90%; text-align: left; ")))),          
     br(),
-    p(tags$h5("The profiles are intended to increase understanding of local health and social issues and to prompt further investigation, rather than to be used as a performance management tool.
-        The information needs to be interpreted within a local framework; an indicator may be higher or lower in one area compared to another, but local knowledge is needed to understand and interpret differences.", style = "width: 700px")),
+    p(tags$h5("The profiles are intended to increase understanding of local health 
+              and social issues and to prompt further investigation, rather than 
+              to be used as a performance management tool.
+        The information needs to be interpreted within a local framework; an indicator 
+              may be higher or lower in one area compared to another, but local 
+              knowledge is needed to understand and interpret differences.", 
+              style = "width: 700px")),
     br(),
     br(),
     br(),
-    p(tags$h5("If you require any further information by bespoke geographies or have any questions regarding the tool, please", tags$a(href="mailto:ScotPHO@nhs.net", "contact us.", class="externallink"), style = "width: 600px")),
+    p(tags$h5("If you require any further information by bespoke geographies or 
+              have any questions regarding the tool, please", 
+              tags$a(href="mailto:ScotPHO@nhs.net", "contact us.", class="externallink"), 
+              style = "width: 600px")),
     br(),
     br(),
-    p(tags$h5("Please also note this tool is being continuously developed and we welcome any ", tags$a(href="mailto:ScotPHO@nhs.net", "feedback", class="externallink"), " you may have on it.", style = "width: 600px")),
+    p(tags$h5("Please also note this tool is being continuously developed and we 
+              welcome any ", tags$a(href="mailto:ScotPHO@nhs.net", "feedback", 
+                                    class="externallink"), " you may have on it.", 
+              style = "width: 600px")),
     br(),
     modalButton("Exit", icon("times-circle")),
     size = "l", align= "center",
@@ -1660,235 +1708,192 @@ showModal(welcome_modal)
   
   #####################################.      
   #### Table ----
-  #####################################.      
+  #####################################. 
+  # Reactive data for IZ and locality filters
   #Filter iz_list and hscl list by parent area selection
-  interzone_filtered <- reactive({ sort(parent_iz_list$areaname[parent_iz_list$parent_area==input$iz_parent]) })
-  hsclocality_filtered <- reactive({ sort(parent_hscl_list$areaname[parent_hscl_list$parent_area==input$hscl_parent]) })
+  interzone_filtered <- reactive({ 
+    sort(parent_iz_list$areaname[parent_iz_list$parent_area==input$iz_parent]) 
+    })
   
+  hsclocality_filtered <- reactive({ 
+    sort(parent_hscl_list$areaname[parent_hscl_list$parent_area==input$hscl_parent]) 
+    })
+  
+  ###############################################.
+  # Reactive filters 
   #Filter IZ's by Parent area
   
   output$iz_filtered <- renderUI ({ 
-    if (input$iz_parent == "Show all"){ selectizeInput("iz_true", label = NULL,
-                                                       width = "229px", choices = intzone_name, selected = NULL, multiple=TRUE, options = list(maxOptions = 1300, placeholder = "Select or type specific intermediate zone")) 
-    } else {selectizeInput("iz_true", label = NULL,
-                           width = "229px", choices = interzone_filtered(), selected = NULL, multiple=TRUE, options = list(placeholder = "Select or type specific intermediate zone"))}
+    
+    if (input$iz_parent == "Show all"){ 
+      choices_selected <- intzone_name
+    } else { # if a partnership selected reduce the list of IZs shown
+      choices_selected <- interzone_filtered()
+    }
+    
+    selectizeInput("iz_true", label = NULL, width = "229px", choices = choices_selected, 
+                   selected = NULL, multiple=TRUE, options = list(maxOptions = 1300, 
+                      placeholder = "Select or type specific intermediate zone"))
   }) 
   
+  #Filter HSCL's by parent area
+  output$hscl_filtered <- renderUI ({ 
+    if (input$hscl_parent == "Show all"){ 
+      choices_selected <- locality_name
+    } else {  # if a partnership selected reduce the list of localities shown
+      choices_selected <- hsclocality_filtered()
+    }
+    selectizeInput(
+      "hscl_true", label = NULL, width = "229px", choices = choices_selected, 
+      selected = NULL, multiple=TRUE, options = 
+        list(placeholder = "Select or type specific HSC locality"))
+  }) 
+  
+  #########.
+  #Clearing and modifying inputs through observes
   #select all IZ's belonging to a certain parent-area
   observe({
     if (input$iz_parent_all == "FALSE")
-      return(if (input$iz_parent == "Show all"){ updateSelectizeInput(session,"iz_true", label = NULL,
-                                                                      choices = intzone_name, selected = character(0), options = list(maxOptions = 1300, placeholder = "Select or type specific intermediate zone")) 
-      } else {updateSelectizeInput(session,"iz_true", label = NULL,
-                                   choices = interzone_filtered(), selected = character(0), options = list(placeholder = "Select or type specific intermediate zone")) })
+      return(if (input$iz_parent == "Show all"){ 
+        
+        updateSelectizeInput(session,"iz_true", label = NULL,
+          choices = intzone_name, selected = character(0), 
+          options = list(maxOptions = 1300, 
+                       placeholder = "Select or type specific intermediate zone")) 
+      } else {
+        updateSelectizeInput(
+          session,"iz_true", label = NULL, choices = interzone_filtered(), 
+          selected = character(0), options = 
+            list(placeholder = "Select or type specific intermediate zone")) 
+        }
+      ) #return bracket
     
     isolate({
-      updateSelectizeInput(session, "iz_true", label = NULL,
-                           choices = intzone_name, selected = interzone_filtered(), options = list(placeholder = "Select or type specific intermediate zone")) })
-  })
+      updateSelectizeInput(
+        session, "iz_true", label = NULL, choices = intzone_name, 
+        selected = interzone_filtered(), options = 
+          list(placeholder = "Select or type specific intermediate zone")) })
+  })#end of observe
   
-  #when you change initial filter, clear the second list of geographies anc checkbox
+  #when you change initial filter, clear the second list of geographies and checkbox
   observeEvent(input$iz_parent, {
-    updateCheckboxInput(session, "iz_parent_all", label = NULL, value = FALSE)
-    if (input$iz_parent == "Show all"){ selectizeInput("iz_true", label = NULL,
-                                                       width = "229px", choices = intzone_name, selected = NULL, multiple=TRUE, options = list(maxOptions = 1300, placeholder = "Select or type specific intermediate zone")) 
-    } else {selectizeInput("iz_true", label = NULL,
-                           choices = interzone_filtered(), selected = character(0), multiple=TRUE, options = list(placeholder = "Select or type specific intermediate zone"))}
     
+    updateCheckboxInput(session, "iz_parent_all", label = NULL, value = FALSE)
+    
+    if (input$iz_parent == "Show all"){ 
+      selectizeInput(
+        "iz_true", label = NULL, width = "229px", 
+        choices = intzone_name, selected = NULL, multiple=TRUE, options = 
+          list(maxOptions = 1300, placeholder = "Select or type specific intermediate zone")) 
+    } else {
+      selectizeInput(
+        "iz_true", label = NULL, choices = interzone_filtered(), 
+        selected = character(0), multiple=TRUE, options =
+          list(placeholder = "Select or type specific intermediate zone"))
+      }
   })
   
-  #Filter HSCL's by parent area
-  
-  output$hscl_filtered <- renderUI ({ 
-    if (input$hscl_parent == "Show all"){ selectizeInput("hscl_true", label = NULL,
-                                                         width = "229px", choices = locality_name, selected = NULL, multiple=TRUE, options = list(maxOptions = 1300, placeholder = "Select or type specific HSC locality")) 
-    } else {selectizeInput("hscl_true", label = NULL,
-                           width = "229px", choices = hsclocality_filtered(), selected = NULL, multiple=TRUE, options = list(placeholder = "Select or type specific HSC locality"))}
-  }) 
-  
+
   #select all IZ's belonging to a certain parent-area
   observe({
     if (input$hscl_parent_all == "FALSE")
-      return(if (input$hscl_parent == "Show all"){ updateSelectizeInput(session,"hscl_true", label = NULL,
-                                                                        choices = locality_name, selected = character(0), options = list(maxOptions = 1300, placeholder = "Select or type specific HSC locality")) 
-      } else {updateSelectizeInput(session,"hscl_true", label = NULL,
-                                   choices = hsclocality_filtered(), selected = character(0), options = list(placeholder = "Select or type specific HSC locality"))})
+      return(if (input$hscl_parent == "Show all"){ 
+        updateSelectizeInput(
+          session,"hscl_true", label = NULL,choices = locality_name, 
+          selected = character(0), options = 
+            list(maxOptions = 1300, placeholder = "Select or type specific HSC locality")) 
+      } else {
+        updateSelectizeInput(
+          session,"hscl_true", label = NULL, choices = hsclocality_filtered(), 
+          selected = character(0), options = 
+            list(placeholder = "Select or type specific HSC locality"))
+        }
+      ) #return bracket
     
     isolate({
-      updateSelectizeInput(session, "hscl_true", label = NULL,
-                           choices = locality_name, selected = hsclocality_filtered(),options = list(placeholder = "Select or type specific HSC locality")) })
-  })
+      updateSelectizeInput(
+        session, "hscl_true", label = NULL, choices = locality_name, 
+        selected = hsclocality_filtered(), options = 
+          list(placeholder = "Select or type specific HSC locality")) 
+      })
+  }) #end of observe
   
   #when you change initial filter, clear the second list of geographies anc checkbox
   observeEvent(input$hscl_parent, {
     updateCheckboxInput(session, "hscl_parent_all", label = NULL, value = FALSE)
-    if (input$hscl_parent == "Show all"){ selectizeInput("hscl_true", label = NULL,
-                                                         width = "229px", choices = locality_name, selected = NULL, multiple=TRUE, options = list(maxOptions = 1300, placeholder = "Select or type specific HSC locality")) 
-    } else {selectizeInput("hscl_true", label = NULL,
-                           choices = hsclocality_filtered(), selected = character(0), multiple=TRUE, options = list(placeholder = "Select or type specific HSC locality"))}
     
+    if (input$hscl_parent == "Show all"){ 
+      selectizeInput(
+        "hscl_true", label = NULL, width = "229px", choices = locality_name, 
+        selected = NULL, multiple=TRUE, options = 
+          list(maxOptions = 1300, placeholder = "Select or type specific HSC locality")) 
+    } else {
+      selectizeInput(
+        "hscl_true", label = NULL, choices = hsclocality_filtered(), 
+        selected = character(0), multiple=TRUE, options = 
+          list(placeholder = "Select or type specific HSC locality"))
+      }
   })
-  
   
   #to clear choices when boxes are unticked/radio button is changed
-  observeEvent(input$iz=="FALSE", {
+  observeEvent(input$iz=="FALSE", { #for IZs
     updateCheckboxInput(session, "iz_parent_all", label = NULL, value = FALSE)
     updateSelectizeInput(session, "iz_true", label = NULL,
-                         choices = intzone_name, selected = character(0), options = list(placeholder = "Select or type specific intermediate zone")) 
-    updateSelectizeInput(session, "iz_parent", label = "Filter list by HSC partnership", selected = "Show all")})
+                         choices = intzone_name, selected = character(0), options = 
+                           list(placeholder = "Select or type specific intermediate zone")) 
+    updateSelectizeInput(session, "iz_parent", label = "Filter intermediate zone list by HSC partnership", 
+                         selected = "Show all")
+    })
   
-  observeEvent(input$la=="FALSE", {
-    updateSelectizeInput(session, "la_true", label = NULL,
-                         choices = la_name, selected = character(0), options = list(placeholder = "Select or type specific council area")) })
-  observeEvent(input$hb=="FALSE", {
+  observeEvent(input$la=="FALSE", {#for CAs
+    updateSelectizeInput(session, "la_true", label = NULL, choices = la_name, 
+                         selected = character(0), options = 
+                           list(placeholder = "Select or type specific council area")) 
+    })
+  
+  observeEvent(input$hb=="FALSE", { #for HBs
     updateSelectizeInput(session, "hb_true", label = NULL,
-                         choices = hb_name, selected = character(0), options = list(placeholder = "Select or type specific health board")) })
-  observeEvent(input$hscl=="FALSE", {
+                         choices = hb_name, selected = character(0),
+                         options = list(placeholder = "Select or type specific health board")) 
+    })
+  
+  observeEvent(input$hscl=="FALSE", { #for localities
     updateSelectizeInput(session, "hscl_true", label = NULL,
-                         choices = locality_name, selected = character(0), options = list(placeholder = "Select or type specific HSC locality"))
-    updateSelectizeInput(session, "hscl_parent", label = "Filter list by HSC partnership", selected = "Show all")})
-  observeEvent(input$hscp=="FALSE", {
+                         choices = locality_name, selected = character(0), options = 
+                           list(placeholder = "Select or type specific HSC locality"))
+    
+    updateSelectizeInput(session, "hscl_parent", label = "Filter locality list by HSC partnership",
+                         selected = "Show all")
+    })
+  
+  observeEvent(input$hscp=="FALSE", { #for hsc partnerships
     updateSelectizeInput(session, "hscp_true", label = NULL,
-                         choices = partnership_name, selected = character(0), options = list(placeholder = "Select or type specific HSC partnership")) })
-  observeEvent(input$adp=="FALSE", {
+                         choices = partnership_name, selected = character(0), options = 
+                           list(placeholder = "Select or type specific HSC partnership"))
+    })
+  
+  observeEvent(input$adp=="FALSE", { #for ADPs
     updateSelectizeInput(session, "adp_true", label = NULL,
-                         choices = adp_name, selected = character(0), options = list(placeholder = "Select or type specific ADP")) })
-  observeEvent(input$product_filter, {
+                         choices = adp_name, selected = character(0), options = 
+                           list(placeholder = "Select or type specific ADP")) 
+    })
+  
+  observeEvent(input$product_filter, { # for indicator/topic/profile filters
     updateSelectizeInput(session,"indicator_filter", label = NULL,
-                         choices = indicator_list, selected = character(0),
-                         options = list(maxOptions = 1000, placeholder = "Click or type indicators to filter by"))
-    updateSelectizeInput(session,"topic_filter", label = NULL, choices = topic_list, selected = NULL,
-                         options = list(maxOptions = 1000, placeholder = "Click or type domains to filter by"))
-    updateSelectizeInput(session,"profile_filter", label = NULL, choices = profile_list, selected = NULL,
-                         options = list(maxOptions = 1000, placeholder = "Click or type profiles to filter by"))
+                         choices = indicator_list, selected = character(0), options = 
+                           list(maxOptions = 1000,
+                                placeholder = "Click or type indicators to filter by"))
     
+    updateSelectizeInput(session,"topic_filter", label = NULL, choices = topic_list, 
+                         selected = NULL, options = 
+                           list(maxOptions = 1000, 
+                                placeholder = "Click or type domains to filter by"))
+    
+    updateSelectizeInput(session,"profile_filter", label = NULL, choices = profile_list, 
+                         selected = NULL, options = 
+                           list(maxOptions = 1000, 
+                                placeholder = "Click or type profiles to filter by"))
   })
-  
-  filter_table <- reactive ({
-    
-    #if list of indicators selected
-    if (!is.null(input$indicator_filter)) { 
-      if (input$all_data == TRUE) {
-        filtered_geos <- optdata %>%  filter(year>=input$date_from[1] & year<=input$date_from[2]) %>% 
-          filter(indicator %in% input$indicator_filter)
-      } else {filtered_geo <- optdata %>% filter((areaname %in% input$iz_true & areatype == "Intermediate zone")|
-                                                   (areaname %in% input$la_true & areatype == "Council area")|
-                                                   (areaname %in% input$hb_true & areatype == "Health board")|
-                                                   (areaname %in% input$adp_true & areatype == "Alcohol & drug partnership")|
-                                                   (areaname %in% input$hscl_true & areatype == "HSC locality")|
-                                                   (areaname %in% input$hscp_true & areatype == "HSC partnership")|
-                                                   (code %in% input$code)
-      ) %>% filter(year>=input$date_from[1] & year<=input$date_from[2]) %>% filter(indicator %in% input$indicator_filter)
-      
-      filtered_geo2 <- if (input$scotland == TRUE) {
-        optdata %>% filter(areaname == "Scotland") %>% filter(year>=input$date_from[1] & year<=input$date_from[2]) %>% 
-          filter(indicator %in% input$indicator_filter)
-        
-      }      
-      
-      filtered_geos <- rbind(filtered_geo,filtered_geo2)
-      
-      }
-      
-      table <- filtered_geos %>% subset(select=c("code", "areaname", "areatype", "indicator","year", 
-                                                 "def_period","numerator", "measure", "lowci","upci","type_definition"))
-      
-      #if list of domains selected
-    } else if (!is.null(input$topic_filter)) { 
-      if (input$all_data == TRUE) {
-        filtered_geos <- optdata %>%  filter(year>=input$date_from[1] & year<=input$date_from[2]) %>% 
-          filter((domain1 %in% input$topic_filter)|(domain2 %in% input$topic_filter)|(domain3 %in% input$topic_filter))
-      } else {filtered_geo <- optdata %>% filter((areaname %in% input$iz_true & areatype == "Intermediate zone")|
-                                                   (areaname %in% input$la_true & areatype == "Council area")|
-                                                   (areaname %in% input$hb_true & areatype == "Health board")|
-                                                   (areaname %in% input$adp_true & areatype == "Alcohol & drug partnership")|
-                                                   (areaname %in% input$hscl_true & areatype == "HSC locality")|
-                                                   (areaname %in% input$hscp_true & areatype == "HSC partnership")|
-                                                   (code %in% input$code)
-      ) %>% filter(year>=input$date_from[1] & year<=input$date_from[2]) %>% 
-        filter((domain1 %in% input$topic_filter)|(domain2 %in% input$topic_filter)|(domain3 %in% input$topic_filter))
-      
-      filtered_geo2 <- if (input$scotland == TRUE) {
-        optdata %>% filter(areaname == "Scotland") %>% filter(year>=input$date_from[1] & year<=input$date_from[2]) %>% 
-          filter((domain1 %in% input$topic_filter)|(domain2 %in% input$topic_filter)|(domain3 %in% input$topic_filter))
-        
-      }  
-      
-      filtered_geos <- rbind(filtered_geo,filtered_geo2)
-      
-      } 
-      
-      table <- filtered_geos %>% subset(select=c("code", "areaname", "areatype", "indicator","year", 
-                                                 "def_period","numerator", "measure", "lowci","upci","type_definition"))
-      
-      #if list of profiles selected    
-    } else if (!is.null(input$profile_filter)) { 
-      if (input$all_data == TRUE) {
-        filtered_geos <- optdata %>%  filter(year>=input$date_from[1] & year<=input$date_from[2]) %>% 
-          filter((grepl((paste("^",input$profile_filter,sep="",collapse="|")),profile_domain1))|(grepl((paste("^",input$profile_filter,sep="",collapse="|")),profile_domain2)))
-      } else {filtered_geo <- optdata %>% filter((areaname %in% input$iz_true & areatype == "Intermediate zone")|
-                                                   (areaname %in% input$la_true & areatype == "Council area")|
-                                                   (areaname %in% input$hb_true & areatype == "Health board")|
-                                                   (areaname %in% input$adp_true & areatype == "Alcohol & drug partnership")|
-                                                   (areaname %in% input$hscl_true & areatype == "HSC locality")|
-                                                   (areaname %in% input$hscp_true & areatype == "HSC partnership")|
-                                                   (code %in% input$code)
-      ) %>% filter(year>=input$date_from[1] & year<=input$date_from[2]) %>% 
-        filter((grepl((paste("^",input$profile_filter,sep="",collapse="|")),profile_domain1))|(grepl((paste("^",input$profile_filter,sep="",collapse="|")),profile_domain2)))
-      
-      filtered_geo2 <- if (input$scotland == TRUE) {
-        optdata %>% filter(areaname == "Scotland") %>% filter(year>=input$date_from[1] & year<=input$date_from[2]) %>% 
-          filter((grepl((paste("^",input$profile_filter,sep="",collapse="|")),profile_domain1))|(grepl((paste("^",input$profile_filter,sep="",collapse="|")),profile_domain2)))
-        
-      }
-      
-      filtered_geos <- rbind(filtered_geo,filtered_geo2)
-      
-      } 
-      
-      table <- filtered_geos %>% subset(select=c("code", "areaname", "areatype", "indicator","year", 
-                                                 "def_period","numerator", "measure", "lowci","upci","type_definition"))
-    } else { 
-      if (input$all_data == TRUE) {
-        filtered_geos <- optdata %>%  filter(year>=input$date_from[1] & year<=input$date_from[2])
-        
-      } else {filtered_geo <- optdata %>% filter((areaname %in% input$iz_true & areatype == "Intermediate zone")|
-                                                   (areaname %in% input$la_true & areatype == "Council area")|
-                                                   (areaname %in% input$hb_true & areatype == "Health board")|
-                                                   (areaname %in% input$adp_true & areatype == "Alcohol & drug partnership")|
-                                                   (areaname %in% input$hscl_true & areatype == "HSC locality")|
-                                                   (areaname %in% input$hscp_true & areatype == "HSC partnership")|
-                                                   (code %in% input$code)
-      ) %>% filter(year>=input$date_from[1] & year<=input$date_from[2])
-      
-      filtered_geo2 <- if (input$scotland == TRUE) {
-        optdata %>% filter(areaname == "Scotland") %>% filter(year>=input$date_from[1] & year<=input$date_from[2])
-        
-      }
-      
-      filtered_geos <- rbind(filtered_geo,filtered_geo2)
-      
-      } 
-      
-      table <- filtered_geos %>% subset(select=c("code", "areaname", "areatype", "indicator","year", 
-                                                 "def_period","numerator", "measure", "lowci","upci","type_definition", "data_source", "last_updated", "next_update"))
-      
-    }
-    
-    
-  })
-  
-  #display table based on selection made by user on indicator tab
-  output$table_filtered <- DT::renderDataTable({
-    
-    DT::datatable(filter_table(),
-                  style = 'bootstrap', rownames = FALSE, options = list(dom = 'tp', language = list(
-                    zeroRecords = "No records found matching your selection - have you selected a geography? See 'Indicator definitions' under the Info tab for Geographies available."), columnDefs = list(list(visible=FALSE, targets=c(4,8,9)))), 
-                  colnames = c("Area code", "Area", "Type", "Indicator", "Year","Period", "Numerator", 
-                               "Measure", "Lower CI","Upper CI", "Definition")
-    )
-  })
-  
   
   #Clearing all user inputs to default
   observeEvent(input$clear, {
@@ -1927,8 +1932,168 @@ showModal(welcome_modal)
     
   })
   
+  ###############################################.
+  # Preparing reactive data for table output
+  filter_table <- reactive ({
+    if (is.null(input$indicator_filter) & is.null(input$topic_filter) & 
+        is.null(input$profile_filter)) {
+      # if no data selected create empty dataset to avoid app crashing
+      table <- data.frame(code = factor(), areaname = factor(), areatype = factor(), 
+                          indicator = factor(), year = double(), 
+                          def_period = factor(), numerator =double(), measure =double(), 
+                          lowci =double(), upci=double(), type_definition = factor())
+
+    #if list of indicators selected
+    } else {
+      if (!is.null(input$indicator_filter)) { 
+        if (input$all_data == TRUE) {
+        filtered_geos <- optdata %>%  
+          filter(year>=input$date_from[1] & year<=input$date_from[2] & 
+                   indicator %in% input$indicator_filter)
+        } else {
+        filtered_geo <- optdata %>% 
+          filter((areaname %in% input$iz_true & areatype == "Intermediate zone")|
+                   (areaname %in% input$la_true & areatype == "Council area")|
+                   (areaname %in% input$hb_true & areatype == "Health board")|
+                   (areaname %in% input$adp_true & areatype == "Alcohol & drug partnership")|
+                   (areaname %in% input$hscl_true & areatype == "HSC locality")|
+                   (areaname %in% input$hscp_true & areatype == "HSC partnership")|
+                   (code %in% input$code)) %>% 
+          filter(year>=input$date_from[1] & year<=input$date_from[2] & 
+                   indicator %in% input$indicator_filter)
+        
+        filtered_geo2 <- if (input$scotland == TRUE) {
+          optdata %>% filter(areaname == "Scotland" &
+                               (year>=input$date_from[1] & year<=input$date_from[2]) &
+                               indicator %in% input$indicator_filter)
+        }      
+        
+        filtered_geos <- rbind(filtered_geo, filtered_geo2)
+        
+      }
+      
+      #if list of domains selected
+    } else if (!is.null(input$topic_filter)) { 
+      if (input$all_data == TRUE) {
+        filtered_geos <- optdata %>%  
+          filter(year>=input$date_from[1] & year<=input$date_from[2] &
+                   (domain1 %in% input$topic_filter|domain2 %in% input$topic_filter|
+                      domain3 %in% input$topic_filter))
+        
+      } else {
+        
+        filtered_geo <- optdata %>% 
+          filter((areaname %in% input$iz_true & areatype == "Intermediate zone")|
+                   (areaname %in% input$la_true & areatype == "Council area")|
+                   (areaname %in% input$hb_true & areatype == "Health board")|
+                   (areaname %in% input$adp_true & areatype == "Alcohol & drug partnership")|
+                   (areaname %in% input$hscl_true & areatype == "HSC locality")|
+                   (areaname %in% input$hscp_true & areatype == "HSC partnership")|
+                   code %in% input$code) %>% 
+          filter(year>=input$date_from[1] & year<=input$date_from[2] & 
+                   (domain1 %in% input$topic_filter|domain2 %in% input$topic_filter|
+                      domain3 %in% input$topic_filter))
+        
+        filtered_geo2 <- if (input$scotland == TRUE) {
+          optdata %>% 
+            filter(areaname == "Scotland" & 
+                     year>=input$date_from[1] & year<=input$date_from[2] & 
+                     (domain1 %in% input$topic_filter|domain2 %in% input$topic_filter|
+                        domain3 %in% input$topic_filter))
+        }  
+        
+        # Merging together Scotland and other areas selected
+        filtered_geos <- rbind(filtered_geo, filtered_geo2)
+        
+      } #end of else statement
+      
+      #if list of profiles selected    
+    } else if (!is.null(input$profile_filter)) { 
+      if (input$all_data == TRUE) {
+        filtered_geos <- optdata %>%  
+          filter(year>=input$date_from[1] & year<=input$date_from[2]) %>% 
+          filter((grepl((paste("^",input$profile_filter,sep="",collapse="|")),
+                        profile_domain1))|(grepl((paste("^",input$profile_filter,sep="",collapse="|")),
+                                                 profile_domain2)))
+      } else {
+        filtered_geo <- optdata %>% 
+          filter((areaname %in% input$iz_true & areatype == "Intermediate zone")|
+                   (areaname %in% input$la_true & areatype == "Council area")|
+                   (areaname %in% input$hb_true & areatype == "Health board")|
+                   (areaname %in% input$adp_true & areatype == "Alcohol & drug partnership")|
+                   (areaname %in% input$hscl_true & areatype == "HSC locality")|
+                   (areaname %in% input$hscp_true & areatype == "HSC partnership")|
+                   (code %in% input$code)) %>% 
+          filter(year>=input$date_from[1] & year<=input$date_from[2]) %>% 
+          filter((grepl((paste("^",input$profile_filter,sep="",collapse="|")),
+                        profile_domain1))|
+                   (grepl((paste("^",input$profile_filter,sep="",collapse="|")),
+                          profile_domain2)))
+        
+        filtered_geo2 <- if (input$scotland == TRUE) {
+          optdata %>% 
+            filter(areaname == "Scotland" &
+                     year>=input$date_from[1] & year<=input$date_from[2]) %>% 
+            filter((grepl((paste("^",input$profile_filter,sep="",collapse="|")),
+                          profile_domain1))|(grepl((paste("^",input$profile_filter,sep="",collapse="|")),
+                                                   profile_domain2)))
+          
+        }
+        # Merging together Scotland and other areas selected
+        filtered_geos <- rbind(filtered_geo,filtered_geo2)
+        
+      } 
+      # if all available geographies checkbox checked
+      if (input$all_data == TRUE) {
+        filtered_geos <- optdata %>%  
+          filter(year>=input$date_from[1] & year<=input$date_from[2])
+        
+      } else {
+        filtered_geo <- optdata %>% 
+          filter((areaname %in% input$iz_true & areatype == "Intermediate zone")|
+                   (areaname %in% input$la_true & areatype == "Council area")|
+                   (areaname %in% input$hb_true & areatype == "Health board")|
+                   (areaname %in% input$adp_true & areatype == "Alcohol & drug partnership")|
+                   (areaname %in% input$hscl_true & areatype == "HSC locality")|
+                   (areaname %in% input$hscp_true & areatype == "HSC partnership")|
+                   (code %in% input$code)) %>% 
+          filter(year>=input$date_from[1] & year<=input$date_from[2])
+        
+        filtered_geo2 <- if (input$scotland == TRUE) {
+          optdata %>% 
+            filter(areaname == "Scotland" &
+                  year>=input$date_from[1] & year<=input$date_from[2])
+          
+        }
+        # Merging together Scotland and other areas selected
+        filtered_geos <- rbind(filtered_geo,filtered_geo2)
+        
+      } 
+      
+    } #end of the else if statement
+    
+    table <- filtered_geos %>% select(code, areaname, areatype, indicator, year, 
+                                      def_period, numerator, measure, lowci, upci, type_definition)
+    } #end of the whole if statement
+    
+  })
   
-  #Downloading data in csv format
+  #display table based on selection made by user on indicator tab
+  output$table_filtered <- DT::renderDataTable({
+    
+    DT::datatable(filter_table(),
+                  style = 'bootstrap', rownames = FALSE, options = list(dom = 'tp', language = list(
+                    zeroRecords = "No records found matching your selection - 
+                    have you selected a geography and at least one indicator/domain/profile? 
+                    See 'Indicator definitions' under the Info tab for Geographies available."), 
+                    columnDefs = list(list(visible=FALSE, targets=c(4,8,9)))), 
+                  colnames = c("Area code", "Area", "Type", "Indicator", "Year","Period", "Numerator", 
+                               "Measure", "Lower CI","Upper CI", "Definition")
+    )
+  })
+  
+  ###############################################.
+  # Downloading data in csv format
   table_csv <- reactive({ format_csv(filter_table()) })
   
   #The filters the user applies in the data table will determine what data they download - indicator tab table
@@ -1940,20 +2105,59 @@ showModal(welcome_modal)
   )
   
   #################################################.
-  ##  Technical Doc Page
-  #################################################
+  ##  Technical Doc Page ----
+  #################################################.
+  # Reactive data
   indicator_selected <- reactive({ filter(techdoc,techdoc$indicator_name==input$indicator_defined)})
   
-  output$indicator <- renderValueBox({
-    #valueBox("Definition", definitions$indicator_definition[definitions$indicator_name==input$indicator_defined], icon = icon ("book"),color = "blue", width = 8)
+  ###############################################.
+  # Reactive filter
+  #Filter indicator list by  profile or by domain 
+  output$indicator_chosen <- renderUI ({
+
+    if (input$profile_defined != "Show all"){
+      indic_selection <- sort(unique(c(as.character(optdata$indicator[grep(input$profile_defined,optdata$profile_domain1)]),
+                                       as.character(optdata$indicator[grep(input$profile_defined,optdata$profile_domain2)] ))))
+    } else if (input$topic_defined != "Show all"){
+      indic_selection <- sort(unique(optdata$indicator[optdata$domain1==input$topic_defined|
+                                                         optdata$domain2==input$topic_defined|
+                                                         optdata$domain3==input$topic_defined]))
+    } else { 
+      indic_selection <- indicator_list
+      }
     
-    valueBox(tags$p(indicator_selected()$indicator_name, style="color: white; font-size: 30px; font-weight: bold;"), HTML(paste("<b>","Indicator number:","</b>",indicator_selected()$indicator_number,br(),"<b>","Profile:","</b>",indicator_selected()$profile,br(),
-                                                                                                                                "<b>","Domain:","</b>",indicator_selected()$domain)), icon = icon ("book"),color = "blue")
-    
-  })
-  #  valueBox(tags$p(techdoc$indicator_name[techdoc$indicator_name==input$indicator_defined], style="color: white; font-size: 30px; font-weight: bold;"), HTML(paste("<b>","Indicator number:","</b>",techdoc$indicator_number[techdoc$indicator_name==input$indicator_defined],br(),"<b>","Profile:","</b>",techdoc$profile[techdoc$indicator_name==input$indicator_defined])), icon = icon ("book"),color = "blue")
+    selectizeInput("indicator_defined", label = "Select indicator to see technical information for",
+                   width = "510px", choices = indic_selection, 
+                   selected = character(0), multiple=TRUE, 
+                   options = list(placeholder = "Select your indicator of interest", maxItems = 1)) 
+  }) 
   
-  #  })
+  #To keep it simple, when you change profile, reset topic and vice versa.
+  observeEvent(input$profile_defined, { 
+    if (input$topic_defined != "Show all" && input$profile_defined != "Show all"){ 
+      updateSelectizeInput(session,"topic_defined", label = "Or by domain",
+                           choices = topic_list_filter, selected = "Show all")
+    }
+  })
+  
+  observeEvent(input$topic_defined, { 
+    if (input$profile_defined != "Show all" && input$topic_defined != "Show all"){ 
+      updateSelectizeInput(session,"profile_defined", label = "Filter by profile",
+                           choices = profile_list_filter, selected = "Show all")
+    }
+  })
+  
+  ###############################################.
+  # Creating text and titles for info
+  # Title box
+  output$indicator <- renderValueBox({
+
+    valueBox(tags$p(indicator_selected()$indicator_name, style="color: white; font-size: 30px; font-weight: bold;"), 
+             HTML(paste("<b>","Profile:","</b>",indicator_selected()$profile,br(),
+                        "<b>","Domain:","</b>",indicator_selected()$domain)), icon = icon ("book"),color = "blue")
+  })
+
+  # Text for all metadata parts of the indicator
   output$definition <- renderText ({indicator_selected()$indicator_definition })
   output$rationale <- renderText ({ indicator_selected()$inclusion_rationale})
   output$source <- renderText ({indicator_selected()$data_source})
@@ -1978,51 +2182,19 @@ showModal(welcome_modal)
   output$supporting_info <- renderText ({indicator_selected()$supporting_information})
   output$next_update <- renderText ({indicator_selected()$next_update})
   
-  #Filter indicator list by  profile or by domain
-  profile_filtered_list <- reactive({ sort(unique(c(as.character(optdata$indicator[grep(input$profile_defined,optdata$profile_domain1)]),as.character(optdata$indicator[grep(input$profile_defined,optdata$profile_domain2)] )))) })
-  topic_filtered_list <- reactive({ sort(unique(optdata$indicator[optdata$domain1==input$topic_defined|optdata$domain2==input$topic_defined|optdata$domain3==input$topic_defined])) })
-  
-  output$indicator_chosen <- renderUI ({ 
-    if (input$profile_defined != "Show all"){ selectizeInput("indicator_defined", label = "Select indicator to see technical information for",
-                                                             width = "510px", choices = profile_filtered_list(), selected = character(0), multiple=TRUE, options = list(placeholder = "Select your indicator of interest", maxItems = 1)) 
-    } else if (input$topic_defined != "Show all"){ selectizeInput("indicator_defined", label = "Select indicator to see technical information for",
-                                                                  width = "510px", choices = topic_filtered_list(), selected = character(0), multiple=TRUE, options = list(placeholder = "Select your indicator of interest", maxItems = 1)) 
-      
-    } else {selectizeInput("indicator_defined", label = "Select indicator to see technical information for",
-                           width = "510px", choices = indicator_list, selected = character(0), multiple=TRUE, options = list(placeholder = "Select your indicator of interest", maxItems = 1))}
-  }) 
-  
-  #To keep it simple, when you change profile, reset topic and vice versa.
-  observeEvent(input$profile_defined, { 
-    if (input$topic_defined != "Show all" && input$profile_defined != "Show all"){ updateSelectizeInput(session,"topic_defined", label = "Or by Topic",
-                                                                                                        choices = topic_list_filter, selected = "Show all")}
-  })
-  observeEvent(input$topic_defined, { 
-    if (input$profile_defined != "Show all" && input$topic_defined != "Show all"){ updateSelectizeInput(session,"profile_defined", label = "Filter by Profile",
-                                                                                                        choices = profile_list_filter, selected = "Show all")}
-  })
-  
+
+  ###############################################.
   #Download definitions table for selected indicator
   indicator_definitions <- reactive({ techdoc %>% filter(indicator_name == input$indicator_defined)})
   
   indicator_csv <- reactive({ format_definitions_csv(indicator_definitions()) })
+  
   output$definitions_by_indicator <- downloadHandler(
     filename ="indicator_definitions.csv",
     content = function(file) {
       write.csv(indicator_csv(),
                 file, row.names=FALSE) } 
   )
-  
-  ########################
-  #Re-open Modal
-  ########################
-  
-  observeEvent(input$openModal, {
-    showModal(
-      welcome_modal
-    )
-  })
-  
   
 } #server closing bracket
 
