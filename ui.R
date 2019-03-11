@@ -276,38 +276,56 @@ tabPanel("Summary", icon = icon("list-ul"), value = "summary",
 ## Barcode ----
 #####################################################################.
 tabPanel("Barcode", icon = icon("barcode"), value = "barcode",
-         sidebarPanel(width=3,
-                      actionButton("help_bar", label="Help", icon= icon('question-circle'), class ="down"),
-                      actionButton("defs_bar",label="Definitions", icon= icon('info'), class ="down"),
-                      selectInput("profile_bar", "Profile", choices = profile_list),
-                      uiOutput("topic_ui_bar"),
-                      uiOutput("geotype_ui_bar"),
-                      conditionalPanel(#Conditional panel for extra dropdown for localities & IZ
-                        condition = "input.geotype_bar== 'HSC locality' | input.geotype_bar == 'Intermediate zone' ",
-                        selectInput("loc_iz_bar", label = "Partnership for localities/intermediate zones", choices = partnership_name)),
-                      uiOutput("geoname_ui_bar"),
-                      selectInput("geocomp_bar", "Compare with", choices = comparator_list, selectize=TRUE, selected = "Scotland"),
-                      p(img(src='signif_better.png', height=18, style="padding-right: 2px; vertical-align:middle"), 
-                        "Better than comparator", br(),
-                        img(src='non_signif.png', height=18, style="padding-right: 2px; vertical-align:middle"), 
-                        "Not different to comparator", br(),
-                        img(src='signif_worse.png', height=18, style="padding-right: 2px; vertical-align:middle"), 
-                        "Worse than comparator", br(),
-                        img(src='signif_nocalc.png', height=18, style="padding-right: 2px; vertical-align:middle"), 
-                        "No differences can be calculated"),
-                      uiOutput("ui_bar_legend_selected"),
-                      uiOutput("ui_bar_legend_comparator"),
-                      uiOutput("ui_bar_legend_areatype"),
-                      downloadButton('download_bar', 'Download data', class = "down"),
-                      savechart_button('download_barplot', 'Save chart',  class = "down")
+         wellPanel(
+           column(3,
+                  selectInput("profile_spine", "Profile", choices = profile_list),
+                  uiOutput("topic_ui_spine")
+           ),
+           column(3,
+                  uiOutput("geotype_ui_spine"),
+                  conditionalPanel(#Conditional panel for extra dropdown for localities & IZ
+                    condition = "input.geotype_spine== 'HSC locality' | input.geotype_spine == 'Intermediate zone' ",
+                    selectInput("loc_iz_spine", label = "Partnership for localities/intermediate zones", choices = partnership_name))
+           ),
+           column(2,
+                  uiOutput("geoname_ui_spine")
+           ),
+           column(2,
+                  selectInput("geocomp_spine", "Select a comparison area", choices = comparator_list, selectize=TRUE, selected = "Scotland")
+           ),
+           column(2,
+                  actionButton("help_spine", label="Help", icon= icon('question-circle'), class ="down"),
+                  bsModal("mod_defs_spine", "Definitions", "defs_spine", htmlOutput('defs_text_spine')),
+                  actionButton("defs_spine",label="Definitions", icon= icon('info'), class ="down"),
+                  downloadButton('download_spine', 'Download data', class = "down"),
+                  savechart_button('download_spineplot', 'Save chart',  class = "down"))
          ),
-         mainPanel(width=9,
-                   bsModal("mod_defs_bar", "Definitions", "defs_bar", htmlOutput('defs_text_bar')),
-                   h4(textOutput("bar_title"), style="color: black; text-align: left"),
-                   h5(textOutput("bar_subtitle"), style="color: black; text-align: left"),
-                   withSpinner(uiOutput("ui_bar_plot"))
+         wellPanel(
+           column(4,
+                  h4(textOutput("spine_title"), style="color: black; text-align: left"),
+                  h5(textOutput("spine_subtitle"), style="color: black; text-align: left")),
+           column(3,
+                  br(),
+                  br(),
+                  p(img(src='signif_better.png', height=18, style="padding-right: 2px; vertical-align:middle"), 
+                    "Better than comparator", br(),
+                    img(src='non_signif.png', height=18, style="padding-right: 2px; vertical-align:middle"), 
+                    "Not different to comparator", br(),
+                    img(src='signif_worse.png', height=18, style="padding-right: 2px; vertical-align:middle"), 
+                    "Worse than comparator", br(),
+                    img(src='signif_nocalc.png', height=18, style="padding-right: 2px; vertical-align:middle"), 
+                    "No differences can be calculated")),
+           column(5,
+                  br(),
+                  br(),
+                  uiOutput("ui_spine_legend_selected"),
+                  uiOutput("ui_spine_legend_areatype"),
+                  uiOutput("ui_spine_legend_comparator"))),
+         mainPanel(
+           column(12,
+                  withSpinner(uiOutput("ui_spine_plot")))
          )
-),
+), #Tab panel bracket
 ###############################################.
 ## Time trend ----
 ###############################################.
