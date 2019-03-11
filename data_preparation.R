@@ -212,7 +212,7 @@ alcohol_stays_d11 <- read_csv("/conf/phip/Projects/Profiles/Data/Indicators/Shin
   rename(measure = rate) %>%
   mutate_if(is.character,factor) #converting characters into factors
 
-alcohol_stays_adp <- read_csv("/conf/phip/Projects/Profiles/Data/Indicators/Shiny Data/alcohol_stays_ADP_AL.csv") %>%
+alcohol_stays_adp <- read_csv("/conf/phip/Projects/Profiles/Data/Indicators/Shiny Data/alcohol_stays_ADP.csv") %>%
   filter(substr(code,1,3)=="S11") %>% #selecting only adp level
   mutate(update_date = "08/02/2019", ind_id = 20203) %>%
   rename(measure = rate) %>%
