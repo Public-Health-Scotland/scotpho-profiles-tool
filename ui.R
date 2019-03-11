@@ -113,10 +113,10 @@ tabPanel(
   mainPanel(
     width = 11, style="margin-left:4%; margin-right:4%",
     fluidRow(h3("Welcome to the ScotPHO profiles", style="margin-top:0px;")),
-    fluidRow(h4("Explore data by profile or domain area", style="margin-top:0px; ")),
     fluidRow(
-      #Heatmap and tile plot box
+      #Summary box
       column(6, class="landing-page-column",
+             fluidRow(h4("Explore data by profile", style="margin-top:0px; ")),
              div(class="landing-page-box", 
                  div("Profile summary", class = "landing-page-box-title"),
                  div(class = "landing-page-icon", style="background-image: url(heatmap_2.png);
@@ -124,15 +124,17 @@ tabPanel(
                  actionButton('jump_to_summary', 'A high level view of an area across a suit of indicators', 
                               class="landing-page-button", 
                               icon = icon("arrow-circle-right", "icon-lp")))),
-      #Barcode plot box
+      #Table box 
       column(6, class="landing-page-column",
+             fluidRow(h4("Access the data behind the tool", style="margin-top:0px; ")),
              div(class="landing-page-box", 
-                 div("Topic summary: Barcode", class = "landing-page-box-title"),
-                 div(class = "landing-page-icon", style="background-image: url(barcode_3.png);
+                 div("Data", class = "landing-page-box-title"),
+                 div(class = "landing-page-icon", style="background-image: url(data_table.png);
                      background-size: auto 80%; background-position: center; background-repeat: no-repeat; "),
-                 actionButton('jump_to_barcode', 'Explore how indicators for a topic compare across different geographies',
-                              class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp"))))
-    ),
+                 actionButton('jump_to_table', 'View and download the data behind the tool', 
+                              class="landing-page-button", 
+                              icon = icon("arrow-circle-right", "icon-lp"))
+                 ))),
     fluidRow(h4("Explore a single indicator in more detail")),
     #2nd row of boxes
     fluidRow(
@@ -162,20 +164,10 @@ tabPanel(
                  actionButton('jump_to_map', 'Compare geographical variation for an indicator using a map', 
                               class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp"))))
     ),
-    fluidRow(h4("Access the data behind the tool and find supporting information")),
+    fluidRow(h4("Find supporting information")),
     fluidRow(
-      #Table box 
-      column(4, class="landing-page-column",
-             div(class="landing-page-box", 
-                 div("Data", class = "landing-page-box-title"),
-                 div(class = "landing-page-icon", style="background-image: url(data_table.png);
-                     background-size: auto 80%; background-position: center; background-repeat: no-repeat; "),
-                 actionButton('jump_to_table', 'View and download the data behind the tool', 
-                              class="landing-page-button", 
-                              icon = icon("arrow-circle-right", "icon-lp"))
-             )),
       #About box
-      column(4, class="landing-page-column",
+      column(6, class="landing-page-column",
              div(class="landing-page-box-about", 
                  div("About", class = "landing-page-box-title"),
                  div(class = "landing-page-about-icon", style="background-image: url(about_2.png);
@@ -194,7 +186,7 @@ tabPanel(
                               icon = icon("arrow-circle-right", "icon-lp")))
       ),
       #Resources box
-      column(4, class="landing-page-column", 
+      column(6, class="landing-page-column", 
              div(class="landing-page-box-about",
                  div("Resources", class = "landing-page-box-title"),
                  div(class = "landing-page-about-icon", style="background-image: url(technical_resources.png);
@@ -221,7 +213,10 @@ tabPanel(
 tabPanel("Summary", icon = icon("list-ul"), value = "summary",
          wellPanel( #Filter options
            column(2,
-                  selectInput("profile_summary", "Profile", choices = profile_list)
+                  selectInput("profile_summary", "Profile", choices = profile_list),
+                  # domain if spine selected
+                  conditionalPanel(condition = 'input.chart_summary == "Spine"',
+                                   uiOutput("topic_ui_spine"))
            ),
            column(3,
                   uiOutput("geotype_ui_summary"),
@@ -233,7 +228,8 @@ tabPanel("Summary", icon = icon("list-ul"), value = "summary",
                   uiOutput("geoname_ui_summary")
            ),
            column(2,
-                  awesomeRadio("comp_summary", label = "Compare against",
+                  conditionalPanel(condition = 'input.chart_summary %in% c("Snapshot", "Trend") ',
+                    awesomeRadio("comp_summary", label = "Compare against",
                                choices = list("Area" = 1, "Time" = 2), 
                                selected = 1, inline=TRUE, checkbox = TRUE),
                   conditionalPanel(condition = "input.comp_summary == 1 ",  
@@ -242,7 +238,10 @@ tabPanel("Summary", icon = icon("list-ul"), value = "summary",
                   ),
                   conditionalPanel(condition = "input.comp_summary == 2 ", 
                                    uiOutput("yearcomp_ui_summary")
-                  ) 
+                  )),
+                  conditionalPanel(condition = 'input.chart_summary == "Spine"',
+                                   selectizeInput("geocomp_spine", "Select a comparison area", 
+                                                  choices = comparator_list, selected = "Scotland"))
            ),
            column(3,
                   #Legend
@@ -258,48 +257,15 @@ tabPanel("Summary", icon = icon("list-ul"), value = "summary",
            column(2,
                   actionButton("help_summary",label="Help", icon= icon('question-circle'), class ="down"),
                   actionButton("defs_summary",label="Definitions", icon= icon('info'), class ="down"),
-                  downloadButton('download_summary', 'Download data', class = "down")
+                  downloadButton('download_summary', 'Download data', class = "down"),
+                  conditionalPanel(condition = 'input.chart_summary == "Spine"',
+                    savechart_button('download_spineplot', 'Save chart',  class = "down"))
                   # savechart_button('download_summaryplot', 'Save chart',  class = "down")
            ),
            div(radioGroupButtons("chart_summary", label= "", status = "primary", 
-                             choices = c("Snapshot", "Trend"), justified = TRUE),
+                             choices = c("Snapshot", "Trend", "Spine"), justified = TRUE),
                style = "width:50%; margin-left: 25%") # centering div
          ), #well panel bracket
-         mainPanel(width = 12,
-                   bsModal("mod_defs_summary", "Definitions", "defs_summary", htmlOutput('defs_text_summary')),
-                   h4(textOutput("summary_title"), style="color: black; text-align: left"),
-                   h5(textOutput("summary_subtitle"), style="color: black; text-align: left"),
-                   uiOutput("summary_ui_plots")
-        )
-  ), #Tab panel bracket
-#####################################################################.
-## Barcode ----
-#####################################################################.
-tabPanel("Barcode", icon = icon("barcode"), value = "barcode",
-         wellPanel(
-           column(3,
-                  selectInput("profile_spine", "Profile", choices = profile_list),
-                  uiOutput("topic_ui_spine")
-           ),
-           column(3,
-                  uiOutput("geotype_ui_spine"),
-                  conditionalPanel(#Conditional panel for extra dropdown for localities & IZ
-                    condition = "input.geotype_spine== 'HSC locality' | input.geotype_spine == 'Intermediate zone' ",
-                    selectInput("loc_iz_spine", label = "Partnership for localities/intermediate zones", choices = partnership_name))
-           ),
-           column(2,
-                  uiOutput("geoname_ui_spine")
-           ),
-           column(2,
-                  selectInput("geocomp_spine", "Select a comparison area", choices = comparator_list, selectize=TRUE, selected = "Scotland")
-           ),
-           column(2,
-                  actionButton("help_spine", label="Help", icon= icon('question-circle'), class ="down"),
-                  bsModal("mod_defs_spine", "Definitions", "defs_spine", htmlOutput('defs_text_spine')),
-                  actionButton("defs_spine",label="Definitions", icon= icon('info'), class ="down"),
-                  downloadButton('download_spine', 'Download data', class = "down"),
-                  savechart_button('download_spineplot', 'Save chart',  class = "down"))
-         ),
          wellPanel(
            column(4,
                   h4(textOutput("spine_title"), style="color: black; text-align: left"),
@@ -320,12 +286,19 @@ tabPanel("Barcode", icon = icon("barcode"), value = "barcode",
                   br(),
                   uiOutput("ui_spine_legend_selected"),
                   uiOutput("ui_spine_legend_areatype"),
-                  uiOutput("ui_spine_legend_comparator"))),
-         mainPanel(
-           column(12,
-                  withSpinner(uiOutput("ui_spine_plot")))
-         )
-), #Tab panel bracket
+                  uiOutput("ui_spine_legend_comparator"))
+         ),
+         mainPanel(width = 12,
+                   bsModal("mod_defs_summary", "Definitions", "defs_summary", htmlOutput('defs_text_summary')),
+                   h4(textOutput("summary_title"), style="color: black; text-align: left"),
+                   h5(textOutput("summary_subtitle"), style="color: black; text-align: left"),
+                   # Depending what users selects different visualizations
+                   conditionalPanel(condition = 'input.chart_summary %in% c("Snapshot", "Trend") ',
+                                    uiOutput("summary_ui_plots")),
+                   conditionalPanel(condition = 'input.chart_summary == "Spine"',
+                                    withSpinner(uiOutput("ui_spine_plot")))
+        )
+  ), #Tab panel bracket
 ###############################################.
 ## Time trend ----
 ###############################################.

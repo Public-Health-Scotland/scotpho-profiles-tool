@@ -209,10 +209,6 @@ showModal(welcome_modal)
     updateTabsetPanel(session, "intabset", selected = "summary")
   })
   
-  observeEvent(input$jump_to_barcode, {
-    updateTabsetPanel(session, "intabset", selected = "barcode")
-  })
-  
   observeEvent(input$jump_to_trend, {
     updateTabsetPanel(session, "intabset", selected = "trend")
   })
@@ -249,8 +245,19 @@ showModal(welcome_modal)
   ###############################################.
   ## Summary - common objects ----
   ###############################################.
-  # Heatmap help pop-up
+  # Summary help pop-up
   observeEvent(input$help_summary, {
+    
+    if (input$chart_summary == "Spine") {
+      
+      showModal(modalDialog(
+        title = "How to use this chart",
+        p(img(src="help_barcode2.png",height=600)),size = "l",
+        easyClose = TRUE, fade=FALSE
+      ))
+      
+    } else {
+
     showModal(modalDialog(
       title = "How to use this chart",
       p(column(6,"Select 'Area' to compare against another region, or select 'Time' to compare
@@ -272,6 +279,7 @@ showModal(welcome_modal)
       
       size = "l", easyClose = TRUE, fade=FALSE
       ))
+    }
   })
   
   ###############################################.
@@ -279,8 +287,16 @@ showModal(welcome_modal)
   #Subsetting by domain and profile. Profile is fiddly as vector uses abbreviations 
   # so needs to be converted to the names to match techdoc.
   defs_data_summary <- reactive({
-    techdoc %>% 
-      subset(grepl(names(profile_list[unname(profile_list) == input$profile_summary]), profile))
+    if (input$chart_summary == "Spine") {
+      
+      techdoc %>% subset(grepl(input$topic_spine, domain) &
+                           grepl(names(profile_list[unname(profile_list) == input$profile_summary]),
+                                 profile))
+    } else {
+      techdoc %>% 
+        subset(grepl(names(profile_list[unname(profile_list) == input$profile_summary]), profile))  
+    }
+
     })
   
   output$defs_text_summary <- renderUI({
@@ -295,6 +311,12 @@ showModal(welcome_modal)
   output$geotype_ui_summary <- renderUI({
     
     areas <- areatype_profile[[names(profile_list[unname(profile_list) == input$profile_summary])]]
+    
+    if (input$chart_summary == "Spine") {
+      areas <- areas[! areas %in% c("Scotland")]
+    } else {
+      areas <- areas
+    }
     
     selectInput("geotype_summary", "Geography level", choices=areas,
                 selected = "Health board")
@@ -318,6 +340,7 @@ showModal(welcome_modal)
     
   })
   
+
   # Years to compare with depending on what data is available
   output$yearcomp_ui_summary <- renderUI({
     
@@ -668,6 +691,8 @@ showModal(welcome_modal)
       format_csv(snapshot_data())
     } else if (input$chart_summary == "Trend") {
       format_csv(summary_chosen_area())
+    } else if (input$chart_summary == "Spine") {
+      spine_csv()
     }
   })
   
@@ -939,58 +964,16 @@ showModal(welcome_modal)
   ## Spine/Barcode ----
   ###############################################.    
   
-  ###############################################.
-  # Indicator definitions
-  # Subsetting by domain and profile. Profile is fiddly as vector uses abbreviations 
-  # so needs to be converted to the names to match techdoc.
-  defs_data_spine <- reactive({techdoc %>% subset(grepl(input$topic_spine, domain) &
-                                                    grepl(names(profile_list[unname(profile_list) == input$profile_spine]),
-                                                          profile))})
-  
-  output$defs_text_spine <- renderUI({
-    
-    HTML(paste(sprintf("<b><u>%s</b></u> <br> %s ", defs_data_spine()$indicator_name, 
-                       defs_data_spine()$indicator_definition), collapse = "<br><br>"))
-  })
-  
+
   ############################################.
   ## Reactive controls
   
   # Reactive controls for domain depending on profile
   output$topic_ui_spine <- renderUI({
-    domain_list <- sort(profile_lookup$domain[profile_lookup$profile == input$profile_spine])
+    domain_list <- sort(profile_lookup$domain[profile_lookup$profile == input$profile_summary])
     selectInput("topic_spine", "Domain", choices = domain_list, selected='')
   })
   
-  # Reactive controls for areatype depending on profile selected
-  output$geotype_ui_spine <- renderUI({
-    areas <- areatype_profile[[names(profile_list[unname(profile_list) == input$profile_spine])]]
-    areas <- areas [! areas %in% c("Scotland")]
-    selectInput("geotype_spine", "Geography level", choices=areas,
-                selected = "Health board")
-  })        
-  
-  # Reactive controls for spinecode:area name depending on areatype selected
-  output$geoname_ui_spine <- renderUI({
-    areas_spine <- if (input$geotype_spine %in% c("Health board", "Council area", 
-                                                  "Alcohol & drug partnership", "HSC partnership"))
-    {
-      sort(geo_lookup$areaname[geo_lookup$areatype == input$geotype_spine])
-    } else {
-      sort(geo_lookup$areaname[geo_lookup$areatype == input$geotype_spine
-                               & geo_lookup$parent_area == input$loc_iz_spine])
-    }
-    selectInput("geoname_spine", "Select your area", choices = areas_spine, selectize=TRUE, selected = "")
-  })
-  
-  # Barcode help pop-up
-  observeEvent(input$help_spine, {
-    showModal(modalDialog(
-      title = "How to use this chart",
-      p(img(src="help_barcode2.png",height=600)),size = "l",
-      easyClose = TRUE, fade=FALSE
-    ))
-  })  
   
   ############################################.
   ## Spine Data
@@ -1002,11 +985,11 @@ showModal(welcome_modal)
       group_by (indicator) %>%
       mutate(max_year = max(year))%>%
       subset (year == max_year &
-                (substr(profile_domain1, 1, 3) == input$profile_spine |
-                   substr(profile_domain2, 1, 3) == input$profile_spine) &
+                (substr(profile_domain1, 1, 3) == input$profile_summary |
+                   substr(profile_domain2, 1, 3) == input$profile_summary) &
                 (substr(profile_domain1, 5, nchar(as.vector(profile_domain1))) == input$topic_spine |
                    substr(profile_domain2, 5, nchar(as.vector(profile_domain2))) == input$topic_spine) &
-                areatype  == input$geotype_spine &
+                areatype  == input$geotype_summary &
                 !(indicator %in% c("Mid-year population estimate - all ages", "Quit attempts")))
   })
   
@@ -1016,12 +999,12 @@ showModal(welcome_modal)
       group_by (indicator) %>%
       mutate(max_year=max(year))%>%
       subset (year == max_year &
-                areaname == input$geoname_spine &
-                (substr(profile_domain1, 1, 3) == input$profile_spine |
-                   substr(profile_domain2, 1, 3) == input$profile_spine) &
+                areaname == input$geoname_summary &
+                (substr(profile_domain1, 1, 3) == input$profile_summary |
+                   substr(profile_domain2, 1, 3) == input$profile_summary) &
                 (substr(profile_domain1, 5, nchar(as.vector(profile_domain1))) == input$topic_spine |
                    substr(profile_domain2, 5, nchar(as.vector(profile_domain2))) == input$topic_spine) &
-                areatype  == input$geotype_spine &
+                areatype  == input$geotype_summary &
                 !(indicator %in% c("Mid-year population estimate - all ages", "Quit attempts"))) %>%
       select(c(indicator, measure, lowci, upci)) %>%
       rename(measure_chosen= measure, lowci_chosen=lowci, upci_chosen= upci) %>%
@@ -1037,8 +1020,8 @@ showModal(welcome_modal)
       subset (year==max_year &
                 areaname == input$geocomp_spine &
                 areatype %in% c("Health board", "Council area", "Scotland") &
-                (substr(profile_domain1, 1, 3) == input$profile_spine |
-                   substr(profile_domain2, 1, 3) == input$profile_spine) &
+                (substr(profile_domain1, 1, 3) == input$profile_summary |
+                   substr(profile_domain2, 1, 3) == input$profile_summary) &
                 (substr(profile_domain1, 5, nchar(as.vector(profile_domain1))) == input$topic_spine |
                    substr(profile_domain2, 5, nchar(as.vector(profile_domain2))) == input$topic_spine) &
                 !(indicator %in% c("Mid-year population estimate - all ages", "Quit attempts"))) %>%
@@ -1106,8 +1089,8 @@ showModal(welcome_modal)
                             spine %>% mutate(y=1))
     
     #Chart title text & subtitle
-    areatype_name <- input$geotype_spine
-    chosenarea_name <- input$geoname_spine
+    areatype_name <- input$geotype_summary
+    chosenarea_name <- input$geoname_summary
     comparea_name <- input$geocomp_spine
     
     #Create colour scale for lines & legend key.
@@ -1177,7 +1160,7 @@ showModal(welcome_modal)
   #Create text output for responsive plot legend
   #legend - selected area - green
   output$ui_spine_legend_selected <- renderUI({
-    img(src='spine_legend_selected.jpg', height=18, style="padding-right: 2px; vertical-align:middle",paste(input$geoname_spine,sep = ""))
+    img(src='spine_legend_selected.jpg', height=18, style="padding-right: 2px; vertical-align:middle",paste(input$geoname_summary,sep = ""))
   }) 
   
   #legend - comparator - pink
@@ -1187,16 +1170,16 @@ showModal(welcome_modal)
   
   #legend - area type - grey bars
   output$ui_spine_legend_areatype <- renderUI({
-    img(src='bar_legend_areatype.jpg', height=18, style="padding-right: 2px; vertical-align:middle",paste(input$geotype_spine))
+    img(src='bar_legend_areatype.jpg', height=18, style="padding-right: 2px; vertical-align:middle",paste(input$geotype_summary))
   }) 
   
   output$spine_title <- renderText({
-    paste(names(profile_list[unname(profile_list) == input$profile_spine]),
+    paste(names(profile_list[unname(profile_list) == input$profile_summary]),
           " profile: ", input$topic_spine,sep="")
   })
   
   output$spine_subtitle <- renderText({
-    paste(input$geoname_spine," (",input$geotype_spine,") compared against ",input$geocomp_spine,sep="")
+    paste(input$geoname_summary," (",input$geotype_summary,") compared against ",input$geocomp_spine,sep="")
   })    
   
   #####################.
@@ -1229,17 +1212,13 @@ showModal(welcome_modal)
     
   })
   
-  # Download spine data
-  output$download_spine <- downloadHandler( filename =  'spinechart_data.csv',
-                                            content = function(file) { write.csv(spine_csv(), file, row.names=FALSE) })
-  
   # Downloading chart  
   output$download_spineplot <- downloadHandler(
     filename = 'spine.png',
     content = function(file){
       ggsave(file, plot = plot_spine()
-             +ggtitle(label=paste(names(profile_list[unname(profile_list) == input$profile_spine])," profile: ", input$topic_spine,sep=""),
-                      subtitle =paste(input$geoname_spine," (",input$geotype_spine,") compared against ",input$geocomp_spine,sep="")),
+             +ggtitle(label=paste(names(profile_list[unname(profile_list) == input$profile_summary])," profile: ", input$topic_spine,sep=""),
+                      subtitle =paste(input$geoname_summary," (",input$geotype_summary,") compared against ",input$geocomp_spine,sep="")),
              device = "png",width=15, limitsize=FALSE)
     })
 
