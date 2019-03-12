@@ -142,7 +142,7 @@ tabPanel(
     #2nd row of boxes
     fluidRow(
       #Trend plot box
-      column(4, class="landing-page-column",
+      column(6, class="landing-page-column",
              div(class="landing-page-box", 
                  div("Trend", class = "landing-page-box-title"),
                  div(class = "landing-page-icon", style="background-image: url(time_trend.png);
@@ -151,22 +151,14 @@ tabPanel(
                               class="landing-page-button", 
                               icon = icon("arrow-circle-right", "icon-lp")))),
       #Rank plot box
-      column(4, class="landing-page-column",
+      column(6, class="landing-page-column",
              div(class="landing-page-box", 
                  div("Rank", class = "landing-page-box-title"),
-                 div(class = "landing-page-icon", style="background-image: url(rank_5.png);
+                 div(class = "landing-page-icon", style="background-image: url(maprank.png);
                      background-size: auto 80%; background-position: center; background-repeat: no-repeat; "),
-                 actionButton('jump_to_rank', 'Compare geographical variation for an indicator using a bar chart', 
-                              class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp")))),
-      #Map plot box
-      column(4, class="landing-page-column",
-             div(class="landing-page-box", 
-                 div("Map", class = "landing-page-box-title"),
-                 div(class = "landing-page-icon", style="background-image: url(map_2.png);
-                     background-size: auto 80%; background-position: center; background-repeat: no-repeat; "),
-                 actionButton('jump_to_map', 'Compare geographical variation for an indicator using a map', 
+                 actionButton('jump_to_rank', 'Compare geographical variation for an indicator', 
                               class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp"))))
-    ),
+      ), # end of second row
     fluidRow(h4("Find supporting information", style="margin-top:0px; 
                          color:black; text-align: center; ")),
     fluidRow(
@@ -283,54 +275,69 @@ tabPanel("Summary", icon = icon("list-ul"), value = "summary",
 ## Time trend ----
 ###############################################.
 tabPanel("Trend", icon = icon("area-chart"), value = "trend",
-                   sidebarPanel(width=3,
-                          selectInput("indic_trend", "Indicator", choices=indicator_list),
-                          awesomeCheckbox("ci_trend", label = "95% confidence intervals", value = FALSE),
-                          awesomeCheckbox("colorblind_trend",  
-                                          label = "Improved accessibility", value = FALSE),
-                          actionButton("defs_trend",label="Definitions", icon= icon('info'), class ="down"),
-                          shiny::hr(),
-                          p(tags$b("Select the areas you want to plot.
-                                   You can select multiple areas per geography level")),
-                          selectInput("hbname_trend", "Health board", choices = c("Select health boards" = "", paste(hb_name)),
-                                      multiple=TRUE, selectize=TRUE, selected = ""),
-                          selectInput("scotname_trend", "Scotland", choices = c("", "Scotland"), 
-                                      selectize=TRUE, selected = "Scotland"),
-                          selectInput("caname_trend", "Council area", choices =  c("Select council areas" = "", paste(la_name)),
-                                      multiple=TRUE, selectize=TRUE, selected = ""),
-                          selectInput("adpname_trend", "Alcohol & drug partnership", choices =  c("Select partnerships" = "", paste(adp_name)),
-                                      multiple=TRUE, selectize=TRUE, selected = ""),
-                          selectInput("partname_trend", "HSC partnership", choices =  c("Select partnerships" = "", paste(partnership_name)),
-                                      multiple=TRUE, selectize=TRUE, selected = ""),
-                          selectInput("loc_iz_trend", "To choose a locality or intermediate zone first 
-                                      select an HSC partnership", 
-                                      choices = partnership_name),
-                          uiOutput("loc_ui_trend"),
-                          uiOutput("iz_ui_trend"),
-                          downloadButton('download_trend', 'Download data', class = "down"),
-                          savechart_button('download_trendplot', 'Save chart',  class = "down")
-                   ),
-         mainPanel(width = 9, #Main panel
-          bsModal("mod_defs_trend", "Definitions", "defs_trend", htmlOutput('defs_text_trend')),
-          h4(textOutput("title_trend"), style="color: black; text-align: left"),
-          withSpinner(plotlyOutput("trend_plot"))
+         sidebarPanel(width=4,
+                      selectInput("indic_trend", "Indicator", choices=indicator_list),
+                      div(title= "Display the rate/percentage data or the raw numbers.",
+                          awesomeRadio("var_plot_trend", label =NULL, inline = TRUE, 
+                                       choices = c("Rate/Percentage" = "measure", 
+                                                   "Numerator" = "numerator"))),
+                      div(title="Show or hide the 95% confidence intervals for the data selected.", # tooltip
+                          awesomeCheckbox("ci_trend", label = "95% confidence intervals", value = FALSE)),
+                      actionButton("defs_trend", label="Definitions", icon= icon('info'), class ="down"),
+                      shiny::hr(),
+                      p(tags$b("Select the areas you want to plot. You can select multiple 
+                               areas for each type of geography.")),
+                      awesomeCheckbox("scotname_trend", tags$b("Scotland"), value=TRUE),
+                      column(6,
+                             selectizeInput("hbname_trend", "Health board", choices = c("Select health boards" = "", paste(hb_name)),
+                                            multiple=TRUE, selected = ""),
+                             selectizeInput("partname_trend", "HSC partnership", choices =  c("Select partnerships" = "", paste(partnership_name)),
+                                            multiple=TRUE, selected = "")),
+                      column(6,
+                             selectizeInput("caname_trend", "Council area", choices =  c("Select council areas" = "", paste(la_name)),
+                                            multiple=TRUE, selected = ""),
+                             selectizeInput("adpname_trend", "Alcohol & drug partnership", choices =  c("Select partnerships" = "", paste(adp_name)),
+                                            multiple=TRUE, selected = "")),
+                      selectInput("loc_iz_trend", "To choose a locality or intermediate zone, first 
+                                  select an HSC partnership", choices = partnership_name),
+                      column(6, uiOutput("loc_ui_trend")),
+                      column(6,uiOutput("iz_ui_trend")),
+                      downloadButton('download_trend', 'Download data', class = "down"),
+                      savechart_button('download_trendplot', 'Save chart',  class = "down")
+                      ),
+         mainPanel(width = 8, #Main panel
+                   bsModal("mod_defs_trend", "Definitions", "defs_trend", htmlOutput('defs_text_trend')),
+                   h4(textOutput("title_trend"), style="color: black; text-align: left"),
+                   withSpinner(plotlyOutput("trend_plot"))
          )
-), #Tab panel bracket
+                      ), #Tab panel bracket
 ###############################################.
-## Rank chart ---- 
+## Rank and map ---- 
 ###############################################.
 tabPanel("Rank", icon = icon("signal"), value = "rank",
-         sidebarPanel(width=4, #Filter options
+         wellPanel(#Filter options
+           column(width = 4,
                   selectInput("indic_rank", "Indicator", choices=indicator_list),
-                  actionButton("defs_rank", label="Definitions", icon= icon('info'), class ="down"),
                   uiOutput("geotype_ui_rank"),
                   conditionalPanel( #Conditional panel for extra dropdown for localities & IZ
                     condition = "input.geotype_rank == 'HSC locality' | input.geotype_rank == 'Intermediate zone' ",
                     selectInput("loc_iz_rank", label = "Partnership for localities/intermediate zones",
-                                choices = partnership_name)),
+                                choices = partnership_name))
+           ),
+           column(width = 3,
                   uiOutput("year_ui_rank"), 
-                  selectInput("geocomp_rank", "Comparator", choices = comparator_list,
-                              selectize=TRUE, selected = "Scotland"),
+                  awesomeRadio("comp_rank", label = "Compare against:",
+                               choices = list("Area" = 1, "Time" = 2), 
+                               selected = 1, inline=TRUE, checkbox=TRUE),
+                  conditionalPanel(condition = "input.comp_rank == 1 ",  
+                                   selectInput("geocomp_rank", "Comparator", choices = comparator_list,
+                                               selectize=TRUE, selected = "Scotland")
+                  ),
+                  conditionalPanel(condition = "input.comp_rank == 2 ", 
+                                   uiOutput("yearcomp_ui_rank")
+                  )
+           ),
+           column(width = 3,
                   awesomeCheckbox("ci_rank", label = "95% confidence intervals", value = FALSE),
                   #Legend
                   p(img(src='signif_better.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
@@ -340,59 +347,28 @@ tabPanel("Rank", icon = icon("signal"), value = "rank",
                     img(src='signif_worse.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
                     "Worse than comparator", br(),
                     img(src='signif_nocalc2.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
-                    "No differences can be calculated"),
+                    "No differences can be calculated", br(),
+                    img(src='baseline_year_color.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
+                    "Baseline year comparison")
+           ),
+           column(width = 2,
+                  actionButton("defs_rank", label="Definitions", icon= icon('info'), class ="down"), 
                   downloadButton('download_rank', 'Download data', class = "down"),
-                  savechart_button('download_rankplot', 'Save chart', class = "down")
-         ),
-         mainPanel(width = 8, #Main panel
-                   bsModal("mod_defs_rank", "Definitions", "defs_rank", htmlOutput('defs_text_rank')),
-                   h4(textOutput("rank_title"), style="color: black; text-align: left"),
-                   h5(textOutput("rank_subtitle"), style="color: black; text-align: left"),
-                   withSpinner(plotlyOutput("rank_plot")) 
-         )
-), #Tab panel bracket
-###############################################.
-###########Map ----
-###############################################.
-tabPanel("Map", icon = icon("globe"), value = "map",
-         sidebarPanel(    
-           selectInput("indic_map", "Indicator", choices=indicator_map_list),
-           actionButton("defs_map", label="Definitions", icon= icon('info'), class ="down"),
-           uiOutput("geotype_ui_map"),
-           conditionalPanel(#Conditional panel for extra dropdown for localities & IZ
-             condition = "input.geotype_bar== 'HSC locality' | input.geotype_map == 'Intermediate zone' ",
-             selectInput("iz_map", label = "Council for intermediate zones", choices = la_name)),
-           uiOutput("year_ui_map"),
-           awesomeRadio("comp_map", label = "Compare against:",
-                        choices = list("Area" = 1, "Time" = 2), 
-                        selected = 1, inline=TRUE, checkbox=TRUE),
-           conditionalPanel(condition = "input.comp_map == 1 ",  
-                            selectInput("geocomp_map", "Comparator", choices = comparator_list,
-                                        selectize=TRUE, selected = "Scotland")
-           ),
-           conditionalPanel(condition = "input.comp_map == 2 ", 
-                            uiOutput("yearcomp_ui_map")
-           ),
-           #Legend
-           p(img(src='signif_better.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
-             "Better than comparator", br(),
-             img(src='non_signif.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
-             "Not different to comparator", br(),
-             img(src='signif_worse.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
-             "Worse than comparator", br(),
-             img(src='signif_nocalc.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
-             "No differences can be calculated"),
-           downloadButton('download_map', 'Download data', class = "down"),
-           savechart_button('download_mapplot', 'Save map', class = "down")
-         ), 
-         mainPanel( #Main panel
-           bsModal("mod_defs_map", "Definitions", "defs_map", htmlOutput('defs_text_map')),
-           h4(textOutput("map_title"), style="color: black; text-align: left"),
-           h5(textOutput("map_subtitle"), style="color: black; text-align: left"),
-           withSpinner(leafletOutput("map", width="100%",height="600px"))
+                  savechart_button('download_rankplot', 'Save chart', class = "down"),
+                  savechart_button('download_mapplot', 'Save map', class = "down")
            )
+         ), #well pannel bracket
+         mainPanel(width = 12, #Main panel
+                   bsModal("mod_defs_rank", "Definitions", "defs_rank", htmlOutput('defs_text_rank')),
+                   column(width = 7, #rank bar
+                          h4(textOutput("rank_title"), style="color: black; text-align: left"),  
+                          h5(textOutput("rank_subtitle"), style="color: black; text-align: left"),  
+                          withSpinner(plotlyOutput("rank_plot"))           ),
+                   column(width = 5, #map
+                          uiOutput("map_ui")
+                   )
+         ) #main panel bracket
 ), #Tab panel bracket
-
 ###############################################.
 ## Data ----
 ###############################################.
@@ -402,116 +378,112 @@ tabPanel("Data", icon = icon("table"), value = "table",
            width = 12, style="margin-left:0.5%; margin-right:0.5%",
            #Row 1 for intro  
            fluidRow(
-                    p("Filter ScotPHO data by", style = "font-weight: bold; color: black;"),
-                    tags$div("Select appropriate conditions to filter data. ",
-                             "To delete choices use RETURN or select item and DELETE"),
-                    br()
-                    ),
+             p("Filter ScotPHO data by", style = "font-weight: bold; color: black;"),
+             tags$div("Select appropriate conditions to filter data. ",
+                      "To delete choices use RETURN or select item and DELETE"),
+             br()
+           ),
            #Row 2 for selections
            fluidRow(
              column(3,
                     p("Profile product", style = "font-weight: bold; color: black;"),  
-                    tags$div("All available indicators will be displayed for",tags$br(),"selected geography if none specified"),
-                    br(),
+                    tags$div("All available indicators will be displayed for
+                             selected geography if none specified"),
                     awesomeRadio("product_filter", label=NULL, choices = c("Indicator", "Domain", "Profile"), selected = NULL, inline = FALSE,
-                                 status = "primary", checkbox = TRUE, width = NULL),
-                    br(),
-                    conditionalPanel(
-                      condition="input.product_filter=='Indicator'",
-                      selectizeInput("indicator_filter", label = NULL,
-                                     width = "280px", choices = indicator_list, selected = NULL,
-                                     multiple=TRUE, options = list(maxOptions = 1000, placeholder = "Select or type indicators to filter by"))
-                      
+                                 status = "primary", checkbox = TRUE),
+                    conditionalPanel(condition="input.product_filter=='Indicator'",
+                                     selectizeInput("indicator_filter", label = NULL,
+                                                    choices = indicator_list, selected = NULL,
+                                                    multiple=TRUE, options = list(maxOptions = 1000, placeholder = "Select or type indicators to filter by"))
+                                     
                     ),
-                    conditionalPanel(
-                      condition="input.product_filter=='Domain'",
-                      selectizeInput("topic_filter", label = NULL,
-                                     width = "280px", choices = topic_list, selected = NULL,
-                                     multiple=TRUE, options = list(maxOptions = 1000, placeholder = "Select or type domains to filter by"))
+                    conditionalPanel(condition="input.product_filter=='Domain'",
+                                     selectizeInput("topic_filter", label = NULL,
+                                                    choices = topic_list, selected = NULL,
+                                                    multiple=TRUE, options = list(maxOptions = 1000, placeholder = "Select or type domains to filter by"))
                     ),
-                    conditionalPanel(
-                      condition="input.product_filter=='Profile'",
-                      selectizeInput("profile_filter", label = NULL,
-                                     width = "280px", choices = profile_list, selected = NULL,
-                                     multiple=TRUE, options = list(maxOptions = 1000, placeholder = "Select or type profiles to filter by"))    
-                      
+                    conditionalPanel(condition="input.product_filter=='Profile'",
+                                     selectizeInput("profile_filter", label = NULL,
+                                                    choices = profile_list, selected = NULL,
+                                                    multiple=TRUE, options = list(maxOptions = 1000, placeholder = "Select or type profiles to filter by"))    
                     )
-             ),
+                    ),# column bracket
              column(3,
-                    
                     p("Geography", style = "font-weight: bold; color: black;"),
-                    awesomeCheckbox("iz",label = "Intermediate zone", value = FALSE),
-                    conditionalPanel(
-                      condition = "input.iz == true",
-                      selectizeInput("iz_parent", label = "Filter list by HSC partnership",
-                                     width = "229px", choices = parent_geo_list, selected = "Show all", multiple=FALSE),
-                      conditionalPanel(
-                        condition = "input.iz_parent != 'Show all'",
-                        checkboxInput("iz_parent_all",label = "Select all intermediate zones in this area", value = FALSE)),
-                      uiOutput("iz_filtered")),
-                    
-                    awesomeCheckbox("la",label = "Council area", value = FALSE),
-                    conditionalPanel(
-                      condition = "input.la == true",
-                      selectizeInput("la_true", label = NULL,
-                                     width = "229px", choices = la_name, selected = NULL, multiple=TRUE, options = list(placeholder = "Select or type council area of interest"))),
-                    
-                    awesomeCheckbox("hscl",label = "Health and social care locality", value = FALSE),
-                    conditionalPanel(
-                      condition = "input.hscl == true",
-                      selectizeInput("hscl_parent", label = "Filter list by HSC partnership",
-                                     width = "229px", choices = parent_geo_list, selected = "Show all", multiple=FALSE),
-                      conditionalPanel(
-                        condition = "input.hscl_parent != 'Show all'",
-                        checkboxInput("hscl_parent_all",label = "Select all HSC localities in this area", value = FALSE)),
-                      uiOutput("hscl_filtered")),
-                    
-                    awesomeCheckbox("adp",label = "Alcohol and drugs partnership", value = FALSE),
-                    conditionalPanel(
-                      condition = "input.adp == true",
-                      selectizeInput("adp_true", label = NULL,
-                                     width = "229px", choices = adp_name, selected = NULL, multiple=TRUE,options = list(placeholder = "Select or type ADP of interest")))  
-                    
-             ),
-             column(3,
-                    br(),
-                    awesomeCheckbox("hscp",label = "Health and social care partnership", value = FALSE),
-                    conditionalPanel(
-                      condition = "input.hscp == true",
-                      selectInput("hscp_true", label = NULL,
-                                  width = "229px", choices = partnership_name, selected = NULL, multiple=TRUE)),
-                    
+                    # Scotland selections
+                    awesomeCheckbox("scotland",label = "Scotland", value = FALSE),
+                    # Panel for health board selections
                     awesomeCheckbox("hb",label = "Health board", value = FALSE),
                     conditionalPanel(
                       condition = "input.hb == true",
                       selectInput("hb_true", label = NULL,
-                                  width = "229px", choices = hb_name, selected = NULL, multiple=TRUE)),
+                                  choices = hb_name, selected = NULL, multiple=TRUE)),
+                    # Panel for council area selections
+                    awesomeCheckbox("la", label = "Council area", value = FALSE),
+                    conditionalPanel(condition = "input.la == true",
+                                     selectizeInput("la_true", label = NULL,
+                                                    choices = la_name, selected = NULL, multiple=TRUE, 
+                                                    options = list(placeholder = "Select or type council area of interest"))),
+                    # Panel for ADP selections
+                    awesomeCheckbox("adp",label = "Alcohol & drug partnership", value = FALSE),
+                    conditionalPanel(condition = "input.adp == true",
+                                     selectizeInput("adp_true", label = NULL,
+                                                    choices = adp_name, selected = NULL, multiple=TRUE,
+                                                    options = list(placeholder = "Select or type ADP of interest")))  
                     
-                    
-                    awesomeCheckbox("scotland",label = "Scotland", value = FALSE),
+             ), # column bracket
+             column(3,
+                    br(),
+                    # Panel for HSC partnership selections
+                    awesomeCheckbox("hscp",label = "Health & social care partnership", value = FALSE),
+                    conditionalPanel(
+                      condition = "input.hscp == true",
+                      selectInput("hscp_true", label = NULL, choices = partnership_name, 
+                                  selected = NULL, multiple=TRUE)),
+                    # Panel for locality selections
+                    awesomeCheckbox("hscl",label = "Health & social care locality", value = FALSE),
+                    conditionalPanel(condition = "input.hscl == true",
+                                     selectizeInput("hscl_parent", label = "Filter locality list by HSC partnership",
+                                                    choices = parent_geo_list, 
+                                                    selected = "Show all", multiple=FALSE),
+                                     # if they haven't selected all, show tickbox so they can select all localities of parent area
+                                     conditionalPanel(condition = "input.hscl_parent != 'Show all'",
+                                                      checkboxInput("hscl_parent_all",label = "Select all HSC localities in this area", 
+                                                                    value = FALSE)),
+                                     uiOutput("hscl_filtered")),
+                    # Panel for intermediate zone selections
+                    awesomeCheckbox("iz",label = "Intermediate zone", value = FALSE),
+                    conditionalPanel(condition = "input.iz == true",
+                                     selectizeInput("iz_parent", label = "Filter intermediate zone list by HSC partnership",
+                                                    choices = parent_geo_list, selected = "Show all", multiple=FALSE),
+                                     # if they haven't selected all, show tickbox so they can select all izs of parent area
+                                     conditionalPanel(condition = "input.iz_parent != 'Show all'",
+                                                      checkboxInput("iz_parent_all",label = "Select all intermediate zones in this area", value = FALSE)),
+                                     uiOutput("iz_filtered")),
+                    # To select all available geographies
                     awesomeCheckbox("all_data",label = "All available geographies", value = FALSE),
-                    selectizeInput("code", label = NULL,
-                                   width = "229px", choices = code_list, options = list(placeholder = 'Or search by area code'), multiple=TRUE, selected = "")
-                    
-             ),
+                    # to search by code
+                    selectizeInput("code", label = NULL, choices = code_list,
+                                   options = list(placeholder = 'Or search by area code'), 
+                                   multiple=TRUE, selected = "")
+             ), #column bracket
              column(3,
                     p("Time period", style = "font-weight: bold; color: black;"),
-                    br(),
                     sliderInput("date_from",label = NULL, min = min_year, max = max_year, value = c(min_year,max_year), 
-                                width = "260px", step = 1, sep="", round = TRUE, ticks = TRUE, dragRange = FALSE),
+                                step = 1, sep="", round = TRUE, ticks = TRUE, dragRange = FALSE),
                     br(),
-                    actionButton("clear", label = "Clear all filters", width= "200px", icon ("eraser"), style='background: #3399FF; color: #FFF; font-size:100%'),
-                    br(),
+                    actionButton("clear", label = "Clear all filters",  icon ("eraser"), class = "down"),
                     downloadButton("download_table_csv", 'Download data', class = "down")
-             )
-           ),
-           
-           #Row 3- Table
-           fluidRow(  
-             column(12, div(DT::dataTableOutput("table_filtered"), style = "font-size: 98%; width: 98%"))
-           ))
+             ) #column bracket
+         ), #filters fluid row bracket
          
- ), #Tab panel bracket  
+         #Row 3- Table
+         fluidRow(  
+           column(12, div(DT::dataTableOutput("table_filtered"), 
+                          style = "font-size: 98%; width: 98%"))
+         )
+           ) # main panel bracket
+  ), #Tab panel bracket  
 ###############################################.             
 ##############About----    
 ###############################################.
@@ -541,28 +513,24 @@ navbarMenu("Info", icon = icon("info-circle"),
            tabPanel("Indicator definitions", value = "definition",
                     #Sidepanel for filtering data
                     fluidRow(
-                      column(width = 5, offset= 1, #align="center"#style="margin-left:0.5%; margin-right:0.5%",
-                             #fluidRow(
+                      column(width = 5, offset= 1,
                              p("Indicator definitions and technical information", style = "font-weight: bold; color: black;"),
-                             div(style="display:inline-block",selectizeInput("profile_defined", label = "Filter by Profile",
-                                                                             width = "250px", choices = profile_list_filter, selected = "Show all", multiple=FALSE)),
-                             div(style="display:inline-block", selectizeInput("topic_defined", label = "Or by Topic",
-                                                                              width = "250px", choices = topic_list_filter, selected = "Show all", multiple=FALSE)),
-                             br(),
-                             uiOutput("indicator_chosen"),
-                             #selectizeInput("indicator_defined", label = "Select indicator to see technical information for",
-                             #              width = "510px", choices = indicator_list, selected = character(0), multiple=TRUE, options = list(placeholder = "Select your indicator of interest", maxItems = 1)),
-                             br(),br()
+                             div(style="display:inline-block",
+                                 selectizeInput("profile_defined", label = "Filter by Profile",
+                                                width = "250px", choices = profile_list_filter, 
+                                                selected = "Show all", multiple=FALSE)),
+                             div(style="display:inline-block", 
+                                 selectizeInput("topic_defined", label = "Or by Topic",
+                                                width = "250px", choices = topic_list_filter, 
+                                                selected = "Show all", multiple=FALSE)),
+                             uiOutput("indicator_chosen")
                       ), # column bracket 
                       column(width=6,
                              br(), br(), br(),
-                             # div(style="display:inline-block", downloadButton("definitions_by_profile", 'Download selected profile definitions', class = "down")),
-                             #div(style="display:inline-block", downloadButton("definitions_by_domain", 'Download selected topic definitions', class = "down")),
-                             br(), br(), downloadButton("definitions_by_indicator", 'Download indicator definition', class = "down")
+                             downloadButton("definitions_by_indicator", 
+                                            'Download indicator definition', class = "down")
                       )#column bracket
-                      
                     ), #fluidRow bracket
-                    
                     fluidRow(      
                       column(width=10, offset=1,
                              useShinydashboard(),
@@ -643,10 +611,7 @@ navbarMenu("Info", icon = icon("info-circle"),
                                    h5(textOutput("next_update")))
                              ) #conditional Panel bracket 
                       )  #column bracket
-                      
-                      # )#column bracket
                     )#fluidRow bracket
-                    
            ), #Tab panel bracket             
 ###############################################.             
 ##############Resources----    

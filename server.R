@@ -5,20 +5,23 @@
 
 ## Define a server for the Shiny app
 function(input, output, session) {
-  ################################################################
+  ################################################################.
   #    Modal ----
-  ################################################################
+  ################################################################.
   #Welcome Modal
   welcome_modal <- modalDialog(
     br(),
     p(img(src="scotpho_reduced.png", height=100)),
     br(),
     br(),
-    p(tags$h4("Welcome to the ScotPHO Profiles Tool"), tags$br(),tags$br(),tags$div(h5("This interactive tool provides access to a range of public health related indicators at different"),
-                                                                                    h5("geographies including NHS boards, council areas and health and social care partnerships.")),
+    p(tags$h4("Welcome to the ScotPHO Profiles Tool"), tags$br(),tags$br(),
+      tags$div(h5("This interactive tool provides access to a range of public 
+                  health related indicators at different"),
+               h5("geographies including NHS boards, council areas and health and 
+                  social care partnerships.")),
       style = "color:0E3E5D; font-size:20px"),
     br(),
-    p(tags$h5("Find out more about how to get the most out of the tool")),
+    p(tags$h5("Learn more about the tool or get started")),
     actionButton("tour","Take a tour", icon("play-circle")),
     HTML("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"),
     #For when we make any updates in future
@@ -27,27 +30,36 @@ function(input, output, session) {
     modalButton("Go to the tool", icon("times-circle")),
     size = "l", align= "center",
     easyClose = TRUE, fade=FALSE, footer = NULL
-  )
+      )
   
-showModal(welcome_modal)
+  showModal(welcome_modal)
   
   #"Take a Tour" Modal - first window
   first_modal <- modalDialog(
     fluidRow( 
       column(12,
-             p(tags$div(" To begin, select the visualisation you want to see", style = "color:0E3E5D; font-size:20px; width: 90%; text-align: left;")),
-             br(), tags$h5("There are different ways to navigate around the tool.", style = "width: 90%; text-align: left; " ), br(), br())), 
+             p(tags$div(" To begin, select the visualisation you want to see", 
+                        style = "color:0E3E5D; font-size:20px; width: 90%; text-align: left;")),
+             br(), tags$h5("There are different ways to navigate around the tool.", 
+                           style = "width: 90%; text-align: left; " ), br(), br())), 
     fluidRow(
-      column(5, offset=1,tags$h5("You can select visualisations via the tabs at the top of the page")),
+      column(5, offset=1,tags$h5("You can select visualisations via the tabs at 
+                                 the top of the page")),
       column(3, br(), img(src="tabs_select.png", height=43, width=400))),
     fluidRow(
-      column(6, br(), br(), br(), br(), tags$a(img(src="landing_select.png", height=150, width=250, align="right"))),
-      column(4, br(), br(), br(),br(),  br(), br(), br(), br(), tags$h5("Or select to view a visualisation using the option buttons shown on the Home Page"))),
+      column(6, br(), br(), br(), br(), 
+             tags$a(img(src="landing_select.png", height=150, width=250, align="right"))),
+      column(4, br(), br(), br(),br(),  br(), br(), br(), br(), 
+             tags$h5("Or select to view a visualisation using the option buttons 
+                     shown on the Home Page"))),
     fluidRow(
-      column(5, offset=1,  br(), br(), br(), br(), br(), h5("To return to the profiles Home Page at any point just click on the house button at the top of the page."),
+      column(5, offset=1,  br(), br(), br(), br(), br(), 
+             h5("To return to the profiles Home Page at any point just click on 
+                the house button at the top of the page."),
              h5("Clicking on the ScotPHO logo will take you to the main ScotPHO website.")),
-      column(3,br(),br(), br(), br(), br(), br(), br(), img(src="home_select.png", height=50, width=300))
-    ),
+      column(3,br(),br(), br(), br(), br(), br(), br(), 
+             img(src="home_select.png", height=50, width=300))
+      ),
     br(),
     br(),
     actionButton("next1","Next", icon("play-circle")),
@@ -55,7 +67,7 @@ showModal(welcome_modal)
     modalButton("Exit", icon("times-circle")),
     size = "l", align= "center",
     easyClose = TRUE, fade=TRUE, footer = NULL
-  )
+    )
   
   #call from either tour button or back button from modal 2
   observeEvent(input$tour,  {showModal(first_modal) })
@@ -66,18 +78,25 @@ showModal(welcome_modal)
   second_modal <- modalDialog(
     fluidRow(
       column(12,
-             p(tags$div("Next use the menus to select the data you want to see", style = "color:0E3E5D; font-size:20px; width: 90%; text-align: left; ")),                 
+             p(tags$div("Next use the menus to select the data you want to see", 
+                        style = "color:0E3E5D; font-size:20px; width: 90%; text-align: left; ")),                 
              br(),
              br(),
-             p(tags$h5("Some of our visualisations allow you to look at a predefined set of indicators related to a particular domain or profile e.g. ‘health and wellbeing’ or ‘children and young people’,
-                       while others are designed to look at a single indicator in more detail. Using menus next to a visualisation you can select the area you are interested in and the time period.", style = "width: 90%; text-align: left; "))),
+             p(tags$h5("Some of our visualisations allow you to look at a predefined 
+                       set of indicators related to a particular domain or profile 
+                       e.g. ‘health and wellbeing’ or ‘children and young people’,
+                       while others are designed to look at a single indicator in 
+                       more detail. Using menus next to a visualisation you can select 
+                       the area you are interested in and the time period.", 
+                       style = "width: 90%; text-align: left; "))),
       column(6,
              br(),
              br(),
              br(),
              br(),
              br(),
-             tags$h5("Use the drop-down menus to select filters of interest",  style="width:300px; "),
+             tags$h5("Use the drop-down menus to select filters of interest",  
+                     style="width:300px; "),
              p(tags$a(img(src="select_indic_single.png", height=200, width=300))),
              br()
       ),
@@ -86,13 +105,17 @@ showModal(welcome_modal)
              br(),
              br(),
              p(tags$a(img(src="select_indicator.png", height=180, width=260))),
-             p(tags$h5("Some fields may allow for multiple entries and most fields can be searched by typing into the field, as well as scrolling down the list of options", style = "width: 350px")),
+             p(tags$h5("Some fields may allow for multiple entries and most fields 
+                       can be searched by typing into the field, as well as scrolling 
+                       down the list of options", style = "width: 350px")),
              p(tags$a(img(src="type_select.png", height=180, width=260))),
              br()
-      )),
+             )),
     br(),
-    p(tags$h5("For more information about geographic areas within Scotland, please refer to" , tags$a(href="http://statistics.gov.scot/home", "statistics.gov.scot.", 
-                                                                                                      class="externallink"))),
+    p(tags$h5("For more information about geographic areas within Scotland, 
+              please refer to" , 
+              tags$a(href="http://statistics.gov.scot/home", "statistics.gov.scot.", 
+                     class="externallink"))),
     br(),
     actionButton("back1","Back", icon("backward")),
     HTML("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"),
@@ -101,7 +124,7 @@ showModal(welcome_modal)
     modalButton("Exit", icon("times-circle")),
     size = "l", align= "center",
     easyClose = TRUE, fade=TRUE, footer = NULL
-             )
+      )
   
   #call from either next1 button or back button from modal 3
   observeEvent(input$next1,  {showModal(second_modal) })
@@ -113,28 +136,35 @@ showModal(welcome_modal)
   third_modal <- modalDialog(
     fluidRow(
       column(12,
-             p(tags$div("Finally, save the visualisation or download data", style = "color:0E3E5D; font-size:20px; width: 90%; text-align: left; ")),                 
+             p(tags$div("Finally, save the visualisation or download data", 
+                        style = "color:0E3E5D; font-size:20px; width: 90%; text-align: left; ")),                 
              br(),
              br(),
-             p(tags$h5("Our tool allows you to download the visualisation images and the data behind them.", style = "width: 90%; text-align: left; "))),
+             p(tags$h5("Our tool allows you to download the visualisation 
+                       images and the data behind them.", 
+                       style = "width: 90%; text-align: left; "))),
       column(6,
              br(),
              br(),
              br(),
-             tags$h5("Charts displayed can be saved by clicking on the ‘Save chart’ button",  style="width:300px; "),
+             tags$h5("Charts displayed can be saved by clicking on the 
+                     ‘Save chart’ button",  style="width:300px; "),
              p(tags$a(img(src="save_chart2.png", height=60, width=230))),
              br()
-      ),
+             ),
       column(6,
              br(),
              br(),
              br(),
-             p(tags$h5("The raw data used to draw a chart can also be downloaded in csv format", style = "width: 350px")),
+             p(tags$h5("The raw data used to draw a chart can also be downloaded 
+                       in csv format", style = "width: 350px")),
              p(tags$a(img(src="save.png", height=60, width=230))),
              br()
-      )),
+             )),
     br(),
-    p(tags$h5("The ", tags$b("'Table'")," tab within our tool allows users to quickly and easily download larger selections of data covering multiple area or multiple indicators.", style = "width: 750px")),
+    p(tags$h5("The ", tags$b("'Table'")," tab within our tool allows users to 
+              quickly and easily download larger selections of data covering 
+              multiple area or multiple indicators.", style = "width: 750px")),
     br(),
     actionButton("back2","Back", icon("backward")),
     HTML("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"),
@@ -143,28 +173,34 @@ showModal(welcome_modal)
     modalButton("Exit", icon("times-circle")),
     size = "l", align= "center",
     easyClose = TRUE, fade=TRUE, footer = NULL
-  )
+    )
   
   #call from either next2 button or back button from modal 4
   observeEvent(input$next2,  {showModal(third_modal) })
   
   observeEvent(input$back3,  {showModal(third_modal) })
-
-  #"See latest updates" Modal window - Activate if Update is carried out once rolled out live to users
+  
+  #"See latest updates" Modal window - Activate if Update is carried out once 
+  # rolled out live to users
   updates_modal <- modalDialog(
     fluidRow(
       column(12,
-             p(tags$div("We are continuously updating and developing our tool", style = "color:0E3E5D; font-size:20px; width: 90%; text-align: left; ")),                 
+             p(tags$div("We are continuously updating and developing our tool", 
+                        style = "color:0E3E5D; font-size:20px; width: 90%; text-align: left; ")),                 
              br(),
              br(),
-             #p(tags$h5("Some new exciting features that have been added to our tool include:", style = "width: 90%; text-align: left; "))),
-             p(tags$h5("Recent indicator updates include:", style = "width: 90%; text-align: left; font-weight: bold; "))),
-             column(12, 
-              tags$h5(HTML(paste(techdoc$indicator_name[techdoc$days_since_update<60], collapse='<br>')))
-             )),
+             p(tags$h5("Recent indicator updates include:", 
+                       style = "width: 90%; text-align: left; font-weight: bold; "))),
+      column(12, 
+             tags$h5(HTML(paste(techdoc$indicator_name[techdoc$days_since_update<60], 
+                                collapse='<br>')))
+      )),
     br(),
     p(tags$h5("Thanks for stopping by!")),
-    p(tags$h5("For any further questions or other developments you would like to suggest for our current tool, please contact us at", tags$a(href="mailto:ScotPHO@nhs.net", "ScotPHO@nhs.net", class="externallink"), style = "width: 700px")),
+    p(tags$h5("For any further questions or other developments you would like to 
+              suggest for our current tool, please contact us at", 
+              tags$a(href="mailto:ScotPHO@nhs.net", "ScotPHO@nhs.net", class="externallink"), 
+              style = "width: 700px")),
     br(),
     actionButton("updatesreturn","Back", icon("backward")),
     HTML("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"),
@@ -180,24 +216,36 @@ showModal(welcome_modal)
   fourth_modal <- modalDialog(
     fluidRow(
       column(12,
-             p(tags$div("Please note", style = "color:0E3E5D; font-size:20px; width: 90%; text-align: left; ")))),          
+             p(tags$div("Please note", style = "color:0E3E5D; font-size:20px; 
+                        width: 90%; text-align: left; ")))),          
     br(),
-    p(tags$h5("The profiles are intended to increase understanding of local health and social issues and to prompt further investigation, rather than to be used as a performance management tool.
-        The information needs to be interpreted within a local framework; an indicator may be higher or lower in one area compared to another, but local knowledge is needed to understand and interpret differences.", style = "width: 700px")),
+    p(tags$h5("The profiles are intended to increase understanding of local health 
+              and social issues and to prompt further investigation, rather than 
+              to be used as a performance management tool.
+              The information needs to be interpreted within a local framework; an indicator 
+              may be higher or lower in one area compared to another, but local 
+              knowledge is needed to understand and interpret differences.", 
+              style = "width: 700px")),
     br(),
     br(),
     br(),
-    p(tags$h5("If you require any further information by bespoke geographies or have any questions regarding the tool, please", tags$a(href="mailto:ScotPHO@nhs.net", "contact us.", class="externallink"), style = "width: 600px")),
+    p(tags$h5("If you require any further information by bespoke geographies or 
+              have any questions regarding the tool, please", 
+              tags$a(href="mailto:ScotPHO@nhs.net", "contact us.", class="externallink"), 
+              style = "width: 600px")),
     br(),
     br(),
-    p(tags$h5("Please also note this tool is being continuously developed and we welcome any ", tags$a(href="mailto:ScotPHO@nhs.net", "feedback", class="externallink"), " you may have on it.", style = "width: 600px")),
+    p(tags$h5("Please also note this tool is being continuously developed and we 
+              welcome any ", tags$a(href="mailto:ScotPHO@nhs.net", "feedback", 
+                                    class="externallink"), " you may have on it.", 
+              style = "width: 600px")),
     br(),
     modalButton("Exit", icon("times-circle")),
     size = "l", align= "center",
     easyClose = TRUE, fade=TRUE, footer = NULL
-  )
+             )
   
-  observeEvent(input$next3, {   showModal(fourth_modal)  })
+  observeEvent(input$next3, { showModal(fourth_modal) })
   
   ###############################################.
   ## Landing page ----
@@ -215,10 +263,6 @@ showModal(welcome_modal)
   
   observeEvent(input$jump_to_rank, {
     updateTabsetPanel(session, "intabset", selected = "rank")
-  })
-  
-  observeEvent(input$jump_to_map, {
-    updateTabsetPanel(session, "intabset", selected = "map")
   })
   
   observeEvent(input$jump_to_simd, {
@@ -1229,28 +1273,29 @@ showModal(welcome_modal)
              device = "png",width=15, limitsize=FALSE)
     })
 
-###############################################.        
-#### Time trend plot ----
-###############################################.  
-#####################.
-# Reactive controls
+  ###############################################.        
+  #### Time trend plot ----
+  ###############################################.  
+  #####################.
+  # Reactive controls
   #Controls for chart. Dynamic selection of locality and iz.
   output$loc_ui_trend <- renderUI({
-    selectInput("locname_trend", "HSC locality", 
-                choices = c("Select localities" = "", paste(unique(geo_lookup$areaname[
-                  geo_lookup$parent_area == input$loc_iz_trend &
-                    geo_lookup$areatype == 'HSC locality' ]))),
-                multiple=TRUE, selectize=TRUE, selected = "")
+    selectizeInput("locname_trend", "HSC locality", 
+                   choices = c("Select localities" = "", paste(unique(geo_lookup$areaname[
+                     geo_lookup$parent_area == input$loc_iz_trend &
+                       geo_lookup$areatype == 'HSC locality' ]))),
+                   multiple=TRUE, selected = "")
   })
-
+  
   output$iz_ui_trend <- renderUI({
-    selectInput("izname_trend", "Intermediate zone", 
-                choices = c("Select intermediate zones" = "", 
-                            paste(unique(geo_lookup$areaname[
-                  geo_lookup$parent_area == input$loc_iz_trend &
-                    geo_lookup$areatype == 'Intermediate zone' ]))),
-                multiple=TRUE, selectize=TRUE, selected = "")
+    selectizeInput("izname_trend", "Intermediate zone", 
+                   choices = c("Select intermediate zones" = "", 
+                               paste(unique(geo_lookup$areaname[
+                                 geo_lookup$parent_area == input$loc_iz_trend &
+                                   geo_lookup$areatype == 'Intermediate zone' ]))),
+                   multiple=TRUE, selected = "")
   })
+  
   
   ###############################################.
   # disabling controls if no data available for a type of geography
@@ -1266,22 +1311,47 @@ showModal(welcome_modal)
     toggleState ("partname_trend", condition= 
                    "HSC partnership" %in%  unique(trend$areatype))
     
+    toggleState ("loc_iz_trend", 
+                 condition = "Intermediate zone" %in%  unique(trend$areatype) |
+                   "HSC locality" %in%  unique(trend$areatype))
+    
     toggleState ("locname_trend", condition= 
                    "HSC locality" %in%  unique(trend$areatype))
     
     toggleState ("izname_trend", condition= 
                    "Intermediate zone" %in%  unique(trend$areatype)) 
     
-    toggleState ("loc_iz_trend", 
-                 condition = "Intermediate zone" %in%  unique(trend$areatype) |
-                   "HSC locality" %in%  unique(trend$areatype))
-    
     toggleState("caname_trend",
                 condition = ("Council area" %in%  unique(trend$areatype)))
     
     toggleState("hbname_trend",
                 condition = ("Health board" %in%  unique(trend$areatype)))
+    
+    # Disabling numerator/rate radio buttons if no numerator available
+    toggleState("var_plot_trend",
+                condition = all(is.na(trend_data()$numerator)) == FALSE)
+    
+    # if moving to one indicator without numerator, switch to rate
+    if (all(is.na(trend_data()$numerator)) == TRUE & input$var_plot_trend == "numerator") {
+      updateAwesomeRadio(session, "var_plot_trend", selected = "measure")
+    }
+    
   })
+  
+  # Disabling and unchecking CI option if numerator selected or no cis available
+  # Observe with multiple events code from here: https://stackoverflow.com/questions/34731975/how-to-listen-for-more-than-one-event-expression-within-a-shiny-eventreactive-ha
+  observeEvent({
+    input$var_plot_trend 
+    input$indic_trend}, {
+      # Disabling and unchecking CI option if numerator selected or no cis available
+      if (input$var_plot_trend == "numerator" | (all(is.na(trend_data()$upci)) == TRUE)) {
+        disable("ci_trend")
+        updateAwesomeCheckbox(session, "ci_trend", value = FALSE)
+      } else if (input$var_plot_trend == "measure") {
+        enable("ci_trend")
+      }
+      
+    })
   
   ###############################################.
   # Indicator definitions
@@ -1295,110 +1365,99 @@ showModal(welcome_modal)
                        defs_data_trend()$indicator_definition), collapse = "<br><br>"))
   })
   
-#####################.
-# Reactive data 
+  #####################.
+  # Reactive data 
   #Time trend data. Filtering based on user input values.
   trend_data <- reactive({ 
     
     trend <- optdata %>% 
       subset((areaname %in% input$hbname_trend &  areatype == "Health board" |
-               areaname %in% input$caname_trend & areatype == "Council area" |
-               areaname %in% input$scotname_trend & areatype == "Scotland"  |
-               areaname %in% input$adpname_trend  & areatype == "Alcohol & drug partnership" |
-               areaname %in% input$locname_trend  & areatype == "HSC locality" |
-               areaname %in% input$partname_trend & areatype == "HSC partnership"   |
-               areaname %in% input$izname_trend & areatype == "Intermediate zone") & 
+                areaname %in% input$caname_trend & areatype == "Council area" |
+                input$scotname_trend == TRUE & areatype == "Scotland"  |
+                areaname %in% input$adpname_trend  & areatype == "Alcohol & drug partnership" |
+                areaname %in% input$locname_trend  & areatype == "HSC locality" |
+                areaname %in% input$partname_trend & areatype == "HSC partnership"   |
+                areaname %in% input$izname_trend & areatype == "Intermediate zone") & 
                indicator == input$indic_trend) %>% 
-      droplevels() 
-    
-    trend$areaname_full <- as.factor(trend$areaname_full)
-    trend <- trend[order(trend$year),] #Needs to be sorted by year for Plotly
+      droplevels() %>% 
+      mutate(areaname_full = as.factor(areaname_full),
+             # adjusting levels of areatype, so Scotland always plotted as black
+             areatype = factor(areatype,
+                               levels = c("Scotland", "Health board ", "Council area",
+                                          "Alcohol & drug partnership", "HSC partnership",
+                                          "HSC locality", "Intermediate zone"))) %>% 
+      arrange(year, areatype, areaname_full) #Needs to be sorted by year for Plotly
   })
   
-#####################.
-# Creating plot
-  #Function to create palette for trend plot
-  create_trendpalette <- function(){
-    #Creating palette of colors with a tone for each geography type
-    #First obtaining length of each geography type
-    hb_length <- length(input$hbname_trend)
-    ca_length <- length(input$caname_trend)
-    scot_length <- length(input$scotname_trend)
-    adp_length <- length(input$adpname_trend)
-    part_length <- length(input$partname_trend)
-    loc_length <- length(input$locname_trend)
-    iz_length <- length(input$izname_trend)
-    colorblind_length <- hb_length+ca_length+scot_length+adp_length+part_length+
-      loc_length+iz_length
-    
-    #Then creating a gradient scale for each geography type based on its length
-    hb_scale <- scales::seq_gradient_pal("#08519c", "#9ecae1", "Lab")(seq(0,1,length.out=hb_length))
-    ca_scale <- scales::seq_gradient_pal("#006d2c", "#a1d99b", "Lab")(seq(0,1,length.out=ca_length))
-    scot_scale <- scales::seq_gradient_pal("#000000", "#000000", "Lab")(seq(0,1,length.out=scot_length))
-    adp_scale <- scales::seq_gradient_pal("#FF0000", "#ffd6cc", "Lab")(seq(0,1,length.out=adp_length))
-    part_scale <- scales::seq_gradient_pal("#FF0000", "#ffd6cc", "Lab")(seq(0,1,length.out=part_length))
-    loc_scale <- scales::seq_gradient_pal("#dadaeb", "#54278f", "Lab")(seq(0,1,length.out=loc_length))
-    iz_scale <- scales::seq_gradient_pal("#ffff66", "#4d4d00", "Lab")(seq(0,1,length.out=iz_length))
-    colorblind_scale <- scales::seq_gradient_pal("#08306b", "#deebf7", "Lab")(seq(0,1,length.out=colorblind_length))
-    
-    #Then creating vector for each geography type with area names and color
-    scot_cols <- setNames(scot_scale, unique(trend_data()$areaname_full[trend_data()$areatype == "Scotland"]))
-    hb_cols <- setNames(hb_scale, unique(trend_data()$areaname_full[trend_data()$areatype == "Health board"]))
-    ca_cols <- setNames(ca_scale, unique(trend_data()$areaname_full[trend_data()$areatype == "Council area"]))
-    adp_cols <- setNames(adp_scale, unique(trend_data()$areaname_full[trend_data()$areatype == "Alcohol & drug partnership"]))
-    part_cols <- setNames(part_scale, unique(trend_data()$areaname_full[trend_data()$areatype == "HSC partnership"]))
-    loc_cols <- setNames(loc_scale, unique(trend_data()$areaname_full[trend_data()$areatype == "HSC locality"]))
-    iz_cols <- setNames(iz_scale, unique(trend_data()$areaname_full[trend_data()$areatype == "Intermediate zone"]))
-    colorblind_cols <- c(setNames(colorblind_scale, unique(trend_data()$areaname_full)))
-    
-    #Combining them all in the final palette. Using different palette if colour bling option checked
-    if(input$colorblind_trend == FALSE){
-      trend_col <- c(scot_cols, hb_cols, ca_cols, adp_cols, part_cols, loc_cols, iz_cols)
-    }
-    else{
-      trend_col <- colorblind_cols
-    }
-  }
-  
-  #Title of plot
-
-  
+  #####################.
+  # Creating plot
   #####################.
   # titles 
   output$title_trend <- renderText(paste0(input$indic_trend))
-
-#Plot 
-  output$trend_plot <- renderPlotly({
+  
+  #####################.
+  #Plot 
+  plot_trend_chart <- function() {
     #If no data available for that period then plot message saying data is missing
-    if (is.data.frame(trend_data()) && nrow(trend_data()) == 0)
+    # Also if numerator is all NA
+    if (is.data.frame(trend_data()) && nrow(trend_data()) == 0  |
+        (all(is.na(trend_data()$numerator)) == TRUE & input$var_plot_trend == "numerator"))
     {
       plot_nodata()
-    }
-    else { #If data is available then plot it
+    } else { #If data is available then plot it
       
-      #Creating palette of colors with a tone for each geography type
-      trend_col <-create_trendpalette()
+      #Creating palette of colors: colorblind proof
+      #First obtaining length of each geography type, if more than 6, then 6, 
+      # this avoids issues. Extra selections will not be plotted
+      trend_length <- ifelse(length(input$scotname_trend)+length(input$hbname_trend)+ length(input$caname_trend)+
+                               length(input$adpname_trend)+length(input$partname_trend)+
+                               length(input$locname_trend)+length(input$izname_trend) > 12, 12,
+                             length(input$scotname_trend)+length(input$hbname_trend)+ length(input$caname_trend)+
+                               length(input$adpname_trend)+length(input$partname_trend)+
+                               length(input$locname_trend)+length(input$izname_trend))
+      
+      # First define the palette of colours used, then set a named vector, so each color
+      # gets assigned to an area. I think is based on the order in the dataset, which
+      # helps because Scotland is always first so always black.
+      trend_palette <- c("#000000", "#a6cee3", "#1f78b4", "#b2df8a", "#33a02c", "#fb9a99",
+                         "#e31a1c", "#fdbf6f", "#ff7f00", "#cab2d6", "#6a3d9a", "#b15928")
+      
+      trend_scale <- c(setNames(trend_palette, unique(trend_data()$areaname_full)[1:trend_length]))
+      trend_col <- trend_scale[1:trend_length]
+      
+      # Same approach for symbols
+      symbols_palette <-  c('circle', 'diamond', 'circle', 'diamond', 'circle', 'diamond',
+                            'square','triangle-up', 'square','triangle-up', 'square','triangle-up')
+      symbols_scale <- c(setNames(symbols_palette, unique(trend_data()$areaname_full)[1:trend_length]))
+      symbols_trend <- symbols_scale[1:trend_length]
       
       #Text for tooltip
-      tooltip_trend <- c(paste0(trend_data()$areaname, "<br>", trend_data()$year,
+      tooltip_trend <- c(paste0(trend_data()$areaname, "<br>", trend_data()$trend_axis,
                                 "<br>", trend_data()$measure))
       
+      # y axis title
+      yaxis_title <- case_when(input$var_plot_trend == "measure" ~ paste0(unique(trend_data()$type_definition)), 
+                               input$var_plot_trend == "numerator" ~ "Number")
+      
       #Creating time trend plot
-      trend_plot <-   plot_ly(data=trend_data(), x=~trend_axis,  y = ~measure, 
-                text=tooltip_trend, hoverinfo="text",
-                type = 'scatter', mode = 'lines+markers',
-                color = ~areaname_full, colors = trend_col) %>% 
+      trend_plot <- plot_ly(data=trend_data(), x=~trend_axis,  y = ~get(input$var_plot_trend),
+                            color = ~areaname_full, colors = trend_col, 
+                            text=tooltip_trend, hoverinfo="text", height = 600 ) %>% 
+        add_trace(type = 'scatter', mode = 'lines+markers', marker = list(size = 8),
+                  symbol = ~areaname_full, symbols = symbols_trend) %>% 
         #Layout 
         layout(annotations = list(), #It needs this because of a buggy behaviour of Plotly
                margin = list(b = 160, t=5), #to avoid labels getting cut out
-               yaxis = list(title = ~type_definition, rangemode="tozero", fixedrange=TRUE,
-                            size = 4, titlefont =list(size=14), tickfont =list(size=14)), 
+               yaxis = list(title = yaxis_title, rangemode="tozero", fixedrange=TRUE,
+                            size = 4, titlefont =list(size=14), tickfont =list(size=14)),
                xaxis = list(title = FALSE, tickfont =list(size=14), tickangle = 270, fixedrange=TRUE),
-               font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif')) %>%  
+               font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif'),
+               showlegend = TRUE,
+               legend = list(orientation = 'h', x = 0, y = 1.18)) %>%  #legend on top
         config(displayModeBar = FALSE, displaylogo = F, collaborate=F, editable =F) # taking out plotly logo and collaborate button
       
       #Adding confidence intervals depending on user input
-      if (input$ci_trend == TRUE) {
+      if (input$ci_trend == TRUE & input$var_plot_trend != "Numerator") {
         trend_plot %>% 
           add_ribbons(data = trend_data(), ymin = ~lowci, ymax = ~upci, showlegend = F,
                       opacity = 0.2) 
@@ -1407,67 +1466,32 @@ showModal(welcome_modal)
         trend_plot
       }
     }
-  }) 
+  }
+  # Creating plot for ui side
+  output$trend_plot <- renderPlotly({ plot_trend_chart()  }) 
   
-#####################.
-# Downloading data and plot
-  #Function in ggplot to be able to save chart
-  plot_trend_ggplot <- function(){
-    
-    trend_col <- create_trendpalette() #palette
-
-    #Creating time trend plot
-    trend_plot <- ggplot(data=trend_data(), aes(y = measure,  x = trend_axis, group = areaname_full))+
-      geom_line(aes(color=areaname_full))+
-      geom_point(aes(color=areaname_full))+
-      labs(title=title_wrapper(paste0(input$indic_trend), width = 40), 
-           y = unique(trend_data()$type_definition))+
-      scale_color_manual(values=trend_col, name = "")+
-      #Layout
-      theme(text = element_text(size=11, family="Helvetica Neue,Helvetica,Arial,sans-serif"),
-            axis.text.x = element_text(angle=90),
-            axis.line.x = element_line(),
-            axis.ticks = element_blank(),
-            aspect.ratio=0.3,
-            plot.title = element_text(hjust = 0.5), #centering title
-            axis.title.x = element_blank(), #taking out y axis title
-            legend.key=element_blank(), #taking out background from legend
-            panel.grid.major = element_line(colour="#F0F0F0"),#grid lines
-            panel.background = element_blank() #Blanking background
-      )
-    
-    #Adding confidence intervals depending on user input
-    if (input$ci_trend == TRUE) {
-      trend_plot +
-        geom_ribbon(aes(ymin = lowci, ymax = upci, alpha = 0.2, 
-                        color=areaname_full, fill = areaname_full), 
-                    show.legend=F) +
-        scale_y_continuous(expand = c(0, 2), limits=c(0, max(trend_data()$upci)+ (max(trend_data()$upci)/100)))+
-        scale_fill_manual(values=trend_col, name = "")
-    } else if (input$ci_trend == FALSE) {
-      trend_plot +
-        scale_y_continuous(expand = c(0, 2), limits=c(0, max(trend_data()$measure)+ (max(trend_data()$measure)/100)))
-    }
-  } 
-  
+  #####################.
+  # Downloading data and plot
   #Downloading data
   trend_csv <- reactive({ format_csv(trend_data()) })
   
   output$download_trend <- downloadHandler(filename =  'timetrend_data.csv',
-    content = function(file) {write.csv(trend_csv(), file, row.names=FALSE)})
+                                           content = function(file) {write.csv(trend_csv(), file, row.names=FALSE)})
   
   # Downloading chart  
   output$download_trendplot <- downloadHandler(
     filename = 'trend.png',
     content = function(file){
-      ggsave(file, plot = plot_trend_ggplot(), device = "png", scale=6, limitsize=FALSE)
+      export(p = plot_trend_chart() %>% 
+               layout(title = paste0(input$indic_trend), margin = list(t = 140)), 
+             file = file, zoom = 3)
     })
   
-#####################################.       
-#### Rank plot ----
-###############################################.   
-#####################.
-# Reactive controls
+  ###############################################.       
+  #### Rank plot ----
+  ###############################################.   
+  #####################.
+  # Reactive controls - used for the map as well.
   #Dropdown for time period based on indicator selection  
   output$year_ui_rank <- renderUI({
     time_period <- sort(unique(optdata$trend_axis[optdata$indicator == input$indic_rank&
@@ -1485,6 +1509,20 @@ showModal(welcome_modal)
                 choices = areas, selected = "Health board")
   })
   
+  # Years to compare with depending on what data is available
+  output$yearcomp_ui_rank <- renderUI({
+    rank_data <- optdata %>% subset(areatype == input$geotype_rank & 
+                                      indicator==input$indic_rank)
+    
+    years <- c(min(rank_data$year):max(rank_data$year))
+    periods <- c(sort(paste0(unique(rank_data$trend_axis[rank_data$year>=min(rank_data$year) &
+                                                           rank_data$year<=max(rank_data$year)]))))
+    
+    selectInput("yearcomp_rank", "Baseline year", choices = periods,
+                selectize=TRUE)
+  })
+  
+  
   ###############################################.
   # Indicator definitions
   #Subsetting by domain and profile. Profile is fiddly as vector uses abbreviations 
@@ -1497,21 +1535,35 @@ showModal(welcome_modal)
                        defs_data_rank()$indicator_definition), collapse = "<br><br>"))
   })
   
-#####################.
-# Reactive data  
+  #####################.
+  # Reactive data  
   # Comparator data rank plot. Could be moved inside rank_bar_data
   rank_compar <- reactive({
-    #Fiddly way of selecting period because some cases (e.g. Life expectancy)
-    #might have different periods for the same year, e.g. IZ 2013 is 2011-2015
-    #and HB 2013 is 2012-2014.
-    year_chosen <- unique(optdata$year[optdata$trend_axis == input$year_rank])
     
-    rank_compar <- optdata %>% subset(year %in% year_chosen & 
-             areatype %in% c("Health board", "Council area", "Scotland") &
-             areaname == input$geocomp_rank &
-             indicator == input$indic_rank) %>% 
-      droplevels()
+    if (input$comp_rank == 1){
+      #Fiddly way of selecting period because some cases (e.g. Life expectancy)
+      #might have different periods for the same year, e.g. IZ 2013 is 2011-2015
+      #and HB 2013 is 2012-2014.
+      year_chosen <- unique(optdata$year[optdata$trend_axis == input$year_rank])
+      
+      rank_compar <- optdata %>% subset(year %in% year_chosen & 
+                                          areatype %in% c("Health board", "Council area", "Scotland") &
+                                          areaname == input$geocomp_rank &
+                                          indicator == input$indic_rank) %>% 
+        droplevels()
+      
+    } else if (input$comp_rank == 2) { #if time comparison selected
+      
+      rank_compar <- optdata %>% subset(areatype == input$geotype_rank &
+                                          trend_axis == input$yearcomp_rank & 
+                                          indicator==input$indic_rank) %>% 
+        rename(comp_value = measure, comp_name = areaname) %>% 
+        select(code, comp_value, comp_name) %>% #to allow merging
+        droplevels()
+      
+    }
   })
+  
   
   #Rank plot data based on user input
   rank_bar_data <- reactive({
@@ -1519,50 +1571,53 @@ showModal(welcome_modal)
     if (input$geotype_rank %in% c("Scotland", "Health board", "Council area", 
                                   "Alcohol & drug partnership", "HSC partnership"))
     {
-      rank_bar <-optdata %>% 
+      rank_bar <- optdata %>% 
         subset(areatype == input$geotype_rank &  
                  trend_axis == input$year_rank &
-                 indicator == input$indic_rank) %>% 
-        droplevels()
-      
-      #Cannot be done in the same pipe operation as it does not work with the areaname mutate
-      rank_bar <- rank_bar %>% 
-        mutate(comp_value = rank_compar()$measure) %>% #comparator value and name
-        mutate(comp_name = rank_compar()$areaname) %>% 
-        mutate(lowci_diff = measure - lowci) %>% 
-        mutate(upci_diff = upci - measure) %>% 
-        arrange(desc(measure)) # for ranking by value
-    }
-    else { #if locality or IZ it needs to filter based on the parent area and be the right area type.
+                 indicator == input$indic_rank) %>% droplevels()
+    } else { #if locality or IZ it needs to filter based on the parent area and be the right area type.
       rank_bar <-  optdata %>% 
         subset(areatype == input$geotype_rank &
                  parent_area == input$loc_iz_rank &
                  trend_axis == input$year_rank &
-                 indicator == input$indic_rank) %>% 
-        droplevels()
-      
-      #Cannot be done in the same pipe operation as it does not work with the areaname mutate
-      rank_bar <-rank_bar %>% 
-        mutate(comp_value = rank_compar()$measure) %>% #comparator value and name
-        mutate(comp_name = rank_compar()$areaname) %>% 
-        mutate(lowci_diff = measure - lowci) %>% 
-        mutate(upci_diff = upci - measure) %>% 
+                 indicator == input$indic_rank) %>% droplevels()
+    }
+    
+    if (input$comp_rank == 1) { #for area comparisons
+      rank_bar <- rank_bar %>% 
+        mutate(comp_value = rank_compar()$measure, #comparator value and name
+               comp_name = rank_compar()$areaname,
+               lowci_diff = measure - lowci, 
+               upci_diff = upci - measure) %>% 
         arrange(desc(measure)) # for ranking by value
+    } else if (input$comp_rank == 2) { #if time comparison selected
+      #This helps to deals with cases of incomplete data, e.g. 2011 has all HB but 2013 not.
+      #Works for those cases where there are more data in the past (comparator)
+      #and one for those which have more data in the present (chosen area)
+      rank_bar <- left_join(x = rank_bar, y = rank_compar(), by = "code") %>% 
+        mutate(lowci_diff = measure - lowci, 
+               upci_diff = upci - measure) %>% 
+        arrange(desc(measure)) # for ranking by value
+      
     }
   })
   
   ############################.
   #Title of plot
+  make_rank_subtitle <- function() {
+    case_when(input$comp_rank == 1 ~ paste0(input$geotype_rank, "s compared against ",
+                                            input$geocomp_rank, " - ",  input$year_rank),
+              input$comp_rank == 2 ~ paste0("Changes within ", input$geotype_rank, 
+                                            ": ", input$year_rank, " compared to ", input$yearcomp_rank))
+  }
+  
   output$rank_title <- renderText( paste0(input$indic_rank) )
   
-  output$rank_subtitle <- renderText({
-    paste0(input$geotype_rank, "s compared against ",
-           input$geocomp_rank, " - ",  input$year_rank)
-  })
+  output$rank_subtitle <- renderText({ make_rank_subtitle()  })
   
   ############################.
   # Creating  plot
-  output$rank_plot <- renderPlotly({
+  plot_rank_charts <- function(){
     
     #If no data available for that period then plot message saying data is missing
     if (is.data.frame(rank_bar_data()) && nrow(rank_bar_data()) == 0)
@@ -1571,12 +1626,23 @@ showModal(welcome_modal)
     }
     else { #If data is available then plot it
       
+      # height of the plot
+      # Calculates number of different indicators and then multiplies by pixels per row
+      # it needs the sum at the end as otherwise small domains plots will be too small
+      if (input$comp_rank == 1) {#if area comparison, standard length
+        height_plot <- 500
+      } else if (input$comp_rank == 2) {
+        #Obtaining number of areas
+        no_ind <- length(unique(rank_bar_data()$areaname))
+        height_plot <- no_ind * 25 + 70
+      }
+      
       #Coloring based on if signicantly different from comparator
       color_pal <- case_when(
-        rank_bar_data()$interpret == "O" ~ '#ccccff',
+        rank_bar_data()$interpret == "O" ~ '#999966',
         is.na(rank_bar_data()$lowci) | is.na(rank_bar_data()$upci) | 
           is.na(rank_bar_data()$comp_value) | is.na(rank_bar_data()$measure) |
-          rank_bar_data()$measure == 0 ~ '#ccccff',
+          rank_bar_data()$measure == 0 ~ '#999966',
         rank_bar_data()$lowci <= rank_bar_data()$comp_value & 
           rank_bar_data()$upci >= rank_bar_data()$comp_value ~'#cccccc',
         rank_bar_data()$lowci > rank_bar_data()$comp_value & 
@@ -1588,167 +1654,116 @@ showModal(welcome_modal)
         rank_bar_data()$upci < rank_bar_data()$comp_value & 
           rank_bar_data()$interpret == "H" ~ '#ffa64d', 
         TRUE ~ '#ccccff')
-
-      # Text for tooltip
-      tooltip_rank <- c(paste0(rank_bar_data()$areaname, ": ", rank_bar_data()$measure, "<br>",
-                               input$geocomp_rank, ": ", rank_bar_data()$comp_value))
+      
+      # Text for tooltip - one for each type of chart
+      tooltip_bar <-c(paste0(rank_bar_data()$areaname, ": ", rank_bar_data()$measure, "<br>",
+                             input$geocomp_rank, ": ", rank_bar_data()$comp_value))
+      
+      tooltip_dumbbell <- c(paste0(rank_bar_data()$areaname, "<br>",
+                                   input$year_rank, ": ", rank_bar_data()$measure, "<br>",
+                                   input$yearcomp_rank, ": ", rank_bar_data()$comp_value))
       
       #Creating a vector with the area names in the order they are going to be plotted
       order_areas <- as.vector(rank_bar_data()$areaname)
       
+      ###############################################.
+      # Starting the plot 
       # General plot and layout, bars with or without error bars will be added after user input
-      p <-   plot_ly(data = rank_bar_data(), x = ~areaname) %>% 
+      rank_plot <- plot_ly(data = rank_bar_data(), height = height_plot) 
+      
+      if (input$comp_rank == 1) {
         #Comparator line
-        add_trace(y = ~comp_value, name = ~unique(comp_name), type = 'scatter', mode = 'lines',
-                  line = list(color = '#FF0000'), showlegend = FALSE, hoverinfo="skip") %>% 
-        #Layout
-        layout(annotations = list(), #It needs this because of a buggy behaviour
-               yaxis = list(title = ~type_definition, titlefont =list(size=14), 
-                            tickfont =list(size=14), fixedrange=TRUE),
-               xaxis = list(title = "", tickangle = 270, fixedrange=TRUE,
-                            tickfont =list(size=13), #axis parameters
-                            categoryorder="array", #order of plotting
-                            categoryarray = order_areas),
-               font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif'),
-               margin=list(b = 160, t = 5), # to prevent labels getting cut out
-               hovermode = 'false') %>% # to get hover compare mode as default
-        config(displayModeBar = FALSE, displaylogo = F, collaborate=F, editable =F)
-      
-      #Respond to user input regarding confidence intervals
-      if (input$ci_rank == FALSE) {  
-        #adding bar layer without confidence intervals
-        p %>%  add_bars(y = ~ measure, text=tooltip_rank, hoverinfo="text",
-                        marker = list(color = color_pal))
-                   
+        rank_plot <- rank_plot %>% 
+          add_trace(x = ~areaname, y = ~comp_value, name = ~unique(comp_name), type = 'scatter', mode = 'lines',
+                    line = list(color = '#FF0000'), showlegend = FALSE, hoverinfo="skip")
+        
+        #Respond to user input regarding confidence intervals
+        if (input$ci_rank == FALSE) {  
+          #adding bar layer without confidence intervals
+          rank_plot <- rank_plot %>% add_bars(x = ~areaname, y = ~ measure, text=tooltip_bar, hoverinfo="text",
+                                              marker = list(color = color_pal))
+          
+        }
+        else { 
+          #adding bar layer with error bars
+          rank_plot <- rank_plot %>% add_bars(x = ~areaname,y = ~ measure, text=tooltip_bar, hoverinfo="text",
+                                              marker = list(color = color_pal), 
+                                              error_y = list(type = "data",color='#000000',
+                                                             symmetric = FALSE, array = ~upci_diff, arrayminus = ~lowci_diff)) 
+        }
+        
+        # Adding layout
+        rank_plot %>% layout(annotations = list(), #It needs this because of a buggy behaviour
+                             yaxis = list(title = ~type_definition, titlefont =list(size=14), 
+                                          tickfont =list(size=14), fixedrange=TRUE),
+                             xaxis = list(title = "", tickangle = 270, fixedrange=TRUE,
+                                          tickfont =list(size=13), #axis parameters
+                                          categoryorder="array", #order of plotting
+                                          categoryarray = order_areas),
+                             font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif'),
+                             margin=list(b = 180, t = 5), # to prevent labels getting cut out
+                             hovermode = 'false') %>% # to get hover compare mode as default
+          config(displayModeBar = FALSE, displaylogo = F, collaborate=F, editable =F)
+        
+      } else if (input$comp_rank == 2) {#if time comparison selected, plot dumbbell plot
+        
+        rank_plot <- rank_plot %>% 
+          add_segments(y = ~areaname, yend = ~areaname, x = ~measure, xend = ~comp_value, 
+                       showlegend = FALSE, color = I("gray80"), hoverinfo="skip") %>% 
+          # value of the area in the selected baseline period -comparator
+          add_trace(y = ~areaname, x = ~comp_value, name = ~unique(comp_name), 
+                    type = 'scatter', mode = 'markers', showlegend = FALSE, 
+                    marker = list(color = 'black', size = 10), text=tooltip_dumbbell, hoverinfo="text") %>% 
+          # value of the area in the selected period
+          add_trace(y = ~areaname, x = ~measure, name = ~unique(areaname), type = 'scatter', mode = 'markers',
+                    marker = list(color = color_pal, size = 10,
+                                  line = list(color = 'gray', width = 2)), 
+                    showlegend = FALSE, text=tooltip_dumbbell, hoverinfo="text") %>% 
+          # Adding layout
+          layout(xaxis = list(title = ~type_definition, titlefont =list(size=14), 
+                              side = "top", tickfont =list(size=14), fixedrange=TRUE),
+                 yaxis = list(title = "", fixedrange=TRUE,
+                              tickfont =list(size=13), #axis parameters
+                              categoryorder="array", #order of plotting
+                              categoryarray = rev(order_areas)),
+                 font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif'),
+                 margin=list(l = 170, t=40)) %>%  # to prevent labels getting cut out
+          config(displayModeBar = FALSE, displaylogo = F, collaborate=F, editable =F)
+        
       }
-      else{ 
-        #adding bar layer with error bars
-        p %>% add_bars(y = ~ measure, text=tooltip_rank, hoverinfo="text",
-                   marker = list(color = color_pal), 
-                   error_y = list(type = "data",color='#000000',
-                     symmetric = FALSE, array = ~upci_diff, arrayminus = ~lowci_diff)) 
-      }
-    }
-  }) 
+    } # bracket for "plot if data"
+  } 
   
-############################.
-#Downloading plot and data
-  # Function to save plot
-  plot_rank_ggplot <- function(){
-    #Coloring based on if signicantly different from comparator
-    color_pal <- case_when(
-      rank_bar_data()$interpret == "O" ~ '#ccccff',
-      is.na(rank_bar_data()$lowci) | is.na(rank_bar_data()$upci) | 
-        is.na(rank_bar_data()$comp_value) | is.na(rank_bar_data()$measure) |
-        rank_bar_data()$measure == 0~ '#ccccff',
-      rank_bar_data()$lowci <= rank_bar_data()$comp_value & 
-        rank_bar_data()$upci >= rank_bar_data()$comp_value ~ '#cccccc',
-      rank_bar_data()$lowci > rank_bar_data()$comp_value & 
-        rank_bar_data()$interpret == "H" ~ '#4da6ff',
-      rank_bar_data()$lowci > rank_bar_data()$comp_value & 
-        rank_bar_data()$interpret == "L" ~ '#ffa64d',
-      rank_bar_data()$upci < rank_bar_data()$comp_value & 
-        rank_bar_data()$interpret == "L" ~ '#4da6ff',
-      rank_bar_data()$upci < rank_bar_data()$comp_value & 
-        rank_bar_data()$interpret == "H" ~ '#ffa64d', 
-      TRUE ~ '#ccccff')
-    
-    #Creating a vector with the area names in the order they are going to be plotted
-    color_pal <- setNames(color_pal, rank_bar_data()$areaname)
-    
-    #title for rank
-    title_rank <- paste0(input$indic_rank)
-    subtitle_rank <-  paste0(input$geotype_rank, "s compared against ",
-                             input$geocomp_rank, " - ",  input$year_rank)
-
-    # General plot and layout, bars with or without error bars will be added after user input
-    p <- ggplot(data=rank_bar_data(), aes(y = measure,  x = reorder(areaname, -measure)))+
-      geom_bar(aes(fill=areaname), stat = "identity")+
-      geom_hline(aes(yintercept=comp_value, color="red"))+
-      labs(title=title_rank, subtitle = subtitle_rank,
-           y=unique(rank_bar_data()$type_definition))+
-      scale_fill_manual(values=color_pal, name = "")+
-      scale_y_continuous(expand = c(0, 0), limits=c(0, max(rank_bar_data()$upci)))+
-      #Layout
-      theme(text = element_text(size=11, family="Helvetica Neue,Helvetica,Arial,sans-serif"),
-            axis.text.x = element_text(angle=90, hjust=1), 
-            axis.line.x = element_line(), 
-            axis.ticks = element_blank(),
-            aspect.ratio=0.3,
-            plot.title = element_text(hjust = 0.5), #centering title
-            axis.title.x = element_blank(), #taking out x axis title
-            legend.position = "none", #taking out background from legend
-            panel.grid.major.y = element_line(colour="#F0F0F0"),
-            panel.background = element_blank() #Blanking background
-      )
-    
-    #Respond to user input regarding confidence intervals
-    if (input$ci_rank == FALSE) {  
-      p <- p 
-      
-    } else{ 
-      #adding bar layer with error bars
-      p <-  p +   geom_errorbar(aes(ymin=lowci, ymax=upci), width=.2,
-                                position=position_dodge(.9))
-      
-    }
-  }
+  # Calling the renderPlotly object
+  output$rank_plot <- renderPlotly({plot_rank_charts()  }) 
   
+  ###############################################.
   #Downloading data
   rank_csv <- reactive({ format_csv(rank_bar_data()) })
-
+  
   output$download_rank <- downloadHandler(filename =  'rank_data.csv',
-    content = function(file) {write.csv(rank_csv(), file, row.names=FALSE) })
+                                          content = function(file) {write.csv(rank_csv(), file, row.names=FALSE) })
   
   #Downloading chart
   output$download_rankplot <- downloadHandler(
     filename = 'rank.png',
     content = function(file){
-      ggsave(file, plot = plot_rank_ggplot(), device = "png", scale=5, limitsize=FALSE)
+      export(p = plot_rank_charts() %>% 
+               layout(title = paste0(input$indic_rank, "<br>", make_rank_subtitle()),
+                      margin = list(t = 180)),
+             file = file)
     })
   
-#####################################.    
-### Map ----
-#####################################. 
-#####################.
-# Reactive controls
-  #Dynamic selection of the last period available based on indicator selected
-  output$year_ui_map <- renderUI({
-    time_period <- sort(unique(optdata$trend_axis[optdata$indicator == input$indic_map  &
-                                                    optdata$areatype == input$geotype_map]))
-    
-    selectInput("year_map", "Time period",
-                choices = time_period, selected = last(time_period))
-  })
-  
-  #Dropdown for geotype based on what data is available for that indicator
-  output$geotype_ui_map <- renderUI({
-    areas <- sort(unique(optdata$areatype[optdata$indicator == input$indic_map]))
-    #taking out areas without shapefiles
-    areas <- areas [! areas %in% c("Scotland", "HSC locality", 
-                                   "Alcohol & drug partnership")]
-    selectInput("geotype_map", label = "Geography level",
-                choices = areas, selected = "Health board")
-  })
-  
-  # Years to compare with depending on what data is available
-  output$yearcomp_ui_map <- renderUI({
-    map_pol <- optdata %>% subset(areatype == input$geotype_map & 
-                                    indicator==input$indic_map)
-    
-    years <- c(min(map_pol$year):max(map_pol$year))
-    periods <- c(sort(paste0(unique(map_pol$trend_axis[map_pol$year>=min(map_pol$year) &
-                                                         map_pol$year<=max(map_pol$year)]))))
-    
-    selectInput("yearcomp_map", "Baseline year", choices = periods,
-                selectize=TRUE)
-  })
-  
+  #####################################.    
+  ### Map ----
+  #####################################. 
+  #####################.
+  # Reactive controls: it uses the ones from the rank section
   ###############################################.
   # Indicator definitions
   #Subsetting by domain and profile. Profile is fiddly as vector uses abbreviations 
   # so needs to be converted to the names to match techdoc.
-  defs_data_map <- reactive({techdoc %>% subset(input$indic_map == indicator_name)})
+  defs_data_map <- reactive({techdoc %>% subset(input$indic_rank == indicator_name)})
   
   output$defs_text_map <- renderUI({
     
@@ -1757,90 +1772,34 @@ showModal(welcome_modal)
   })
   
   #####################.
-  # Dynamic data
-  # Dataset for comparator chosen by user
-  map_compar <- reactive({
-    
-    if (input$comp_map == 1){
-      #Fiddly way of selecting period because some cases (e.g. Life expectancy)
-      #might have different periods for the same year, e.g. IZ 2013 is 2011-2015
-      #and HB 2013 is 2012-2014.
-      year_chosen <- unique(optdata$year[optdata$trend_axis == input$year_map])
-      
-      map_compar <- optdata %>% subset(year %in% year_chosen & 
-                                         areatype %in% c("Health board", "Council area", "Scotland") &
-                                         areaname == input$geocomp_map &
-                                         indicator == input$indic_map) %>% 
-        droplevels()
-      
-    } else if (input$comp_map == 2) { #if time comparison selected
-      
-      map_compar <- optdata %>% subset(areatype == input$geotype_map &
-                                         trend_axis == input$yearcomp_map & 
-                                         indicator==input$indic_map) %>% 
-        rename(comp_value = measure, comp_name = areaname) %>% 
-        select(code, comp_value, comp_name) %>% #to allow merging
-        droplevels()
-      
-    }
-  }) 
-  
-  #Dataset for area type chosen by user
-  map_chosenarea <- reactive({ 
-    map_chosenarea <- optdata %>% 
-      subset(areatype == input$geotype_map &
-               trend_axis==input$year_map & 
-               indicator==input$indic_map) %>% 
-      droplevels() #dropping missing factor levels to allow merging
-    
-    if (input$comp_map == 1) { #for area comparisons
-      map_chosenarea <- map_chosenarea %>% 
-        mutate(comp_value = map_compar()$measure, #comparator value and name
-               comp_name = map_compar()$areaname) 
-      
-    } else if (input$comp_map == 2) { #if time comparison selected
-      #This helps to deals with cases of incomplete data, e.g. 2011 has all HB but 2013 not.
-      #Works for those cases where there are more data in the past (comparator)
-      #and one for those which have more data in the present (chosen area)
-      map_chosenarea <- left_join(x = map_chosenarea, y = map_compar(), by = "code")
-
-    }
-  }) 
+  # # Dynamic data - uses some of the rank ones
   
   #Merging shapefile with dynamic selection of data
   poly_map <- reactive({
-    if (input$geotype_map == "Council area"){
-      map_pol <- sp::merge(ca_bound, map_chosenarea(), by='code')
-    } else if(input$geotype_map == "Health board"){
-      map_pol <- sp::merge(hb_bound, map_chosenarea(), by='code')
-    } else if(input$geotype_map == "HSC partnership"){
-      map_pol <- sp::merge(hscp_bound, map_chosenarea(), by='code')
-    } else if(input$geotype_map == "Intermediate zone"){
-      iz_bound <- iz_bound %>% subset(council == input$iz_map)
-      
-      map_pol <- sp::merge(iz_bound, map_chosenarea(), by='code')
+    if (input$geotype_rank == "Council area"){
+      map_pol <- sp::merge(ca_bound, rank_bar_data(), by='code')
+    } else if(input$geotype_rank == "Health board"){
+      map_pol <- sp::merge(hb_bound, rank_bar_data(), by='code')
+    } else if(input$geotype_rank == "HSC partnership"){
+      map_pol <- sp::merge(hscp_bound, rank_bar_data(), by='code')
+    } else if(input$geotype_rank == "Intermediate zone"){
+      map_pol <- sp::merge(iz_bound, rank_bar_data(), by='code')
+      map_pol <- map_pol %>% subset(parent_area == input$loc_iz_rank)
+    } else {
+      map_pol <- data.frame(matrix(vector(), 0, 3)) #empty data frame
     }
     
   }) 
-  
-  ############################.
-  #Title of plot
-  output$map_title <- renderText( paste0(input$indic_map) )
-  
-  output$map_subtitle <- renderText({
-    paste0(input$geotype_map, "s compared against ",
-           input$geocomp_map, " - ", input$year_map)
-  })
   
   #####################.
   # Plotting map
   #Function to create color palette based on if signicantly different from comparator
   create_map_palette <- function(){
     case_when(
-      poly_map()$interpret == "O" ~ '#ffffff',
+      poly_map()$interpret == "O" ~ '#999966',
       is.na(poly_map()$lowci) | is.na(poly_map()$upci) | 
         is.na(poly_map()$comp_value) | is.na(poly_map()$measure) |
-        poly_map()$measure == 0 ~ '#ffffff',
+        poly_map()$measure == 0 ~ '#999966',
       poly_map()$lowci <= poly_map()$comp_value & poly_map()$upci >= poly_map()$comp_value ~'#999999',
       poly_map()$lowci > poly_map()$comp_value & poly_map()$interpret == "H" ~ '#3d99f5',
       poly_map()$lowci > poly_map()$comp_value & poly_map()$interpret == "L" ~ '#ff9933',
@@ -1873,15 +1832,30 @@ showModal(welcome_modal)
       ) 
   })
   
+  # If no data or shapefile plot no map available
+  output$map_ui <- renderUI({
+    if(is.data.frame(poly_map()) && nrow(poly_map()) == 0) {
+      h4("No map available for that geographic level.", style = "color:black")
+    } else {
+      withSpinner(leafletOutput("map", width="100%",height="600px"))
+    }
+  })
+  
   #####################.
   # Downloading data
   #Function to create map that can be downloaded
   plot_map_download <- function(){
-    color_map <- create_map_palette() #palette
-    plot(poly_map(), col=color_map)
-    title(paste0(input$indic_map, "\n", input$geotype_map, 
-                 "s compared against ", input$geocomp_map, " - ", input$year_map),
-          cex.main = 3,  line = -1)
+    
+    if(is.data.frame(poly_map()) && nrow(poly_map()) == 0) {
+      plot.new()
+      text(0.5,0.5,"No map available for that geographic level.")
+    } else {
+      color_map <- create_map_palette() #palette
+      title_map <- paste0(input$indic_rank, "\n", make_rank_subtitle())
+      
+      plot(poly_map(), col=color_map)
+      title(title_map, cex.main = 3,  line = -1) # adding title
+    }
   }
   
   
@@ -1908,235 +1882,192 @@ showModal(welcome_modal)
   
   #####################################.      
   #### Table ----
-  #####################################.      
+  #####################################. 
+  # Reactive data for IZ and locality filters
   #Filter iz_list and hscl list by parent area selection
-  interzone_filtered <- reactive({ sort(parent_iz_list$areaname[parent_iz_list$parent_area==input$iz_parent]) })
-  hsclocality_filtered <- reactive({ sort(parent_hscl_list$areaname[parent_hscl_list$parent_area==input$hscl_parent]) })
+  interzone_filtered <- reactive({ 
+    sort(parent_iz_list$areaname[parent_iz_list$parent_area==input$iz_parent]) 
+  })
   
+  hsclocality_filtered <- reactive({ 
+    sort(parent_hscl_list$areaname[parent_hscl_list$parent_area==input$hscl_parent]) 
+  })
+  
+  ###############################################.
+  # Reactive filters 
   #Filter IZ's by Parent area
   
   output$iz_filtered <- renderUI ({ 
-    if (input$iz_parent == "Show all"){ selectizeInput("iz_true", label = NULL,
-                                                       width = "229px", choices = intzone_name, selected = NULL, multiple=TRUE, options = list(maxOptions = 1300, placeholder = "Select or type specific intermediate zone")) 
-    } else {selectizeInput("iz_true", label = NULL,
-                           width = "229px", choices = interzone_filtered(), selected = NULL, multiple=TRUE, options = list(placeholder = "Select or type specific intermediate zone"))}
+    
+    if (input$iz_parent == "Show all"){ 
+      choices_selected <- intzone_name
+    } else { # if a partnership selected reduce the list of IZs shown
+      choices_selected <- interzone_filtered()
+    }
+    
+    selectizeInput("iz_true", label = NULL, width = "229px", choices = choices_selected, 
+                   selected = NULL, multiple=TRUE, options = list(maxOptions = 1300, 
+                                                                  placeholder = "Select or type specific intermediate zone"))
   }) 
   
+  #Filter HSCL's by parent area
+  output$hscl_filtered <- renderUI ({ 
+    if (input$hscl_parent == "Show all"){ 
+      choices_selected <- locality_name
+    } else {  # if a partnership selected reduce the list of localities shown
+      choices_selected <- hsclocality_filtered()
+    }
+    selectizeInput(
+      "hscl_true", label = NULL, width = "229px", choices = choices_selected, 
+      selected = NULL, multiple=TRUE, options = 
+        list(placeholder = "Select or type specific HSC locality"))
+  }) 
+  
+  #########.
+  #Clearing and modifying inputs through observes
   #select all IZ's belonging to a certain parent-area
   observe({
     if (input$iz_parent_all == "FALSE")
-      return(if (input$iz_parent == "Show all"){ updateSelectizeInput(session,"iz_true", label = NULL,
-                                                                      choices = intzone_name, selected = character(0), options = list(maxOptions = 1300, placeholder = "Select or type specific intermediate zone")) 
-      } else {updateSelectizeInput(session,"iz_true", label = NULL,
-                                   choices = interzone_filtered(), selected = character(0), options = list(placeholder = "Select or type specific intermediate zone")) })
+      return(if (input$iz_parent == "Show all"){ 
+        
+        updateSelectizeInput(session,"iz_true", label = NULL,
+                             choices = intzone_name, selected = character(0), 
+                             options = list(maxOptions = 1300, 
+                                            placeholder = "Select or type specific intermediate zone")) 
+      } else {
+        updateSelectizeInput(
+          session,"iz_true", label = NULL, choices = interzone_filtered(), 
+          selected = character(0), options = 
+            list(placeholder = "Select or type specific intermediate zone")) 
+      }
+      ) #return bracket
     
     isolate({
-      updateSelectizeInput(session, "iz_true", label = NULL,
-                           choices = intzone_name, selected = interzone_filtered(), options = list(placeholder = "Select or type specific intermediate zone")) })
-  })
+      updateSelectizeInput(
+        session, "iz_true", label = NULL, choices = intzone_name, 
+        selected = interzone_filtered(), options = 
+          list(placeholder = "Select or type specific intermediate zone")) })
+  })#end of observe
   
-  #when you change initial filter, clear the second list of geographies anc checkbox
+  #when you change initial filter, clear the second list of geographies and checkbox
   observeEvent(input$iz_parent, {
-    updateCheckboxInput(session, "iz_parent_all", label = NULL, value = FALSE)
-    if (input$iz_parent == "Show all"){ selectizeInput("iz_true", label = NULL,
-                                                       width = "229px", choices = intzone_name, selected = NULL, multiple=TRUE, options = list(maxOptions = 1300, placeholder = "Select or type specific intermediate zone")) 
-    } else {selectizeInput("iz_true", label = NULL,
-                           choices = interzone_filtered(), selected = character(0), multiple=TRUE, options = list(placeholder = "Select or type specific intermediate zone"))}
     
+    updateCheckboxInput(session, "iz_parent_all", label = NULL, value = FALSE)
+    
+    if (input$iz_parent == "Show all"){ 
+      selectizeInput(
+        "iz_true", label = NULL, width = "229px", 
+        choices = intzone_name, selected = NULL, multiple=TRUE, options = 
+          list(maxOptions = 1300, placeholder = "Select or type specific intermediate zone")) 
+    } else {
+      selectizeInput(
+        "iz_true", label = NULL, choices = interzone_filtered(), 
+        selected = character(0), multiple=TRUE, options =
+          list(placeholder = "Select or type specific intermediate zone"))
+    }
   })
   
-  #Filter HSCL's by parent area
-  
-  output$hscl_filtered <- renderUI ({ 
-    if (input$hscl_parent == "Show all"){ selectizeInput("hscl_true", label = NULL,
-                                                         width = "229px", choices = locality_name, selected = NULL, multiple=TRUE, options = list(maxOptions = 1300, placeholder = "Select or type specific HSC locality")) 
-    } else {selectizeInput("hscl_true", label = NULL,
-                           width = "229px", choices = hsclocality_filtered(), selected = NULL, multiple=TRUE, options = list(placeholder = "Select or type specific HSC locality"))}
-  }) 
   
   #select all IZ's belonging to a certain parent-area
   observe({
     if (input$hscl_parent_all == "FALSE")
-      return(if (input$hscl_parent == "Show all"){ updateSelectizeInput(session,"hscl_true", label = NULL,
-                                                                        choices = locality_name, selected = character(0), options = list(maxOptions = 1300, placeholder = "Select or type specific HSC locality")) 
-      } else {updateSelectizeInput(session,"hscl_true", label = NULL,
-                                   choices = hsclocality_filtered(), selected = character(0), options = list(placeholder = "Select or type specific HSC locality"))})
+      return(if (input$hscl_parent == "Show all"){ 
+        updateSelectizeInput(
+          session,"hscl_true", label = NULL,choices = locality_name, 
+          selected = character(0), options = 
+            list(maxOptions = 1300, placeholder = "Select or type specific HSC locality")) 
+      } else {
+        updateSelectizeInput(
+          session,"hscl_true", label = NULL, choices = hsclocality_filtered(), 
+          selected = character(0), options = 
+            list(placeholder = "Select or type specific HSC locality"))
+      }
+      ) #return bracket
     
     isolate({
-      updateSelectizeInput(session, "hscl_true", label = NULL,
-                           choices = locality_name, selected = hsclocality_filtered(),options = list(placeholder = "Select or type specific HSC locality")) })
-  })
+      updateSelectizeInput(
+        session, "hscl_true", label = NULL, choices = locality_name, 
+        selected = hsclocality_filtered(), options = 
+          list(placeholder = "Select or type specific HSC locality")) 
+    })
+  }) #end of observe
   
   #when you change initial filter, clear the second list of geographies anc checkbox
   observeEvent(input$hscl_parent, {
     updateCheckboxInput(session, "hscl_parent_all", label = NULL, value = FALSE)
-    if (input$hscl_parent == "Show all"){ selectizeInput("hscl_true", label = NULL,
-                                                         width = "229px", choices = locality_name, selected = NULL, multiple=TRUE, options = list(maxOptions = 1300, placeholder = "Select or type specific HSC locality")) 
-    } else {selectizeInput("hscl_true", label = NULL,
-                           choices = hsclocality_filtered(), selected = character(0), multiple=TRUE, options = list(placeholder = "Select or type specific HSC locality"))}
     
+    if (input$hscl_parent == "Show all"){ 
+      selectizeInput(
+        "hscl_true", label = NULL, width = "229px", choices = locality_name, 
+        selected = NULL, multiple=TRUE, options = 
+          list(maxOptions = 1300, placeholder = "Select or type specific HSC locality")) 
+    } else {
+      selectizeInput(
+        "hscl_true", label = NULL, choices = hsclocality_filtered(), 
+        selected = character(0), multiple=TRUE, options = 
+          list(placeholder = "Select or type specific HSC locality"))
+    }
   })
-  
   
   #to clear choices when boxes are unticked/radio button is changed
-  observeEvent(input$iz=="FALSE", {
+  observeEvent(input$iz=="FALSE", { #for IZs
     updateCheckboxInput(session, "iz_parent_all", label = NULL, value = FALSE)
     updateSelectizeInput(session, "iz_true", label = NULL,
-                         choices = intzone_name, selected = character(0), options = list(placeholder = "Select or type specific intermediate zone")) 
-    updateSelectizeInput(session, "iz_parent", label = "Filter list by HSC partnership", selected = "Show all")})
+                         choices = intzone_name, selected = character(0), options = 
+                           list(placeholder = "Select or type specific intermediate zone")) 
+    updateSelectizeInput(session, "iz_parent", label = "Filter intermediate zone list by HSC partnership", 
+                         selected = "Show all")
+  })
   
-  observeEvent(input$la=="FALSE", {
-    updateSelectizeInput(session, "la_true", label = NULL,
-                         choices = la_name, selected = character(0), options = list(placeholder = "Select or type specific council area")) })
-  observeEvent(input$hb=="FALSE", {
+  observeEvent(input$la=="FALSE", {#for CAs
+    updateSelectizeInput(session, "la_true", label = NULL, choices = la_name, 
+                         selected = character(0), options = 
+                           list(placeholder = "Select or type specific council area")) 
+  })
+  
+  observeEvent(input$hb=="FALSE", { #for HBs
     updateSelectizeInput(session, "hb_true", label = NULL,
-                         choices = hb_name, selected = character(0), options = list(placeholder = "Select or type specific health board")) })
-  observeEvent(input$hscl=="FALSE", {
+                         choices = hb_name, selected = character(0),
+                         options = list(placeholder = "Select or type specific health board")) 
+  })
+  
+  observeEvent(input$hscl=="FALSE", { #for localities
     updateSelectizeInput(session, "hscl_true", label = NULL,
-                         choices = locality_name, selected = character(0), options = list(placeholder = "Select or type specific HSC locality"))
-    updateSelectizeInput(session, "hscl_parent", label = "Filter list by HSC partnership", selected = "Show all")})
-  observeEvent(input$hscp=="FALSE", {
+                         choices = locality_name, selected = character(0), options = 
+                           list(placeholder = "Select or type specific HSC locality"))
+    
+    updateSelectizeInput(session, "hscl_parent", label = "Filter locality list by HSC partnership",
+                         selected = "Show all")
+  })
+  
+  observeEvent(input$hscp=="FALSE", { #for hsc partnerships
     updateSelectizeInput(session, "hscp_true", label = NULL,
-                         choices = partnership_name, selected = character(0), options = list(placeholder = "Select or type specific HSC partnership")) })
-  observeEvent(input$adp=="FALSE", {
+                         choices = partnership_name, selected = character(0), options = 
+                           list(placeholder = "Select or type specific HSC partnership"))
+  })
+  
+  observeEvent(input$adp=="FALSE", { #for ADPs
     updateSelectizeInput(session, "adp_true", label = NULL,
-                         choices = adp_name, selected = character(0), options = list(placeholder = "Select or type specific ADP")) })
-  observeEvent(input$product_filter, {
+                         choices = adp_name, selected = character(0), options = 
+                           list(placeholder = "Select or type specific ADP")) 
+  })
+  
+  observeEvent(input$product_filter, { # for indicator/topic/profile filters
     updateSelectizeInput(session,"indicator_filter", label = NULL,
-                         choices = indicator_list, selected = character(0),
-                         options = list(maxOptions = 1000, placeholder = "Click or type indicators to filter by"))
-    updateSelectizeInput(session,"topic_filter", label = NULL, choices = topic_list, selected = NULL,
-                         options = list(maxOptions = 1000, placeholder = "Click or type domains to filter by"))
-    updateSelectizeInput(session,"profile_filter", label = NULL, choices = profile_list, selected = NULL,
-                         options = list(maxOptions = 1000, placeholder = "Click or type profiles to filter by"))
+                         choices = indicator_list, selected = character(0), options = 
+                           list(maxOptions = 1000,
+                                placeholder = "Click or type indicators to filter by"))
     
+    updateSelectizeInput(session,"topic_filter", label = NULL, choices = topic_list, 
+                         selected = NULL, options = 
+                           list(maxOptions = 1000, 
+                                placeholder = "Click or type domains to filter by"))
+    
+    updateSelectizeInput(session,"profile_filter", label = NULL, choices = profile_list, 
+                         selected = NULL, options = 
+                           list(maxOptions = 1000, 
+                                placeholder = "Click or type profiles to filter by"))
   })
-  
-  filter_table <- reactive ({
-    
-    #if list of indicators selected
-    if (!is.null(input$indicator_filter)) { 
-      if (input$all_data == TRUE) {
-        filtered_geos <- optdata %>%  filter(year>=input$date_from[1] & year<=input$date_from[2]) %>% 
-          filter(indicator %in% input$indicator_filter)
-      } else {filtered_geo <- optdata %>% filter((areaname %in% input$iz_true & areatype == "Intermediate zone")|
-                                                   (areaname %in% input$la_true & areatype == "Council area")|
-                                                   (areaname %in% input$hb_true & areatype == "Health board")|
-                                                   (areaname %in% input$adp_true & areatype == "Alcohol & drug partnership")|
-                                                   (areaname %in% input$hscl_true & areatype == "HSC locality")|
-                                                   (areaname %in% input$hscp_true & areatype == "HSC partnership")|
-                                                   (code %in% input$code)
-      ) %>% filter(year>=input$date_from[1] & year<=input$date_from[2]) %>% filter(indicator %in% input$indicator_filter)
-      
-      filtered_geo2 <- if (input$scotland == TRUE) {
-        optdata %>% filter(areaname == "Scotland") %>% filter(year>=input$date_from[1] & year<=input$date_from[2]) %>% 
-          filter(indicator %in% input$indicator_filter)
-        
-      }      
-      
-      filtered_geos <- rbind(filtered_geo,filtered_geo2)
-      
-      }
-      
-      table <- filtered_geos %>% subset(select=c("code", "areaname", "areatype", "indicator","year", 
-                                                 "def_period","numerator", "measure", "lowci","upci","type_definition"))
-      
-      #if list of domains selected
-    } else if (!is.null(input$topic_filter)) { 
-      if (input$all_data == TRUE) {
-        filtered_geos <- optdata %>%  filter(year>=input$date_from[1] & year<=input$date_from[2]) %>% 
-          filter((domain1 %in% input$topic_filter)|(domain2 %in% input$topic_filter)|(domain3 %in% input$topic_filter))
-      } else {filtered_geo <- optdata %>% filter((areaname %in% input$iz_true & areatype == "Intermediate zone")|
-                                                   (areaname %in% input$la_true & areatype == "Council area")|
-                                                   (areaname %in% input$hb_true & areatype == "Health board")|
-                                                   (areaname %in% input$adp_true & areatype == "Alcohol & drug partnership")|
-                                                   (areaname %in% input$hscl_true & areatype == "HSC locality")|
-                                                   (areaname %in% input$hscp_true & areatype == "HSC partnership")|
-                                                   (code %in% input$code)
-      ) %>% filter(year>=input$date_from[1] & year<=input$date_from[2]) %>% 
-        filter((domain1 %in% input$topic_filter)|(domain2 %in% input$topic_filter)|(domain3 %in% input$topic_filter))
-      
-      filtered_geo2 <- if (input$scotland == TRUE) {
-        optdata %>% filter(areaname == "Scotland") %>% filter(year>=input$date_from[1] & year<=input$date_from[2]) %>% 
-          filter((domain1 %in% input$topic_filter)|(domain2 %in% input$topic_filter)|(domain3 %in% input$topic_filter))
-        
-      }  
-      
-      filtered_geos <- rbind(filtered_geo,filtered_geo2)
-      
-      } 
-      
-      table <- filtered_geos %>% subset(select=c("code", "areaname", "areatype", "indicator","year", 
-                                                 "def_period","numerator", "measure", "lowci","upci","type_definition"))
-      
-      #if list of profiles selected    
-    } else if (!is.null(input$profile_filter)) { 
-      if (input$all_data == TRUE) {
-        filtered_geos <- optdata %>%  filter(year>=input$date_from[1] & year<=input$date_from[2]) %>% 
-          filter((grepl((paste("^",input$profile_filter,sep="",collapse="|")),profile_domain1))|(grepl((paste("^",input$profile_filter,sep="",collapse="|")),profile_domain2)))
-      } else {filtered_geo <- optdata %>% filter((areaname %in% input$iz_true & areatype == "Intermediate zone")|
-                                                   (areaname %in% input$la_true & areatype == "Council area")|
-                                                   (areaname %in% input$hb_true & areatype == "Health board")|
-                                                   (areaname %in% input$adp_true & areatype == "Alcohol & drug partnership")|
-                                                   (areaname %in% input$hscl_true & areatype == "HSC locality")|
-                                                   (areaname %in% input$hscp_true & areatype == "HSC partnership")|
-                                                   (code %in% input$code)
-      ) %>% filter(year>=input$date_from[1] & year<=input$date_from[2]) %>% 
-        filter((grepl((paste("^",input$profile_filter,sep="",collapse="|")),profile_domain1))|(grepl((paste("^",input$profile_filter,sep="",collapse="|")),profile_domain2)))
-      
-      filtered_geo2 <- if (input$scotland == TRUE) {
-        optdata %>% filter(areaname == "Scotland") %>% filter(year>=input$date_from[1] & year<=input$date_from[2]) %>% 
-          filter((grepl((paste("^",input$profile_filter,sep="",collapse="|")),profile_domain1))|(grepl((paste("^",input$profile_filter,sep="",collapse="|")),profile_domain2)))
-        
-      }
-      
-      filtered_geos <- rbind(filtered_geo,filtered_geo2)
-      
-      } 
-      
-      table <- filtered_geos %>% subset(select=c("code", "areaname", "areatype", "indicator","year", 
-                                                 "def_period","numerator", "measure", "lowci","upci","type_definition"))
-    } else { 
-      if (input$all_data == TRUE) {
-        filtered_geos <- optdata %>%  filter(year>=input$date_from[1] & year<=input$date_from[2])
-        
-      } else {filtered_geo <- optdata %>% filter((areaname %in% input$iz_true & areatype == "Intermediate zone")|
-                                                   (areaname %in% input$la_true & areatype == "Council area")|
-                                                   (areaname %in% input$hb_true & areatype == "Health board")|
-                                                   (areaname %in% input$adp_true & areatype == "Alcohol & drug partnership")|
-                                                   (areaname %in% input$hscl_true & areatype == "HSC locality")|
-                                                   (areaname %in% input$hscp_true & areatype == "HSC partnership")|
-                                                   (code %in% input$code)
-      ) %>% filter(year>=input$date_from[1] & year<=input$date_from[2])
-      
-      filtered_geo2 <- if (input$scotland == TRUE) {
-        optdata %>% filter(areaname == "Scotland") %>% filter(year>=input$date_from[1] & year<=input$date_from[2])
-        
-      }
-      
-      filtered_geos <- rbind(filtered_geo,filtered_geo2)
-      
-      } 
-      
-      table <- filtered_geos %>% subset(select=c("code", "areaname", "areatype", "indicator","year", 
-                                                 "def_period","numerator", "measure", "lowci","upci","type_definition", "data_source", "last_updated", "next_update"))
-      
-    }
-    
-    
-  })
-  
-  #display table based on selection made by user on indicator tab
-  output$table_filtered <- DT::renderDataTable({
-    
-    DT::datatable(filter_table(),
-                  style = 'bootstrap', rownames = FALSE, options = list(dom = 'tp', language = list(
-                    zeroRecords = "No records found matching your selection - have you selected a geography? See 'Indicator definitions' under the Info tab for Geographies available."), columnDefs = list(list(visible=FALSE, targets=c(4,8,9)))), 
-                  colnames = c("Area code", "Area", "Type", "Indicator", "Year","Period", "Numerator", 
-                               "Measure", "Lower CI","Upper CI", "Definition")
-    )
-  })
-  
   
   #Clearing all user inputs to default
   observeEvent(input$clear, {
@@ -2175,8 +2106,168 @@ showModal(welcome_modal)
     
   })
   
+  ###############################################.
+  # Preparing reactive data for table output
+  filter_table <- reactive ({
+    if (is.null(input$indicator_filter) & is.null(input$topic_filter) & 
+        is.null(input$profile_filter)) {
+      # if no data selected create empty dataset to avoid app crashing
+      table <- data.frame(code = factor(), areaname = factor(), areatype = factor(), 
+                          indicator = factor(), year = double(), 
+                          def_period = factor(), numerator =double(), measure =double(), 
+                          lowci =double(), upci=double(), type_definition = factor())
+      
+      #if list of indicators selected
+    } else {
+      if (!is.null(input$indicator_filter)) { 
+        if (input$all_data == TRUE) {
+          filtered_geos <- optdata %>%  
+            filter(year>=input$date_from[1] & year<=input$date_from[2] & 
+                     indicator %in% input$indicator_filter)
+        } else {
+          filtered_geo <- optdata %>% 
+            filter((areaname %in% input$iz_true & areatype == "Intermediate zone")|
+                     (areaname %in% input$la_true & areatype == "Council area")|
+                     (areaname %in% input$hb_true & areatype == "Health board")|
+                     (areaname %in% input$adp_true & areatype == "Alcohol & drug partnership")|
+                     (areaname %in% input$hscl_true & areatype == "HSC locality")|
+                     (areaname %in% input$hscp_true & areatype == "HSC partnership")|
+                     (code %in% input$code)) %>% 
+            filter(year>=input$date_from[1] & year<=input$date_from[2] & 
+                     indicator %in% input$indicator_filter)
+          
+          filtered_geo2 <- if (input$scotland == TRUE) {
+            optdata %>% filter(areaname == "Scotland" &
+                                 (year>=input$date_from[1] & year<=input$date_from[2]) &
+                                 indicator %in% input$indicator_filter)
+          }      
+          
+          filtered_geos <- rbind(filtered_geo, filtered_geo2)
+          
+        }
+        
+        #if list of domains selected
+      } else if (!is.null(input$topic_filter)) { 
+        if (input$all_data == TRUE) {
+          filtered_geos <- optdata %>%  
+            filter(year>=input$date_from[1] & year<=input$date_from[2] &
+                     (domain1 %in% input$topic_filter|domain2 %in% input$topic_filter|
+                        domain3 %in% input$topic_filter))
+          
+        } else {
+          
+          filtered_geo <- optdata %>% 
+            filter((areaname %in% input$iz_true & areatype == "Intermediate zone")|
+                     (areaname %in% input$la_true & areatype == "Council area")|
+                     (areaname %in% input$hb_true & areatype == "Health board")|
+                     (areaname %in% input$adp_true & areatype == "Alcohol & drug partnership")|
+                     (areaname %in% input$hscl_true & areatype == "HSC locality")|
+                     (areaname %in% input$hscp_true & areatype == "HSC partnership")|
+                     code %in% input$code) %>% 
+            filter(year>=input$date_from[1] & year<=input$date_from[2] & 
+                     (domain1 %in% input$topic_filter|domain2 %in% input$topic_filter|
+                        domain3 %in% input$topic_filter))
+          
+          filtered_geo2 <- if (input$scotland == TRUE) {
+            optdata %>% 
+              filter(areaname == "Scotland" & 
+                       year>=input$date_from[1] & year<=input$date_from[2] & 
+                       (domain1 %in% input$topic_filter|domain2 %in% input$topic_filter|
+                          domain3 %in% input$topic_filter))
+          }  
+          
+          # Merging together Scotland and other areas selected
+          filtered_geos <- rbind(filtered_geo, filtered_geo2)
+          
+        } #end of else statement
+        
+        #if list of profiles selected    
+      } else if (!is.null(input$profile_filter)) { 
+        if (input$all_data == TRUE) {
+          filtered_geos <- optdata %>%  
+            filter(year>=input$date_from[1] & year<=input$date_from[2]) %>% 
+            filter((grepl((paste("^",input$profile_filter,sep="",collapse="|")),
+                          profile_domain1))|(grepl((paste("^",input$profile_filter,sep="",collapse="|")),
+                                                   profile_domain2)))
+        } else {
+          filtered_geo <- optdata %>% 
+            filter((areaname %in% input$iz_true & areatype == "Intermediate zone")|
+                     (areaname %in% input$la_true & areatype == "Council area")|
+                     (areaname %in% input$hb_true & areatype == "Health board")|
+                     (areaname %in% input$adp_true & areatype == "Alcohol & drug partnership")|
+                     (areaname %in% input$hscl_true & areatype == "HSC locality")|
+                     (areaname %in% input$hscp_true & areatype == "HSC partnership")|
+                     (code %in% input$code)) %>% 
+            filter(year>=input$date_from[1] & year<=input$date_from[2]) %>% 
+            filter((grepl((paste("^",input$profile_filter,sep="",collapse="|")),
+                          profile_domain1))|
+                     (grepl((paste("^",input$profile_filter,sep="",collapse="|")),
+                            profile_domain2)))
+          
+          filtered_geo2 <- if (input$scotland == TRUE) {
+            optdata %>% 
+              filter(areaname == "Scotland" &
+                       year>=input$date_from[1] & year<=input$date_from[2]) %>% 
+              filter((grepl((paste("^",input$profile_filter,sep="",collapse="|")),
+                            profile_domain1))|(grepl((paste("^",input$profile_filter,sep="",collapse="|")),
+                                                     profile_domain2)))
+            
+          }
+          # Merging together Scotland and other areas selected
+          filtered_geos <- rbind(filtered_geo,filtered_geo2)
+          
+        } 
+        # if all available geographies checkbox checked
+        if (input$all_data == TRUE) {
+          filtered_geos <- optdata %>%  
+            filter(year>=input$date_from[1] & year<=input$date_from[2])
+          
+        } else {
+          filtered_geo <- optdata %>% 
+            filter((areaname %in% input$iz_true & areatype == "Intermediate zone")|
+                     (areaname %in% input$la_true & areatype == "Council area")|
+                     (areaname %in% input$hb_true & areatype == "Health board")|
+                     (areaname %in% input$adp_true & areatype == "Alcohol & drug partnership")|
+                     (areaname %in% input$hscl_true & areatype == "HSC locality")|
+                     (areaname %in% input$hscp_true & areatype == "HSC partnership")|
+                     (code %in% input$code)) %>% 
+            filter(year>=input$date_from[1] & year<=input$date_from[2])
+          
+          filtered_geo2 <- if (input$scotland == TRUE) {
+            optdata %>% 
+              filter(areaname == "Scotland" &
+                       year>=input$date_from[1] & year<=input$date_from[2])
+            
+          }
+          # Merging together Scotland and other areas selected
+          filtered_geos <- rbind(filtered_geo,filtered_geo2)
+          
+        } 
+        
+      } #end of the else if statement
+      
+      table <- filtered_geos %>% select(code, areaname, areatype, indicator, year, 
+                                        def_period, numerator, measure, lowci, upci, type_definition)
+    } #end of the whole if statement
+    
+  })
   
-  #Downloading data in csv format
+  #display table based on selection made by user on indicator tab
+  output$table_filtered <- DT::renderDataTable({
+    
+    DT::datatable(filter_table(),
+                  style = 'bootstrap', rownames = FALSE, options = list(dom = 'tp', language = list(
+                    zeroRecords = "No records found matching your selection - 
+                    have you selected a geography and at least one indicator/domain/profile? 
+                    See 'Indicator definitions' under the Info tab for Geographies available."), 
+                    columnDefs = list(list(visible=FALSE, targets=c(4,8,9)))), 
+                  colnames = c("Area code", "Area", "Type", "Indicator", "Year","Period", "Numerator", 
+                               "Measure", "Lower CI","Upper CI", "Definition")
+                  )
+  })
+  
+  ###############################################.
+  # Downloading data in csv format
   table_csv <- reactive({ format_csv(filter_table()) })
   
   #The filters the user applies in the data table will determine what data they download - indicator tab table
@@ -2188,20 +2279,59 @@ showModal(welcome_modal)
   )
   
   #################################################.
-  ##  Technical Doc Page
-  #################################################
+  ##  Technical Doc Page ----
+  #################################################.
+  # Reactive data
   indicator_selected <- reactive({ filter(techdoc,techdoc$indicator_name==input$indicator_defined)})
   
-  output$indicator <- renderValueBox({
-    #valueBox("Definition", definitions$indicator_definition[definitions$indicator_name==input$indicator_defined], icon = icon ("book"),color = "blue", width = 8)
+  ###############################################.
+  # Reactive filter
+  #Filter indicator list by  profile or by domain 
+  output$indicator_chosen <- renderUI ({
     
-    valueBox(tags$p(indicator_selected()$indicator_name, style="color: white; font-size: 30px; font-weight: bold;"), HTML(paste("<b>","Indicator number:","</b>",indicator_selected()$indicator_number,br(),"<b>","Profile:","</b>",indicator_selected()$profile,br(),
-                                                                                                                                "<b>","Domain:","</b>",indicator_selected()$domain)), icon = icon ("book"),color = "blue")
+    if (input$profile_defined != "Show all"){
+      indic_selection <- sort(unique(c(as.character(optdata$indicator[grep(input$profile_defined,optdata$profile_domain1)]),
+                                       as.character(optdata$indicator[grep(input$profile_defined,optdata$profile_domain2)] ))))
+    } else if (input$topic_defined != "Show all"){
+      indic_selection <- sort(unique(optdata$indicator[optdata$domain1==input$topic_defined|
+                                                         optdata$domain2==input$topic_defined|
+                                                         optdata$domain3==input$topic_defined]))
+    } else { 
+      indic_selection <- indicator_list
+    }
     
-  })
-  #  valueBox(tags$p(techdoc$indicator_name[techdoc$indicator_name==input$indicator_defined], style="color: white; font-size: 30px; font-weight: bold;"), HTML(paste("<b>","Indicator number:","</b>",techdoc$indicator_number[techdoc$indicator_name==input$indicator_defined],br(),"<b>","Profile:","</b>",techdoc$profile[techdoc$indicator_name==input$indicator_defined])), icon = icon ("book"),color = "blue")
+    selectizeInput("indicator_defined", label = "Select indicator to see technical information for",
+                   width = "510px", choices = indic_selection, 
+                   selected = character(0), multiple=TRUE, 
+                   options = list(placeholder = "Select your indicator of interest", maxItems = 1)) 
+  }) 
   
-  #  })
+  #To keep it simple, when you change profile, reset topic and vice versa.
+  observeEvent(input$profile_defined, { 
+    if (input$topic_defined != "Show all" && input$profile_defined != "Show all"){ 
+      updateSelectizeInput(session,"topic_defined", label = "Or by domain",
+                           choices = topic_list_filter, selected = "Show all")
+    }
+  })
+  
+  observeEvent(input$topic_defined, { 
+    if (input$profile_defined != "Show all" && input$topic_defined != "Show all"){ 
+      updateSelectizeInput(session,"profile_defined", label = "Filter by profile",
+                           choices = profile_list_filter, selected = "Show all")
+    }
+  })
+  
+  ###############################################.
+  # Creating text and titles for info
+  # Title box
+  output$indicator <- renderValueBox({
+    
+    valueBox(tags$p(indicator_selected()$indicator_name, style="color: white; font-size: 30px; font-weight: bold;"), 
+             HTML(paste("<b>","Profile:","</b>",indicator_selected()$profile,br(),
+                        "<b>","Domain:","</b>",indicator_selected()$domain)), icon = icon ("book"),color = "blue")
+  })
+  
+  # Text for all metadata parts of the indicator
   output$definition <- renderText ({indicator_selected()$indicator_definition })
   output$rationale <- renderText ({ indicator_selected()$inclusion_rationale})
   output$source <- renderText ({indicator_selected()$data_source})
@@ -2226,34 +2356,13 @@ showModal(welcome_modal)
   output$supporting_info <- renderText ({indicator_selected()$supporting_information})
   output$next_update <- renderText ({indicator_selected()$next_update})
   
-  #Filter indicator list by  profile or by domain
-  profile_filtered_list <- reactive({ sort(unique(c(as.character(optdata$indicator[grep(input$profile_defined,optdata$profile_domain1)]),as.character(optdata$indicator[grep(input$profile_defined,optdata$profile_domain2)] )))) })
-  topic_filtered_list <- reactive({ sort(unique(optdata$indicator[optdata$domain1==input$topic_defined|optdata$domain2==input$topic_defined|optdata$domain3==input$topic_defined])) })
   
-  output$indicator_chosen <- renderUI ({ 
-    if (input$profile_defined != "Show all"){ selectizeInput("indicator_defined", label = "Select indicator to see technical information for",
-                                                             width = "510px", choices = profile_filtered_list(), selected = character(0), multiple=TRUE, options = list(placeholder = "Select your indicator of interest", maxItems = 1)) 
-    } else if (input$topic_defined != "Show all"){ selectizeInput("indicator_defined", label = "Select indicator to see technical information for",
-                                                                  width = "510px", choices = topic_filtered_list(), selected = character(0), multiple=TRUE, options = list(placeholder = "Select your indicator of interest", maxItems = 1)) 
-      
-    } else {selectizeInput("indicator_defined", label = "Select indicator to see technical information for",
-                           width = "510px", choices = indicator_list, selected = character(0), multiple=TRUE, options = list(placeholder = "Select your indicator of interest", maxItems = 1))}
-  }) 
-  
-  #To keep it simple, when you change profile, reset topic and vice versa.
-  observeEvent(input$profile_defined, { 
-    if (input$topic_defined != "Show all" && input$profile_defined != "Show all"){ updateSelectizeInput(session,"topic_defined", label = "Or by Topic",
-                                                                                                        choices = topic_list_filter, selected = "Show all")}
-  })
-  observeEvent(input$topic_defined, { 
-    if (input$profile_defined != "Show all" && input$topic_defined != "Show all"){ updateSelectizeInput(session,"profile_defined", label = "Filter by Profile",
-                                                                                                        choices = profile_list_filter, selected = "Show all")}
-  })
-  
+  ###############################################.
   #Download definitions table for selected indicator
-  
   indicator_definitions <- reactive({ techdoc %>% filter(indicator_name == input$indicator_defined)})
+  
   indicator_csv <- reactive({ format_definitions_csv(indicator_definitions()) })
+  
   output$definitions_by_indicator <- downloadHandler(
     filename ="indicator_definitions.csv",
     content = function(file) {
@@ -2261,25 +2370,7 @@ showModal(welcome_modal)
                 file, row.names=FALSE) } 
   )
   
-  ########################
-  #Re-open Modal
-  ########################
-  
-  observeEvent(input$openModal, {
-    showModal(
-      welcome_modal
-    )
-  })
-  
-  
 } #server closing bracket
 
 #########################  END ----
-
-
-
-
-
-
-
 
