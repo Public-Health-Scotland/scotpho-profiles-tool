@@ -116,7 +116,8 @@ tabPanel(
     fluidRow(
       #Summary box
       column(6, class="landing-page-column",
-             fluidRow(h4("Explore data by profile", style="margin-top:0px; ")),
+             fluidRow(h4("Explore data by profile", style="margin-top:0px; 
+                         color:black; text-align: center; ")),
              div(class="landing-page-box", 
                  div("Profile summary", class = "landing-page-box-title"),
                  div(class = "landing-page-icon", style="background-image: url(heatmap_2.png);
@@ -126,7 +127,8 @@ tabPanel(
                               icon = icon("arrow-circle-right", "icon-lp")))),
       #Table box 
       column(6, class="landing-page-column",
-             fluidRow(h4("Access the data behind the tool", style="margin-top:0px; ")),
+             fluidRow(h4("Access the data behind the tool", style="margin-top:0px; 
+                         color:black; text-align: center; ")),
              div(class="landing-page-box", 
                  div("Data", class = "landing-page-box-title"),
                  div(class = "landing-page-icon", style="background-image: url(data_table.png);
@@ -135,7 +137,8 @@ tabPanel(
                               class="landing-page-button", 
                               icon = icon("arrow-circle-right", "icon-lp"))
                  ))),
-    fluidRow(h4("Explore a single indicator in more detail")),
+    fluidRow(h4("Explore a single indicator in more detail", style="margin-top:0px; 
+                         color:black; text-align: center; ")),
     #2nd row of boxes
     fluidRow(
       #Trend plot box
@@ -164,7 +167,8 @@ tabPanel(
                  actionButton('jump_to_map', 'Compare geographical variation for an indicator using a map', 
                               class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp"))))
     ),
-    fluidRow(h4("Find supporting information")),
+    fluidRow(h4("Find supporting information", style="margin-top:0px; 
+                         color:black; text-align: center; ")),
     fluidRow(
       #About box
       column(6, class="landing-page-column",
@@ -212,7 +216,7 @@ tabPanel(
 ###############################################.
 tabPanel("Summary", icon = icon("list-ul"), value = "summary",
          wellPanel( #Filter options
-           column(2,
+           column(3,
                   selectInput("profile_summary", "Profile", choices = profile_list),
                   # domain if spine selected
                   conditionalPanel(condition = 'input.chart_summary == "Spine"',
@@ -227,34 +231,10 @@ tabPanel("Summary", icon = icon("list-ul"), value = "summary",
                   ),
                   uiOutput("geoname_ui_summary")
            ),
-           column(2,
-                  conditionalPanel(condition = 'input.chart_summary %in% c("Snapshot", "Trend") ',
-                    awesomeRadio("comp_summary", label = "Compare against",
-                               choices = list("Area" = 1, "Time" = 2), 
-                               selected = 1, inline=TRUE, checkbox = TRUE),
-                  conditionalPanel(condition = "input.comp_summary == 1 ",  
-                                   selectInput("geocomp_summary", "Compare with", choices = comparator_list,
-                                               selectize=TRUE, selected = "Scotland")
-                  ),
-                  conditionalPanel(condition = "input.comp_summary == 2 ", 
-                                   uiOutput("yearcomp_ui_summary")
-                  )),
-                  conditionalPanel(condition = 'input.chart_summary == "Spine"',
-                                   selectizeInput("geocomp_spine", "Select a comparison area", 
-                                                  choices = comparator_list, selected = "Scotland"))
+           column(3,
+                  uiOutput("comp_ui_summary") # comparator options
            ),
            column(3,
-                  #Legend
-                  p(img(src='signif_better.png', height=18, style="padding-right: 2px; vertical-align:middle"), 
-                    "Better than comparator", br(),
-                    img(src='non_signif.png', height=18, style="padding-right: 2px; vertical-align:middle"), 
-                    "Not different to comparator", br(),
-                    img(src='signif_worse.png', height=18, style="padding-right: 2px; vertical-align:middle"), 
-                    "Worse than comparator", br(),
-                    img(src='signif_nocalc.png', height=18, style="padding-right: 2px; vertical-align:middle"), 
-                    "No differences can be calculated")
-           ),
-           column(2,
                   actionButton("help_summary",label="Help", icon= icon('question-circle'), class ="down"),
                   actionButton("defs_summary",label="Definitions", icon= icon('info'), class ="down"),
                   downloadButton('download_summary', 'Download data', class = "down"),
@@ -262,41 +242,41 @@ tabPanel("Summary", icon = icon("list-ul"), value = "summary",
                     savechart_button('download_spineplot', 'Save chart',  class = "down"))
                   # savechart_button('download_summaryplot', 'Save chart',  class = "down")
            ),
-           div(radioGroupButtons("chart_summary", label= "", status = "primary", 
-                             choices = c("Snapshot", "Trend", "Spine"), justified = TRUE),
-               style = "width:50%; margin-left: 25%") # centering div
+           div(style = "width:74%; margin-left: 13%", # centering div
+               p("Select what type of summary you want to see: 
+                  snapshot is a comparison with the latest data available, 
+             trend will show how things are changing over time, and 
+             spine compares indicators with the rest of areas of the same level.")),
+           div(style = "width:50%; margin-left: 25%", # centering div
+             radioGroupButtons("chart_summary", status = "primary", justified = TRUE,
+                             choices = c("Snapshot", "Trend", "Spine"), label= "" )) 
          ), #well panel bracket
-         wellPanel(
-           column(4,
-                  h4(textOutput("spine_title"), style="color: black; text-align: left"),
-                  h5(textOutput("spine_subtitle"), style="color: black; text-align: left")),
-           column(3,
-                  br(),
-                  br(),
-                  p(img(src='signif_better.png', height=18, style="padding-right: 2px; vertical-align:middle"), 
-                    "Better than comparator", br(),
-                    img(src='non_signif.png', height=18, style="padding-right: 2px; vertical-align:middle"), 
-                    "Not different to comparator", br(),
-                    img(src='signif_worse.png', height=18, style="padding-right: 2px; vertical-align:middle"), 
-                    "Worse than comparator", br(),
-                    img(src='signif_nocalc.png', height=18, style="padding-right: 2px; vertical-align:middle"), 
-                    "No differences can be calculated")),
-           column(5,
-                  br(),
-                  br(),
-                  uiOutput("ui_spine_legend_selected"),
-                  uiOutput("ui_spine_legend_areatype"),
-                  uiOutput("ui_spine_legend_comparator"))
-         ),
          mainPanel(width = 12,
                    bsModal("mod_defs_summary", "Definitions", "defs_summary", htmlOutput('defs_text_summary')),
-                   h4(textOutput("summary_title"), style="color: black; text-align: left"),
-                   h5(textOutput("summary_subtitle"), style="color: black; text-align: left"),
+                   fluidRow(column(4,
+                          h4(textOutput("summary_title"), style="color: black; text-align: left"),
+                          h5(textOutput("summary_subtitle"), style="color: black; text-align: left")
+                          ),
+                   column(3,
+                          br(),
+                          br(),
+                          p(img(src='signif_better.png', height=18, style="padding-right: 2px; vertical-align:middle"), 
+                            "Better than comparator", br(),
+                            img(src='non_signif.png', height=18, style="padding-right: 2px; vertical-align:middle"), 
+                            "Not different to comparator", br(),
+                            img(src='signif_worse.png', height=18, style="padding-right: 2px; vertical-align:middle"), 
+                            "Worse than comparator", br(),
+                            img(src='signif_nocalc.png', height=18, style="padding-right: 2px; vertical-align:middle"), 
+                            "No differences can be calculated")),
+                   conditionalPanel(condition = 'input.chart_summary == "Spine"', 
+                        column(5,
+                          br(),
+                          br(),
+                          uiOutput("ui_spine_legend_selected"),
+                          uiOutput("ui_spine_legend_areatype"),
+                          uiOutput("ui_spine_legend_comparator")))),
                    # Depending what users selects different visualizations
-                   conditionalPanel(condition = 'input.chart_summary %in% c("Snapshot", "Trend") ',
-                                    uiOutput("summary_ui_plots")),
-                   conditionalPanel(condition = 'input.chart_summary == "Spine"',
-                                    withSpinner(uiOutput("ui_spine_plot")))
+                          uiOutput("summary_ui_plots")
         )
   ), #Tab panel bracket
 ###############################################.
@@ -697,7 +677,7 @@ navbarMenu("Info", icon = icon("info-circle"),
                         tags$li(class= "li-custom", tags$a(href="https://github.com/Health-SocialCare-Scotland/ScotPHO-profile-indicators",
                                                            "Indicator production code", class="externallink"), 
                                 " and ",
-                                tags$a(href="https://github.com/Health-SocialCare-Scotland/ScotPHO-profile-tool",
+                                tags$a(href="https://github.com/ScotPHO/scotpho-profiles-tool",
                                        "Profile tool code", class="externallink"), 
                                 "- Access the code used to produce the indicator data and this tool"),
                         #Link to population lookups

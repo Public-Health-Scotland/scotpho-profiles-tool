@@ -342,11 +342,28 @@ showModal(welcome_modal)
   
 
   # Years to compare with depending on what data is available
-  output$yearcomp_ui_summary <- renderUI({
+  output$comp_ui_summary <- renderUI({
     
     years <- c(min(summary_chosen_area()$year):max(summary_chosen_area()$year))
     
-    selectizeInput("yearcomp_summary", "Baseline year", choices = years)
+    if (input$chart_summary %in% c("Snapshot", "Trend")) {
+      tagList( 
+        awesomeRadio("comp_summary", label = "Compare against",
+                     choices = list("Area" = 1, "Time" = 2), 
+                     selected = 1, inline=TRUE, checkbox = TRUE),
+        conditionalPanel(condition = "input.comp_summary == 1 ",  
+                         selectInput("geocomp_summary", "Select a comparison area", choices = comparator_list,
+                                     selectize=TRUE, selected = "Scotland")
+        ),
+        conditionalPanel(condition = "input.comp_summary == 2 ", 
+                         selectizeInput("yearcomp_summary", "Baseline year", choices = years)
+        )
+      )
+    } else if (input$chart_summary == "Spine") {
+      selectizeInput("geocomp_spine", "Select a comparison area", 
+                     choices = comparator_list, selected = "Scotland")
+    }
+
   })
   
   #####################.
@@ -678,8 +695,14 @@ showModal(welcome_modal)
           h5("Population", style="color: black; text-align: center; font-weight: bold;"),
           div(align = "center", withSpinner(plotlyOutput("heat_pop_pop", height = "auto")))
         )#taglist bracket
-      }
-    } # end of if else == "Trend"
+      } # end of if else == "Trend"
+    } else if (input$chart_summary == "Spine") {
+      # Resize plot height for display in app
+      tagList(withSpinner( plotOutput("spine_plot", height=spine_plot_height(), width="90%")),
+              br(),
+              br()
+              )
+    } # end of if else == "Spine"
     
   })
   
@@ -1150,13 +1173,6 @@ showModal(welcome_modal)
     else {plot_spine()}
   })
   
-  
-  # Resize plot height for display in app
-  output$ui_spine_plot <-renderUI({
-    plotOutput("spine_plot", height=spine_plot_height(), width="100%")
-  })
-  
-  
   #Create text output for responsive plot legend
   #legend - selected area - green
   output$ui_spine_legend_selected <- renderUI({
@@ -1172,16 +1188,7 @@ showModal(welcome_modal)
   output$ui_spine_legend_areatype <- renderUI({
     img(src='bar_legend_areatype.jpg', height=18, style="padding-right: 2px; vertical-align:middle",paste(input$geotype_summary))
   }) 
-  
-  output$spine_title <- renderText({
-    paste(names(profile_list[unname(profile_list) == input$profile_summary]),
-          " profile: ", input$topic_spine,sep="")
-  })
-  
-  output$spine_subtitle <- renderText({
-    paste(input$geoname_summary," (",input$geotype_summary,") compared against ",input$geocomp_spine,sep="")
-  })    
-  
+
   #####################.
   # Downloading spine plot and data  
   # Define data file to download
