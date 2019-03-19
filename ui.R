@@ -234,17 +234,16 @@ tabPanel("Summary", icon = icon("list-ul"), value = "summary",
                     savechart_button('download_spineplot', 'Save chart',  class = "down"))
                   # savechart_button('download_summaryplot', 'Save chart',  class = "down")
            ),
-           div(style = "width:74%; margin-left: 13%", # centering div
-               p("Select what type of summary you want to see: 
-                  snapshot is a comparison with the latest data available, 
-             trend will show how things are changing over time, and 
-             spine compares indicators with the rest of areas of the same level.")),
-           div(style = "width:50%; margin-left: 25%", # centering div
+           div(style = "width:60%; margin-left: 20%; min-width: 350px", # centering div
              radioGroupButtons("chart_summary", status = "primary", justified = TRUE,
-                             choices = c("Snapshot", "Trend", "Spine"), label= "" )) 
+                             choices = c("Snapshot", "Trend", "Spine"), label= "Select what type of summary you want to see: 
+                  snapshot is a comparison with the latest data available, 
+                             trend will show how things are changing over time, and 
+                             spine compares indicators with the rest of areas of the same level." )) 
          ), #well panel bracket
          mainPanel(width = 12,
-                   bsModal("mod_defs_summary", "Definitions", "defs_summary", htmlOutput('defs_text_summary')),
+                   bsModal("mod_defs_summary", "Definitions", "defs_summary",
+                           htmlOutput('defs_text_summary')),
                    fluidRow(column(4,
                           h4(textOutput("summary_title"), style="color: black; text-align: left"),
                           h5(textOutput("summary_subtitle"), style="color: black; text-align: left")
