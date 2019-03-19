@@ -494,9 +494,29 @@ function(input, output, session) {
   # and profile selected
   output$summary_ui_plots <- renderUI({
     
+    # Preparing a brief explanation for each visualisation 
+    if (input$chart_summary == "Snapshot") {
+      explanation_text <- p("This visualisation shows all the indicators of the profile you
+            have chosen. The latest data available for each one of them is
+                                    compared against the selected comparator. The color of the boxes reflects if
+                                    the differences are significant or not.")
+    } else if (input$chart_summary == "Trend") {
+      explanation_text <- p("This visualisation shows all the indicators of the profile you
+            have chosen. The latest data available for each one of them is
+                                    compared against the selected comparator. The color of the boxes reflects if
+                                    the differences are significant or not.")
+    } else if (input$chart_summary == "Spine") {
+      explanation_text <- p("This visualisation shows all the indicators of the domain you
+                            have chosen. The latest data available for each one of them is
+                            compared against the selected comparator. Each bar represents a different area.
+                            The color of the square to the left of the bars reflects if
+                                    the differences are significant or not.")
+    }
+    
     if (input$chart_summary == "Snapshot") {
       if (input$profile_summary == "HWB") {
         tagList(#Health and Wellbeing profile
+          explanation_text,
           column(4,
                  h5("Behaviours", style="color: black; text-align: center; font-weight: bold;"),
                  div(align = "center", withSpinner(plotlyOutput("summ_hwb_beha", height = "auto"))),
@@ -528,6 +548,7 @@ function(input, output, session) {
         ) #taglist bracket
       } else if (input$profile_summary == "CYP") {
         tagList(#Children and young people profile
+          explanation_text,
           column(4,
                  h5("Active", style="color: black; text-align: center; font-weight: bold;"),
                  div(align = "center", withSpinner(plotlyOutput("summ_cyp_active", height = "auto"))),
@@ -551,6 +572,7 @@ function(input, output, session) {
         )# taglist bracket
       } else if (input$profile_summary == "ALC") {
         tagList(#Alcohol profile
+          explanation_text,
           column(4,
                  h5("Environment", style="color: black; text-align: center; font-weight: bold;"),
                  div(align = "center", withSpinner(plotlyOutput("summ_alc_env", height = "auto"))),
@@ -572,6 +594,7 @@ function(input, output, session) {
         )#taglist bracket
       } else if (input$profile_summary == "DRG") {
         tagList(#Drugs profile
+          explanation_text,
           column(4,
                  h5("Environment", style="color: black; text-align: center; font-weight: bold;"),
                  div(align = "center", withSpinner(plotlyOutput("summ_drg_env", height = "auto"))),
@@ -595,6 +618,7 @@ function(input, output, session) {
         )#taglist bracket
       } else if (input$profile_summary == "MEN") {
         tagList(#Mental Health profile
+          explanation_text,
           column(4,
                  h5("Female adult", style="color: black; text-align: center; font-weight: bold;"),
                  div(align = "center", withSpinner(plotlyOutput("summ_men_fem", height = "auto")))
@@ -610,6 +634,7 @@ function(input, output, session) {
         )#taglist bracket
       } else if (input$profile_summary == "TOB") {
         tagList(#Tobacco profile
+          explanation_text,
           column(4,
                  h5("Smoking in school children", style="color: black; text-align: center; font-weight: bold;"),
                  div(align = "center", withSpinner(plotlyOutput("summ_tob_school", height = "auto"))),
@@ -631,6 +656,7 @@ function(input, output, session) {
         )#taglist bracket
       } else if (input$profile_summary == "POP") {
         tagList(#Population profile
+          explanation_text,
           h5("Population", style="color: black; text-align: center; font-weight: bold;"),
           div(align = "center", withSpinner(plotlyOutput("summ_pop_pop", height = "auto")))
         )#taglist bracket
@@ -638,6 +664,7 @@ function(input, output, session) {
     } else if (input$chart_summary == "Trend") { #IF SELECTED HEATMAP
       if (input$profile_summary == "HWB") {
         tagList(#Health and Wellbeing profile
+          explanation_text,
           h5("Behaviours", style="color: black; text-align: center; font-weight: bold;"),
           withSpinner(plotlyOutput("heat_hwb_beha", height = "auto")),
           h5("Social care & housing", style="color: black; text-align: center; font-weight: bold;"),
@@ -663,6 +690,7 @@ function(input, output, session) {
         )
       } else if (input$profile_summary == "CYP") {
         tagList(#Children and young people profile
+          explanation_text,
           h5("Active", style="color: black; text-align: center; font-weight: bold;"),
           div(align = "center", withSpinner(plotlyOutput("heat_cyp_active", height = "auto"))),
           h5("Healthy", style="color: black; text-align: center; font-weight: bold;"),
@@ -680,6 +708,7 @@ function(input, output, session) {
         )# taglist bracket
       } else if (input$profile_summary == "ALC") {
         tagList(#Alcohol profile
+          explanation_text,
           h5("Environment", style="color: black; text-align: center; font-weight: bold;"),
           div(align = "center", withSpinner(plotlyOutput("heat_alc_env", height = "auto"))),
           h5("Services", style="color: black; text-align: center; font-weight: bold;"),
@@ -695,6 +724,7 @@ function(input, output, session) {
         )#taglist bracket
       } else if (input$profile_summary == "DRG") {
         tagList(#Drugs profile
+          explanation_text,
           h5("Environment", style="color: black; text-align: center; font-weight: bold;"),
           div(align = "center", withSpinner(plotlyOutput("heat_drg_env", height = "auto"))),
           h5("Services", style="color: black; text-align: center; font-weight: bold;"),
@@ -712,6 +742,7 @@ function(input, output, session) {
         )#taglist bracket
       } else if (input$profile_summary == "MEN") {
         tagList(#Mental Health profile
+          explanation_text,
           h5("Female adult", style="color: black; text-align: center; font-weight: bold;"),
           div(align = "center", withSpinner(plotlyOutput("heat_men_fem", height = "auto"))),
           h5("Male adult", style="color: black; text-align: center; font-weight: bold;"),
@@ -721,6 +752,7 @@ function(input, output, session) {
         )#taglist bracket
       } else if (input$profile_summary == "TOB") {
         tagList(#Tobacco profile
+          explanation_text,
           h5("Smoking in school children", style="color: black; text-align: center; font-weight: bold;"),
           div(align = "center", withSpinner(plotlyOutput("heat_tob_school", height = "auto"))),
           h5("Smoking cessation & smoking cessation products", style="color: black; text-align: center; font-weight: bold;"),
@@ -736,13 +768,16 @@ function(input, output, session) {
         )#taglist bracket
       } else if (input$profile_summary == "POP") {
         tagList(#Population profile
+          explanation_text,
           h5("Population", style="color: black; text-align: center; font-weight: bold;"),
           div(align = "center", withSpinner(plotlyOutput("heat_pop_pop", height = "auto")))
         )#taglist bracket
       } # end of if else == "Trend"
     } else if (input$chart_summary == "Spine") {
       # Resize plot height for display in app
-      tagList(withSpinner( plotOutput("spine_plot", height=spine_plot_height(), width="90%")),
+      tagList(
+        explanation_text,
+        withSpinner( plotOutput("spine_plot", height=spine_plot_height(), width="90%")),
               br(),
               br()
               )
