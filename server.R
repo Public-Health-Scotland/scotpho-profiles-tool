@@ -351,19 +351,11 @@ function(input, output, session) {
   
   #####################.
   # Reactive controls
-  # Reactive controls for areatype depending on profile selected
-  output$geotype_ui_summary <- renderUI({
+  # Reactive controls for profile depending on area selected
+  output$profile_ui_summary <- renderUI({
     
-    areas <- areatype_profile[[names(profile_list[unname(profile_list) == input$profile_summary])]]
-    
-    if (input$chart_summary == "Spine") {
-      areas <- areas[! areas %in% c("Scotland")]
-    } else {
-      areas <- areas
-    }
-    
-    selectInput("geotype_summary", "Geography level", choices=areas,
-                selected = "Health board")
+    profiles <- profile_areatype[input$geotype_summary]
+    selectInput("profile_summary", "Profile", choices = profiles)
     
   })
   

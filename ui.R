@@ -209,13 +209,9 @@ tabPanel(
 tabPanel("Summary", icon = icon("list-ul"), value = "summary",
          wellPanel( #Filter options
            column(3,
-                  selectInput("profile_summary", "Profile", choices = profile_list),
-                  # domain if spine selected
-                  conditionalPanel(condition = 'input.chart_summary == "Spine"',
-                                   uiOutput("topic_ui_spine"))
-           ),
-           column(3,
-                  uiOutput("geotype_ui_summary"),
+                  p(tags$b("Step 1. Select your area")),
+                  selectInput("geotype_summary", "Geography level", choices=areatype_list,
+                              selected = "Health board"),
                   conditionalPanel(#Conditional panel for extra dropdown for localities & IZ
                     condition = "input.geotype_summary== 'HSC locality' | input.geotype_summary == 'Intermediate zone' ",
                     selectInput("loc_iz_summary", label = "Partnership for localities/intermediate zones",
@@ -224,6 +220,14 @@ tabPanel("Summary", icon = icon("list-ul"), value = "summary",
                   uiOutput("geoname_ui_summary")
            ),
            column(3,
+                  p(tags$b("Step 2. Select a profile ")),
+                  uiOutput("profile_ui_summary"),
+                  # domain if spine selected
+                  conditionalPanel(condition = 'input.chart_summary == "Spine"',
+                                   uiOutput("topic_ui_spine"))
+           ),
+           column(3,
+                  p(tags$b("Step 3. Select a comparator ")),
                   uiOutput("comp_ui_summary") # comparator options
            ),
            column(3,
@@ -236,7 +240,7 @@ tabPanel("Summary", icon = icon("list-ul"), value = "summary",
            ),
            div(style = "width:60%; margin-left: 20%; min-width: 350px", # centering div
              radioGroupButtons("chart_summary", status = "primary", justified = TRUE,
-                             choices = c("Snapshot", "Trend", "Spine"), label= "Select what type of summary you want to see: 
+                             choices = c("Snapshot", "Trend", "Spine"), label= "Step 4. Select what type of summary you want to see: 
                   snapshot is a comparison with the latest data available, 
                              trend will show how things are changing over time, and 
                              spine compares indicators with the rest of areas of the same level." )) 

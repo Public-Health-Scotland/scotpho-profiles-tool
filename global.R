@@ -157,6 +157,27 @@ areatype_profile <- list(
                    "HSC locality", "HSC partnership",  "Intermediate zone", "Scotland") 
 )
 
+profile_areatype <- list(
+  "Scotland" = setNames(c('HWB','CYP','ALC','DRG','MEN', "TOB", "POP"),
+                        c('Health & wellbeing','Children & young people','Alcohol',
+                          'Drugs','Mental Health', "Tobacco control", "Population")),
+  "Health board" = setNames(c('HWB','CYP','ALC','DRG', "TOB", "POP"),
+                            c('Health & wellbeing','Children & young people','Alcohol',
+                              'Drugs', "Tobacco control", "Population")),
+  "Council area" = setNames(c('HWB','CYP','ALC','MEN', "TOB", "POP"),
+                            c('Health & wellbeing','Children & young people','Alcohol',
+                              'Mental Health', "Tobacco control", "Population")),
+  "HSC partnership" = setNames(c('HWB','CYP', "POP"),
+                               c('Health & wellbeing','Children & young people', "Population")),
+  "HSC locality" = setNames(c('HWB','CYP', "POP"),
+                            c('Health & wellbeing','Children & young people', "Population")),
+  "Intermediate zone" = setNames(c('HWB','CYP', "POP"),
+                                 c('Health & wellbeing','Children & young people', "Population")),
+  "Alcohol & drug partnership" = setNames(c('ALC','DRG', "POP"),
+                                          c('Alcohol','Drugs', "Population"))
+)
+  
+
 ###############################################.
 ## Palettes ----
 ###############################################.   
