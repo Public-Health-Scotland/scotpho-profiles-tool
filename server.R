@@ -1938,139 +1938,140 @@ showModal(welcome_modal)
                           indicator = factor(), year = double(), 
                           def_period = factor(), numerator =double(), measure =double(), 
                           lowci =double(), upci=double(), type_definition = factor())
-
-    #if list of indicators selected
-    } else {
-      if (!is.null(input$indicator_filter)) { 
-        if (input$all_data == TRUE) {
-        filtered_geos <- optdata %>%  
-          filter(year>=input$date_from[1] & year<=input$date_from[2] & 
-                   indicator %in% input$indicator_filter)
-        } else {
-        filtered_geo <- optdata %>% 
-          filter((areaname %in% input$iz_true & areatype == "Intermediate zone")|
-                   (areaname %in% input$la_true & areatype == "Council area")|
-                   (areaname %in% input$hb_true & areatype == "Health board")|
-                   (areaname %in% input$adp_true & areatype == "Alcohol & drug partnership")|
-                   (areaname %in% input$hscl_true & areatype == "HSC locality")|
-                   (areaname %in% input$hscp_true & areatype == "HSC partnership")|
-                   (code %in% input$code)) %>% 
-          filter(year>=input$date_from[1] & year<=input$date_from[2] & 
-                   indicator %in% input$indicator_filter)
-        
-        filtered_geo2 <- if (input$scotland == TRUE) {
-          optdata %>% filter(areaname == "Scotland" &
-                               (year>=input$date_from[1] & year<=input$date_from[2]) &
-                               indicator %in% input$indicator_filter)
-        }      
-        
-        filtered_geos <- rbind(filtered_geo, filtered_geo2)
-        
-      }
       
-      #if list of domains selected
-    } else if (!is.null(input$topic_filter)) { 
-      if (input$all_data == TRUE) {
-        filtered_geos <- optdata %>%  
-          filter(year>=input$date_from[1] & year<=input$date_from[2] &
-                   (domain1 %in% input$topic_filter|domain2 %in% input$topic_filter|
-                      domain3 %in% input$topic_filter))
+      #if list of indicators selected
+    } else {
+      if (!is.null(input$indicator_filter)) { #if indicator selected
+        if (input$all_data == TRUE) {
+          filtered_geos <- optdata %>%  
+            filter(year>=input$date_from[1] & year<=input$date_from[2] & 
+                     indicator %in% input$indicator_filter)
+        } else {
+          filtered_geo <- optdata %>% 
+            filter((areaname %in% input$iz_true & areatype == "Intermediate zone")|
+                     (areaname %in% input$la_true & areatype == "Council area")|
+                     (areaname %in% input$hb_true & areatype == "Health board")|
+                     (areaname %in% input$adp_true & areatype == "Alcohol & drug partnership")|
+                     (areaname %in% input$hscl_true & areatype == "HSC locality")|
+                     (areaname %in% input$hscp_true & areatype == "HSC partnership")|
+                     (code %in% input$code)) %>% 
+            filter(year>=input$date_from[1] & year<=input$date_from[2] & 
+                     indicator %in% input$indicator_filter)
+          
+          filtered_geo2 <- if (input$scotland == TRUE) {
+            optdata %>% filter(areaname == "Scotland" &
+                                 (year>=input$date_from[1] & year<=input$date_from[2]) &
+                                 indicator %in% input$indicator_filter)
+          }      
+          
+          filtered_geos <- rbind(filtered_geo, filtered_geo2)
+          
+        }
         
-      } else {
-        
-        filtered_geo <- optdata %>% 
-          filter((areaname %in% input$iz_true & areatype == "Intermediate zone")|
-                   (areaname %in% input$la_true & areatype == "Council area")|
-                   (areaname %in% input$hb_true & areatype == "Health board")|
-                   (areaname %in% input$adp_true & areatype == "Alcohol & drug partnership")|
-                   (areaname %in% input$hscl_true & areatype == "HSC locality")|
-                   (areaname %in% input$hscp_true & areatype == "HSC partnership")|
-                   code %in% input$code) %>% 
-          filter(year>=input$date_from[1] & year<=input$date_from[2] & 
-                   (domain1 %in% input$topic_filter|domain2 %in% input$topic_filter|
-                      domain3 %in% input$topic_filter))
-        
-        filtered_geo2 <- if (input$scotland == TRUE) {
-          optdata %>% 
-            filter(areaname == "Scotland" & 
-                     year>=input$date_from[1] & year<=input$date_from[2] & 
+        #if list of domains selected
+      } else if (!is.null(input$topic_filter)) { 
+        if (input$all_data == TRUE) {
+          filtered_geos <- optdata %>%  
+            filter(year>=input$date_from[1] & year<=input$date_from[2] &
                      (domain1 %in% input$topic_filter|domain2 %in% input$topic_filter|
                         domain3 %in% input$topic_filter))
-        }  
+          
+        } else {
+          
+          filtered_geo <- optdata %>% 
+            filter((areaname %in% input$iz_true & areatype == "Intermediate zone")|
+                     (areaname %in% input$la_true & areatype == "Council area")|
+                     (areaname %in% input$hb_true & areatype == "Health board")|
+                     (areaname %in% input$adp_true & areatype == "Alcohol & drug partnership")|
+                     (areaname %in% input$hscl_true & areatype == "HSC locality")|
+                     (areaname %in% input$hscp_true & areatype == "HSC partnership")|
+                     code %in% input$code) %>% 
+            filter(year>=input$date_from[1] & year<=input$date_from[2] & 
+                     (domain1 %in% input$topic_filter|domain2 %in% input$topic_filter|
+                        domain3 %in% input$topic_filter))
+          
+          filtered_geo2 <- if (input$scotland == TRUE) {
+            optdata %>% 
+              filter(areaname == "Scotland" & 
+                       year>=input$date_from[1] & year<=input$date_from[2] & 
+                       (domain1 %in% input$topic_filter|domain2 %in% input$topic_filter|
+                          domain3 %in% input$topic_filter))
+          }  
+          
+          # Merging together Scotland and other areas selected
+          filtered_geos <- rbind(filtered_geo, filtered_geo2)
+          
+        } #end of else statement
         
-        # Merging together Scotland and other areas selected
-        filtered_geos <- rbind(filtered_geo, filtered_geo2)
-        
-      } #end of else statement
-      
-      #if list of profiles selected    
-    } else if (!is.null(input$profile_filter)) { 
-      if (input$all_data == TRUE) {
-        filtered_geos <- optdata %>%  
-          filter(year>=input$date_from[1] & year<=input$date_from[2]) %>% 
-          filter((grepl((paste("^",input$profile_filter,sep="",collapse="|")),
-                        profile_domain1))|(grepl((paste("^",input$profile_filter,sep="",collapse="|")),
-                                                 profile_domain2)))
-      } else {
-        filtered_geo <- optdata %>% 
-          filter((areaname %in% input$iz_true & areatype == "Intermediate zone")|
-                   (areaname %in% input$la_true & areatype == "Council area")|
-                   (areaname %in% input$hb_true & areatype == "Health board")|
-                   (areaname %in% input$adp_true & areatype == "Alcohol & drug partnership")|
-                   (areaname %in% input$hscl_true & areatype == "HSC locality")|
-                   (areaname %in% input$hscp_true & areatype == "HSC partnership")|
-                   (code %in% input$code)) %>% 
-          filter(year>=input$date_from[1] & year<=input$date_from[2]) %>% 
-          filter((grepl((paste("^",input$profile_filter,sep="",collapse="|")),
-                        profile_domain1))|
-                   (grepl((paste("^",input$profile_filter,sep="",collapse="|")),
-                          profile_domain2)))
-        
-        filtered_geo2 <- if (input$scotland == TRUE) {
-          optdata %>% 
-            filter(areaname == "Scotland" &
-                     year>=input$date_from[1] & year<=input$date_from[2]) %>% 
-            filter((grepl((paste("^",input$profile_filter,sep="",collapse="|")),
-                          profile_domain1))|(grepl((paste("^",input$profile_filter,sep="",collapse="|")),
+        #if list of profiles selected    
+      } else if (!is.null(input$profile_filter)) { 
+        if (input$all_data == TRUE) {
+          filtered_geos <- optdata %>%  
+            filter(year>=input$date_from[1] & year<=input$date_from[2]) %>% 
+            filter((grepl((paste0("^",input$profile_filter,collapse="|")),
+                          profile_domain1))|(grepl((paste0("^",input$profile_filter,collapse="|")),
                                                    profile_domain2)))
+        } else {
+          filtered_geo <- optdata %>% 
+            filter((areaname %in% input$iz_true & areatype == "Intermediate zone")|
+                     (areaname %in% input$la_true & areatype == "Council area")|
+                     (areaname %in% input$hb_true & areatype == "Health board")|
+                     (areaname %in% input$adp_true & areatype == "Alcohol & drug partnership")|
+                     (areaname %in% input$hscl_true & areatype == "HSC locality")|
+                     (areaname %in% input$hscp_true & areatype == "HSC partnership")|
+                     (code %in% input$code)) %>% 
+            filter(year>=input$date_from[1] & year<=input$date_from[2]) %>% 
+            filter((grepl((paste0("^",input$profile_filter,collapse="|")),
+                          profile_domain1))|
+                     (grepl((paste0("^",input$profile_filter,collapse="|")),
+                            profile_domain2)))
+          
+          filtered_geo2 <- if (input$scotland == TRUE) {
+            optdata %>% 
+              filter(areaname == "Scotland" &
+                       year>=input$date_from[1] & year<=input$date_from[2]) %>% 
+              filter((grepl((paste0("^",input$profile_filter,collapse="|")),
+                            profile_domain1))|(grepl((paste0("^",input$profile_filter,collapse="|")),
+                                                     profile_domain2)))
+            
+          }
+          # Merging together Scotland and other areas selected
+          filtered_geos <- rbind(filtered_geo,filtered_geo2)
           
         }
-        # Merging together Scotland and other areas selected
-        filtered_geos <- rbind(filtered_geo,filtered_geo2)
-        
-      } 
-      # if all available geographies checkbox checked
-      if (input$all_data == TRUE) {
-        filtered_geos <- optdata %>%  
-          filter(year>=input$date_from[1] & year<=input$date_from[2])
-        
-      } else {
-        filtered_geo <- optdata %>% 
-          filter((areaname %in% input$iz_true & areatype == "Intermediate zone")|
-                   (areaname %in% input$la_true & areatype == "Council area")|
-                   (areaname %in% input$hb_true & areatype == "Health board")|
-                   (areaname %in% input$adp_true & areatype == "Alcohol & drug partnership")|
-                   (areaname %in% input$hscl_true & areatype == "HSC locality")|
-                   (areaname %in% input$hscp_true & areatype == "HSC partnership")|
-                   (code %in% input$code)) %>% 
-          filter(year>=input$date_from[1] & year<=input$date_from[2])
-        
-        filtered_geo2 <- if (input$scotland == TRUE) {
-          optdata %>% 
-            filter(areaname == "Scotland" &
-                  year>=input$date_from[1] & year<=input$date_from[2])
+      } else { #ending the profile selection bit
+        # if all available geographies checkbox checked
+        if (input$all_data == TRUE) {
+          filtered_geos <- optdata %>%  
+            filter(year>=input$date_from[1] & year<=input$date_from[2])
           
-        }
-        # Merging together Scotland and other areas selected
-        filtered_geos <- rbind(filtered_geo,filtered_geo2)
+        } else {
+          filtered_geo <- optdata %>% 
+            filter((areaname %in% input$iz_true & areatype == "Intermediate zone")|
+                     (areaname %in% input$la_true & areatype == "Council area")|
+                     (areaname %in% input$hb_true & areatype == "Health board")|
+                     (areaname %in% input$adp_true & areatype == "Alcohol & drug partnership")|
+                     (areaname %in% input$hscl_true & areatype == "HSC locality")|
+                     (areaname %in% input$hscp_true & areatype == "HSC partnership")|
+                     (code %in% input$code)) %>% 
+            filter(year>=input$date_from[1] & year<=input$date_from[2])
+          
+          filtered_geo2 <- if (input$scotland == TRUE) {
+            optdata %>% 
+              filter(areaname == "Scotland" &
+                       year>=input$date_from[1] & year<=input$date_from[2])
+            
+          }
+          # Merging together Scotland and other areas selected
+          filtered_geos <- rbind(filtered_geo,filtered_geo2)
+          
+        } 
         
-      } 
+      } #end of the else if statement for all available geographies
       
-    } #end of the else if statement
-    
-    table <- filtered_geos %>% select(code, areaname, areatype, indicator, year, 
-                                      def_period, numerator, measure, lowci, upci, type_definition)
-    } #end of the whole if statement
+      table <- filtered_geos %>% select(code, areaname, areatype, indicator, year, 
+                                        def_period, numerator, measure, lowci, upci, type_definition)
+    } #end of the whole if statement (if users have selected any data)
     
   })
   
