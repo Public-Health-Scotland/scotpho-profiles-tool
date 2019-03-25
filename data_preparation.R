@@ -7,13 +7,17 @@
 ############################.
 server_desktop <- "server"
 if (server_desktop == "server") {
-  lookups <- "/conf/phip/Projects/Profiles/Data/Lookups/"
+  lookups <- "/PHI_conf/ScotPHO/Profiles/Data/Lookups/"
   basefiles <- "/conf/phip/Projects/Profiles/Data/Scotland Localities/"
-  shapefiles <- "/conf/phip/Projects/Profiles/Data/Shapefiles/"
+  shapefiles <- "/PHI_conf/ScotPHO/Profiles/Data/Shapefiles/"
+  shiny_files <- "/PHI_conf/ScotPHO/Profiles/Data/Shiny Data/"
+  
 } else if (server_desktop == "desktop") {
-  lookups <- "//stats/phip/Projects/Profiles/Data/Lookups/"
+  lookups <- "//stats/ScotPHO/Profiles/Data/Lookups/"
   basefiles <- "//stats/phip/Projects/Profiles/Data/Scotland Localities/"
-  shapefiles <- "//stats/phip/Projects/Profiles/Data/Shapefiles"
+  shapefiles <- "//stats/ScotPHO/Profiles/Data/Shapefiles/"
+  shiny_files <- "//stats/ScotPHO/Profiles/Data/Shiny Data/"
+  
 }
 
 ############################.
@@ -32,7 +36,7 @@ library(rmapshaper) #for reducing size of shapefiles
 ## Lookups ---- 
 ###############################################.
 # Lookup with all geography codes information.
-geo_lookup<- read_spss(paste0(lookups, "code_dictionary.sav")) %>%
+geo_lookup<- read_spss(paste0(lookups, "Geography/code_dictionary.sav")) %>%
   setNames(tolower(names(.))) %>% #variables to lower case
   mutate_all(factor) %>% # converting variables into factors
   #Creating geography type variable
@@ -56,7 +60,7 @@ geo_lookup$areaname <- gsub(" and ", " & ", geo_lookup$areaname)
 geo_lookup$areaname <- gsub(" - ", "-", geo_lookup$areaname)
 
 #Bringing parent geography information
-geo_parents <- read_spss(paste0(lookups, "IZtoPartnership_parent_lookup.sav")) %>% 
+geo_parents <- read_spss(paste0(lookups, "Geography/IZtoPartnership_parent_lookup.sav")) %>% 
   setNames(tolower(names(.)))  #variables to lower case
 
 #TEMPORARY FIX. dealing with change in ca, hb and hscp codes
@@ -174,8 +178,8 @@ geo_lookup$areaname_full <- gsub("HSC locality", "HSCL", geo_lookup$areaname_ful
 geo_lookup$areaname_full <- gsub("Intermediate zone", "IZ", geo_lookup$areaname_full)
 
 geo_lookup <- as.data.frame(geo_lookup)
-saveRDS(geo_lookup, "./data/geo_lookup.rds")
-geo_lookup <- readRDS("./data/geo_lookup.rds") 
+saveRDS(geo_lookup, "data/geo_lookup.rds")
+geo_lookup <- readRDS("data/geo_lookup.rds") 
 
 ######
 #Indicator information lookup table 
@@ -197,22 +201,27 @@ optdata <- read_csv(paste0(basefiles, "All Data for Shiny.csv"),
   mutate_if(is.character,factor) #converting characters into factors
 
 # These indicators are not in the old tool, so they are added now
-part_measure <- read_csv("/conf/phip/Projects/Profiles/Data/Indicators/Shiny Data/ParticipationMeasure.csv") %>%
+part_measure <- read_csv(paste0(shiny_files, "ParticipationMeasure.csv")) %>%
   mutate(update_date = "01/11/2018") %>%
   rename(measure = rate) %>%
   mutate_if(is.character,factor) #converting characters into factors
 
-sechand_smok <- read_csv("/conf/phip/Projects/Profiles/Data/Indicators/Shiny Data/SecondhandSmoke_shiny.csv") %>%
+sechand_smok <- read_csv(paste0(shiny_files, "SecondhandSmoke_shiny.csv")) %>%
   mutate(update_date = "19/12/2018") %>%
   rename(measure = rate) %>%
   mutate_if(is.character,factor) #converting characters into factors
 
-alcohol_stays_d11 <- read_csv("/conf/phip/Projects/Profiles/Data/Indicators/Shiny Data/alcohol_stays_dz11.csv") %>%
+child_lowinc <- read_csv(paste0(shiny_files, "ChildrenLowIncome_shiny.csv")) %>%
+  mutate(update_date = "10/03/2019") %>%
+  rename(measure = rate) %>%
+  mutate_if(is.character,factor) #converting characters into factors
+
+alcohol_stays_d11 <- read_csv(paste0(shiny_files,"alcohol_stays_dz11.csv")) %>%
   mutate(update_date = "08/02/2019") %>%
   rename(measure = rate) %>%
   mutate_if(is.character,factor) #converting characters into factors
 
-alcohol_stays_adp <- read_csv("/conf/phip/Projects/Profiles/Data/Indicators/Shiny Data/alcohol_stays_ADP.csv") %>%
+alcohol_stays_adp <- read_csv(paste0(shiny_files,"alcohol_stays_ADP.csv")) %>%
   filter(substr(code,1,3)=="S11") %>% #selecting only adp level
   mutate(update_date = "08/02/2019", ind_id = 20203) %>%
   rename(measure = rate) %>%
@@ -220,14 +229,15 @@ alcohol_stays_adp <- read_csv("/conf/phip/Projects/Profiles/Data/Indicators/Shin
 
 alcohol_stays <- rbind(alcohol_stays_d11, alcohol_stays_adp)
 
-alc_deaths_adp <- read_csv("/conf/phip/Projects/Profiles/Data/Indicators/Shiny Data/alcohol_deaths_ADP_AL.csv") %>%
+alc_deaths_adp <- read_csv(paste0(shiny_files,"alcohol_deaths_ADP_AL.csv")) %>%
   filter(substr(code,1,3) == "S11") %>% #other geographies already in main file
   mutate(ind_id = 20204) %>% # so it has the same ind number as the H&W one
   mutate(update_date = "22/09/2017") %>%
   rename(measure = rate) %>%
   mutate_if(is.character,factor) #converting characters into factors
 
-optdata <- rbind(optdata, part_measure, sechand_smok, alcohol_stays, alc_deaths_adp)
+optdata <- rbind(optdata, part_measure, sechand_smok, child_lowinc,
+                 alcohol_stays, alc_deaths_adp)
 
 #TEMPORARY FIX. dealing with change in ca, hb and hscp codes
 optdata$code <- as.factor(recode(as.character(optdata$code), 
@@ -318,8 +328,8 @@ optdata <- optdata %>%
         ) #negation
       )#subset
 
-saveRDS(optdata, "./data/optdata.rds")
-optdata <- readRDS("./data/optdata.rds") 
+saveRDS(optdata, "data/optdata.rds")
+optdata <- readRDS("data/optdata.rds") 
 
 ###############################################.
 ## Profile lookup ----
@@ -331,23 +341,21 @@ profile_lookup <- data.frame(profile_domain = c(paste(unique(optdata$profile_dom
          domain = substr(profile_domain, 5, nchar(as.vector(profile_domain)))) %>% 
   select(-profile_domain)
 
-saveRDS(profile_lookup, "./data/profile_lookup.rds")
-profile_lookup <- readRDS("./data/profile_lookup.rds") 
+saveRDS(profile_lookup, "data/profile_lookup.rds")
+profile_lookup <- readRDS("data/profile_lookup.rds") 
 
 ###############################################.
 ## Technical document ----
 ###############################################.
 #This syntax updates the Technical Document table based on an online Google Drive version of the table
 #Run every time you want to refresh the data in the local copy to represent what's in the online copy
+definition_table <-read_csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vTzrwAG7IFBjLvxuxUO0vJ7mn2AgilWVA1ZJQ9oVaLOSG4mgkquMKWga8MY5g2OFkFn-3awM_GYaHjL/pub?gid=94312583&single=true&output=csv") %>% 
+  as.data.frame() %>% mutate(indicator_number = as.factor(indicator_number))
 
-definition_table <-read.csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vTzrwAG7IFBjLvxuxUO0vJ7mn2AgilWVA1ZJQ9oVaLOSG4mgkquMKWga8MY5g2OFkFn-3awM_GYaHjL/pub?gid=94312583&single=true&output=csv",
-                            sep = ",", na.strings=c("NA", " ", ""), strip.white = TRUE, stringsAsFactors = FALSE)
-
-definition_table <- as.data.frame(definition_table)
-definition_table$indicator_number <- as.factor(definition_table$indicator_number)
-
-saveRDS(definition_table,"./data/techdoc.rds")
-techdoc <- readRDS("./data/techdoc.rds") 
+saveRDS(definition_table,"data/techdoc.rds") #for opt
+techdoc <- readRDS("data/techdoc.rds") 
+#backup copy in case issues with google drive
+write_csv(definition_table,"/PHI_conf/ScotPHO/Profiles/Shiny Tool/techdoc_backup.csv") 
 
 ###############################################.
 ## Shapefiles ----
@@ -375,7 +383,7 @@ names(ca_bound@data)[names(ca_bound@data)=="name"] <- "area_name"
 ca_bound$code <- recode(as.character(ca_bound$code), 
                           "S12000015"='S12000047', "S12000024"='S12000048')
 
-saveRDS(ca_bound, "./data/CA_boundary.rds")
+saveRDS(ca_bound, "data/CA_boundary.rds")
 
 ##########################.
 ###Health board
@@ -401,7 +409,7 @@ names(hb_bound@data)[names(hb_bound@data)=="hbname"] <- "area_name"
 hb_bound$code <- recode(as.character(hb_bound$code), 
                           "S08000018"='S08000029', "S08000027"= 'S08000030')
 
-saveRDS(hb_bound, "./data/HB_boundary.rds")
+saveRDS(hb_bound, "data/HB_boundary.rds")
 
 ##########################.
 ###HSC Partnership
@@ -435,8 +443,8 @@ names(hscp_bound@data)[names(hscp_bound@data)=="hianame"] <- "area_name"
 hscp_bound$code <- recode(as.character(hscp_bound$code), 
                           "S37000014"='S37000032', "S37000023"='S37000033')
 
-saveRDS(hscp_bound, "./data/HSCP_boundary.rds")
-hscp_bound <- readRDS("./data/HSCP_boundary.rds")
+saveRDS(hscp_bound, "data/HSCP_boundary.rds")
+hscp_bound <- readRDS("data/HSCP_boundary.rds")
 
 ##########################.
 ###Intermediate zone
@@ -449,16 +457,15 @@ iz_bound_orig$council <- gsub(" and ", " & ", iz_bound_orig$council)
 iz_bound_orig$council <- gsub("Edinburgh", "City of Edinburgh", iz_bound_orig$council)
 iz_bound_orig$council <- gsub("Eilean Siar", "Na h-Eileanan Siar", iz_bound_orig$council)
 
-saveRDS(iz_bound_orig, "./data/IZ_boundary.rds")
-iz_bound <- readRDS("./data/IZ_boundary.rds")
+saveRDS(iz_bound_orig, "data/IZ_boundary.rds")
+iz_bound <- readRDS("data/IZ_boundary.rds")
 
 ###############################################.
 ## New process data ----
 ###############################################.
 #NOT READY
 #Finds all the csvs in that folder reads them and combine them.
-path <- '/conf/phip/Projects/Profiles/Data/Indicators/Shiny Data/'
-files <-  list.files(path = path, pattern = "*.csv", full.names = TRUE)
+files <-  list.files(path = shiny_files, pattern = "*.csv", full.names = TRUE)
 optdata <- as.data.frame(do.call(rbind, lapply(files, fread)))
 # optdata2 <- as.data.frame(do.call(rbind, lapply(files, read_csv)))
 
@@ -496,7 +503,7 @@ optdata$upci[optdata$supression=="Y" & (substr(optdata$type_id,1,2)=='cr' | (sub
 optdata <- optdata %>% group_by(ind_id, year, areatype) %>% 
   mutate(measure_sc = case_when(interpret=="H" ~ as.vector(rescale(measure, to=c(1,0))), 
                                 interpret=="L", as.vector(rescale(measure, to=c(0,1))),
-                                TRUE ~ 0)))  %>%
+                                TRUE ~ 0))  %>%
   ungroup()
 
 
