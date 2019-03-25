@@ -36,8 +36,7 @@ library(rmapshaper) #for reducing size of shapefiles
 ## Lookups ---- 
 ###############################################.
 # Lookup with all geography codes information.
-geo_lookup<- read_spss(paste0(lookups, "Geography/code_dictionary.sav")) %>%
-  setNames(tolower(names(.))) %>% #variables to lower case
+geo_lookup <- readRDS(paste0(lookups, "Geography/codedictionary.rds")) %>% 
   mutate_all(factor) %>% # converting variables into factors
   #Creating geography type variable
   mutate(areatype = case_when(substr(code, 1, 3) == "S00" ~ "Scotland", 
@@ -46,26 +45,20 @@ geo_lookup<- read_spss(paste0(lookups, "Geography/code_dictionary.sav")) %>%
                               substr(code, 1, 3) == "S11" ~ "Alcohol & drug partnership",
                               substr(code, 1, 3) == "S99" ~ "HSC locality",
                               substr(code, 1, 3) == "S37" ~ "HSC partnership",
-                              substr(code, 1, 3) == "S02" ~ "Intermediate zone"))
-
-#TEMPORARY FIX. dealing with change in ca, hb and hscp codes
-geo_lookup$code <- recode(as.character(geo_lookup$code), 
-                    "S12000015"='S12000047', "S12000024"='S12000048', 
-                    "S08000018"='S08000029', "S08000027"= 'S08000030', 
-                    "S37000014"='S37000032', "S37000023"='S37000033')
-
-#Changing ands for & to reduce issues with long labels
-#and " - " for "-"
-geo_lookup$areaname <- gsub(" and ", " & ", geo_lookup$areaname)
-geo_lookup$areaname <- gsub(" - ", "-", geo_lookup$areaname)
+                              substr(code, 1, 3) == "S02" ~ "Intermediate zone"),
+         #TEMPORARY FIX. dealing with change in ca, hb and hscp codes
+         code = recode(code, "S12000015"='S12000047', "S12000024"='S12000048', 
+                       "S08000018"='S08000029', "S08000027"= 'S08000030', 
+                       "S37000014"='S37000032', "S37000023"='S37000033'),
+         #Changing ands for & to reduce issues with long labels and " - " for "-"
+         areaname = gsub(" and ", " & ", areaname),
+         areaname = gsub(" - ", "-", areaname))
 
 #Bringing parent geography information
-geo_parents <- read_spss(paste0(lookups, "Geography/IZtoPartnership_parent_lookup.sav")) %>% 
-  setNames(tolower(names(.)))  #variables to lower case
-
-#TEMPORARY FIX. dealing with change in ca, hb and hscp codes
-geo_parents$hscp_partnership <- recode(as.character(geo_parents$hscp_partnership), 
-                          "S37000014"='S37000032', "S37000023"='S37000033')
+geo_parents <- readRDS(paste0(lookups, "Geography/IZtoPartnership_parent_lookup.rds")) %>% 
+  #TEMPORARY FIX. dealing with change in ca, hb and hscp codes
+  mutate(hscp_partnership = recode(hscp_partnership, "S37000014"='S37000032', 
+                                   "S37000023"='S37000033'))
 
 #Creating parent geography for IZ level.
 geo_par_iz <- geo_parents %>% 
@@ -165,19 +158,17 @@ geo_lookup <- geo_lookup %>%
   #Creating variable that includeas area name and type for trend plotting
   mutate(areaname_full = paste(areaname, "-", areatype)) %>% 
   mutate_if(is.character, factor) %>% #transforming into factors
-  select(-c(parent_code)) 
-
+  #select(-c(parent_code)) %>% 
 #Reducing length of the area type descriptor
-geo_lookup$areaname_full <- ifelse(geo_lookup$areaname == "Scotland", "Scotland",
-                                   paste(geo_lookup$areaname_full))
-geo_lookup$areaname_full <- gsub("Health board", "HB", geo_lookup$areaname_full)
-geo_lookup$areaname_full <- gsub("Council area", "CA", geo_lookup$areaname_full)
-geo_lookup$areaname_full <- gsub("Alcohol & drug partnership", "ADP", geo_lookup$areaname_full)
-geo_lookup$areaname_full <- gsub("HSC partnership", "HSCP", geo_lookup$areaname_full)
-geo_lookup$areaname_full <- gsub("HSC locality", "HSCL", geo_lookup$areaname_full)
-geo_lookup$areaname_full <- gsub("Intermediate zone", "IZ", geo_lookup$areaname_full)
+  mutate(areaname_full = ifelse(areaname == "Scotland", "Scotland",
+                                paste(areaname_full)),
+         areaname_full = gsub("Health board", "HB", areaname_full), 
+         areaname_full = gsub("Council area", "CA", areaname_full), 
+         areaname_full =gsub("Alcohol & drug partnership", "ADP", areaname_full), 
+         areaname_full =gsub("HSC partnership", "HSCP", areaname_full), 
+         areaname_full =gsub("HSC locality", "HSCL", areaname_full), 
+         areaname_full =gsub("Intermediate zone", "IZ", areaname_full))
 
-geo_lookup <- as.data.frame(geo_lookup)
 saveRDS(geo_lookup, "data/geo_lookup.rds")
 geo_lookup <- readRDS("data/geo_lookup.rds") 
 
@@ -237,19 +228,17 @@ alc_deaths_adp <- read_csv(paste0(shiny_files,"alcohol_deaths_ADP_AL.csv")) %>%
   mutate_if(is.character,factor) #converting characters into factors
 
 optdata <- rbind(optdata, part_measure, sechand_smok, child_lowinc,
-                 alcohol_stays, alc_deaths_adp)
-
+                 alcohol_stays, alc_deaths_adp) %>% 
 #TEMPORARY FIX. dealing with change in ca, hb and hscp codes
-optdata$code <- as.factor(recode(as.character(optdata$code), 
-                       "S12000015"='S12000047', "S12000024"='S12000048', 
+  mutate(code = recode(code, "S12000015"='S12000047', "S12000024"='S12000048', 
                        "S08000018"='S08000029', "S08000027"= 'S08000030', 
                        "S37000014"='S37000032', "S37000023"='S37000033'))
 
 #Dealing with lack of update_date for HSCP and HSC locality
 update_table <- optdata %>% select(c(ind_id, update_date)) %>% distinct() %>% 
-  subset(!is.na(update_date))
-update_table$update_date <- as.Date(update_table$update_date,"%m/%d/%Y")
-update_table <- update_table %>% group_by(ind_id) %>% top_n(1, update_date) %>% 
+  subset(!is.na(update_date)) %>% 
+  mutate(update_date = as.Date(update_date,"%m/%d/%Y")) %>% 
+  group_by(ind_id) %>% top_n(1, update_date) %>% 
   ungroup() %>% unique()
 
 optdata <- optdata %>% select(-update_date)
@@ -260,29 +249,36 @@ optdata <- left_join(x=optdata, y=update_table, by=c("ind_id"))
 optdata <- left_join(x=optdata, y=ind_lookup, by=c("ind_id"))
 optdata <- left_join(x=optdata, y=geo_lookup, by=c("code")) 
 
-#Apply supressions. NEEDS TO CHECK THAT IT WORKS FINE ONCE WE HAVE A REAL CASE
-# If indicator is presented as standardised rate and suppression required then suppress numerator where count is less than specified value.
+#Apply supressions. 
+# If indicator is presented as standardised rate and suppression required 
+# then suppress numerator where count is less than specified value.
 # standardised rates do not require suppression of rates or CI.
-optdata$numerator[optdata$supression=="Y" & substr(optdata$type_id,1,2)=='sr' 
-                  & optdata$numerator<optdata$supress_less_than] <- NA
-# If indicator is presented as crude rate or percentage and suppression required then suppress numerator where count is less than specified value.
+# If indicator is presented as crude rate or percentage and suppression required 
+# then suppress numerator where count is less than specified value.
 # crude rate and percentages DO require suppression of rates and CI as well as numerator.
-optdata$numerator[optdata$supression=="Y" & (substr(optdata$type_id,1,2)=='cr' | (substr(optdata$type_id,1,1))=='%') 
-                   & optdata$numerator<optdata$supress_less_than] <- NA
-optdata$measure[optdata$supression=="Y" & (substr(optdata$type_id,1,2)=='cr' | (substr(optdata$type_id,1,1))=='%') 
-                  & optdata$numerator<optdata$supress_less_than] <- NA
-optdata$lowci[optdata$supression=="Y" & (substr(optdata$type_id,1,2)=='cr' | (substr(optdata$type_id,1,1))=='%') 
-                  & optdata$numerator<optdata$supress_less_than] <- NA
-optdata$upci[optdata$supression=="Y" & (substr(optdata$type_id,1,2)=='cr' | (substr(optdata$type_id,1,1))=='%') 
-                  & optdata$numerator<optdata$supress_less_than] <- NA
+optdata <- optdata %>% 
+  mutate(numerator = case_when(#std rate case
+    supression=="Y" & substr(type_id,1,2)=='sr' & numerator<supress_less_than ~ NA_real_,
+    # crude rate and percentage cases
+    supression =="Y" & (substr(type_id,1,2)=='cr' | (substr(type_id,1,1))=='%') & 
+     numerator<supress_less_than ~ NA_real_, TRUE ~ numerator ), #if not keep numerator
+    measure = case_when(# crude rate and percentage cases
+      supression =="Y" & (substr(type_id,1,2)=='cr' | (substr(type_id,1,1))=='%') & 
+        numerator<supress_less_than ~ NA_real_, TRUE ~ measure ),
+    lowci =case_when(# crude rate and percentage cases
+      supression =="Y" & (substr(type_id,1,2)=='cr' | (substr(type_id,1,1))=='%') & 
+        numerator<supress_less_than ~ NA_real_, TRUE ~ lowci ),
+    upci =case_when(# crude rate and percentage cases
+      supression =="Y" & (substr(type_id,1,2)=='cr' | (substr(type_id,1,1))=='%') & 
+        numerator<supress_less_than ~ NA_real_, TRUE ~ upci )
+    )
 
 # Scaling measures (0 to 1) in groups by year, area type and indicator. 
 #Does not work well for Scotland totals. TRUE?
 optdata <- optdata %>% group_by(ind_id, year, areatype) %>% 
   mutate(measure_sc = case_when(interpret=="H"~ as.vector(rescale(measure, to=c(1,0))), 
                                 interpret=="L" ~ as.vector(rescale(measure, to=c(0,1))),
-                                TRUE ~ 0))  %>%
-  ungroup()
+                                TRUE ~ 0))  %>% ungroup()
 
 #Creating variables for topic/profile filters. 
 #This probably should be added to the indicator lookup - most indicators assigned to death topic for now.
@@ -291,16 +287,12 @@ optdata <- optdata %>%
   #rounding variables
   mutate(numerator = round(numerator, 1), measure = round(measure, 1),
          lowci = round(lowci, 1), upci = round(upci, 1)) %>% 
-  droplevels() #to get rid of factor levels not present in data set.
-
-#Making the numerator the measure for a few indicators, so it plots correctly
-optdata$measure <- ifelse(optdata$indicator %in% c('Mid-year population estimate - all ages',
-                                                   'S2 pupils - SALSUS', 'S4 pupils - SALSUS',
-                                                   "Quit attempts"),
-                          optdata$numerator, optdata$measure)
-
-optdata <- as.data.frame(optdata)
-optdata$ind_id <- as.factor(optdata$ind_id )
+  droplevels() %>%  #to get rid of factor levels not present in data set.
+  #Making the numerator the measure for a few indicators, so it plots correctly
+  mutate(measure = ifelse(indicator %in% c('Mid-year population estimate - all ages',
+                                           'S2 pupils - SALSUS', 'S4 pupils - SALSUS',
+                                           "Quit attempts"), numerator, measure),
+         ind_id = as.factor(ind_id))
 
 ###TEMPORARY FIXES HOPEFULLY
 #Dealing with lack of data for certain years and hb for Healthy weight at P1.
