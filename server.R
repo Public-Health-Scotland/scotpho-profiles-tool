@@ -272,10 +272,10 @@ showModal(welcome_modal)
     updateTabsetPanel(session, "intabset", selected = "rank")
   })
   
-  observeEvent(input$jump_to_simd, {
-    updateTabsetPanel(session, "intabset", selected = "simd")
-  })
-  
+  # observeEvent(input$jump_to_simd, {
+  #   updateTabsetPanel(session, "intabset", selected = "simd")
+  # })
+  # 
   observeEvent(input$jump_to_table, {
     updateTabsetPanel(session, "intabset", selected = "table")
   })

@@ -145,7 +145,7 @@ tabPanel(
     #2nd row of boxes
     fluidRow(
       #Trend plot box
-      column(6, class="landing-page-column",
+      column(4, class="landing-page-column",
              div(class="landing-page-box", 
                  div("Trend", class = "landing-page-box-title"),
                  div(class = "landing-page-icon", style="background-image: url(time_trend.png);
@@ -153,13 +153,23 @@ tabPanel(
                  actionButton('jump_to_trend', 'Look at how an indicator changes over time',
                               class="landing-page-button", 
                               icon = icon("arrow-circle-right", "icon-lp")))),
-      #Rank plot box
-      column(6, class="landing-page-column",
+      #Rank/map plot box
+      column(4, class="landing-page-column",
              div(class="landing-page-box", 
                  div("Rank", class = "landing-page-box-title"),
                  div(class = "landing-page-icon", style="background-image: url(maprank.png);
-                     background-size: auto 80%; background-position: center; background-repeat: no-repeat; "),
+                     background-size: auto 75%; background-position: center; background-repeat: no-repeat; "),
                  actionButton('jump_to_rank', 'Compare geographical variation for an indicator', 
+                              class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp")))),
+      #Inequalities box
+      column(4, class="landing-page-column",
+             div(class="landing-page-box", 
+                 div("Health inequalities", class = "landing-page-box-title"),
+                 div(class = "landing-page-icon", style="background-image: url(equality_icon.png);
+                     background-size: auto 85%; background-position: center; background-repeat: no-repeat; "),
+                 # Currently a link to the health inequalities app
+                 actionButton('jump_to_simd', 'Explore how an indicator varies with socioeconomic deprivation', 
+                              onclick ="window.open('https://scotland.shinyapps.io/scotpho-health-inequalities', '_blank')",
                               class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp"))))
     ), # end of second row
     fluidRow(h4("Access the data behind the tool and find supporting information")),
