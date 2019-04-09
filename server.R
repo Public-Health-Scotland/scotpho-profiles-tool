@@ -1359,7 +1359,7 @@ showModal(welcome_modal)
   
 #####################.
 # Reactive data  
-  # Comparator data rank plot. Could be moved inside rank_bar_data
+  # Comparator data rank plot. 
   rank_compar <- reactive({
 
     if (input$comp_rank == 1){
@@ -1373,6 +1373,13 @@ showModal(welcome_modal)
                                           areaname == input$geocomp_rank &
                                           indicator == input$indic_rank) %>% 
         droplevels()
+      
+      # dealing with councils and boards with the same name
+      if (length(unique(rank_compar$areatype)) != 1) {
+        rank_compar <- rank_compar %>% subset(areatype == "Health board")
+      } else {
+        rank_compar <- rank_compar
+      }
       
     } else if (input$comp_rank == 2) { #if time comparison selected
       

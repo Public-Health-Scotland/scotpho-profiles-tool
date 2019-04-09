@@ -165,7 +165,7 @@ tabPanel(
       column(4, class="landing-page-column",
              div(class="landing-page-box", 
                  div("Health inequalities", class = "landing-page-box-title"),
-                 div(class = "landing-page-icon", style="background-image: url(equality_icon.png);
+                 div(class = "landing-page-icon", style="background-image: url(health_inequality.png);
                      background-size: auto 85%; background-position: center; background-repeat: no-repeat; "),
                  # Currently a link to the health inequalities app
                  actionButton('jump_to_simd', 'Explore how an indicator varies with socioeconomic deprivation', 
