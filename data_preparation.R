@@ -207,6 +207,21 @@ child_lowinc <- read_csv(paste0(shiny_files, "ChildrenLowIncome_shiny.csv")) %>%
   rename(measure = rate) %>%
   mutate_if(is.character,factor) #converting characters into factors
 
+dental_p1 <- read_csv(paste0(shiny_files, "child_dental_p1_shiny.csv")) %>%
+  mutate(update_date = "10/01/2019") %>%
+  rename(measure = rate) %>%
+  mutate_if(is.character,factor) #converting characters into factors
+
+dental_p7 <- read_csv(paste0(shiny_files, "child_dental_p7_shiny.csv")) %>%
+  mutate(update_date = "10/01/2019") %>%
+  rename(measure = rate) %>%
+  mutate_if(is.character,factor) #converting characters into factors
+
+weight_p1 <- read_csv(paste0(shiny_files, "child_healthyweight_shiny.csv")) %>%
+  mutate(update_date = "10/01/2019") %>%
+  rename(measure = rate) %>%
+  mutate_if(is.character,factor) #converting characters into factors
+
 alcohol_stays_d11 <- read_csv(paste0(shiny_files,"alcohol_stays_dz11.csv")) %>%
   mutate(update_date = "08/02/2019") %>%
   rename(measure = rate) %>%
@@ -228,7 +243,7 @@ alc_deaths_adp <- read_csv(paste0(shiny_files,"alcohol_deaths_ADP_AL.csv")) %>%
   mutate_if(is.character,factor) #converting characters into factors
 
 optdata <- rbind(optdata, part_measure, sechand_smok, child_lowinc,
-                 alcohol_stays, alc_deaths_adp) %>% 
+                 alcohol_stays, alc_deaths_adp, dental_p1, dental_p7, weight_p1) %>% 
 #TEMPORARY FIX. dealing with change in ca, hb and hscp codes
   mutate(code = recode(code, "S12000015"='S12000047', "S12000024"='S12000048', 
                        "S08000018"='S08000029', "S08000027"= 'S08000030', 
