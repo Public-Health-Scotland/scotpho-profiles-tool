@@ -30,9 +30,9 @@ function(input, output, session) {
     modalButton("Go to the tool", icon("times-circle")),
     size = "l", align= "center",
     easyClose = TRUE, fade=FALSE, footer = NULL
-  )
+      )
   
-showModal(welcome_modal)
+  showModal(welcome_modal)
   
   #"Take a Tour" Modal - first window
   first_modal <- modalDialog(
@@ -59,7 +59,7 @@ showModal(welcome_modal)
              h5("Clicking on the ScotPHO logo will take you to the main ScotPHO website.")),
       column(3,br(),br(), br(), br(), br(), br(), br(), 
              img(src="home_select.png", height=50, width=300))
-    ),
+      ),
     br(),
     br(),
     actionButton("next1","Next", icon("play-circle")),
@@ -67,7 +67,7 @@ showModal(welcome_modal)
     modalButton("Exit", icon("times-circle")),
     size = "l", align= "center",
     easyClose = TRUE, fade=TRUE, footer = NULL
-  )
+    )
   
   #call from either tour button or back button from modal 2
   observeEvent(input$tour,  {showModal(first_modal) })
@@ -83,8 +83,8 @@ showModal(welcome_modal)
              br(),
              br(),
              p(tags$h5("Some of our visualisations allow you to look at a predefined 
-                        set of indicators related to a particular domain or profile 
-                        e.g. ‘health and wellbeing’ or ‘children and young people’,
+                       set of indicators related to a particular domain or profile 
+                       e.g. ‘health and wellbeing’ or ‘children and young people’,
                        while others are designed to look at a single indicator in 
                        more detail. Using menus next to a visualisation you can select 
                        the area you are interested in and the time period.", 
@@ -110,7 +110,7 @@ showModal(welcome_modal)
                        down the list of options", style = "width: 350px")),
              p(tags$a(img(src="type_select.png", height=180, width=260))),
              br()
-      )),
+             )),
     br(),
     p(tags$h5("For more information about geographic areas within Scotland, 
               please refer to" , 
@@ -124,7 +124,7 @@ showModal(welcome_modal)
     modalButton("Exit", icon("times-circle")),
     size = "l", align= "center",
     easyClose = TRUE, fade=TRUE, footer = NULL
-             )
+      )
   
   #call from either next1 button or back button from modal 3
   observeEvent(input$next1,  {showModal(second_modal) })
@@ -151,7 +151,7 @@ showModal(welcome_modal)
                      ‘Save chart’ button",  style="width:300px; "),
              p(tags$a(img(src="save_chart2.png", height=60, width=230))),
              br()
-      ),
+             ),
       column(6,
              br(),
              br(),
@@ -160,7 +160,7 @@ showModal(welcome_modal)
                        in csv format", style = "width: 350px")),
              p(tags$a(img(src="save.png", height=60, width=230))),
              br()
-      )),
+             )),
     br(),
     p(tags$h5("The ", tags$b("'Table'")," tab within our tool allows users to 
               quickly and easily download larger selections of data covering 
@@ -173,13 +173,13 @@ showModal(welcome_modal)
     modalButton("Exit", icon("times-circle")),
     size = "l", align= "center",
     easyClose = TRUE, fade=TRUE, footer = NULL
-  )
+    )
   
   #call from either next2 button or back button from modal 4
   observeEvent(input$next2,  {showModal(third_modal) })
   
   observeEvent(input$back3,  {showModal(third_modal) })
-
+  
   #"See latest updates" Modal window - Activate if Update is carried out once 
   # rolled out live to users
   updates_modal <- modalDialog(
@@ -191,10 +191,10 @@ showModal(welcome_modal)
              br(),
              p(tags$h5("Recent indicator updates include:", 
                        style = "width: 90%; text-align: left; font-weight: bold; "))),
-             column(12, 
-              tags$h5(HTML(paste(techdoc$indicator_name[techdoc$days_since_update<60], 
-                                 collapse='<br>')))
-             )),
+      column(12, 
+             tags$h5(HTML(paste(techdoc$indicator_name[techdoc$days_since_update<60], 
+                                collapse='<br>')))
+      )),
     br(),
     p(tags$h5("Thanks for stopping by!")),
     p(tags$h5("For any further questions or other developments you would like to 
@@ -222,7 +222,7 @@ showModal(welcome_modal)
     p(tags$h5("The profiles are intended to increase understanding of local health 
               and social issues and to prompt further investigation, rather than 
               to be used as a performance management tool.
-        The information needs to be interpreted within a local framework; an indicator 
+              The information needs to be interpreted within a local framework; an indicator 
               may be higher or lower in one area compared to another, but local 
               knowledge is needed to understand and interpret differences.", 
               style = "width: 700px")),
@@ -243,25 +243,18 @@ showModal(welcome_modal)
     modalButton("Exit", icon("times-circle")),
     size = "l", align= "center",
     easyClose = TRUE, fade=TRUE, footer = NULL
-  )
+             )
   
-  observeEvent(input$next3, {   showModal(fourth_modal)  })
+  observeEvent(input$next3, { showModal(fourth_modal) })
   
   ###############################################.
   ## Landing page ----
   ###############################################.
   # Creating events that take you to different tabs
   # activated when pressing buttons from the landing page
-  observeEvent(input$jump_to_ring, {
-    updateTabsetPanel(session, "intabset", selected = "ring")
-  })
-  
-  observeEvent(input$jump_to_heat, {
-    updateTabsetPanel(session, "intabset", selected = "heat")
-  })
-  
-  observeEvent(input$jump_to_barcode, {
-    updateTabsetPanel(session, "intabset", selected = "barcode")
+
+  observeEvent(input$jump_to_summary, {
+    updateTabsetPanel(session, "intabset", selected = "summary")
   })
   
   observeEvent(input$jump_to_trend, {
@@ -292,262 +285,25 @@ showModal(welcome_modal)
     updateTabsetPanel(session, "intabset", selected = "others")
   })
   
-  ###############################################.        
-  #### Profile Summary (ring plot) ----
-  ###############################################.   
-  
-  ## Profile Summary (ring) help pop-up modal dialog - still need to create image file.
-  observeEvent(input$help_ring, {
-    showModal(modalDialog(
-      title = "How to use this chart",
-      p(img(src="help_ring.png",height=600)),size = "l",
-      easyClose = TRUE, fade=FALSE
-    ))
-  })
-  
-  ## REACTIVE CONTROLS
-  # Reactive controls for areatype depending on profile selected
-  output$geotype_ui_ring <- renderUI({
-    areas <- areatype_profile[[names(profile_list[unname(profile_list) == input$profile_ring])]]
+ 
+  ###############################################.
+  ## Summary - common objects ----
+  ###############################################.
+  # Summary help pop-up
+  observeEvent(input$help_summary, {
     
-    selectInput("geotype_ring", "Geography level", choices=areas,
-                selected = "Health board")
-  })
-  
-  # Reactive controls for profile summary:area name depending on areatype selected
-  output$geoname_ui_ring <- renderUI({
-    areas_ring <- if (input$geotype_ring %in% c("Health board", "Council area", "HSC partnership", "Alcohol & drug partnership"))
-    {
-      sort(geo_lookup$areaname[geo_lookup$areatype == input$geotype_ring])
-    } else {
-      sort(geo_lookup$areaname[geo_lookup$areatype == input$geotype_ring
-                               & geo_lookup$parent_area == input$loc_iz_ring])
-    }
-    selectInput("geoname_ring", "Select your area", choices = areas_ring,
-                selectize=TRUE, selected = "Health board")
-  })
-  
-  # Years to compare with depending on what data is available
-  output$yearcomp_ui_ring <- renderUI({
-    ring_years <- optdata %>%
-      subset (areaname == input$geoname_ring &
-                domain1 != "Population" &   #exclude population indicators
-                areatype  == input$geotype_ring) %>% #not sure this is strictly neccessary?
-      select(year) %>%
-      droplevels()
-    years <- c(min(ring_years$year):max(ring_years$year))
-    selectInput("yearcomp_ring", "Baseline year", choices = years,selectize=TRUE, selected = "2011")
-  })
-  
-
-  ## DATA SELECTIONS
-  # Ring data for the chosen area. Filtering based on user input values.
-  ring_chosenarea <- reactive({ 
-    optdata %>%
-      group_by(indicator) %>%
-      mutate(max_year=max(year))%>%
-      subset ((year==max_year) &
-                areaname == input$geoname_ring &
-                domain1 != "Population" &  #exclude population indicators
-                (substr(profile_domain1, 1, 3) == input$profile_ring |
-                   substr(profile_domain2, 1, 3) == input$profile_ring) &
-                areatype  == input$geotype_ring) %>%
-      droplevels()
-  })
-  
-  #Select comparator based on years available for area selected.
-  ring_chosencomp <- reactive({   
-    #filter data to create series for chosen comparator
-    if(input$comp_ring == 1){
-      ring_chosencomp <- optdata %>%
-        group_by(indicator) %>%
-        mutate(max_year=max(year))%>%
-        subset (year==max_year &
-                  areaname == input$geocomp_ring &
-                  domain1 != "Population" &
-                  (substr(profile_domain1, 1, 3) == input$profile_ring |
-                     substr(profile_domain2, 1, 3) == input$profile_ring) &
-                  areatype %in% c("Health board", "Council area", "Scotland")) %>% 
-        select(c(indicator, measure, year, areatype)) %>% 
-        rename(comp_m =measure,comp_areatype=areatype) %>% 
-        droplevels()
-    }else if(input$comp_ring==2){
-      ring_chosencomp <- optdata %>%
-        group_by(indicator) %>%
-        subset (year==input$yearcomp_ring &
-                  areaname == input$geoname_ring &
-                  domain1 != "Population" &
-                  (substr(profile_domain1, 1, 3) == input$profile_ring |
-                     substr(profile_domain2, 1, 3) == input$profile_ring) &
-                  areatype %in% c("Health board", "Council area", "Scotland")) %>% 
-        select(c(indicator, measure)) %>% 
-        rename(comp_m =measure) %>% 
-        droplevels()
-    }
-  })
-  
-  ## RING PLOT FUNCTION
-  plot_ring <- function(){   
-    
-    #Merging comparator and chosen area
-    if (input$comp_ring == 1){
-      ring <- merge(x=ring_chosenarea(), y=ring_chosencomp(), by=c("indicator", "year"))
-    } else if (input$comp_ring == 2) {
-      ring <- merge(x=ring_chosenarea(), y=ring_chosencomp(), by=c("indicator"), all.x = TRUE)
-    }
-    
-    #identify significant differences
-    ring <- ring %>%  
-      mutate(flag=case_when(
-        ring$interpret == "O" ~ 'No significance can be calculated',
-        ring$lowci<=ring$comp_m & ring$upci>=ring$comp_m ~'Statistically not significantly different from comparator average',
-        ring$lowci > ring$comp_m & ring$interpret == "H" ~'Statistically significantly better than comparator average',
-        ring$lowci > ring$comp_m & ring$interpret == "L" ~ 'Statistically significantly worse than comparator average',
-        ring$upci < ring$comp_m & ring$interpret == "L" ~'Statistically significantly better than comparator average',
-        ring$upci < ring$comp_m & ring$interpret == "H" ~'Statistically significantly worse than comparator average',
-        TRUE ~ 'No significance can be calculated'), 
-        #identifies correct domain name for title
-      domain=case_when(substr(ring$profile_domain1,1,3)==input$profile_ring ~ 
-                         substr(ring$profile_domain1, 5, nchar(as.vector(profile_domain1))),
-                       TRUE ~ substr(ring$profile_domain2,5,nchar(as.vector(profile_domain2))))) %>% 
-      select(domain,flag,indicator) %>%
-      droplevels()
-    
-    #reorder flag factors levels to get correct order in chart
-    ring$flag <- factor(ring$flag, levels=c("Statistically significantly better than comparator average","Statistically not significantly different from comparator average","Statistically significantly worse than comparator average","No significance can be calculated"))
-    
-    #group and count idicators within a domain by significance
-    ring <- ring %>%
-      group_by(domain,flag) %>%
-      count(indicator) %>%
-      summarise(count=sum(n))
-    
-    #group by domain to count total by domain
-    ring <- ring %>%  
-      group_by(domain) %>% arrange(domain) %>%
-      mutate(fraction=count/sum(count),
-             ymax=cumsum(fraction),
-             ymin=c(0,head(ymax,n=-1)),
-             ind_sum=sum(count),
-             bfrac=ifelse(flag =='Statistically significantly better than comparator average',
-                          fraction,0),
-             bcount=ifelse(flag =='Statistically significantly better than comparator average',
-                           count,0)) %>%
-      droplevels ()
-    
-    fill_df <- data.frame(flag = c ('No significance can be calculated',
-                                    'Statistically not significantly different from comparator average',
-                                    'Statistically significantly better than comparator average',
-                                    'Statistically significantly worse than comparator average'),
-                          stringsAsFactors = TRUE)
-    
-    fillcolours <- c("white","grey88","#4da6ff", "#ffa64d")
-    names(fillcolours) <- levels(fill_df$flag)
-    fill_colour <- scale_fill_manual(name = "flag",values = fillcolours)
-
-    ggplot(ring, aes(fill=flag, ymax=ymax, ymin=ymin, xmax=4.5, xmin=1.5)) +
-      geom_rect(colour='#555555') +
-      geom_label(data=ring, label.size = NA, aes(label =paste(count), x = 3, y = (ymin + ymax)/2),show.legend = F,size = 7, colour='#555555') +
-      fill_colour +
-      theme(
-        axis.text=element_blank(), # taking out x axis labels
-        axis.title = element_blank(),
-        text = element_text(family="Helvetica Neue,Helvetica,Arial,sans-serif",colour ='#555555'),
-        axis.ticks=element_blank(), # taking out x axis tick marks
-        legend.position = "none",
-        panel.background = element_blank(),#Blanking background
-        panel.border = element_blank())+ #remove frame round plot plot
-      facet_wrap(~ring$domain,labeller = label_wrap_gen(multi_line = TRUE)) +
-      coord_polar(theta="y") +
-      theme(
-        strip.text.x = element_text(size=14,colour='#555555',family="Helvetica Neue,Helvetica,Arial,sans-serif"),
-        strip.background = element_blank())+
-      xlim(c(0,4.5))
-  }
-  
-  # titles 
-  #create title and subtitle variables
-  output$ring_title <- renderText({
-    paste0(names(profile_list[unname(profile_list) == input$profile_ring])," profile")
-  })
-  
-  output$ring_subtitle <- renderText({
-    if(input$comp_ring == 1){
-      paste0(input$geoname_ring," (",input$geotype_ring,") compared against ",
-             input$geocomp_ring)
-    } else if(input$comp_ring==2){
-      paste0("Changes within ",input$geoname_ring,": latest data available",
-             " compared to ", input$yearcomp_ring)
-    }
-  })
-  
-  #Render plot in app and resize 
-  output$ring_plot <- renderPlot({
-    plot_ring()
-  }, height = function() {
-    session$clientData$output_ring_plot_width
-  })
-  
-  # Defined data file to down
-  ring_csv <- reactive({
-    #Merging comparator and chosen area
-    if (input$comp_ring == 1){
-      ring <- merge(x = ring_chosenarea(), y = ring_chosencomp(), by=c("indicator", "year"))
-    } else if (input$comp_ring == 2) {
-      ring <- merge(x = ring_chosenarea(), y = ring_chosencomp(), by=c("indicator"), all.x = TRUE)
-    }
-    
-    #identify significant differences
-    ring <- ring %>%
-      mutate(flag=case_when(
-        ring$interpret == "O" ~'No significance can be calculated',
-        ring$lowci<=ring$comp_m & ring$upci>=ring$comp_m ~'Statistically not significantly different from comparator average',
-        ring$lowci > ring$comp_m & ring$interpret == "H" ~ 'Statistically significantly better than comparator average',
-        ring$lowci > ring$comp_m & ring$interpret == "L" ~ 'Statistically significantly worse than comparator average',
-        ring$upci < ring$comp_m & ring$interpret == "L" ~'Statistically significantly better than comparator average',
-        ring$upci < ring$comp_m & ring$interpret == "H" ~'Statistically significantly worse than comparator average',
-        TRUE ~ 'Statistically not significantly different from comparator average'),
-      domain=case_when(substr(ring$profile_domain1,1,3)==input$profile_ring ~ 
-                         substr(ring$profile_domain1,5,nchar(as.vector(profile_domain1))),
-                       TRUE ~ substr(ring$profile_domain2,5,nchar(as.vector(profile_domain2))))) %>% #identifies correct domain name for title
-      droplevels()
-    
-    ring <- ring %>%
-      arrange(domain, flag) %>%
-      select(c(domain, flag, indicator, areaname, areatype, def_period, numerator, measure,
-               lowci, upci, type_definition, comp_m, comp_areatype)) %>%
-      rename(lower_confidence_interval=lowci, upper_confidence_interval=upci,
-             latest_period = def_period, definition = type_definition, comparator_measure = comp_m, difference=flag,comparator_geo=comp_areatype)
-  })
-  
-  # Download data file
-  output$download_ring <- downloadHandler( filename =  'ring_data.csv',
-                                           content = function(file) { write.csv(ring_csv(), file, row.names=FALSE) })
- # Downloading chart
-  output$download_ringplot <- downloadHandler(
-    filename = 'Profile_summary.png',
-    content = function(file){
-      if(input$comp_ring == 1){
-        ggsave(file, plot = plot_ring()
-               +ggtitle(label=paste0(names(profile_list[unname(profile_list) == input$profile_ring])," profile"),
-                        subtitle =paste0(input$geoname_ring," (",input$geotype_ring,") compared against ",input$geocomp_ring)),
-               device = "png",height = 15,width=15, limitsize=FALSE)
-      } else if(input$comp_ring==2){
-        ggsave(file, plot = plot_ring()
-               +ggtitle(label=paste0(names(profile_list[unname(profile_list) == input$profile_ring])," profile"),
-                        subtitle =paste0("Changes within ",input$geoname_ring,": latest data available"," compared to ", input$yearcomp_ring)),
-               device = "png",height = 15,width=15, limitsize=FALSE)
-      }
-    })
-
-  ###############################################.        
-  #### Heatmap ----
-  ###############################################.   
-  # Heatmap help pop-up
-  observeEvent(input$help_heat, {
-    showModal(modalDialog(
-      title = "How to use this chart",
+    if (input$chart_summary == "Spine") {
       
+      showModal(modalDialog(
+        title = "How to use this chart",
+        p(img(src="help_barcode2.png",height=600)),size = "l",
+        easyClose = TRUE, fade=FALSE
+      ))
+      
+    } else {
+
+    showModal(modalDialog(
+      title = "How to use this chart",
       p(column(6,"Select 'Area' to compare against another region, or select 'Time' to compare
                against a baseline year of the same area."),
         column(6, img(src="help_heatmap1.png"))),
@@ -567,165 +323,658 @@ showModal(welcome_modal)
       
       size = "l", easyClose = TRUE, fade=FALSE
       ))
+    }
   })
+  
   ###############################################.
   # Indicator definitions
   #Subsetting by domain and profile. Profile is fiddly as vector uses abbreviations 
   # so needs to be converted to the names to match techdoc.
-  defs_data_heat <- reactive({techdoc %>% subset(grepl(input$topic_heat, domain) &
-                                                   grepl(names(profile_list[unname(profile_list) == input$profile_heat]),
-                                                         profile))})
-  
-  output$defs_text_heat <- renderUI({
-    
-    HTML(paste(sprintf("<b><u>%s</b></u> <br> %s ", defs_data_heat()$indicator_name, 
-                       defs_data_heat()$indicator_definition), collapse = "<br><br>"))
-  })
+  defs_data_summary <- reactive({
+    if (input$chart_summary == "Spine") {
+      
+      techdoc %>% subset(grepl(input$topic_spine, domain) &
+                           grepl(names(profile_list[unname(profile_list) == input$profile_summary]),
+                                 profile))
+    } else {
+      techdoc %>% 
+        subset(grepl(names(profile_list[unname(profile_list) == input$profile_summary]), profile))  
+    }
 
+    })
+  
+  output$defs_text_summary <- renderUI({
+    
+    HTML(paste(sprintf("<b><u>%s</b></u> <br> %s ", defs_data_summary()$indicator_name, 
+                       defs_data_summary()$indicator_definition), collapse = "<br><br>"))
+  })
+  
   #####################.
   # Reactive controls
-  # Reactive controls for areatype depending on profile selected
-  output$geotype_ui_heat <- renderUI({
-
-    areas <- areatype_profile[[names(profile_list[unname(profile_list) == input$profile_heat])]]
+  # Reactive controls for profile depending on area selected
+  output$profile_ui_summary <- renderUI({
     
-    selectInput("geotype_heat", "Geography level", choices=areas,
-                selected = "Health board")
+    profiles <- profile_areatype[input$geotype_summary]
+    selectInput("profile_summary", "Profile", choices = profiles)
     
   })
-
+  
   # Reactive controls for heatmap:area name depending on areatype selected
-  output$geoname_ui_heat <- renderUI({
+  output$geoname_ui_summary <- renderUI({
     
-    areas_heat <- if (input$geotype_heat %in% c("Health board", "Council area", 
+    areas_summary <- if (input$geotype_summary %in% c("Health board", "Council area", 
                                                 "HSC partnership", "Scotland", "Alcohol & drug partnership"))
-      {
-      sort(geo_lookup$areaname[geo_lookup$areatype == input$geotype_heat])
-      } else {
-        sort(geo_lookup$areaname[geo_lookup$areatype == input$geotype_heat
-                                   & geo_lookup$parent_area == input$loc_iz_heat])
-      }
-
-    selectInput("geoname_heat", "Select your area", choices = areas_heat,
-                selectize=TRUE, selected = "")
-
+    {
+      sort(geo_lookup$areaname[geo_lookup$areatype == input$geotype_summary])
+    } else {
+      sort(geo_lookup$areaname[geo_lookup$areatype == input$geotype_summary
+                               & geo_lookup$parent_area == input$loc_iz_summary])
+    }
+    
+    selectizeInput("geoname_summary", "Select your area", 
+                   choices = areas_summary, selected = "")
+    
   })
   
-  # Reactive controls for domain depending on profile
-  output$topic_ui_heat <- renderUI({
-    
-    domain_list <- sort(profile_lookup$domain[profile_lookup$profile == input$profile_heat])
-    
-    selectInput("topic_heat", "Domain", choices = domain_list, selected='')
-  })
-  
+
   # Years to compare with depending on what data is available
-  output$yearcomp_ui_heat <- renderUI({
+  output$comp_ui_summary <- renderUI({
     
-    years <- c(min(heat_chosenarea()$year):max(heat_chosenarea()$year))
+    years <- c(min(summary_chosen_area()$year):max(summary_chosen_area()$year))
     
-    selectInput("yearcomp_heat", "Baseline year", choices = years,
-                selectize=TRUE)
+    if (input$chart_summary %in% c("Snapshot", "Trend")) {
+      tagList( 
+        awesomeRadio("comp_summary", label = "Compare against",
+                     choices = list("Area" = 1, "Time" = 2), 
+                     selected = 1, inline=TRUE, checkbox = TRUE),
+        conditionalPanel(condition = "input.comp_summary == 1 ",  
+                         selectInput("geocomp_summary", "Select a comparison area", choices = comparator_list,
+                                     selectize=TRUE, selected = "Scotland")
+        ),
+        conditionalPanel(condition = "input.comp_summary == 2 ", 
+                         selectizeInput("yearcomp_summary", "Baseline year", choices = years)
+        )
+      )
+    } else if (input$chart_summary == "Spine") {
+      selectizeInput("geocomp_spine", "Select a comparison area", 
+                     choices = comparator_list, selected = "Scotland")
+    }
+
   })
   
   #####################.
   # Reactive data
   #Heatmap data for the chosen area. Filtering based on user input values.
-  heat_chosenarea <- reactive({ 
-      optdata %>% 
-      subset(areaname == input$geoname_heat &
-              areatype == input$geotype_heat &
+  summary_chosen_area <- reactive({ 
+    optdata %>% 
+      subset(areaname == input$geoname_summary &
+               areatype == input$geotype_summary &
                !(indicator %in% c("Mid-year population estimate - all ages", "Quit attempts")) &
-               (substr(profile_domain1, 1, 3) == input$profile_heat |
-                  substr(profile_domain2, 1, 3) == input$profile_heat) &
-               (substr(profile_domain1, 5, nchar(as.vector(profile_domain1))) == input$topic_heat |
-                  substr(profile_domain2, 5, nchar(as.vector(profile_domain2))) == input$topic_heat)) 
-    
+               (substr(profile_domain1, 1, 3) == input$profile_summary |
+                  substr(profile_domain2, 1, 3) == input$profile_summary)) 
   })
   
   #Select comparator based on years available for area selected.
-  heat_chosencomp <- reactive({ 
+  summary_chosencomp <- reactive({ 
     
-    if (input$comp_heat == 1){
-      heat_chosencomp <- optdata %>% 
-        subset(areaname == input$geocomp_heat &
+    if (input$comp_summary == 1){ #if area comparison selected
+      summary_chosencomp <- optdata %>% 
+        subset(areaname == input$geocomp_summary &
                  indicator != "Mid-year population estimate - all ages" &
                  areatype %in% c("Health board", "Council area", "Scotland") &
-                 (substr(profile_domain1, 1, 3) == input$profile_heat |
-                    substr(profile_domain2, 1, 3) == input$profile_heat) &
-                 (substr(profile_domain1, 5, nchar(as.vector(profile_domain1))) == input$topic_heat |
-                    substr(profile_domain2, 5, nchar(as.vector(profile_domain2))) == input$topic_heat)) %>% 
+                 (substr(profile_domain1, 1, 3) == input$profile_summary |
+                    substr(profile_domain2, 1, 3) == input$profile_summary)) %>% 
         select(c(year, indicator, measure)) %>% 
         rename(comp_m=measure) 
-    } else if (input$comp_heat == 2) { #if time comparison selected
-      heat_chosencomp <- heat_chosenarea() %>% 
-        subset(year == input$yearcomp_heat) %>% 
+    } else if (input$comp_summary == 2) { #if time comparison selected
+      summary_chosencomp <- summary_chosen_area() %>% 
+        subset(year == input$yearcomp_summary) %>% 
         select(c(indicator, measure)) %>% 
         rename(comp_m=measure) 
-      
     }
+    
+  })
+  
+  summary_data <- reactive({
+    
+    #Merging comparator and chosen area
+    if (input$comp_summary == 1){
+      sum_data <- left_join(x = summary_chosen_area(), y = summary_chosencomp(), 
+                            by=c("indicator", "year")) %>% droplevels()
+    } else if (input$comp_summary == 2) {
+      sum_data <- left_join(x = summary_chosen_area(), y = summary_chosencomp(), 
+                            by=c("indicator")) %>% droplevels()
+    }
+    
+    sum_data <- sum_data %>%  
+      #Creating a palette of colours based on statistical significance
+      mutate(color = case_when(interpret == "O" ~ 'white',
+                               lowci <= comp_m & upci >= comp_m ~'gray',
+                               lowci > comp_m & interpret == "H" ~ 'blue',
+                               lowci > comp_m & interpret == "L" ~ 'red',
+                               upci < comp_m & interpret == "L" ~ 'blue',
+                               upci < comp_m & interpret == "H" ~ 'red', 
+                               TRUE ~ 'white'),
+             #identifies correct domain name for title
+             domain = as.factor(case_when(
+               substr(profile_domain1,1,3)==input$profile_summary ~
+                 substr(profile_domain1, 5, nchar(as.vector(profile_domain1))),
+               TRUE ~ substr(profile_domain2, 5, nchar(as.vector(profile_domain2))))))
     
   })
   
   #####################.
   # titles 
   #create title and subtitle variables
-  output$heat_title <- renderText({
-    paste0(names(profile_list[unname(profile_list) == input$profile_heat]),
-                       " profile: ", input$topic_heat)
+  output$summary_title <- renderText({
+    paste0(names(profile_list[unname(profile_list) == input$profile_summary]),
+           " profile")
   })
   
-  output$heat_subtitle <- renderText({
-    if(input$comp_heat == 1){
-      paste0(input$geoname_heat," (",input$geotype_heat,") compared against ",
-             input$geocomp_heat)
-    } else if(input$comp_heat==2){
-      paste0("Changes within ",input$geoname_heat,": latest data available",
-           " compared to ", input$yearcomp_heat)
+  output$summary_subtitle <- renderText({
+    if(input$comp_summary == 1){
+      paste0(input$geoname_summary," (",input$geotype_summary,") compared against ",
+             input$geocomp_summary)
+    } else if(input$comp_summary==2){
+      paste0("Changes within ",input$geoname_summary,": latest data available",
+             " compared to ", input$yearcomp_summary)
     }
+  })
+  
+  ###############################################.
+  # This will create a reactive user interface depending on type of visualization 
+  # and profile selected
+  output$summary_ui_plots <- renderUI({
+    
+    # Preparing a brief explanation for each visualisation 
+    if (input$chart_summary == "Snapshot") {
+      explanation_text <- p("This visualisation shows all the indicators of the profile you
+            have chosen. The latest data available for each one of them is
+                                    compared against the selected comparator. The color of the boxes reflects if
+                                    the differences are significant or not.")
+    } else if (input$chart_summary == "Trend") {
+      explanation_text <- p("This visualisation shows all the indicators of the profile you
+            have chosen. The latest data available for each one of them is
+                                    compared against the selected comparator. The color of the boxes reflects if
+                                    the differences are significant or not.")
+    } else if (input$chart_summary == "Spine") {
+      explanation_text <- p("This visualisation shows all the indicators of the domain you
+                            have chosen. The latest data available for each one of them is
+                            compared against the selected comparator. Each bar represents a different area.
+                            The color of the square to the left of the bars reflects if
+                                    the differences are significant or not.")
+    }
+    
+    if (input$chart_summary == "Snapshot") {
+      if (input$profile_summary == "HWB") {
+        tagList(#Health and Wellbeing profile
+          explanation_text,
+          column(4,
+                 h5("Behaviours", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_hwb_beha", height = "auto"))),
+                 h5("Social care & housing", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_hwb_socare", height = "auto"))),
+                 h5("Environment", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_hwb_env", height = "auto"))),
+                 h5("Life expectancy & mortality", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_hwb_lifexp", height = "auto")))
+          ),
+          column(4,
+                 h5("Women's & children's health", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_hwb_women", height = "auto"))),
+                 h5("Immunisations & screening", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_hwb_imm", height = "auto"))),
+                 h5("Economy", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_hwb_econ", height = "auto"))),
+                 h5("Crime", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_hwb_crime", height = "auto")))
+          ),
+          column(4,
+                 h5("Mental health", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_hwb_mh", height = "auto"))),
+                 h5("Ill health & injury", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_hwb_injury", height = "auto"))),
+                 h5("Education", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_hwb_educ", height = "auto")))
+          )
+        ) #taglist bracket
+      } else if (input$profile_summary == "CYP") {
+        tagList(#Children and young people profile
+          explanation_text,
+          column(4,
+                 h5("Active", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_cyp_active", height = "auto"))),
+                 h5("Healthy", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_cyp_health", height = "auto")))
+          ),
+          column(4,
+                 h5("Included", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_cyp_includ", height = "auto"))),
+                 h5("Nurtured", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_cyp_nurt", height = "auto"))),
+                 h5("Safe", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_cyp_safe", height = "auto")))
+          ),
+          column(4,
+                 h5("Achieving", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_cyp_achiev", height = "auto"))),
+                 h5("Responsible", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_cyp_respon", height = "auto")))
+          )
+        )# taglist bracket
+      } else if (input$profile_summary == "ALC") {
+        tagList(#Alcohol profile
+          explanation_text,
+          column(4,
+                 h5("Environment", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_alc_env", height = "auto"))),
+                 h5("Services", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_alc_serv", height = "auto")))
+          ),
+          column(4,
+                 h5("Community safety", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_alc_commsaf", height = "auto"))),
+                 h5("CAPSM/Families", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_alc_family", height = "auto")))
+          ),
+          column(4,
+                 h5("Prevalence", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_alc_preval", height = "auto"))),
+                 h5("Health", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_alc_health", height = "auto")))
+          )
+        )#taglist bracket
+      } else if (input$profile_summary == "DRG") {
+        tagList(#Drugs profile
+          explanation_text,
+          column(4,
+                 h5("Environment", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_drg_env", height = "auto"))),
+                 h5("Services", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_drg_serv", height = "auto"))),
+                 h5("Data quality", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_drg_dat", height = "auto")))
+          ),
+          column(4,
+                 h5("Community safety", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_drg_commsaf", height = "auto"))),
+                 h5("CAPSM/Families", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_drg_family", height = "auto")))
+          ),
+          column(4,
+                 h5("Prevalence", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_drg_preval", height = "auto"))),
+                 h5("Health", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_drg_health", height = "auto")))
+          )
+        )#taglist bracket
+      } else if (input$profile_summary == "MEN") {
+        tagList(#Mental Health profile
+          explanation_text,
+          column(4,
+                 h5("Female adult", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_men_fem", height = "auto")))
+          ),
+          column(4,
+                 h5("Male adult", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_men_male", height = "auto")))
+          ),
+          column(4,
+                 h5("CYP Mental Health", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_men_cyp", height = "auto")))
+          )
+        )#taglist bracket
+      } else if (input$profile_summary == "TOB") {
+        tagList(#Tobacco profile
+          explanation_text,
+          column(4,
+                 h5("Smoking in school children", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_tob_school", height = "auto"))),
+                 h5("Smoking cessation & smoking cessation products", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_tob_cess", height = "auto")))
+          ),
+          column(4,
+                 h5("Smoking attributable deaths & diseases", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_tob_attrib", height = "auto"))),
+                 h5("Smoking during and post pregnancy", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_tob_pregn", height = "auto")))
+          ),
+          column(4,
+                 h5("Adult prevalence", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_tob_preval", height = "auto"))),
+                 h5("Retailer information", style="color: black; text-align: center; font-weight: bold;"),
+                 div(align = "center", withSpinner(plotlyOutput("summ_tob_retail", height = "auto")))
+          )
+        )#taglist bracket
+      } else if (input$profile_summary == "POP") {
+        tagList(#Population profile
+          explanation_text,
+          h5("Population", style="color: black; text-align: center; font-weight: bold;"),
+          div(align = "center", withSpinner(plotlyOutput("summ_pop_pop", height = "auto")))
+        )#taglist bracket
+      }
+    } else if (input$chart_summary == "Trend") { #IF SELECTED HEATMAP
+      if (input$profile_summary == "HWB") {
+        tagList(#Health and Wellbeing profile
+          explanation_text,
+          h5("Behaviours", style="color: black; text-align: center; font-weight: bold;"),
+          withSpinner(plotlyOutput("heat_hwb_beha", height = "auto")),
+          h5("Social care & housing", style="color: black; text-align: center; font-weight: bold;"),
+          withSpinner(plotlyOutput("heat_hwb_socare", height = "auto")),
+          h5("Environment", style="color: black; text-align: center; font-weight: bold;"),
+          withSpinner(plotlyOutput("heat_hwb_env", height = "auto")),
+          h5("Life expectancy & mortality", style="color: black; text-align: center; font-weight: bold;"),
+          withSpinner(plotlyOutput("heat_hwb_lifexp", height = "auto")),
+          h5("Women's & children's health", style="color: black; text-align: center; font-weight: bold;"),
+          withSpinner(plotlyOutput("heat_hwb_women", height = "auto")),
+          h5("Immunisations & screening", style="color: black; text-align: center; font-weight: bold;"),
+          withSpinner(plotlyOutput("heat_hwb_imm", height = "auto")),
+          h5("Economy", style="color: black; text-align: center; font-weight: bold;"),
+          withSpinner(plotlyOutput("heat_hwb_econ", height = "auto")),
+          h5("Crime", style="color: black; text-align: center; font-weight: bold;"),
+          withSpinner(plotlyOutput("heat_hwb_crime", height = "auto")),
+          h5("Mental health", style="color: black; text-align: center; font-weight: bold;"),
+          withSpinner(plotlyOutput("heat_hwb_mh", height = "auto")),
+          h5("Ill health & injury", style="color: black; text-align: center; font-weight: bold;"),
+          withSpinner(plotlyOutput("heat_hwb_injury", height = "auto")),
+          h5("Education", style="color: black; text-align: center; font-weight: bold;"),
+          withSpinner(plotlyOutput("heat_hwb_educ", height = "auto"))
+        )
+      } else if (input$profile_summary == "CYP") {
+        tagList(#Children and young people profile
+          explanation_text,
+          h5("Active", style="color: black; text-align: center; font-weight: bold;"),
+          div(align = "center", withSpinner(plotlyOutput("heat_cyp_active", height = "auto"))),
+          h5("Healthy", style="color: black; text-align: center; font-weight: bold;"),
+          div(align = "center", withSpinner(plotlyOutput("heat_cyp_health", height = "auto"))),
+          h5("Included", style="color: black; text-align: center; font-weight: bold;"),
+          div(align = "center", withSpinner(plotlyOutput("heat_cyp_includ", height = "auto"))),
+          h5("Nurtured", style="color: black; text-align: center; font-weight: bold;"),
+          div(align = "center", withSpinner(plotlyOutput("heat_cyp_nurt", height = "auto"))),
+          h5("Safe", style="color: black; text-align: center; font-weight: bold;"),
+          div(align = "center", withSpinner(plotlyOutput("heat_cyp_safe", height = "auto"))),
+          h5("Achieving", style="color: black; text-align: center; font-weight: bold;"),
+          div(align = "center", withSpinner(plotlyOutput("heat_cyp_achiev", height = "auto"))),
+          h5("Responsible", style="color: black; text-align: center; font-weight: bold;"),
+          div(align = "center", withSpinner(plotlyOutput("heat_cyp_respon", height = "auto")))
+        )# taglist bracket
+      } else if (input$profile_summary == "ALC") {
+        tagList(#Alcohol profile
+          explanation_text,
+          h5("Environment", style="color: black; text-align: center; font-weight: bold;"),
+          div(align = "center", withSpinner(plotlyOutput("heat_alc_env", height = "auto"))),
+          h5("Services", style="color: black; text-align: center; font-weight: bold;"),
+          div(align = "center", withSpinner(plotlyOutput("heat_alc_serv", height = "auto"))),
+          h5("Community safety", style="color: black; text-align: center; font-weight: bold;"),
+          div(align = "center", withSpinner(plotlyOutput("heat_alc_commsaf", height = "auto"))),
+          h5("CAPSM/Families", style="color: black; text-align: center; font-weight: bold;"),
+          div(align = "center", withSpinner(plotlyOutput("heat_alc_family", height = "auto"))),
+          h5("Prevalence", style="color: black; text-align: center; font-weight: bold;"),
+          div(align = "center", withSpinner(plotlyOutput("heat_alc_preval", height = "auto"))),
+          h5("Health", style="color: black; text-align: center; font-weight: bold;"),
+          div(align = "center", withSpinner(plotlyOutput("heat_alc_health", height = "auto")))
+        )#taglist bracket
+      } else if (input$profile_summary == "DRG") {
+        tagList(#Drugs profile
+          explanation_text,
+          h5("Environment", style="color: black; text-align: center; font-weight: bold;"),
+          div(align = "center", withSpinner(plotlyOutput("heat_drg_env", height = "auto"))),
+          h5("Services", style="color: black; text-align: center; font-weight: bold;"),
+          div(align = "center", withSpinner(plotlyOutput("heat_drg_serv", height = "auto"))),
+          h5("Data quality", style="color: black; text-align: center; font-weight: bold;"),
+          div(align = "center", withSpinner(plotlyOutput("heat_drg_dat", height = "auto"))),
+          h5("Community safety", style="color: black; text-align: center; font-weight: bold;"),
+          div(align = "center", withSpinner(plotlyOutput("heat_drg_commsaf", height = "auto"))),
+          h5("CAPSM/Families", style="color: black; text-align: center; font-weight: bold;"),
+          div(align = "center", withSpinner(plotlyOutput("heat_drg_family", height = "auto"))),
+          h5("Prevalence", style="color: black; text-align: center; font-weight: bold;"),
+          div(align = "center", withSpinner(plotlyOutput("heat_drg_preval", height = "auto"))),
+          h5("Health", style="color: black; text-align: center; font-weight: bold;"),
+          div(align = "center", withSpinner(plotlyOutput("heat_drg_health", height = "auto")))
+        )#taglist bracket
+      } else if (input$profile_summary == "MEN") {
+        tagList(#Mental Health profile
+          explanation_text,
+          h5("Female adult", style="color: black; text-align: center; font-weight: bold;"),
+          div(align = "center", withSpinner(plotlyOutput("heat_men_fem", height = "auto"))),
+          h5("Male adult", style="color: black; text-align: center; font-weight: bold;"),
+          div(align = "center", withSpinner(plotlyOutput("heat_men_male", height = "auto"))),
+          h5("CYP Mental Health", style="color: black; text-align: center; font-weight: bold;"),
+          div(align = "center", withSpinner(plotlyOutput("heat_men_cyp", height = "auto")))
+        )#taglist bracket
+      } else if (input$profile_summary == "TOB") {
+        tagList(#Tobacco profile
+          explanation_text,
+          h5("Smoking in school children", style="color: black; text-align: center; font-weight: bold;"),
+          div(align = "center", withSpinner(plotlyOutput("heat_tob_school", height = "auto"))),
+          h5("Smoking cessation & smoking cessation products", style="color: black; text-align: center; font-weight: bold;"),
+          div(align = "center", withSpinner(plotlyOutput("heat_tob_cess", height = "auto"))),
+          h5("Smoking attributable deaths & diseases", style="color: black; text-align: center; font-weight: bold;"),
+          div(align = "center", withSpinner(plotlyOutput("heat_tob_attrib", height = "auto"))),
+          h5("Smoking during and post pregnancy", style="color: black; text-align: center; font-weight: bold;"),
+          div(align = "center", withSpinner(plotlyOutput("heat_tob_pregn", height = "auto"))),
+          h5("Adult prevalence", style="color: black; text-align: center; font-weight: bold;"),
+          div(align = "center", withSpinner(plotlyOutput("heat_tob_preval", height = "auto"))),
+          h5("Retailer information", style="color: black; text-align: center; font-weight: bold;"),
+          div(align = "center", withSpinner(plotlyOutput("heat_tob_retail", height = "auto")))
+        )#taglist bracket
+      } else if (input$profile_summary == "POP") {
+        tagList(#Population profile
+          explanation_text,
+          h5("Population", style="color: black; text-align: center; font-weight: bold;"),
+          div(align = "center", withSpinner(plotlyOutput("heat_pop_pop", height = "auto")))
+        )#taglist bracket
+      } # end of if else == "Trend"
+    } else if (input$chart_summary == "Spine") {
+      # Resize plot height for display in app
+      tagList(
+        explanation_text,
+        withSpinner( plotOutput("spine_plot", height=spine_plot_height(), width="90%")),
+              br(),
+              br()
+              )
+    } # end of if else == "Spine"
+    
   })
   
   #####################.
-  #Heatmap plot
-  
-  # Calculates number of different indicators and then multiplies by pixels per row
-  # it needs the sum at the end as otherwise small domains plots will be too small
-  get_height_heat <- function() {
-    
-    #Obtaining number of indicators
-    no_ind <- unique(heat_chosenarea()$indicator)
-    length <- length(no_ind) * 50 + 125
-  
-  }
-
-  #Function to create ggplot, then used in renderPlot and ggsave
-  plot_heat <- function(){
-    
-    #Merging comparator and chosen area
-    if (input$comp_heat == 1){
-      heat <- left_join(x = heat_chosenarea(), y = heat_chosencomp(), by=c("indicator", "year")) %>% 
-        droplevels()
-    } else if (input$comp_heat == 2) {
-      heat <- left_join(x = heat_chosenarea(), y = heat_chosencomp(), by=c("indicator")) %>% 
-        droplevels()
+  # Downloading controls
+  # Downloading data
+  summary_csv <- reactive({ 
+    if (input$chart_summary == "Snapshot") {
+      format_csv(snapshot_data())
+    } else if (input$chart_summary == "Trend") {
+      format_csv(summary_chosen_area())
+    } else if (input$chart_summary == "Spine") {
+      spine_csv()
     }
+  })
+  
+  output$download_summary <- downloadHandler( 
+    filename =  'summary_data.csv', content = function(file) { 
+      write.csv(summary_csv(), file, row.names=FALSE) })
+  
+  # Downloading chart  
+  # output$download_summaryplot <- downloadHandler(
+  #   filename = 'heatmap.png',
+  #   content = function(file){
+  #     if (input$chart_summary == "Snapshot") {
+  # 
+  #       export(p = plot_snapshot_download(), file = file, zoom = 1)
+  #     } else if (input$chart_summary == "Trend") {
+  #       ggsave(file, plot = plot_heat()+
+  #                ggtitle(paste0(names(profile_list[unname(profile_list) == input$profile_summary]),
+  #                               " profile: "),
+  #                        subtitle =       if(input$comp_heat == 1){
+  #                          paste0(input$geoname_heat," (", input$geotype_heat, ") compared against ",
+  #                                 input$geocomp_heat)
+  #                        } else if(input$comp_heat==2){
+  #                          paste0("Changes within ",input$geoname_heat,": latest data available",
+  #                                 " compared to ", input$yearcomp_heat)
+  #                        }
+  #                ),
+  #              device = "png", scale=4, limitsize=FALSE)     
+  #     }
+  #   })
+  
+  ###############################################.
+  ## Snapshot  ----
+  ###############################################. 
+  # Reactive dataset
+  snapshot_data <- reactive({
+    summary_data() %>% group_by(indicator) %>% top_n(1, year) %>% 
+      ungroup() %>% droplevels() %>% 
+      # Indicator names in two lines, but without splitting words
+      # It split both sides of the cut point and identify if a word has been cut
+      mutate(indicator = as.character(indicator), # needed for plot and substring
+             pluschars = substring(indicator, 35),
+             underchars = substring(indicator, 1, 34),
+             char = substring(indicator, 35, 35),
+             unfinished_word = gsub( " .*$", "", pluschars),
+             plus_minus_unfinished = gsub( "^\\S*", "", pluschars)) %>%
+      # if it's shorter keep name as it is, if it breaks a word paste different bits
+      # there is one case for which it doesn't work well, so adhoc solution
+      mutate(indic_multiline = 
+               case_when(char == "" ~ paste0(indicator),
+                         char == " " ~ paste0(underchars, "<br>", pluschars),
+                         indicator == "Population prescribed drugs for anxiety/depression/psychosis" ~
+                           "Population prescribed drugs for<br>anxiety/depression/psychosis",
+                         TRUE ~ paste0(underchars, unfinished_word, "<br>", plus_minus_unfinished)))
+  })
+  
+  ###############################################.
+  # Function that creates a snapshot plot for a domain 
+  plot_profile_summary <- function(domainchosen) {
     
-    #Creating a palette of colours based on statistical significance
-    heat$color <- case_when(heat$interpret == "O" ~ 'white',
-                            heat$lowci <= heat$comp_m & heat$upci >= heat$comp_m ~'gray',
-                            heat$lowci > heat$comp_m & heat$interpret == "H" ~ 'blue',
-                            heat$lowci > heat$comp_m & heat$interpret == "L" ~ 'red',
-                            heat$upci < heat$comp_m & heat$interpret == "L" ~ 'blue',
-                            heat$upci < heat$comp_m & heat$interpret == "H" ~ 'red', 
-                            TRUE ~ 'white')
+    # only selecting maximum year for each indicator
+    prof_snap_data <- snapshot_data() %>% subset(domain == domainchosen) %>% 
+      droplevels() 
+    
+    #If no data available for that period then plot message saying data is missing
+    if (is.data.frame(prof_snap_data) && nrow(prof_snap_data) == 0)
+    {
+      plot_nodata()
+    } else { 
+
+   # Tooltip
+    if (input$comp_summary == 1) {#depending if time or area comparison
+      tooltip_summary <-  c(paste0(prof_snap_data$trend_axis, "<br>",
+                                   input$geoname_summary, ": ", prof_snap_data$measure, "  ||  ",
+                                   input$geocomp_summary, ": ", prof_snap_data$comp_m, "<br>",
+                                   prof_snap_data$type_definition))
+    } else if (input$comp_summary == 2) {
+      tooltip_summary <-  c(paste0(prof_snap_data$trend_axis, ": ",
+                                   prof_snap_data$measure, "<br>",
+                                   "Baseline period: ", prof_snap_data$comp_m, "<br>",
+                                   prof_snap_data$type_definition))
+    } 
+
+    # eliminating both axis
+    axis_layout <- list(title = "", fixedrange=TRUE, zeroline = FALSE, showline = FALSE,
+                        showticklabels = FALSE, showgrid = FALSE)
+    
+    height_plot <- 38*nrow(prof_snap_data)+10 # height of the plot depends on number indicators
+    
+    # defining plot function
+    plot_ly(prof_snap_data, y = ~indicator,   color = ~color, 
+               colors=  c(blue = "#4da6ff", gray = "gray88", red = "#ffa64d", white = "#ffffff"),
+               height = height_plot) %>% 
+      add_bars(x =1, showlegend= FALSE, width=1, 
+               hoverinfo="text", hovertext = tooltip_summary,
+               marker = list(line= list(color="black", width = 0.5))) %>% 
+      # adding indicator name at center of each bar
+      add_text(text = ~indic_multiline, x =0.5,  showlegend= FALSE, 
+               textfont = list(color='black'), hoverinfo="skip" ) %>% 
+      layout(yaxis = axis_layout, xaxis = axis_layout,
+             margin = list(b= 10 , t=5, l = 5, r = 0),
+             font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif')) %>% # to get hover compare mode as default
+      config(displayModeBar = FALSE, displaylogo = F, collaborate=F, editable =F)
+    }
+ 
+  }
+  
+  ###############################################.
+  # Creating output plots for each domain of each profile 
+  # Charts for Health and wellbeing profile
+  output$summ_hwb_beha <- renderPlotly({ plot_profile_summary("Behaviours")})
+  output$summ_hwb_socare <- renderPlotly({ plot_profile_summary("Social care & housing")})
+  output$summ_hwb_env <- renderPlotly({ plot_profile_summary("Environment")})
+  output$summ_hwb_lifexp <- renderPlotly({ plot_profile_summary("Life expectancy & mortality")})
+  output$summ_hwb_women <- renderPlotly({ plot_profile_summary("Women's & children's health")})
+  output$summ_hwb_imm <- renderPlotly({ plot_profile_summary("Immunisations & screening")})
+  output$summ_hwb_econ <- renderPlotly({ plot_profile_summary("Economy")})
+  output$summ_hwb_crime <- renderPlotly({ plot_profile_summary("Crime")})
+  output$summ_hwb_mh <- renderPlotly({ plot_profile_summary("Mental health")})
+  output$summ_hwb_injury <- renderPlotly({ plot_profile_summary("Ill health & injury")})
+  output$summ_hwb_educ <- renderPlotly({ plot_profile_summary("Education")})
+  # Charts for Children and young people profile
+  output$summ_cyp_active <- renderPlotly({ plot_profile_summary("Active")})
+  output$summ_cyp_health <- renderPlotly({ plot_profile_summary("Healthy")})
+  output$summ_cyp_safe <- renderPlotly({ plot_profile_summary("Safe")})
+  output$summ_cyp_includ <- renderPlotly({ plot_profile_summary("Included")})
+  output$summ_cyp_nurt <- renderPlotly({ plot_profile_summary("Nurtured")})
+  output$summ_cyp_achiev <- renderPlotly({ plot_profile_summary("Achieving")})
+  output$summ_cyp_respon <- renderPlotly({ plot_profile_summary("Responsible")})
+  # Charts for Alcohol profile
+  output$summ_alc_env <- renderPlotly({ plot_profile_summary("Environment")})
+  output$summ_alc_serv <- renderPlotly({ plot_profile_summary("Services")})
+  output$summ_alc_commsaf <- renderPlotly({ plot_profile_summary("Community safety")})
+  output$summ_alc_family <- renderPlotly({ plot_profile_summary("CAPSM/Families")})
+  output$summ_alc_preval <- renderPlotly({ plot_profile_summary("Prevalence")})
+  output$summ_alc_health <- renderPlotly({ plot_profile_summary("Health")})
+  # Charts for Drugs profile
+  output$summ_drg_env <- renderPlotly({ plot_profile_summary("Environment")})
+  output$summ_drg_serv <- renderPlotly({ plot_profile_summary("Services")})
+  output$summ_drg_commsaf <- renderPlotly({ plot_profile_summary("Community safety")})
+  output$summ_drg_family <- renderPlotly({ plot_profile_summary("CAPSM/Families")})
+  output$summ_drg_preval <- renderPlotly({ plot_profile_summary("Prevalence")})
+  output$summ_drg_health <- renderPlotly({ plot_profile_summary("Health")})
+  output$summ_drg_data <- renderPlotly({ plot_profile_summary("Data quality")})
+  # Charts for mental health profile
+  output$summ_men_fem <- renderPlotly({ plot_profile_summary("Female adult")})
+  output$summ_men_male <- renderPlotly({ plot_profile_summary("Male adult")})
+  output$summ_men_cyp <- renderPlotly({ plot_profile_summary("CYP Mental Health")})
+  # Charts for Tobacco profile
+  output$summ_tob_school <- renderPlotly({ plot_profile_summary("Smoking in school children")})
+  output$summ_tob_cess <- renderPlotly({ plot_profile_summary("Smoking cessation & smoking cessation products")})
+  output$summ_tob_attrib <- renderPlotly({ plot_profile_summary("Smoking attributable deaths & diseases")})
+  output$summ_tob_pregn <- renderPlotly({ plot_profile_summary("Smoking during and post pregnancy")})
+  output$summ_tob_preval <- renderPlotly({ plot_profile_summary("Adult prevalence")})
+  output$summ_tob_retail <- renderPlotly({ plot_profile_summary("Retailer information")})
+  # Charts for population profile
+  output$summ_pop_pop <- renderPlotly({ plot_profile_summary("Population")})
+  
+  ###############################################.        
+  #### Heatmap ----
+  ###############################################.  
+  #####################.
+  #Heatmap plot
+  #Function to create ggplot, then used in renderPlot
+  plot_heat <- function(domain_plot){
+    heat <- summary_data() %>% subset(domain == domain_plot) %>% droplevels()
+    
+    #If no data available for that period then plot message saying data is missing
+    if (is.data.frame(heat) && nrow(heat) == 0)
+    {
+      plot_nodata()
+      } else { #If data is available then plot it
+   
+
+    # Calculates number of different indicators and then multiplies by pixels per row
+    # it needs the sum at the end as otherwise small domains plots will be too small
+      #Obtaining number of indicators
+        
+      get_height_heat <- function() {
+        no_ind <- unique(heat$indicator)
+        height_plot <- length(no_ind) * 33 + 50
+      }
     
     #Tooltip
     heat_tooltip <- paste0(heat$indicator, "<br>", heat$def_period, "<br>",
                            heat$type_definition, "<br>", heat$measure)
     
     # Plotting data
-    ggplot(heat, aes(x = year, y = indicator, fill = color,
-                     text= heat_tooltip)) +
+    heat_p <- ggplot(heat, aes(x = year, y = indicator, fill = color, text = heat_tooltip)) +
       geom_tile(color = "black") +
       geom_text(aes(label = round(measure, 0)), size =3) +
       ylim(rev(levels(heat$indicator))) + #to order with A on top
@@ -733,392 +982,348 @@ showModal(welcome_modal)
       scale_fill_manual(name = "Legend", labels = c("Significantly better", "Not significantly different", "Significantly worse", "Significance is not calculated"),
                         values = c(blue = "#4da6ff", gray = "gray88", red = "#ffa64d", white = "#ffffff")) +
       #Giving the right dimensions to the plot
-      scale_x_continuous(position = "top", breaks=seq(from = min(heat$year), to = max(heat$year), by =1)) +
+      scale_x_continuous(position = "top", breaks=seq(from = min(summary_data()$year), 
+                                                      to = 2018, by =1)) + #max(summary_data()$year)
       #Layout
       theme(axis.text.x = element_text(angle=90),
             axis.ticks.y=element_blank(), # taking out axis tick marks
-            axis.title=element_blank(), #Taking out axis titles
+            axis.title.x=element_blank(), #Taking out y axis title
+            axis.title.y=element_blank(), #Taking out y axis title
             panel.background = element_blank(),#Blanking background
             legend.position="none", #taking out legend
             text = element_text(size=14) # changing font size
       )
-  }
-  
-  output$heat_plot <- renderPlotly({
-    #If no data available for that period then plot message saying data is missing
-    if (is.data.frame(heat_chosenarea()) && nrow(heat_chosenarea()) == 0)
-    {
-      plot_nodata()
-    }
-    else { #If data is available then plot it
-    #Converting ggplot into a Plotly object
-      ggplotly(plot_heat(), tooltip=c("text"), height = get_height_heat()) %>%
-      # margins needed as long labels don't work well with Plotly
-        layout(margin = list(l = 400, t = 50),
-             xaxis = list(side = 'top', fixedrange=TRUE), yaxis= list(fixedrange=TRUE),
-             font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif')) %>%
+    
+      #Converting ggplot into a Plotly object
+      ggplotly(heat_p, tooltip=c("text"), height= get_height_heat()) %>%
+        # margins needed as long labels don't work well with Plotly
+        layout(margin = list(l = 400, t = 50, b =0),
+               xaxis = list(side = 'top', fixedrange=TRUE), yaxis= list(fixedrange=TRUE),
+               font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif')) %>%
         config(displayModeBar = FALSE, displaylogo = F, collaborate=F, editable =F) # taking out plotly logo and collaborate button
     }
+  }
+  
+  ###############################################.
+  # Creating output plots for each domain of each profile 
+  output$heat_hwb_beha <- renderPlotly({ plot_heat("Behaviours")})
+  output$heat_hwb_socare <- renderPlotly({ plot_heat("Social care & housing")})
+  output$heat_hwb_env <- renderPlotly({ plot_heat("Environment")})
+  output$heat_hwb_lifexp <- renderPlotly({ plot_heat("Life expectancy & mortality")})
+  output$heat_hwb_women <- renderPlotly({ plot_heat("Women's & children's health")})
+  output$heat_hwb_imm <- renderPlotly({ plot_heat("Immunisations & screening")})
+  output$heat_hwb_econ <- renderPlotly({ plot_heat("Economy")})
+  output$heat_hwb_crime <- renderPlotly({ plot_heat("Crime")})
+  output$heat_hwb_mh <- renderPlotly({ plot_heat("Mental health")})
+  output$heat_hwb_injury <- renderPlotly({ plot_heat("Ill health & injury")})
+  output$heat_hwb_educ <- renderPlotly({ plot_heat("Education")})
+  # Charts for Children and young people profile
+  output$heat_cyp_active <- renderPlotly({ plot_heat("Active")})
+  output$heat_cyp_health <- renderPlotly({ plot_heat("Healthy")})
+  output$heat_cyp_safe <- renderPlotly({ plot_heat("Safe")})
+  output$heat_cyp_includ <- renderPlotly({ plot_heat("Included")})
+  output$heat_cyp_nurt <- renderPlotly({ plot_heat("Nurtured")})
+  output$heat_cyp_achiev <- renderPlotly({ plot_heat("Achieving")})
+  output$heat_cyp_respon <- renderPlotly({ plot_heat("Responsible")})
+  # Charts for Alcohol profile
+  output$heat_alc_env <- renderPlotly({ plot_heat("Environment")})
+  output$heat_alc_serv <- renderPlotly({ plot_heat("Services")})
+  output$heat_alc_commsaf <- renderPlotly({ plot_heat("Community safety")})
+  output$heat_alc_family <- renderPlotly({ plot_heat("CAPSM/Families")})
+  output$heat_alc_preval <- renderPlotly({ plot_heat("Prevalence")})
+  output$heat_alc_health <- renderPlotly({ plot_heat("Health")})
+  # Charts for Drugs profile
+  output$heat_drg_env <- renderPlotly({ plot_heat("Environment")})
+  output$heat_drg_serv <- renderPlotly({ plot_heat("Services")})
+  output$heat_drg_commsaf <- renderPlotly({ plot_heat("Community safety")})
+  output$heat_drg_family <- renderPlotly({ plot_heat("CAPSM/Families")})
+  output$heat_drg_preval <- renderPlotly({ plot_heat("Prevalence")})
+  output$heat_drg_health <- renderPlotly({ plot_heat("Health")})
+  output$heat_drg_data <- renderPlotly({ plot_heat("Data quality")})
+  # Charts for mental health profile
+  output$heat_men_fem <- renderPlotly({ plot_heat("Female adult")})
+  output$heat_men_male <- renderPlotly({ plot_heat("Male adult")})
+  output$heat_men_cyp <- renderPlotly({ plot_heat("CYP Mental Health")})
+  # Charts for Tobacco profile
+  output$heat_tob_school <- renderPlotly({ plot_heat("Smoking in school children")})
+  output$heat_tob_cess <- renderPlotly({ plot_heat("Smoking cessation & smoking cessation products")})
+  output$heat_tob_attrib <- renderPlotly({ plot_heat("Smoking attributable deaths & diseases")})
+  output$heat_tob_pregn <- renderPlotly({ plot_heat("Smoking during and post pregnancy")})
+  output$heat_tob_preval <- renderPlotly({ plot_heat("Adult prevalence")})
+  output$heat_tob_retail <- renderPlotly({ plot_heat("Retailer information")})
+  # Charts for population profile
+  output$heat_pop_pop <- renderPlotly({ plot_heat("Population")})
+  
+  ##############################################.
+  ## Spine/Barcode ----
+  ###############################################.    
+  
+
+  ############################################.
+  ## Reactive controls
+  
+  # Reactive controls for domain depending on profile
+  output$topic_ui_spine <- renderUI({
+    domain_list <- sort(profile_lookup$domain[profile_lookup$profile == input$profile_summary])
+    selectInput("topic_spine", "Domain", choices = domain_list, selected='')
   })
   
-  #####################.
-  # Downloading controls
-  # Downloading data
-    heat_csv <- reactive({ format_csv(heat_chosenarea()) })
   
-    output$download_heat <- downloadHandler( filename =  'heatmap_data.csv',
-      content = function(file) { write.csv(heat_csv(), file, row.names=FALSE) })
+  ############################################.
+  ## Spine Data
+  
+  #Barcode all area data
+  spine_allareas <- reactive({
     
+    optdata %>%
+      group_by (indicator) %>%
+      mutate(max_year = max(year))%>%
+      subset (year == max_year &
+                (substr(profile_domain1, 1, 3) == input$profile_summary |
+                   substr(profile_domain2, 1, 3) == input$profile_summary) &
+                (substr(profile_domain1, 5, nchar(as.vector(profile_domain1))) == input$topic_spine |
+                   substr(profile_domain2, 5, nchar(as.vector(profile_domain2))) == input$topic_spine) &
+                areatype  == input$geotype_summary &
+                !(indicator %in% c("Mid-year population estimate - all ages", "Quit attempts")))
+  })
+  
+  #Barcode data for the chosen area. Filtering based on user input values.
+  spine_chosenarea <- reactive({
+    optdata %>%
+      group_by (indicator) %>%
+      mutate(max_year=max(year))%>%
+      subset (year == max_year &
+                areaname == input$geoname_summary &
+                (substr(profile_domain1, 1, 3) == input$profile_summary |
+                   substr(profile_domain2, 1, 3) == input$profile_summary) &
+                (substr(profile_domain1, 5, nchar(as.vector(profile_domain1))) == input$topic_spine |
+                   substr(profile_domain2, 5, nchar(as.vector(profile_domain2))) == input$topic_spine) &
+                areatype  == input$geotype_summary &
+                !(indicator %in% c("Mid-year population estimate - all ages", "Quit attempts"))) %>%
+      select(c(indicator, measure, lowci, upci)) %>%
+      rename(measure_chosen= measure, lowci_chosen=lowci, upci_chosen= upci) %>%
+      droplevels()
+  })
+  
+  #Select comparator based on years available for area selected.
+  spine_chosencomp <- reactive({
+    
+    optdata %>%
+      group_by (indicator) %>%
+      mutate(max_year=max(year))%>%
+      subset (year==max_year &
+                areaname == input$geocomp_spine &
+                areatype %in% c("Health board", "Council area", "Scotland") &
+                (substr(profile_domain1, 1, 3) == input$profile_summary |
+                   substr(profile_domain2, 1, 3) == input$profile_summary) &
+                (substr(profile_domain1, 5, nchar(as.vector(profile_domain1))) == input$topic_spine |
+                   substr(profile_domain2, 5, nchar(as.vector(profile_domain2))) == input$topic_spine) &
+                !(indicator %in% c("Mid-year population estimate - all ages", "Quit attempts"))) %>%
+      select(c(indicator, measure)) %>%
+      rename(measure_comp =measure) %>%
+      droplevels()
+    
+  })        
+  
+  #####################.
+  # Creating Spine plot 
+  
+  #Dynamically set height of bars
+  spine_plot_height<- function(){
+    (nrow(spine_chosenarea())*50+70)
+  }
+  
+  # Create barcode plot function
+  plot_spine <- function(){
+    
+    ind_count <- length(unique(spine_allareas()$ind_id)) #facet_wrap requires how many chart rows to render
+    
+    #Merging comparator and chosen area
+    spine <- merge(spine_allareas(), spine_chosencomp(), by=c("indicator"))
+    spine <- left_join(spine, spine_chosenarea(), by=c("indicator"))
+    
+    #add variable denoting if sign diff between comparator
+    spine<-spine %>%
+      mutate(flag=case_when(
+        interpret == "O" ~ 'No significance can be calculated',
+        lowci_chosen<=measure_comp & upci_chosen>=measure_comp ~
+          'Not different to comparator',
+        lowci_chosen > measure_comp & interpret == "H" ~ 'Better than comparator',
+        lowci_chosen > measure_comp & interpret == "L" ~ 'Worse than comparator',
+        upci_chosen < measure_comp & interpret == "L" ~ 'Better than comparator',
+        upci_chosen < measure_comp & interpret == "H" ~ 'Worse than comparator',
+        TRUE ~ 'No significance can be calculated'))
+    
+    #Transposing data so that better is always to the right hand side of plot
+    spine <- spine %>%
+      mutate(comp = 1,
+             all = measure/measure_comp,
+             chosen = measure_chosen/measure_comp,
+             all2=case_when(interpret=='L' & measure>measure_comp ~ -(all-1),
+                            interpret=='L' & measure<=measure_comp ~ 
+                              (1-all), TRUE ~ -(1-all)),
+             chosen2=case_when(interpret=='L' & measure_chosen>measure_comp ~
+                                 -(chosen-1),
+                               interpret=='L' & measure_chosen<=measure_comp ~
+                                 (1-chosen), TRUE ~ -(1-chosen))) %>%
+      mutate(comp=0)
+    
+    #define x axis value to assign as intercept for significance
+    minx <- min(spine$all2)-0.1
+    
+    #generate labels for comp and chosen bars
+    data_labels <- spine %>%
+      select(indicator, measure_comp, measure_chosen, chosen2, comp, type_definition,trend_axis, code) %>%
+      group_by(indicator, type_definition, trend_axis, code) %>%
+      summarise(comp_lab=measure_comp[1], chosen_lab=measure_chosen[1],
+                x_chosen=chosen2[1], x_comp = comp[1])%>%
+      droplevels()
+    
+    spine_data <- bind_rows(spine %>% mutate(y=0),
+                            spine %>% mutate(y=1))
+    
+    #Chart title text & subtitle
+    areatype_name <- input$geotype_summary
+    chosenarea_name <- input$geoname_summary
+    comparea_name <- input$geocomp_spine
+    
+    #Create colour scale for lines & legend key.
+    colour_lines <-  scale_colour_manual(" ",values= setNames(c("black","#009999","#990000"), c(areatype_name, chosenarea_name, comparea_name)))
+    
+    #Create fill colour scheme for significance.
+    fill_df <- data.frame(flag = c ('No significance can be calculated','Not different to comparator','Better than comparator','Worse than comparator'),stringsAsFactors = TRUE)
+    fillcolours <- c("#4da6ff","white","grey88","#ffa64d")
+    names(fillcolours) <- levels(fill_df$flag)
+    colour_points <- scale_fill_manual(name = "flag",values = fillcolours)
+    
+    ggplot(spine_data, aes(x = all2, y = y, group=code, colour=areatype))+
+      geom_line(alpha=0.6)+
+      geom_line(aes(x = chosen2, colour=chosenarea_name), size=1) + #line for picked area
+      geom_line(aes(x = comp, colour=comparea_name), size=1) + #line for comparator
+      geom_point(aes(fill=flag, shape=flag, x= minx, y=0.5),size=8,colour="grey40") +
+      geom_text(data=data_labels, aes(x=x_chosen,y=1.5,label=round(chosen_lab,digits=0)),
+                check_overlap = TRUE,size=5,colour = "#009999",vjust=1, hjust=0) + #label for chosenarea - teal
+      geom_text(data=data_labels, aes(x=x_comp,y=-0.6,label=round(comp_lab,digits=0)),
+                check_overlap = TRUE,size=5,colour = "#990000",vjust=0, hjust=1) + #label for comparator - red
+      xlab("Worse  <-------------------->  Better")+
+      scale_x_discrete(position = "top") +
+      colour_lines+
+      colour_points+
+      scale_shape_manual(values=c(22,22,22,22)) +
+      guides(color = "none",fill = "none", shape="none")+
+      theme(
+        axis.title.y=element_blank(), #Taking out y axis title
+        axis.title.x=element_text(size=12, colour ='#555555',hjust=0.6), #x axis title contains better/worse
+        text = element_text(family="Arial"),
+        legend.direction = "vertical",
+        legend.justification = "top",
+        legend.key = element_rect(colour = NA, fill = NA),
+        legend.text = element_text(size=14,colour ='#555555', hjust=-1),
+        legend.title = element_blank(),
+        panel.grid = element_blank(),
+        axis.text=element_blank(), # taking out x axis labels
+        axis.ticks=element_blank(),
+        panel.background = element_rect(fill="grey95"))+ # azure background
+      facet_wrap(~indicator + type_definition + trend_axis, # fields to facet on
+                 nrow=ind_count,ncol=1,                   # how many rows  and colums to include
+                 scales="fixed",                          # fix scale so can compare % diff down column
+                 labeller = label_wrap_gen(multi_line = TRUE), # allow labels to wrap 
+                 strip.position="left")+                    # swap strip text to appear on left
+      theme(strip.text.y = element_text(size=14,colour ='#555555', angle = 180, hjust = 0), #adjust font & rotation
+            strip.switch.pad.wrap = unit(-1, "cm"), # reducing white space between strip panel & chart
+            strip.placement = "outside",  # formatting again to try and limit white space
+            strip.background = element_rect(fill="grey95"))           # change colour of facet wrap background
+  }        
+  
+  
+  
+  # Render spine plot - inlucde if statement for situations where no data available
+  output$spine_plot <- renderPlot({
+    if(is.data.frame(spine_chosenarea()) && nrow(spine_chosenarea())==0)
+    {plot_nodata_gg()}
+    else {plot_spine()}
+  })
+  
+  #Create text output for responsive plot legend
+  #legend - selected area - green
+  output$ui_spine_legend_selected <- renderUI({
+    img(src='spine_legend_selected.jpg', height=18, style="padding-right: 2px; vertical-align:middle",paste(input$geoname_summary,sep = ""))
+  }) 
+  
+  #legend - comparator - pink
+  output$ui_spine_legend_comparator <- renderUI({
+    img(src='spine_legend_comparator.jpg', height=18, style="padding-right: 2px; vertical-align:middle",paste(input$geocomp_spine))
+  })
+  
+  #legend - area type - grey bars
+  output$ui_spine_legend_areatype <- renderUI({
+    img(src='bar_legend_areatype.jpg', height=18, style="padding-right: 2px; vertical-align:middle",paste(input$geotype_summary))
+  }) 
+
+  #####################.
+  # Downloading spine plot and data  
+  # Define data file to download
+  
+  spine_csv <- reactive({
+    
+    #Merging comparator and chosen area
+    spine <- merge(spine_allareas(), spine_chosencomp(), by=c("indicator"))
+    spine <- left_join(spine, spine_chosenarea(), by=c("indicator"))
+    spine <- bind_cols(spine %>% mutate(topic=input$topic_spine))
+    spine <- bind_cols(spine %>% mutate(comparator=input$geocomp_spine))
+    
+    spine<-spine %>%
+      mutate(flag=case_when(
+        interpret == "O" ~'NA',
+        lowci_chosen<= measure_comp & upci_chosen>=measure_comp ~ 'NS',
+        lowci_chosen > measure_comp & interpret == "H" ~ 'Better',
+        lowci_chosen > measure_comp & interpret == "L" ~ 'Worse',
+        upci_chosen < measure_comp & interpret == "L" ~ 'Better',
+        upci_chosen < measure_comp & interpret == "H" ~ 'Worse',
+        TRUE ~ 'NA'))
+    
+    spine %>%
+      select(c(indicator, areaname, areatype, def_period, numerator, measure,
+               lowci, upci, type_definition, topic, measure_comp, comparator, flag)) %>%
+      rename(lower_confidence_interval=lowci, upper_confidence_interval=upci,
+             latest_period = def_period, definition = type_definition, comparator_measure = measure_comp, difference=flag)
+    
+  })
+  
   # Downloading chart  
-    output$download_heatplot <- downloadHandler(
-      filename = 'heatmap.png',
-      content = function(file){
-        ggsave(file, plot = plot_heat()+ 
-                 ggtitle(paste0(names(profile_list[unname(profile_list) == input$profile_heat]),
-                                " profile: ", input$topic_heat),
-                         subtitle =       if(input$comp_heat == 1){
-                           paste0(input$geoname_heat," (",input$geotype_heat,") compared against ",
-                                  input$geocomp_heat)
-                         } else if(input$comp_heat==2){
-                           paste0("Changes within ",input$geoname_heat,": latest data available",
-                                  " compared to ", input$yearcomp_heat)
-                         }
-                         ), 
-               device = "png", scale=4, limitsize=FALSE)
-      })
-    
-    ##############################################.
-    ## Spine/Barcode ----
-    ###############################################.    
-    
-    ###############################################.
-    # Indicator definitions
-    # Subsetting by domain and profile. Profile is fiddly as vector uses abbreviations 
-    # so needs to be converted to the names to match techdoc.
-    defs_data_spine <- reactive({techdoc %>% subset(grepl(input$topic_spine, domain) &
-                                                      grepl(names(profile_list[unname(profile_list) == input$profile_spine]),
-                                                            profile))})
-    
-    output$defs_text_spine <- renderUI({
-      
-      HTML(paste(sprintf("<b><u>%s</b></u> <br> %s ", defs_data_spine()$indicator_name, 
-                         defs_data_spine()$indicator_definition), collapse = "<br><br>"))
+  output$download_spineplot <- downloadHandler(
+    filename = 'spine.png',
+    content = function(file){
+      ggsave(file, plot = plot_spine()
+             +ggtitle(label=paste(names(profile_list[unname(profile_list) == input$profile_summary])," profile: ", input$topic_spine,sep=""),
+                      subtitle =paste(input$geoname_summary," (",input$geotype_summary,") compared against ",input$geocomp_spine,sep="")),
+             device = "png",width=15, limitsize=FALSE)
     })
-    
-    ############################################.
-    ## Reactive controls
-    
-    # Reactive controls for domain depending on profile
-    output$topic_ui_spine <- renderUI({
-      domain_list <- sort(profile_lookup$domain[profile_lookup$profile == input$profile_spine])
-      selectInput("topic_spine", "Domain", choices = domain_list, selected='')
-    })
-    
-    # Reactive controls for areatype depending on profile selected
-    output$geotype_ui_spine <- renderUI({
-      areas <- areatype_profile[[names(profile_list[unname(profile_list) == input$profile_spine])]]
-      areas <- areas [! areas %in% c("Scotland")]
-      selectInput("geotype_spine", "Geography level", choices=areas,
-                  selected = "Health board")
-    })        
-    
-    # Reactive controls for spinecode:area name depending on areatype selected
-    output$geoname_ui_spine <- renderUI({
-      areas_spine <- if (input$geotype_spine %in% c("Health board", "Council area", 
-                                                    "Alcohol & drug partnership", "HSC partnership"))
-      {
-        sort(geo_lookup$areaname[geo_lookup$areatype == input$geotype_spine])
-      } else {
-        sort(geo_lookup$areaname[geo_lookup$areatype == input$geotype_spine
-                                 & geo_lookup$parent_area == input$loc_iz_spine])
-      }
-      selectInput("geoname_spine", "Select your area", choices = areas_spine, selectize=TRUE, selected = "")
-    })
-    
-    # Barcode help pop-up
-    observeEvent(input$help_spine, {
-      showModal(modalDialog(
-        title = "How to use this chart",
-        p(img(src="help_barcode2.png",height=600)),size = "l",
-        easyClose = TRUE, fade=FALSE
-      ))
-    })  
-    
-    ############################################.
-    ## Spine Data
-    
-    #Barcode all area data
-    spine_allareas <- reactive({
-      
-      optdata %>%
-        group_by (indicator) %>%
-        mutate(max_year = max(year))%>%
-        subset (year == max_year &
-                  (substr(profile_domain1, 1, 3) == input$profile_spine |
-                     substr(profile_domain2, 1, 3) == input$profile_spine) &
-                  (substr(profile_domain1, 5, nchar(as.vector(profile_domain1))) == input$topic_spine |
-                     substr(profile_domain2, 5, nchar(as.vector(profile_domain2))) == input$topic_spine) &
-                  areatype  == input$geotype_spine &
-                  !(indicator %in% c("Mid-year population estimate - all ages", "Quit attempts")))
-    })
-    
-    #Barcode data for the chosen area. Filtering based on user input values.
-    spine_chosenarea <- reactive({
-      optdata %>%
-        group_by (indicator) %>%
-        mutate(max_year=max(year))%>%
-        subset (year == max_year &
-                  areaname == input$geoname_spine &
-                  (substr(profile_domain1, 1, 3) == input$profile_spine |
-                     substr(profile_domain2, 1, 3) == input$profile_spine) &
-                  (substr(profile_domain1, 5, nchar(as.vector(profile_domain1))) == input$topic_spine |
-                     substr(profile_domain2, 5, nchar(as.vector(profile_domain2))) == input$topic_spine) &
-                  areatype  == input$geotype_spine &
-                  !(indicator %in% c("Mid-year population estimate - all ages", "Quit attempts"))) %>%
-        select(c(indicator, measure, lowci, upci)) %>%
-        rename(measure_chosen= measure, lowci_chosen=lowci, upci_chosen= upci) %>%
-        droplevels()
-    })
-    
-    #Select comparator based on years available for area selected.
-    spine_chosencomp <- reactive({
-      
-      optdata %>%
-        group_by (indicator) %>%
-        mutate(max_year=max(year))%>%
-        subset (year==max_year &
-                  areaname == input$geocomp_spine &
-                  areatype %in% c("Health board", "Council area", "Scotland") &
-                  (substr(profile_domain1, 1, 3) == input$profile_spine |
-                     substr(profile_domain2, 1, 3) == input$profile_spine) &
-                  (substr(profile_domain1, 5, nchar(as.vector(profile_domain1))) == input$topic_spine |
-                     substr(profile_domain2, 5, nchar(as.vector(profile_domain2))) == input$topic_spine) &
-                  !(indicator %in% c("Mid-year population estimate - all ages", "Quit attempts"))) %>%
-        select(c(indicator, measure)) %>%
-        rename(measure_comp =measure) %>%
-        droplevels()
-      
-    })        
-    
-    #####################.
-    # Creating Spine plot 
-    
-    #Dynamically set height of bars
-    spine_plot_height<- function(){
-      (nrow(spine_chosenarea())*50+70)
-    }
-    
-    # Create barcode plot function
-    plot_spine <- function(){
-      
-      ind_count <- length(unique(spine_allareas()$ind_id)) #facet_wrap requires how many chart rows to render
-      
-      #Merging comparator and chosen area
-      spine <- merge(spine_allareas(), spine_chosencomp(), by=c("indicator"))
-      spine <- left_join(spine, spine_chosenarea(), by=c("indicator"))
-      
-      #add variable denoting if sign diff between comparator
-      spine<-spine %>%
-        mutate(flag=case_when(
-          interpret == "O" ~ 'No significance can be calculated',
-          lowci_chosen<=measure_comp & upci_chosen>=measure_comp ~
-            'Not different to comparator',
-          lowci_chosen > measure_comp & interpret == "H" ~ 'Better than comparator',
-          lowci_chosen > measure_comp & interpret == "L" ~ 'Worse than comparator',
-          upci_chosen < measure_comp & interpret == "L" ~ 'Better than comparator',
-          upci_chosen < measure_comp & interpret == "H" ~ 'Worse than comparator',
-          TRUE ~ 'No significance can be calculated'))
-      
-      #Transposing data so that better is always to the right hand side of plot
-      spine <- spine %>%
-        mutate(comp = 1,
-               all = measure/measure_comp,
-               chosen = measure_chosen/measure_comp,
-               all2=case_when(interpret=='L' & measure>measure_comp ~ -(all-1),
-                              interpret=='L' & measure<=measure_comp ~ 
-                                (1-all), TRUE ~ -(1-all)),
-               chosen2=case_when(interpret=='L' & measure_chosen>measure_comp ~
-                                   -(chosen-1),
-                                 interpret=='L' & measure_chosen<=measure_comp ~
-                                   (1-chosen), TRUE ~ -(1-chosen))) %>%
-        mutate(comp=0)
-      
-      #define x axis value to assign as intercept for significance
-      minx <- min(spine$all2)-0.1
-      
-      #generate labels for comp and chosen bars
-      data_labels <- spine %>%
-        select(indicator, measure_comp, measure_chosen, chosen2, comp, type_definition,trend_axis, code) %>%
-        group_by(indicator, type_definition, trend_axis, code) %>%
-        summarise(comp_lab=measure_comp[1], chosen_lab=measure_chosen[1],
-                  x_chosen=chosen2[1], x_comp = comp[1])%>%
-        droplevels()
-      
-      spine_data <- bind_rows(spine %>% mutate(y=0),
-                              spine %>% mutate(y=1))
-      
-      #Chart title text & subtitle
-      areatype_name <- input$geotype_spine
-      chosenarea_name <- input$geoname_spine
-      comparea_name <- input$geocomp_spine
-    
-      #Create colour scale for lines & legend key.
-      colour_lines <-  scale_colour_manual(" ",values= setNames(c("black","#009999","#990000"), c(areatype_name, chosenarea_name, comparea_name)))
-    
-      #Create fill colour scheme for significance.
-      fill_df <- data.frame(flag = c ('No significance can be calculated','Not different to comparator','Better than comparator','Worse than comparator'),stringsAsFactors = TRUE)
-      fillcolours <- c("#4da6ff","white","grey88","#ffa64d")
-      names(fillcolours) <- levels(fill_df$flag)
-      colour_points <- scale_fill_manual(name = "flag",values = fillcolours)
-      
-      ggplot(spine_data, aes(x = all2, y = y, group=code, colour=areatype))+
-        geom_line(alpha=0.6)+
-        geom_line(aes(x = chosen2, colour=chosenarea_name), size=1) + #line for picked area
-        geom_line(aes(x = comp, colour=comparea_name), size=1) + #line for comparator
-        geom_point(aes(fill=flag, shape=flag, x= minx, y=0.5),size=8,colour="grey40") +
-        geom_text(data=data_labels, aes(x=x_chosen,y=1.5,label=round(chosen_lab,digits=0)),
-                  check_overlap = TRUE,size=5,colour = "#009999",vjust=1, hjust=0) + #label for chosenarea - teal
-        geom_text(data=data_labels, aes(x=x_comp,y=-0.6,label=round(comp_lab,digits=0)),
-                  check_overlap = TRUE,size=5,colour = "#990000",vjust=0, hjust=1) + #label for comparator - red
-        xlab("Worse  <-------------------->  Better")+
-        scale_x_discrete(position = "top") +
-        colour_lines+
-        colour_points+
-        scale_shape_manual(values=c(22,22,22,22)) +
-        guides(color = "none",fill = "none", shape="none")+
-        theme(
-          axis.title.y=element_blank(), #Taking out y axis title
-          axis.title.x=element_text(size=12, colour ='#555555',hjust=0.6), #x axis title contains better/worse
-          text = element_text(family="Arial"),
-          legend.direction = "vertical",
-          legend.justification = "top",
-          legend.key = element_rect(colour = NA, fill = NA),
-          legend.text = element_text(size=14,colour ='#555555', hjust=-1),
-          legend.title = element_blank(),
-          panel.grid = element_blank(),
-          axis.text=element_blank(), # taking out x axis labels
-          axis.ticks=element_blank(),
-          panel.background = element_rect(fill="grey95"))+ # azure background
-        facet_wrap(~indicator + type_definition + trend_axis, # fields to facet on
-                   nrow=ind_count,ncol=1,                   # how many rows  and colums to include
-                   scales="fixed",                          # fix scale so can compare % diff down column
-                   labeller = label_wrap_gen(multi_line = TRUE), # allow labels to wrap 
-                   strip.position="left")+                    # swap strip text to appear on left
-        theme(strip.text.y = element_text(size=14,colour ='#555555', angle = 180, hjust = 0), #adjust font & rotation
-              strip.switch.pad.wrap = unit(-1, "cm"), # reducing white space between strip panel & chart
-              strip.placement = "outside",  # formatting again to try and limit white space
-              strip.background = element_rect(fill="grey95"))           # change colour of facet wrap background
-    }        
-    
-    
 
-    # Render spine plot - inlucde if statement for situations where no data available
-    output$spine_plot <- renderPlot({
-      if(is.data.frame(spine_chosenarea()) && nrow(spine_chosenarea())==0)
-      {plot_nodata_gg()}
-      else {plot_spine()}
-    })
-    
-    
-    # Resize plot height for display in app
-    output$ui_spine_plot <-renderUI({
-      plotOutput("spine_plot", height=spine_plot_height(), width="100%")
-    })
-    
-
-    #Create text output for responsive plot legend
-    #legend - selected area - green
-    output$ui_spine_legend_selected <- renderUI({
-      img(src='spine_legend_selected.jpg', height=18, style="padding-right: 2px; vertical-align:middle",paste(input$geoname_spine,sep = ""))
-    }) 
-    
-    #legend - comparator - pink
-    output$ui_spine_legend_comparator <- renderUI({
-      img(src='spine_legend_comparator.jpg', height=18, style="padding-right: 2px; vertical-align:middle",paste(input$geocomp_spine))
-    })
-    
-    #legend - area type - grey bars
-    output$ui_spine_legend_areatype <- renderUI({
-      img(src='bar_legend_areatype.jpg', height=18, style="padding-right: 2px; vertical-align:middle",paste(input$geotype_spine))
-    }) 
-    
-    output$spine_title <- renderText({
-      paste(names(profile_list[unname(profile_list) == input$profile_spine]),
-            " profile: ", input$topic_spine,sep="")
-    })
-    
-    output$spine_subtitle <- renderText({
-      paste(input$geoname_spine," (",input$geotype_spine,") compared against ",input$geocomp_spine,sep="")
-    })    
-    
-    #####################.
-    # Downloading spine plot and data  
-    # Define data file to download
-    
-    spine_csv <- reactive({
-      
-      #Merging comparator and chosen area
-      spine <- merge(spine_allareas(), spine_chosencomp(), by=c("indicator"))
-      spine <- left_join(spine, spine_chosenarea(), by=c("indicator"))
-      spine <- bind_cols(spine %>% mutate(topic=input$topic_spine))
-      spine <- bind_cols(spine %>% mutate(comparator=input$geocomp_spine))
-      
-      spine<-spine %>%
-        mutate(flag=case_when(
-          interpret == "O" ~'NA',
-          lowci_chosen<= measure_comp & upci_chosen>=measure_comp ~ 'NS',
-          lowci_chosen > measure_comp & interpret == "H" ~ 'Better',
-          lowci_chosen > measure_comp & interpret == "L" ~ 'Worse',
-          upci_chosen < measure_comp & interpret == "L" ~ 'Better',
-          upci_chosen < measure_comp & interpret == "H" ~ 'Worse',
-          TRUE ~ 'NA'))
-      
-      spine %>%
-        select(c(indicator, areaname, areatype, def_period, numerator, measure,
-                 lowci, upci, type_definition, topic, measure_comp, comparator, flag)) %>%
-        rename(lower_confidence_interval=lowci, upper_confidence_interval=upci,
-               latest_period = def_period, definition = type_definition, comparator_measure = measure_comp, difference=flag)
-      
-    })
-    
-    # Download spine data
-    output$download_spine <- downloadHandler( filename =  'spinechart_data.csv',
-                                              content = function(file) { write.csv(spine_csv(), file, row.names=FALSE) })
-    
-    # Downloading chart  
-    output$download_spineplot <- downloadHandler(
-      filename = 'spine.png',
-      content = function(file){
-        ggsave(file, plot = plot_spine()
-               +ggtitle(label=paste(names(profile_list[unname(profile_list) == input$profile_spine])," profile: ", input$topic_spine,sep=""),
-                        subtitle =paste(input$geoname_spine," (",input$geotype_spine,") compared against ",input$geocomp_spine,sep="")),
-               device = "png",width=15, limitsize=FALSE)
-      })
-    
-###############################################.        
-#### Time trend plot ----
-###############################################.  
-#####################.
-# Reactive controls
+  ###############################################.        
+  #### Time trend plot ----
+  ###############################################.  
+  #####################.
+  # Reactive controls
   #Controls for chart. Dynamic selection of locality and iz.
   output$loc_ui_trend <- renderUI({
     selectizeInput("locname_trend", "HSC locality", 
-                choices = c("Select localities" = "", paste(unique(geo_lookup$areaname[
-                  geo_lookup$parent_area == input$loc_iz_trend &
-                    geo_lookup$areatype == 'HSC locality' ]))),
-                multiple=TRUE, selected = "")
-  })
-
-  output$iz_ui_trend <- renderUI({
-    selectizeInput("izname_trend", "Intermediate zone", 
-                choices = c("Select intermediate zones" = "", 
-                            paste(unique(geo_lookup$areaname[
-                  geo_lookup$parent_area == input$loc_iz_trend &
-                    geo_lookup$areatype == 'Intermediate zone' ]))),
-                multiple=TRUE, selected = "")
+                   choices = c("Select localities" = "", paste(unique(geo_lookup$areaname[
+                     geo_lookup$parent_area == input$loc_iz_trend &
+                       geo_lookup$areatype == 'HSC locality' ]))),
+                   multiple=TRUE, selected = "")
   })
   
-
+  output$iz_ui_trend <- renderUI({
+    selectizeInput("izname_trend", "Intermediate zone", 
+                   choices = c("Select intermediate zones" = "", 
+                               paste(unique(geo_lookup$areaname[
+                                 geo_lookup$parent_area == input$loc_iz_trend &
+                                   geo_lookup$areatype == 'Intermediate zone' ]))),
+                   multiple=TRUE, selected = "")
+  })
+  
+  
   ###############################################.
   # disabling controls if no data available for a type of geography
   
@@ -1159,22 +1364,22 @@ showModal(welcome_modal)
     }
     
   })
-
+  
   # Disabling and unchecking CI option if numerator selected or no cis available
   # Observe with multiple events code from here: https://stackoverflow.com/questions/34731975/how-to-listen-for-more-than-one-event-expression-within-a-shiny-eventreactive-ha
   observeEvent({
-                input$var_plot_trend 
-                input$indic_trend}, {
-  # Disabling and unchecking CI option if numerator selected or no cis available
-  if (input$var_plot_trend == "numerator" | (all(is.na(trend_data()$upci)) == TRUE)) {
-    disable("ci_trend")
-    updateAwesomeCheckbox(session, "ci_trend", value = FALSE)
-  } else if (input$var_plot_trend == "measure") {
-    enable("ci_trend")
-  }
-
-  })
-
+    input$var_plot_trend 
+    input$indic_trend}, {
+      # Disabling and unchecking CI option if numerator selected or no cis available
+      if (input$var_plot_trend == "numerator" | (all(is.na(trend_data()$upci)) == TRUE)) {
+        disable("ci_trend")
+        updateAwesomeCheckbox(session, "ci_trend", value = FALSE)
+      } else if (input$var_plot_trend == "measure") {
+        enable("ci_trend")
+      }
+      
+    })
+  
   ###############################################.
   # Indicator definitions
   #Subsetting by domain and profile. Profile is fiddly as vector uses abbreviations 
@@ -1187,19 +1392,19 @@ showModal(welcome_modal)
                        defs_data_trend()$indicator_definition), collapse = "<br><br>"))
   })
   
-#####################.
-# Reactive data 
+  #####################.
+  # Reactive data 
   #Time trend data. Filtering based on user input values.
   trend_data <- reactive({ 
     
     trend <- optdata %>% 
       subset((areaname %in% input$hbname_trend &  areatype == "Health board" |
-               areaname %in% input$caname_trend & areatype == "Council area" |
-               input$scotname_trend == TRUE & areatype == "Scotland"  |
-               areaname %in% input$adpname_trend  & areatype == "Alcohol & drug partnership" |
-               areaname %in% input$locname_trend  & areatype == "HSC locality" |
-               areaname %in% input$partname_trend & areatype == "HSC partnership"   |
-               areaname %in% input$izname_trend & areatype == "Intermediate zone") & 
+                areaname %in% input$caname_trend & areatype == "Council area" |
+                input$scotname_trend == TRUE & areatype == "Scotland"  |
+                areaname %in% input$adpname_trend  & areatype == "Alcohol & drug partnership" |
+                areaname %in% input$locname_trend  & areatype == "HSC locality" |
+                areaname %in% input$partname_trend & areatype == "HSC partnership"   |
+                areaname %in% input$izname_trend & areatype == "Intermediate zone") & 
                indicator == input$indic_trend) %>% 
       droplevels() %>% 
       mutate(areaname_full = as.factor(areaname_full),
@@ -1211,8 +1416,8 @@ showModal(welcome_modal)
       arrange(year, areatype, areaname_full) #Needs to be sorted by year for Plotly
   })
   
-#####################.
-# Creating plot
+  #####################.
+  # Creating plot
   #####################.
   # titles 
   output$title_trend <- renderText(paste0(input$indic_trend))
@@ -1232,11 +1437,11 @@ showModal(welcome_modal)
       #First obtaining length of each geography type, if more than 6, then 6, 
       # this avoids issues. Extra selections will not be plotted
       trend_length <- ifelse(length(input$scotname_trend)+length(input$hbname_trend)+ length(input$caname_trend)+
-        length(input$adpname_trend)+length(input$partname_trend)+
-        length(input$locname_trend)+length(input$izname_trend) > 12, 12,
-          length(input$scotname_trend)+length(input$hbname_trend)+ length(input$caname_trend)+
-          length(input$adpname_trend)+length(input$partname_trend)+
-          length(input$locname_trend)+length(input$izname_trend))
+                               length(input$adpname_trend)+length(input$partname_trend)+
+                               length(input$locname_trend)+length(input$izname_trend) > 12, 12,
+                             length(input$scotname_trend)+length(input$hbname_trend)+ length(input$caname_trend)+
+                               length(input$adpname_trend)+length(input$partname_trend)+
+                               length(input$locname_trend)+length(input$izname_trend))
       
       # First define the palette of colours used, then set a named vector, so each color
       # gets assigned to an area. I think is based on the order in the dataset, which
@@ -1249,7 +1454,7 @@ showModal(welcome_modal)
       
       # Same approach for symbols
       symbols_palette <-  c('circle', 'diamond', 'circle', 'diamond', 'circle', 'diamond',
-                          'square','triangle-up', 'square','triangle-up', 'square','triangle-up')
+                            'square','triangle-up', 'square','triangle-up', 'square','triangle-up')
       symbols_scale <- c(setNames(symbols_palette, unique(trend_data()$areaname_full)[1:trend_length]))
       symbols_trend <- symbols_scale[1:trend_length]
       
@@ -1277,7 +1482,7 @@ showModal(welcome_modal)
                showlegend = TRUE,
                legend = list(orientation = 'h', x = 0, y = 1.18)) %>%  #legend on top
         config(displayModeBar = FALSE, displaylogo = F, collaborate=F, editable =F) # taking out plotly logo and collaborate button
-
+      
       #Adding confidence intervals depending on user input
       if (input$ci_trend == TRUE & input$var_plot_trend != "Numerator") {
         trend_plot %>% 
@@ -1292,13 +1497,13 @@ showModal(welcome_modal)
   # Creating plot for ui side
   output$trend_plot <- renderPlotly({ plot_trend_chart()  }) 
   
-#####################.
-# Downloading data and plot
+  #####################.
+  # Downloading data and plot
   #Downloading data
   trend_csv <- reactive({ format_csv(trend_data()) })
   
   output$download_trend <- downloadHandler(filename =  'timetrend_data.csv',
-    content = function(file) {write.csv(trend_csv(), file, row.names=FALSE)})
+                                           content = function(file) {write.csv(trend_csv(), file, row.names=FALSE)})
   
   # Downloading chart  
   output$download_trendplot <- downloadHandler(
@@ -1309,11 +1514,11 @@ showModal(welcome_modal)
              file = file, zoom = 3)
     })
   
-###############################################.       
-#### Rank plot ----
-###############################################.   
-#####################.
-# Reactive controls - used for the map as well.
+  ###############################################.       
+  #### Rank plot ----
+  ###############################################.   
+  #####################.
+  # Reactive controls - used for the map as well.
   #Dropdown for time period based on indicator selection  
   output$year_ui_rank <- renderUI({
     time_period <- sort(unique(optdata$trend_axis[optdata$indicator == input$indic_rank&
@@ -1334,7 +1539,7 @@ showModal(welcome_modal)
   # Years to compare with depending on what data is available
   output$yearcomp_ui_rank <- renderUI({
     rank_data <- optdata %>% subset(areatype == input$geotype_rank & 
-                                    indicator==input$indic_rank)
+                                      indicator==input$indic_rank)
     
     years <- c(min(rank_data$year):max(rank_data$year))
     periods <- c(sort(paste0(unique(rank_data$trend_axis[rank_data$year>=min(rank_data$year) &
@@ -1357,11 +1562,12 @@ showModal(welcome_modal)
                        defs_data_rank()$indicator_definition), collapse = "<br><br>"))
   })
   
+
 #####################.
 # Reactive data  
   # Comparator data rank plot. 
   rank_compar <- reactive({
-
+    
     if (input$comp_rank == 1){
       #Fiddly way of selecting period because some cases (e.g. Life expectancy)
       #might have different periods for the same year, e.g. IZ 2013 is 2011-2015
@@ -1384,8 +1590,8 @@ showModal(welcome_modal)
     } else if (input$comp_rank == 2) { #if time comparison selected
       
       rank_compar <- optdata %>% subset(areatype == input$geotype_rank &
-                                         trend_axis == input$yearcomp_rank & 
-                                         indicator==input$indic_rank) %>% 
+                                          trend_axis == input$yearcomp_rank & 
+                                          indicator==input$indic_rank) %>% 
         rename(comp_value = measure, comp_name = areaname) %>% 
         select(code, comp_value, comp_name) %>% #to allow merging
         droplevels()
@@ -1413,12 +1619,12 @@ showModal(welcome_modal)
     }
     
     if (input$comp_rank == 1) { #for area comparisons
-    rank_bar <- rank_bar %>% 
-      mutate(comp_value = rank_compar()$measure, #comparator value and name
-             comp_name = rank_compar()$areaname,
-             lowci_diff = measure - lowci, 
-             upci_diff = upci - measure) %>% 
-      arrange(desc(measure)) # for ranking by value
+      rank_bar <- rank_bar %>% 
+        mutate(comp_value = rank_compar()$measure, #comparator value and name
+               comp_name = rank_compar()$areaname,
+               lowci_diff = measure - lowci, 
+               upci_diff = upci - measure) %>% 
+        arrange(desc(measure)) # for ranking by value
     } else if (input$comp_rank == 2) { #if time comparison selected
       #This helps to deals with cases of incomplete data, e.g. 2011 has all HB but 2013 not.
       #Works for those cases where there are more data in the past (comparator)
@@ -1430,7 +1636,7 @@ showModal(welcome_modal)
       
     }
   })
-
+  
   ############################.
   #Title of plot
   make_rank_subtitle <- function() {
@@ -1458,14 +1664,14 @@ showModal(welcome_modal)
       # height of the plot
       # Calculates number of different indicators and then multiplies by pixels per row
       # it needs the sum at the end as otherwise small domains plots will be too small
-        if (input$comp_rank == 1) {#if area comparison, standard length
-          height_plot <- 500
-        } else if (input$comp_rank == 2) {
-          #Obtaining number of areas
-          no_ind <- length(unique(rank_bar_data()$areaname))
-          height_plot <- no_ind * 25 + 70
-        }
-
+      if (input$comp_rank == 1) {#if area comparison, standard length
+        height_plot <- 500
+      } else if (input$comp_rank == 2) {
+        #Obtaining number of areas
+        no_ind <- length(unique(rank_bar_data()$areaname))
+        height_plot <- no_ind * 25 + 70
+      }
+      
       #Coloring based on if signicantly different from comparator
       color_pal <- case_when(
         rank_bar_data()$interpret == "O" ~ '#999966',
@@ -1548,13 +1754,13 @@ showModal(welcome_modal)
                     marker = list(color = color_pal, size = 10,
                                   line = list(color = 'gray', width = 2)), 
                     showlegend = FALSE, text=tooltip_dumbbell, hoverinfo="text") %>% 
-        # Adding layout
+          # Adding layout
           layout(xaxis = list(title = ~type_definition, titlefont =list(size=14), 
                               side = "top", tickfont =list(size=14), fixedrange=TRUE),
                  yaxis = list(title = "", fixedrange=TRUE,
-                                          tickfont =list(size=13), #axis parameters
-                                          categoryorder="array", #order of plotting
-                                          categoryarray = rev(order_areas)),
+                              tickfont =list(size=13), #axis parameters
+                              categoryorder="array", #order of plotting
+                              categoryarray = rev(order_areas)),
                  font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif'),
                  margin=list(l = 170, t=40)) %>%  # to prevent labels getting cut out
           config(displayModeBar = FALSE, displaylogo = F, collaborate=F, editable =F)
@@ -1569,9 +1775,9 @@ showModal(welcome_modal)
   ###############################################.
   #Downloading data
   rank_csv <- reactive({ format_csv(rank_bar_data()) })
-
+  
   output$download_rank <- downloadHandler(filename =  'rank_data.csv',
-    content = function(file) {write.csv(rank_csv(), file, row.names=FALSE) })
+                                          content = function(file) {write.csv(rank_csv(), file, row.names=FALSE) })
   
   #Downloading chart
   output$download_rankplot <- downloadHandler(
@@ -1580,14 +1786,14 @@ showModal(welcome_modal)
       export(p = plot_rank_charts() %>% 
                layout(title = paste0(input$indic_rank, "<br>", make_rank_subtitle()),
                       margin = list(t = 180)),
-               file = file)
+             file = file)
     })
-
-#####################################.    
-### Map ----
-#####################################. 
-#####################.
-# Reactive controls: it uses the ones from the rank section
+  
+  #####################################.    
+  ### Map ----
+  #####################################. 
+  #####################.
+  # Reactive controls: it uses the ones from the rank section
   ###############################################.
   # Indicator definitions
   #Subsetting by domain and profile. Profile is fiddly as vector uses abbreviations 
@@ -1602,7 +1808,7 @@ showModal(welcome_modal)
   
   #####################.
   # # Dynamic data - uses some of the rank ones
- 
+  
   #Merging shapefile with dynamic selection of data
   poly_map <- reactive({
     if (input$geotype_rank == "Council area"){
@@ -1716,11 +1922,11 @@ showModal(welcome_modal)
   #Filter iz_list and hscl list by parent area selection
   interzone_filtered <- reactive({ 
     sort(parent_iz_list$areaname[parent_iz_list$parent_area==input$iz_parent]) 
-    })
+  })
   
   hsclocality_filtered <- reactive({ 
     sort(parent_hscl_list$areaname[parent_hscl_list$parent_area==input$hscl_parent]) 
-    })
+  })
   
   ###############################################.
   # Reactive filters 
@@ -1736,7 +1942,7 @@ showModal(welcome_modal)
     
     selectizeInput("iz_true", label = NULL, width = "229px", choices = choices_selected, 
                    selected = NULL, multiple=TRUE, options = list(maxOptions = 1300, 
-                      placeholder = "Select or type specific intermediate zone"))
+                                                                  placeholder = "Select or type specific intermediate zone"))
   }) 
   
   #Filter HSCL's by parent area
@@ -1760,15 +1966,15 @@ showModal(welcome_modal)
       return(if (input$iz_parent == "Show all"){ 
         
         updateSelectizeInput(session,"iz_true", label = NULL,
-          choices = intzone_name, selected = character(0), 
-          options = list(maxOptions = 1300, 
-                       placeholder = "Select or type specific intermediate zone")) 
+                             choices = intzone_name, selected = character(0), 
+                             options = list(maxOptions = 1300, 
+                                            placeholder = "Select or type specific intermediate zone")) 
       } else {
         updateSelectizeInput(
           session,"iz_true", label = NULL, choices = interzone_filtered(), 
           selected = character(0), options = 
             list(placeholder = "Select or type specific intermediate zone")) 
-        }
+      }
       ) #return bracket
     
     isolate({
@@ -1793,10 +1999,10 @@ showModal(welcome_modal)
         "iz_true", label = NULL, choices = interzone_filtered(), 
         selected = character(0), multiple=TRUE, options =
           list(placeholder = "Select or type specific intermediate zone"))
-      }
+    }
   })
   
-
+  
   #select all IZ's belonging to a certain parent-area
   observe({
     if (input$hscl_parent_all == "FALSE")
@@ -1810,7 +2016,7 @@ showModal(welcome_modal)
           session,"hscl_true", label = NULL, choices = hsclocality_filtered(), 
           selected = character(0), options = 
             list(placeholder = "Select or type specific HSC locality"))
-        }
+      }
       ) #return bracket
     
     isolate({
@@ -1818,7 +2024,7 @@ showModal(welcome_modal)
         session, "hscl_true", label = NULL, choices = locality_name, 
         selected = hsclocality_filtered(), options = 
           list(placeholder = "Select or type specific HSC locality")) 
-      })
+    })
   }) #end of observe
   
   #when you change initial filter, clear the second list of geographies anc checkbox
@@ -1835,7 +2041,7 @@ showModal(welcome_modal)
         "hscl_true", label = NULL, choices = hsclocality_filtered(), 
         selected = character(0), multiple=TRUE, options = 
           list(placeholder = "Select or type specific HSC locality"))
-      }
+    }
   })
   
   #to clear choices when boxes are unticked/radio button is changed
@@ -1846,19 +2052,19 @@ showModal(welcome_modal)
                            list(placeholder = "Select or type specific intermediate zone")) 
     updateSelectizeInput(session, "iz_parent", label = "Filter intermediate zone list by HSC partnership", 
                          selected = "Show all")
-    })
+  })
   
   observeEvent(input$la=="FALSE", {#for CAs
     updateSelectizeInput(session, "la_true", label = NULL, choices = la_name, 
                          selected = character(0), options = 
                            list(placeholder = "Select or type specific council area")) 
-    })
+  })
   
   observeEvent(input$hb=="FALSE", { #for HBs
     updateSelectizeInput(session, "hb_true", label = NULL,
                          choices = hb_name, selected = character(0),
                          options = list(placeholder = "Select or type specific health board")) 
-    })
+  })
   
   observeEvent(input$hscl=="FALSE", { #for localities
     updateSelectizeInput(session, "hscl_true", label = NULL,
@@ -1867,19 +2073,19 @@ showModal(welcome_modal)
     
     updateSelectizeInput(session, "hscl_parent", label = "Filter locality list by HSC partnership",
                          selected = "Show all")
-    })
+  })
   
   observeEvent(input$hscp=="FALSE", { #for hsc partnerships
     updateSelectizeInput(session, "hscp_true", label = NULL,
                          choices = partnership_name, selected = character(0), options = 
                            list(placeholder = "Select or type specific HSC partnership"))
-    })
+  })
   
   observeEvent(input$adp=="FALSE", { #for ADPs
     updateSelectizeInput(session, "adp_true", label = NULL,
                          choices = adp_name, selected = character(0), options = 
                            list(placeholder = "Select or type specific ADP")) 
-    })
+  })
   
   observeEvent(input$product_filter, { # for indicator/topic/profile filters
     updateSelectizeInput(session,"indicator_filter", label = NULL,
@@ -2093,7 +2299,7 @@ showModal(welcome_modal)
                     columnDefs = list(list(visible=FALSE, targets=c(4,8,9)))), 
                   colnames = c("Area code", "Area", "Type", "Indicator", "Year","Period", "Numerator", 
                                "Measure", "Lower CI","Upper CI", "Definition")
-    )
+                  )
   })
   
   ###############################################.
@@ -2118,7 +2324,7 @@ showModal(welcome_modal)
   # Reactive filter
   #Filter indicator list by  profile or by domain 
   output$indicator_chosen <- renderUI ({
-
+    
     if (input$profile_defined != "Show all"){
       indic_selection <- sort(unique(c(as.character(optdata$indicator[grep(input$profile_defined,optdata$profile_domain1)]),
                                        as.character(optdata$indicator[grep(input$profile_defined,optdata$profile_domain2)] ))))
@@ -2128,7 +2334,7 @@ showModal(welcome_modal)
                                                          optdata$domain3==input$topic_defined]))
     } else { 
       indic_selection <- indicator_list
-      }
+    }
     
     selectizeInput("indicator_defined", label = "Select indicator to see technical information for",
                    width = "510px", choices = indic_selection, 
@@ -2155,12 +2361,12 @@ showModal(welcome_modal)
   # Creating text and titles for info
   # Title box
   output$indicator <- renderValueBox({
-
+    
     valueBox(tags$p(indicator_selected()$indicator_name, style="color: white; font-size: 30px; font-weight: bold;"), 
              HTML(paste("<b>","Profile:","</b>",indicator_selected()$profile,br(),
                         "<b>","Domain:","</b>",indicator_selected()$domain)), icon = icon ("book"),color = "blue")
   })
-
+  
   # Text for all metadata parts of the indicator
   output$definition <- renderText ({indicator_selected()$indicator_definition })
   output$rationale <- renderText ({ indicator_selected()$inclusion_rationale})
@@ -2186,7 +2392,7 @@ showModal(welcome_modal)
   output$supporting_info <- renderText ({indicator_selected()$supporting_information})
   output$next_update <- renderText ({indicator_selected()$next_update})
   
-
+  
   ###############################################.
   #Download definitions table for selected indicator
   indicator_definitions <- reactive({ techdoc %>% filter(indicator_name == input$indicator_defined)})
@@ -2203,5 +2409,4 @@ showModal(welcome_modal)
 } #server closing bracket
 
 #########################  END ----
-
 

@@ -25,7 +25,7 @@ library(webshot) #to download plotly charts
 # https://github.com/rstudio/shinyapps-package-dependencies/pull/180
 if (is.null(suppressMessages(webshot:::find_phantom()))) {
   webshot::install_phantomjs()
-  }
+}
 
 ###############################################.
 ## Functions ----
@@ -63,7 +63,7 @@ title_wrapper <- function(x, ...)
 
 #Function to create plot when no data available
 plot_nodata <- function() {
-  text_na <- list(x = 5, y = 5, text = "No data available" ,
+  text_na <- list(x = 5, y = 5, text = "No data available" , size = 20,
                   xref = "x", yref = "y",  showarrow = FALSE)
   
   plot_ly() %>%
@@ -82,10 +82,7 @@ plot_nodata_gg <- function() {
     scale_x_discrete(position = "top")+
     theme(panel.background = element_blank(),
           axis.title.x=element_text(size=20, colour ='#555555'))
-    }
-
-
-
+}
 
 ###############################################.
 ## Data ----
@@ -159,6 +156,27 @@ areatype_profile <- list(
   "Population" = c("Alcohol & drug partnership", "Council area", "Health board",  
                    "HSC locality", "HSC partnership",  "Intermediate zone", "Scotland") 
 )
+
+profile_areatype <- list(
+  "Scotland" = setNames(c('HWB','CYP','ALC','DRG','MEN', "TOB", "POP"),
+                        c('Health & wellbeing','Children & young people','Alcohol',
+                          'Drugs','Mental Health', "Tobacco control", "Population")),
+  "Health board" = setNames(c('HWB','CYP','ALC','DRG', "TOB", "POP"),
+                            c('Health & wellbeing','Children & young people','Alcohol',
+                              'Drugs', "Tobacco control", "Population")),
+  "Council area" = setNames(c('HWB','CYP','ALC','MEN', "TOB", "POP"),
+                            c('Health & wellbeing','Children & young people','Alcohol',
+                              'Mental Health', "Tobacco control", "Population")),
+  "HSC partnership" = setNames(c('HWB','CYP', "POP"),
+                               c('Health & wellbeing','Children & young people', "Population")),
+  "HSC locality" = setNames(c('HWB','CYP', "POP"),
+                            c('Health & wellbeing','Children & young people', "Population")),
+  "Intermediate zone" = setNames(c('HWB','CYP', "POP"),
+                                 c('Health & wellbeing','Children & young people', "Population")),
+  "Alcohol & drug partnership" = setNames(c('ALC','DRG', "POP"),
+                                          c('Alcohol','Drugs', "Population"))
+)
+  
 
 ###############################################.
 ## Palettes ----
