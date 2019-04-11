@@ -222,38 +222,30 @@ weight_p1 <- read_csv(paste0(shiny_files, "child_healthyweight_shiny.csv")) %>%
   rename(measure = rate) %>%
   mutate_if(is.character,factor) #converting characters into factors
 
-alcohol_stays_d11 <- read_csv(paste0(shiny_files,"alcohol_stays_dz11.csv")) %>%
+alcohol_stays <- read_csv(paste0(shiny_files,"alcohol_stays.csv")) %>%
   mutate(update_date = "08/02/2019") %>%
   rename(measure = rate) %>%
   mutate_if(is.character,factor) #converting characters into factors
 
-alcohol_stays_adp <- read_csv(paste0(shiny_files,"alcohol_stays_ADP.csv")) %>%
-  filter(substr(code,1,3)=="S11") %>% #selecting only adp level
-  mutate(update_date = "08/02/2019", ind_id = 20203) %>%
-  rename(measure = rate) %>%
-  mutate_if(is.character,factor) #converting characters into factors
-
-alcohol_stays <- rbind(alcohol_stays_d11, alcohol_stays_adp)
-
-alc_deaths_adp <- read_csv(paste0(shiny_files,"alcohol_deaths_ADP_AL.csv")) %>%
+alc_deaths_adp <- read_csv(paste0(shiny_files,"alcohol_deaths.csv")) %>%
   filter(substr(code,1,3) == "S11") %>% #other geographies already in main file
   mutate(ind_id = 20204) %>% # so it has the same ind number as the H&W one
-  mutate(update_date = "22/09/2017") %>%
+  mutate(update_date = "22/09/2018") %>%
   rename(measure = rate) %>%
   mutate_if(is.character,factor) #converting characters into factors
 
 optdata <- rbind(optdata, part_measure, sechand_smok, child_lowinc,
-                 alcohol_stays, alc_deaths_adp, dental_p1, dental_p7, weight_p1) %>% 
+                 alcohol_stays, alc_deaths_adp, dental_p1, dental_p7, weight_p1) %>%
 #TEMPORARY FIX. dealing with change in ca, hb and hscp codes
-  mutate(code = recode(code, "S12000015"='S12000047', "S12000024"='S12000048', 
-                       "S08000018"='S08000029', "S08000027"= 'S08000030', 
+  mutate(code = recode(code, "S12000015"='S12000047', "S12000024"='S12000048',
+                       "S08000018"='S08000029', "S08000027"= 'S08000030',
                        "S37000014"='S37000032', "S37000023"='S37000033'))
 
 #Dealing with lack of update_date for HSCP and HSC locality
-update_table <- optdata %>% select(c(ind_id, update_date)) %>% distinct() %>% 
-  subset(!is.na(update_date)) %>% 
-  mutate(update_date = as.Date(update_date,"%m/%d/%Y")) %>% 
-  group_by(ind_id) %>% top_n(1, update_date) %>% 
+update_table <- optdata %>% select(c(ind_id, update_date)) %>% distinct() %>%
+  subset(!is.na(update_date)) %>%
+  mutate(update_date = as.Date(update_date,"%m/%d/%Y")) %>%
+  group_by(ind_id) %>% top_n(1, update_date) %>%
   ungroup() %>% unique()
 
 optdata <- optdata %>% select(-update_date)
@@ -262,46 +254,46 @@ optdata <- left_join(x=optdata, y=update_table, by=c("ind_id"))
 
 #Merging with indicator and geography information
 optdata <- left_join(x=optdata, y=ind_lookup, by=c("ind_id"))
-optdata <- left_join(x=optdata, y=geo_lookup, by=c("code")) 
+optdata <- left_join(x=optdata, y=geo_lookup, by=c("code"))
 
-#Apply supressions. 
-# If indicator is presented as standardised rate and suppression required 
+#Apply supressions.
+# If indicator is presented as standardised rate and suppression required
 # then suppress numerator where count is less than specified value.
 # standardised rates do not require suppression of rates or CI.
-# If indicator is presented as crude rate or percentage and suppression required 
+# If indicator is presented as crude rate or percentage and suppression required
 # then suppress numerator where count is less than specified value.
 # crude rate and percentages DO require suppression of rates and CI as well as numerator.
-optdata <- optdata %>% 
+optdata <- optdata %>%
   mutate(numerator = case_when(#std rate case
     supression=="Y" & substr(type_id,1,2)=='sr' & numerator<supress_less_than ~ NA_real_,
     # crude rate and percentage cases
-    supression =="Y" & (substr(type_id,1,2)=='cr' | (substr(type_id,1,1))=='%') & 
+    supression =="Y" & (substr(type_id,1,2)=='cr' | (substr(type_id,1,1))=='%') &
      numerator<supress_less_than ~ NA_real_, TRUE ~ numerator ), #if not keep numerator
     measure = case_when(# crude rate and percentage cases
-      supression =="Y" & (substr(type_id,1,2)=='cr' | (substr(type_id,1,1))=='%') & 
+      supression =="Y" & (substr(type_id,1,2)=='cr' | (substr(type_id,1,1))=='%') &
         numerator<supress_less_than ~ NA_real_, TRUE ~ measure ),
     lowci =case_when(# crude rate and percentage cases
-      supression =="Y" & (substr(type_id,1,2)=='cr' | (substr(type_id,1,1))=='%') & 
+      supression =="Y" & (substr(type_id,1,2)=='cr' | (substr(type_id,1,1))=='%') &
         numerator<supress_less_than ~ NA_real_, TRUE ~ lowci ),
     upci =case_when(# crude rate and percentage cases
-      supression =="Y" & (substr(type_id,1,2)=='cr' | (substr(type_id,1,1))=='%') & 
+      supression =="Y" & (substr(type_id,1,2)=='cr' | (substr(type_id,1,1))=='%') &
         numerator<supress_less_than ~ NA_real_, TRUE ~ upci )
     )
 
-# Scaling measures (0 to 1) in groups by year, area type and indicator. 
+# Scaling measures (0 to 1) in groups by year, area type and indicator.
 #Does not work well for Scotland totals. TRUE?
-optdata <- optdata %>% group_by(ind_id, year, areatype) %>% 
-  mutate(measure_sc = case_when(interpret=="H"~ as.vector(rescale(measure, to=c(1,0))), 
+optdata <- optdata %>% group_by(ind_id, year, areatype) %>%
+  mutate(measure_sc = case_when(interpret=="H"~ as.vector(rescale(measure, to=c(1,0))),
                                 interpret=="L" ~ as.vector(rescale(measure, to=c(0,1))),
                                 TRUE ~ 0))  %>% ungroup()
 
-#Creating variables for topic/profile filters. 
+#Creating variables for topic/profile filters.
 #This probably should be added to the indicator lookup - most indicators assigned to death topic for now.
-optdata <- optdata %>% 
+optdata <- optdata %>%
   select(-c(supression, supress_less_than, type_id)) %>%  #taking out some variables
   #rounding variables
   mutate(numerator = round(numerator, 1), measure = round(measure, 1),
-         lowci = round(lowci, 1), upci = round(upci, 1)) %>% 
+         lowci = round(lowci, 1), upci = round(upci, 1)) %>%
   droplevels() %>%  #to get rid of factor levels not present in data set.
   #Making the numerator the measure for a few indicators, so it plots correctly
   mutate(measure = ifelse(indicator %in% c('Mid-year population estimate - all ages',
@@ -312,64 +304,64 @@ optdata <- optdata %>%
 ###TEMPORARY FIXES HOPEFULLY
 #Dealing with lack of data for certain years and hb for Healthy weight at P1.
 #Excluding those under 5 as most are lack of data and also avoids excess of variation from non-representative years
-optdata <- optdata %>% 
+optdata <- optdata %>%
   subset(!(ind_id == "21106" & (numerator<5 |
-            (((code %in% c('S37000001', 'S37000002', "S12000033", "S12000034", 'S12000020', 
-                         'S37000019', 'S08000020') | 
-                parent_area %in% c("Aberdeen City", 'Aberdeenshire', 'Moray')) 
+            (((code %in% c('S37000001', 'S37000002', "S12000033", "S12000034", 'S12000020',
+                         'S37000019', 'S08000020') |
+                parent_area %in% c("Aberdeen City", 'Aberdeenshire', 'Moray'))
               & year <2009) |
-            ((code %in% c('S12000035', 'S37000004', 'S12000017', 'S37000016', "S12000027", 'S37000026', 
+            ((code %in% c('S12000035', 'S37000004', 'S12000017', 'S37000016', "S12000027", 'S37000026',
                          'S12000040', 'S37000030', 'S08000022', 'S08000026')  |
                 parent_area %in% c("Argyll & Bute", 'Shetland Islands', 'West Lothian', 'Highland'))
               & year %in% c('2007') ) |
             ((code %in% c('S12000039', 'S37000029', 'S12000011', 'S37000011', 'S12000046', 'S37000015') |
-                parent_area %in% c("East Renfrewshire", 'Glasgow City', 'West Dunbartonshire')) 
+                parent_area %in% c("East Renfrewshire", 'Glasgow City', 'West Dunbartonshire'))
           & year %in% c('2007', "2008", "2010")) |
             ((code %in% c('S12000045', 'S37000009') | parent_area %in% c("East Dunbartonshire")
               ) & year %in% c('2007', "2008", "2010", "2016")) |
             ((code %in% c('S12000018', 'S37000017') | parent_area %in% c("Inverclyde")
               ) & year %in% c('2007', "2008", "2009", "2010")) |
-            ((code %in% c('S12000023', 'S37000022', 'S08000025') | 
+            ((code %in% c('S12000023', 'S37000022', 'S08000025') |
                 parent_area %in% c("Orkney Islands") ) & year %in% c('2007', "2008", "2009")))
           )#numerator plus code conditions
         ) #negation
       )#subset
 
 saveRDS(optdata, "data/optdata.rds")
-optdata <- readRDS("data/optdata.rds") 
+optdata <- readRDS("data/optdata.rds")
 
 ###############################################.
 ## Profile lookup ----
-###############################################.   
+###############################################.
 #Creating a file with a column for profile and another one for domain
 profile_lookup <- data.frame(profile_domain = c(paste(unique(optdata$profile_domain1)),
-                                                paste(unique(optdata$profile_domain2)))) %>% 
+                                                paste(unique(optdata$profile_domain2)))) %>%
   mutate(profile = substr(profile_domain, 1, 3),
-         domain = substr(profile_domain, 5, nchar(as.vector(profile_domain)))) %>% 
+         domain = substr(profile_domain, 5, nchar(as.vector(profile_domain)))) %>%
   select(-profile_domain)
 
 saveRDS(profile_lookup, "data/profile_lookup.rds")
-profile_lookup <- readRDS("data/profile_lookup.rds") 
+profile_lookup <- readRDS("data/profile_lookup.rds")
 
 ###############################################.
 ## Technical document ----
 ###############################################.
 #This syntax updates the Technical Document table based on an online Google Drive version of the table
 #Run every time you want to refresh the data in the local copy to represent what's in the online copy
-definition_table <-read_csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vTzrwAG7IFBjLvxuxUO0vJ7mn2AgilWVA1ZJQ9oVaLOSG4mgkquMKWga8MY5g2OFkFn-3awM_GYaHjL/pub?gid=94312583&single=true&output=csv") %>% 
+definition_table <-read_csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vTzrwAG7IFBjLvxuxUO0vJ7mn2AgilWVA1ZJQ9oVaLOSG4mgkquMKWga8MY5g2OFkFn-3awM_GYaHjL/pub?gid=94312583&single=true&output=csv") %>%
   as.data.frame() %>% mutate(indicator_number = as.factor(indicator_number))
 
 saveRDS(definition_table,"data/techdoc.rds") #for opt
-techdoc <- readRDS("data/techdoc.rds") 
+techdoc <- readRDS("data/techdoc.rds")
 #backup copy in case issues with google drive
-write_csv(definition_table,"/PHI_conf/ScotPHO/Profiles/Shiny Tool/techdoc_backup.csv") 
+write_csv(definition_table,"/PHI_conf/ScotPHO/Profiles/Shiny Tool/techdoc_backup.csv")
 
 ###############################################.
 ## Shapefiles ----
-###############################################.   
+###############################################.
 #Reading file with council shapefiles
 #making it small 29mb to 2.5. Sometimes it fails, due to lack of memory (use memory.limits and close things).
-ca_bound_orig<-readOGR(shapefiles, "CA_2011_EoR_Scotland") %>% 
+ca_bound_orig<-readOGR(shapefiles, "CA_2011_EoR_Scotland") %>%
   rmapshaper::ms_simplify(keep=0.0025)
 
 object.size(ca_bound_orig)
