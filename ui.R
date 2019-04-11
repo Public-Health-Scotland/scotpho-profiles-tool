@@ -142,7 +142,7 @@ tabPanel(
     #2nd row of boxes
     fluidRow(
       #Trend plot box
-      column(6, class="landing-page-column",
+      column(4, class="landing-page-column",
              div(class="landing-page-box", 
                  div("Trend", class = "landing-page-box-title"),
                  div(class = "landing-page-icon", style="background-image: url(time_trend.png);
@@ -150,13 +150,23 @@ tabPanel(
                  actionButton('jump_to_trend', 'Look at how an indicator changes over time',
                               class="landing-page-button", 
                               icon = icon("arrow-circle-right", "icon-lp")))),
-      #Rank plot box
-      column(6, class="landing-page-column",
+      #Rank/map plot box
+      column(4, class="landing-page-column",
              div(class="landing-page-box", 
                  div("Rank", class = "landing-page-box-title"),
                  div(class = "landing-page-icon", style="background-image: url(maprank.png);
-                     background-size: auto 80%; background-position: center; background-repeat: no-repeat; "),
+                     background-size: auto 75%; background-position: center; background-repeat: no-repeat; "),
                  actionButton('jump_to_rank', 'Compare geographical variation for an indicator', 
+                              class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp")))),
+      #Inequalities box
+      column(4, class="landing-page-column",
+             div(class="landing-page-box", 
+                 div("Health inequalities", class = "landing-page-box-title"),
+                 div(class = "landing-page-icon", style="background-image: url(health_inequality.png);
+                     background-size: auto 85%; background-position: center; background-repeat: no-repeat; "),
+                 # Currently a link to the health inequalities app
+                 actionButton('jump_to_simd', 'Explore how an indicator varies with socioeconomic deprivation', 
+                              onclick ="window.open('https://scotland.shinyapps.io/scotpho-health-inequalities', '_blank')",
                               class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp"))))
       ), # end of second row
     fluidRow(h4("Find supporting information", style="margin-top:0px; 
@@ -627,8 +637,9 @@ navbarMenu("Info", icon = icon("info-circle"),
                         carry out similar analysis to ours"),
                       tags$ul( 
                         #Link to user guide
-                        tags$li(class= "li-custom", tags$a(href="", "User guide",  class="externallink"), 
-                                tags$b(" (coming soon)"), " - Learn how to use and get the most out of the tool"),
+                        tags$li(class= "li-custom", tags$a(href="https://www.scotpho.org.uk/media/1691/scotpho-profiles-quick-reference-guide-sep2018.docx", 
+                                                           "User guide",  class="externallink"), 
+                                " - Learn how to use and get the most out of the tool"),
                         #Link to overview reports
                         tags$li(class= "li-custom", tags$a(href="http://www.scotpho.org.uk/comparative-health/profiles/resources/",
                                                            "Overview reports",  class="externallink"), 
@@ -642,7 +653,7 @@ navbarMenu("Info", icon = icon("info-circle"),
                                                            "Timetable of updates", class="externallink"), 
                                 "- List of available indicators, date of last update and expected next update"),
                         #Link to Github repositories
-                        tags$li(class= "li-custom", tags$a(href="https://github.com/Health-SocialCare-Scotland/ScotPHO-profile-indicators",
+                        tags$li(class= "li-custom", tags$a(href="https://github.com/ScotPHO/indicator-production",
                                                            "Indicator production code", class="externallink"), 
                                 " and ",
                                 tags$a(href="https://github.com/ScotPHO/scotpho-profiles-tool",

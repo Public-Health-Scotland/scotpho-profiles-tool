@@ -265,10 +265,10 @@ function(input, output, session) {
     updateTabsetPanel(session, "intabset", selected = "rank")
   })
   
-  observeEvent(input$jump_to_simd, {
-    updateTabsetPanel(session, "intabset", selected = "simd")
-  })
-  
+  # observeEvent(input$jump_to_simd, {
+  #   updateTabsetPanel(session, "intabset", selected = "simd")
+  # })
+  # 
   observeEvent(input$jump_to_table, {
     updateTabsetPanel(session, "intabset", selected = "table")
   })
@@ -1562,9 +1562,10 @@ function(input, output, session) {
                        defs_data_rank()$indicator_definition), collapse = "<br><br>"))
   })
   
-  #####################.
-  # Reactive data  
-  # Comparator data rank plot. Could be moved inside rank_bar_data
+
+#####################.
+# Reactive data  
+  # Comparator data rank plot. 
   rank_compar <- reactive({
     
     if (input$comp_rank == 1){
@@ -1578,6 +1579,13 @@ function(input, output, session) {
                                           areaname == input$geocomp_rank &
                                           indicator == input$indic_rank) %>% 
         droplevels()
+      
+      # dealing with councils and boards with the same name
+      if (length(unique(rank_compar$areatype)) != 1) {
+        rank_compar <- rank_compar %>% subset(areatype == "Health board")
+      } else {
+        rank_compar <- rank_compar
+      }
       
     } else if (input$comp_rank == 2) { #if time comparison selected
       
@@ -2146,7 +2154,7 @@ function(input, output, session) {
       
       #if list of indicators selected
     } else {
-      if (!is.null(input$indicator_filter)) { 
+      if (!is.null(input$indicator_filter)) { #if indicator selected
         if (input$all_data == TRUE) {
           filtered_geos <- optdata %>%  
             filter(year>=input$date_from[1] & year<=input$date_from[2] & 
@@ -2213,8 +2221,8 @@ function(input, output, session) {
         if (input$all_data == TRUE) {
           filtered_geos <- optdata %>%  
             filter(year>=input$date_from[1] & year<=input$date_from[2]) %>% 
-            filter((grepl((paste("^",input$profile_filter,sep="",collapse="|")),
-                          profile_domain1))|(grepl((paste("^",input$profile_filter,sep="",collapse="|")),
+            filter((grepl((paste0("^",input$profile_filter,collapse="|")),
+                          profile_domain1))|(grepl((paste0("^",input$profile_filter,collapse="|")),
                                                    profile_domain2)))
         } else {
           filtered_geo <- optdata %>% 
@@ -2226,24 +2234,25 @@ function(input, output, session) {
                      (areaname %in% input$hscp_true & areatype == "HSC partnership")|
                      (code %in% input$code)) %>% 
             filter(year>=input$date_from[1] & year<=input$date_from[2]) %>% 
-            filter((grepl((paste("^",input$profile_filter,sep="",collapse="|")),
+            filter((grepl((paste0("^",input$profile_filter,collapse="|")),
                           profile_domain1))|
-                     (grepl((paste("^",input$profile_filter,sep="",collapse="|")),
+                     (grepl((paste0("^",input$profile_filter,collapse="|")),
                             profile_domain2)))
           
           filtered_geo2 <- if (input$scotland == TRUE) {
             optdata %>% 
               filter(areaname == "Scotland" &
                        year>=input$date_from[1] & year<=input$date_from[2]) %>% 
-              filter((grepl((paste("^",input$profile_filter,sep="",collapse="|")),
-                            profile_domain1))|(grepl((paste("^",input$profile_filter,sep="",collapse="|")),
+              filter((grepl((paste0("^",input$profile_filter,collapse="|")),
+                            profile_domain1))|(grepl((paste0("^",input$profile_filter,collapse="|")),
                                                      profile_domain2)))
             
           }
           # Merging together Scotland and other areas selected
           filtered_geos <- rbind(filtered_geo,filtered_geo2)
           
-        } 
+        }
+      } else { #ending the profile selection bit
         # if all available geographies checkbox checked
         if (input$all_data == TRUE) {
           filtered_geos <- optdata %>%  
@@ -2271,11 +2280,11 @@ function(input, output, session) {
           
         } 
         
-      } #end of the else if statement
+      } #end of the else if statement for all available geographies
       
       table <- filtered_geos %>% select(code, areaname, areatype, indicator, year, 
                                         def_period, numerator, measure, lowci, upci, type_definition)
-    } #end of the whole if statement
+    } #end of the whole if statement (if users have selected any data)
     
   })
   

@@ -149,7 +149,7 @@ areatype_profile <- list(
                            "HSC partnership",  "Intermediate zone", "Scotland"),
   'Children & young people' = c("Council area", "Health board", "HSC locality", 
                                 "HSC partnership",  "Intermediate zone", "Scotland"),
-  'Alcohol' = c("Alcohol & drug partnership", "Health board", "Scotland"),
+  'Alcohol' = c("Alcohol & drug partnership", "Council area", "Health board", "Scotland"),
   'Drugs' = c("Alcohol & drug partnership", "Health board", "Scotland"),
   'Mental Health' = c("Council area", "Scotland"),
   "Tobacco control" = c("Council area", "Health board", "Scotland"), 
