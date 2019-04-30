@@ -86,12 +86,15 @@ plot_nodata_gg <- function() {
 
 #Title for each section summary
 h5_sum <- function(title) {
-  h5(title, style="color: black; text-align: center; font-weight: bold;")
 }
 
-# UI for snapshot plots
-sum_ui_plot <- function(plot_name) {
-  div(align = "center", withSpinner(plotlyOutput(plot_name, height = "auto")))
+
+# UI for heatmap plots
+heat_ui <- function(title, plot_name) {
+  tagList(
+    h5(title, style="color: black; text-align: center; font-weight: bold;"),
+    div(align = "center", withSpinner(plotlyOutput(plot_name, height = "auto")))
+  )
 }
 
 ###############################################.
