@@ -18,8 +18,6 @@ tagList( #needed for shinyjs
                tags$link(rel="shortcut icon", href="favicon_scotpho.ico"), #Icon for browser tab
                #Including Google analytics and Cookie control
                includeScript("google-analytics.js"),
-               # HTML('<script src="https://cc.cdn.civiccomputing.com/8/cookieControl-8.x.min.js"></script>'),
-               # includeScript("cookie-control.js"),
                #Style sidebars/well panels
                tags$style(".well {background-color:#ffffff; border: 0px solid #336699;
                           padding: 5px; box-shadow: none; }",
@@ -219,8 +217,8 @@ tabPanel(
 tabPanel("Summary", icon = icon("list-ul"), value = "summary",
          wellPanel( #Filter options
            column(3,
-                  p(tags$b("Step 1. Select your area")),
-                  selectInput("geotype_summary", "Geography level", choices=areatype_list,
+                  p(tags$b("Step 1. Select a geography level and then an area of interest.")),
+                  selectInput("geotype_summary", label = NULL, choices=areatype_list,
                               selected = "Health board"),
                   conditionalPanel(#Conditional panel for extra dropdown for localities & IZ
                     condition = "input.geotype_summary== 'HSC locality' | input.geotype_summary == 'Intermediate zone' ",
@@ -229,7 +227,7 @@ tabPanel("Summary", icon = icon("list-ul"), value = "summary",
                   ),
                   uiOutput("geoname_ui_summary")
            ),
-           column(3,
+           column(2,
                   p(tags$b("Step 2. Select a profile ")),
                   uiOutput("profile_ui_summary"),
                   # domain if spine selected
@@ -240,20 +238,22 @@ tabPanel("Summary", icon = icon("list-ul"), value = "summary",
                   p(tags$b("Step 3. Select a comparator ")),
                   uiOutput("comp_ui_summary") # comparator options
            ),
-           column(3,
+           column(4,
+           #div(style = "width:60%; margin-left: 20%; min-width: 350px", # centering div
+             p(tags$b("Step 4. Select what type of summary you want to see:"), 
+               " snapshot is a comparison with the latest data available, 
+               trend will show how things are changing over time, and 
+               spine compares indicators with the rest of areas of the same level."),
+             radioGroupButtons("chart_summary", status = "primary", justified = TRUE,
+                             choices = c("Snapshot", "Trend", "Spine"), label=NULL  )),
+           div(#style = "width:60%; ", # centering div
                   actionButton("help_summary",label="Help", icon= icon('question-circle'), class ="down"),
                   actionButton("defs_summary",label="Definitions", icon= icon('info'), class ="down"),
                   downloadButton('download_summary', 'Download data', class = "down"),
-                  conditionalPanel(condition = 'input.chart_summary == "Spine"',
-                    savechart_button('download_spineplot', 'Save chart',  class = "down"))
-                  # savechart_button('download_summaryplot', 'Save chart',  class = "down")
-           ),
-           div(style = "width:60%; margin-left: 20%; min-width: 350px", # centering div
-             radioGroupButtons("chart_summary", status = "primary", justified = TRUE,
-                             choices = c("Snapshot", "Trend", "Spine"), label= "Step 4. Select what type of summary you want to see: 
-                  snapshot is a comparison with the latest data available, 
-                             trend will show how things are changing over time, and 
-                             spine compares indicators with the rest of areas of the same level." )) 
+                  # conditionalPanel(condition = 'input.chart_summary == "Spine"',
+                  #                  savechart_button('download_spineplot', 'Save chart',  class = "down"))
+                  savechart_button('download_summaryplot', 'Save chart',  class = "down")
+           )
          ), #well panel bracket
          mainPanel(width = 12,
                    bsModal("mod_defs_summary", "Definitions", "defs_summary",
