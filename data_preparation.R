@@ -5,19 +5,17 @@
 ############################.
 ##Filepaths ----
 ############################.
-server_desktop <- "server"
-if (server_desktop == "server") {
+# filepaths depending on if using server or desktop
+if (sessionInfo()$platform == "x86_64-redhat-linux-gnu (64-bit)") {
   lookups <- "/PHI_conf/ScotPHO/Profiles/Data/Lookups/"
   basefiles <- "/conf/phip/Projects/Profiles/Data/Scotland Localities/"
   shapefiles <- "/PHI_conf/ScotPHO/Profiles/Data/Shapefiles/"
   shiny_files <- "/PHI_conf/ScotPHO/Profiles/Data/Shiny Data/"
-  
-} else if (server_desktop == "desktop") {
+} else {
   lookups <- "//stats/ScotPHO/Profiles/Data/Lookups/"
   basefiles <- "//stats/phip/Projects/Profiles/Data/Scotland Localities/"
   shapefiles <- "//stats/ScotPHO/Profiles/Data/Shapefiles/"
   shiny_files <- "//stats/ScotPHO/Profiles/Data/Shiny Data/"
-  
 }
 
 ############################.
