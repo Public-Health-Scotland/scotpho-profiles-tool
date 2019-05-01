@@ -6,6 +6,7 @@
 ###############################################.
 tagList( #needed for shinyjs
   useShinyjs(),  # Include shinyjs
+  introjsUI(),   # Enable introjs scripts
   navbarPage(id = "intabset", #needed for landing page
            title = div(tags$a(img(src="scotpho_reduced.png", height=40), href= "http://www.scotpho.org.uk/"),
                        style = "position: relative; top: -5px;"), # Navigation bar
@@ -112,36 +113,48 @@ tabPanel(
   title = " Home", icon = icon("home"),
   mainPanel(
     width = 11, style="margin-left:4%; margin-right:4%",
-    fluidRow(h3("Welcome to the ScotPHO profiles", style="margin-top:0px;")),
+    fluidRow(h3("Welcome to the ScotPHO profiles", style="margin-top:0px;"), #do i need introbox here?
+             actionButton("btn_landing","Guide me around this page")),
     fluidRow(
       #Summary box
       column(6, class="landing-page-column",
-             fluidRow(h4("Explore data by profile", style="margin-top:0px; 
-                         color:black; text-align: center; ")),
-             div(class="landing-page-box", 
+             br(),
+             ## temporary hide title line 
+             # fluidRow(h4("Explore data by profile", style="margin-top:0px; 
+             #             color:black; text-align: center; ")),
+             introBox(div(class="landing-page-box", 
                  div("Profile summary", class = "landing-page-box-title"),
                  div(class = "landing-page-icon", style="background-image: url(heatmap_2.png);
                      background-size: auto 80%; background-position: center; background-repeat: no-repeat; "),
                  actionButton('jump_to_summary', 'A high level view of an area across a suit of indicators', 
                               class="landing-page-button", 
-                              icon = icon("arrow-circle-right", "icon-lp")))),
-      #Table box 
+                              icon = icon("arrow-circle-right", "icon-lp"))),
+                 data.step = 1,
+                 data.intro = "This is the profiles landing page. The button take you to different profile elements such as visualisations, data tables or background information. 
+                 Hover over buttons to see a brief description of what each button does")),
+             #Table box 
       column(6, class="landing-page-column",
-             fluidRow(h4("Access the data behind the tool", style="margin-top:0px; 
-                         color:black; text-align: center; ")),
-             div(class="landing-page-box", 
+             br(),
+             ## temporary hide title line 
+             #fluidRow(h4("Access the data behind the tool", style="margin-top:0px; 
+             #           color:black; text-align: center; ")),
+             introBox(div(class="landing-page-box", 
                  div("Data", class = "landing-page-box-title"),
                  div(class = "landing-page-icon", style="background-image: url(data_table.png);
                      background-size: auto 80%; background-position: center; background-repeat: no-repeat; "),
                  actionButton('jump_to_table', 'View and download the data behind the tool', 
                               class="landing-page-button", 
-                              icon = icon("arrow-circle-right", "icon-lp"))
-                 ))),
-    fluidRow(h4("Explore a single indicator in more detail", style="margin-top:0px; 
-                         color:black; text-align: center; ")),
+                              icon = icon("arrow-circle-right", "icon-lp"))),
+                 data.step = 2,
+                 data.intro = "Data behind the profiles can be downloaded through this data table"))),
+    
+    #temp hide this line - doesn't seem right now we include health inequalities box anyway
+    #fluidRow(h4("Explore a single indicator in more detail", style="margin-top:0px; 
+    #                     color:black; text-align: center; ")),
     #2nd row of boxes
     fluidRow(
       #Trend plot box
+      introBox(
       column(4, class="landing-page-column",
              div(class="landing-page-box", 
                  div("Trend", class = "landing-page-box-title"),
@@ -150,15 +163,18 @@ tabPanel(
                  actionButton('jump_to_trend', 'Look at how an indicator changes over time',
                               class="landing-page-button", 
                               icon = icon("arrow-circle-right", "icon-lp")))),
-      #Rank/map plot box
-      column(4, class="landing-page-column",
-             div(class="landing-page-box", 
-                 div("Rank", class = "landing-page-box-title"),
-                 div(class = "landing-page-icon", style="background-image: url(maprank.png);
+             #Rank/map plot box
+             column(4, class="landing-page-column",
+                    div(class="landing-page-box", 
+                        div("Rank", class = "landing-page-box-title"),
+                        div(class = "landing-page-icon", style="background-image: url(maprank.png);
                      background-size: auto 75%; background-position: center; background-repeat: no-repeat; "),
-                 actionButton('jump_to_rank', 'Compare geographical variation for an indicator', 
-                              class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp")))),
-      #Inequalities box
+                        actionButton('jump_to_rank', 'Compare geographical variation for an indicator', 
+                                     class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp")))),
+             data.step = 3,
+             data.intro = "test"),
+  #Inequalities box
+  introBox(
       column(4, class="landing-page-column",
              div(class="landing-page-box", 
                  div("Health inequalities", class = "landing-page-box-title"),
@@ -167,8 +183,14 @@ tabPanel(
                  # Currently a link to the health inequalities app
                  actionButton('jump_to_simd', 'Explore how an indicator varies with socioeconomic deprivation', 
                               onclick ="window.open('https://scotland.shinyapps.io/scotpho-health-inequalities', '_blank')",
-                              class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp"))))
-      ), # end of second row
+                              class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp")))),
+    data.step = 4,
+    data.intro = "inequalities")),
+    #   ),
+    # data.step = 3,
+    # data.intro = "test"
+    #),
+    # end of second row
     fluidRow(h4("Find supporting information", style="margin-top:0px; 
                          color:black; text-align: center; ")),
     fluidRow(
@@ -486,7 +508,8 @@ tabPanel("Data", icon = icon("table"), value = "table",
                                 step = 1, sep="", round = TRUE, ticks = TRUE, dragRange = FALSE),
                     br(),
                     actionButton("clear", label = "Clear all filters",  icon ("eraser"), class = "down"),
-                    downloadButton("download_table_csv", 'Download data', class = "down")
+                    downloadButton("download_table_csv", 'Download data', class = "down"),
+                    actionButton("btn2","Guide me around this page")
              ) #column bracket
          ), #filters fluid row bracket
          
