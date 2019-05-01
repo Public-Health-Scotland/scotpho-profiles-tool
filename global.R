@@ -98,19 +98,6 @@ heat_ui <- function(title, plot_name) {
   )
 }
 
-#Creating a palette of colours based on statistical significance
-create_pal_sum <- function(dataset) {
-  dataset %>% 
-    mutate(color = case_when(lowci <= comp_m & upci >= comp_m 
-                             & interpret %in% c("H", "L") ~'gray',
-                             lowci > comp_m & interpret == "H" ~ 'blue',
-                             lowci > comp_m & interpret == "L" ~ 'red',
-                             upci < comp_m & interpret == "L" ~ 'blue',
-                             upci < comp_m & interpret == "H" ~ 'red', 
-                             interpret == "O" ~ 'white',
-                             TRUE ~ 'white'))
-}
-
 ###############################################.
 ## Data ----
 ###############################################.    

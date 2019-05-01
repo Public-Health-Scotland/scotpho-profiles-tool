@@ -403,7 +403,7 @@ function(input, output, session) {
   # Reactive data
   summary_data <- reactive({
     #data for the chosen area. Filtering based on user input values.
-    summary_chosen_area <-optdata %>% 
+    summary_chosen_area <- optdata %>% 
       subset(areaname == input$geoname_summary &
                areatype == input$geotype_summary &
                !(indicator %in% c("Mid-year population estimate - all ages", "Quit attempts")) &
@@ -438,8 +438,17 @@ function(input, output, session) {
     }
     
     sum_data <- sum_data %>% 
+      #Creating a palette of colours based on statistical significance
+          mutate(color = case_when(lowci <= comp_m & upci >= comp_m 
+                                   & interpret %in% c("H", "L") ~'gray',
+                                   lowci > comp_m & interpret == "H" ~ 'blue',
+                                   lowci > comp_m & interpret == "L" ~ 'red',
+                                   upci < comp_m & interpret == "L" ~ 'blue',
+                                   upci < comp_m & interpret == "H" ~ 'red', 
+                                   interpret == "O" ~ 'white',
+                                   TRUE ~ 'white'),
              #identifies correct domain name for title
-            mutate(domain = as.factor(case_when(
+                domain = as.factor(case_when(
                substr(profile_domain1,1,3)==input$profile_summary ~
                  substr(profile_domain1, 5, nchar(as.vector(profile_domain1))),
                TRUE ~ substr(profile_domain2, 5, nchar(as.vector(profile_domain2))))))
@@ -734,20 +743,20 @@ function(input, output, session) {
   # Function that creates a snapshot plot for a domain 
   plot_profile_snapshot <- function(domainchosen) {
     
-    # only selecting maximum year for each indicator
+    # only selecting decided domain
     prof_snap_data <- snapshot_data() %>% subset(domain == domainchosen) %>% 
-      create_pal_sum() %>% droplevels() 
+      droplevels() 
     
     #If no data available for that period then plot message saying data is missing
     if (is.data.frame(prof_snap_data) && nrow(prof_snap_data) == 0)
     {
       plot_nodata()
     } else { 
-
+      
    # Tooltip
     if (input$comp_summary == 1) {#depending if time or area comparison
-      tooltip_summary <-  c(paste0(input$geoname_summary, ": ", prof_snap_data$measure, "<br>",
-                                   input$geocomp_summary, ": ", prof_snap_data$comp_m, "<br>",
+      tooltip_summary <-  c(paste0("Area: ", prof_snap_data$measure, "<br>",
+                                   "Comparator: ", prof_snap_data$comp_m, "<br>",
                                    prof_snap_data$trend_axis, ". ", prof_snap_data$type_definition))
     } else if (input$comp_summary == 2) {
       tooltip_summary <-  c(paste0(prof_snap_data$trend_axis, ": ",
@@ -760,12 +769,9 @@ function(input, output, session) {
     axis_layout <- list(title = "", fixedrange=TRUE, zeroline = FALSE, showline = FALSE,
                         showticklabels = FALSE, showgrid = FALSE)
     
-    # height_plot <- 38*nrow(prof_snap_data)+10 # height of the plot depends on number indicators
-    
     # defining plot function
     plot_ly(prof_snap_data, y = ~indicator,   color = ~color, 
                colors=  c(blue = "#4da6ff", gray = "gray88", red = "#ffa64d", white = "#ffffff")
-               # height = height_plot
             ) %>% 
       add_bars(x =1, showlegend= FALSE, width=1, 
                hoverinfo="text", hovertext = tooltip_summary,
@@ -839,8 +845,8 @@ function(input, output, session) {
 # when 0 or 1 indicators the plot needs at least that size to 
 # prevent the spinner from showing and let the tooltip work
     height_plot <- case_when(n_ind > 1 ~ 38*n_ind+10,
-                             n_ind == 1 ~ 78,
-                             n_ind == 0 ~ 50)
+                             n_ind < 2 ~ 78,
+                             TRUE ~ 38*n_ind+10)
     
     tagList(
       h5(title, style="color: black; text-align: center; font-weight: bold;"),
@@ -856,14 +862,13 @@ function(input, output, session) {
   #Function to create ggplot, then used in renderPlot
   plot_heat <- function(domain_plot){
     heat <- summary_data() %>% subset(domain == domain_plot) %>% droplevels() %>% 
-      create_pal_sum()
+       mutate(indicator = as.factor(indicator)) 
     
     #If no data available for that period then plot message saying data is missing
     if (is.data.frame(heat) && nrow(heat) == 0)
     {
       plot_nodata()
       } else { #If data is available then plot it
-   
 
     # Calculates number of different indicators and then multiplies by pixels per row
     # it needs the sum at the end as otherwise small domains plots will be too small
