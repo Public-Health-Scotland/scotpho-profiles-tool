@@ -379,22 +379,19 @@ function(input, output, session) {
 
   # Years to compare with depending on what data is available
   output$comp_ui_summary <- renderUI({
-    
-    years <- c(min(summary_chosen_area()$year):max(summary_chosen_area()$year))
-    
+
     if (input$chart_summary %in% c("Snapshot", "Trend")) {
-      tagList( 
-        awesomeRadio("comp_summary", label = "Compare against",
-                     choices = list("Area" = 1, "Time" = 2), 
-                     selected = 1, inline=TRUE, checkbox = TRUE),
-        conditionalPanel(condition = "input.comp_summary == 1 ",  
-                         selectInput("geocomp_summary", "Select a comparison area", choices = comparator_list,
-                                     selectize=TRUE, selected = "Scotland")
-        ),
-        conditionalPanel(condition = "input.comp_summary == 2 ", 
-                         selectizeInput("yearcomp_summary", "Baseline year", choices = years)
-        )
-      )
+      if (input$comp_summary == 1) {
+          selectInput("geocomp_summary", "Select a comparison area", choices = comparator_list,
+                      selectize=TRUE, selected = "Scotland")
+      } else if (input$comp_summary == 2) {
+        min_year <- min(summary_data()$year)
+        max_year <- max(summary_data()$year)
+        # years <- 2002:2018
+        years <- c(min_year:max_year)
+        
+          selectizeInput("yearcomp_summary", "Baseline year", choices = years)
+      }
     } else if (input$chart_summary == "Spine") {
       selectizeInput("geocomp_spine", "Select a comparison area", 
                      choices = comparator_list, selected = "Scotland")
@@ -404,19 +401,17 @@ function(input, output, session) {
   
   #####################.
   # Reactive data
-  #Heatmap data for the chosen area. Filtering based on user input values.
-  summary_chosen_area <- reactive({ 
-    optdata %>% 
+  summary_data <- reactive({
+    #data for the chosen area. Filtering based on user input values.
+    summary_chosen_area <-optdata %>% 
       subset(areaname == input$geoname_summary &
                areatype == input$geotype_summary &
                !(indicator %in% c("Mid-year population estimate - all ages", "Quit attempts")) &
                (substr(profile_domain1, 1, 3) == input$profile_summary |
-                  substr(profile_domain2, 1, 3) == input$profile_summary)) 
-  })
-  
-  #Select comparator based on years available for area selected.
-  summary_chosencomp <- reactive({ 
+                  substr(profile_domain2, 1, 3) == input$profile_summary)) %>% 
+      droplevels()
     
+    #Select comparator based on years available for area selected.
     if (input$comp_summary == 1){ #if area comparison selected
       summary_chosencomp <- optdata %>% 
         subset(areaname == input$geocomp_summary &
@@ -427,40 +422,27 @@ function(input, output, session) {
         select(c(year, indicator, measure)) %>% 
         rename(comp_m=measure) 
     } else if (input$comp_summary == 2) { #if time comparison selected
-      summary_chosencomp <- summary_chosen_area() %>% 
+      summary_chosencomp <- summary_chosen_area %>% 
         subset(year == input$yearcomp_summary) %>% 
         select(c(indicator, measure)) %>% 
         rename(comp_m=measure) 
     }
     
-  })
-  
-  summary_data <- reactive({
-    
     #Merging comparator and chosen area
     if (input$comp_summary == 1){
-      sum_data <- left_join(x = summary_chosen_area(), y = summary_chosencomp(), 
+      sum_data <- left_join(x = summary_chosen_area, y = summary_chosencomp, 
                             by=c("indicator", "year")) %>% droplevels()
     } else if (input$comp_summary == 2) {
-      sum_data <- left_join(x = summary_chosen_area(), y = summary_chosencomp(), 
+      sum_data <- left_join(x = summary_chosen_area, y = summary_chosencomp, 
                             by=c("indicator")) %>% droplevels()
     }
     
-    sum_data <- sum_data %>%  
-      #Creating a palette of colours based on statistical significance
-      mutate(color = case_when(interpret == "O" ~ 'white',
-                               lowci <= comp_m & upci >= comp_m ~'gray',
-                               lowci > comp_m & interpret == "H" ~ 'blue',
-                               lowci > comp_m & interpret == "L" ~ 'red',
-                               upci < comp_m & interpret == "L" ~ 'blue',
-                               upci < comp_m & interpret == "H" ~ 'red', 
-                               TRUE ~ 'white'),
+    sum_data <- sum_data %>% 
              #identifies correct domain name for title
-             domain = as.factor(case_when(
+            mutate(domain = as.factor(case_when(
                substr(profile_domain1,1,3)==input$profile_summary ~
                  substr(profile_domain1, 5, nchar(as.vector(profile_domain1))),
                TRUE ~ substr(profile_domain2, 5, nchar(as.vector(profile_domain2))))))
-    
   })
   
   #####################.
@@ -484,31 +466,34 @@ function(input, output, session) {
   ###############################################.
   # This will create a reactive user interface depending on type of visualization 
   # and profile selected
-  output$summary_ui_plots <- renderUI({
-    
+  output$summary_expl_text <- renderUI({
     # Preparing a brief explanation for each visualisation 
     if (input$chart_summary == "Snapshot") {
-      explanation_text <- p("This visualisation shows all the indicators of the profile you
-            have chosen. The latest data available for each one of them is
-                                    compared against the selected comparator. The color of the boxes reflects if
-                                    the differences are significant or not.")
+      p("This visualisation shows all the indicators of the profile you
+        have chosen. The latest data available for each one of them is
+        compared against the selected comparator. The color of the boxes reflects if
+        the differences are significant or not. Hover over the boxes to see the
+        values for each indicator.")
     } else if (input$chart_summary == "Trend") {
-      explanation_text <- p("This visualisation shows all the indicators of the profile you
-            have chosen. The latest data available for each one of them is
-                                    compared against the selected comparator. The color of the boxes reflects if
-                                    the differences are significant or not.")
+      p("This visualisation shows all the indicators of the profile you
+        have chosen. The latest data available for each one of them is
+        compared against the selected comparator. The color of the boxes reflects if
+        the differences are significant or not. Hover over the boxes to see the
+        values for each indicator.")
     } else if (input$chart_summary == "Spine") {
-      explanation_text <- p("This visualisation shows all the indicators of the domain you
-                            have chosen. The latest data available for each one of them is
-                            compared against the selected comparator. Each bar represents a different area.
-                            The color of the square to the left of the bars reflects if
-                                    the differences are significant or not.")
+      p("This visualisation shows all the indicators of the domain you
+        have chosen. The latest data available for each one of them is
+        compared against the selected comparator. Each bar represents a different area.
+        The color of the square to the left of the bars reflects if
+        the differences are significant or not.")
     }
+  })
+   
+  output$summary_ui_plots <- renderUI({
     
     if (input$chart_summary == "Snapshot") {
       if (input$profile_summary == "HWB") {
         tagList(#Health and Wellbeing profile
-          explanation_text,
           column(4,
                  snap_ui("Behaviours", "summ_hwb_beha"),
                  snap_ui("Social care & housing", "summ_hwb_socare"),
@@ -529,7 +514,6 @@ function(input, output, session) {
         ) #taglist bracket
       } else if (input$profile_summary == "CYP") {
         tagList(#Children and young people profile
-          explanation_text,
           column(4,
                  snap_ui("Active", "summ_cyp_active"),
                  snap_ui("Healthy", "summ_cyp_health")
@@ -546,7 +530,6 @@ function(input, output, session) {
         )# taglist bracket
       } else if (input$profile_summary == "ALC") {
         tagList(#Alcohol profile
-          explanation_text,
           column(4,
                  snap_ui("Environment", "summ_alc_env"),
                  snap_ui("Services", "summ_alc_serv")
@@ -562,7 +545,6 @@ function(input, output, session) {
         )#taglist bracket
       } else if (input$profile_summary == "DRG") {
         tagList(#Drugs profile
-          explanation_text,
           column(4,
                  snap_ui("Environment", "summ_drg_env"),
                  snap_ui("Services", "summ_drg_serv"),
@@ -579,7 +561,6 @@ function(input, output, session) {
         )#taglist bracket
       } else if (input$profile_summary == "MEN") {
         tagList(#Mental Health profile
-          explanation_text,
           column(4,
                  snap_ui("Female adult", "summ_men_fem")
           ),
@@ -592,7 +573,6 @@ function(input, output, session) {
         )#taglist bracket
       } else if (input$profile_summary == "TOB") {
         tagList(#Tobacco profile
-          explanation_text,
           column(4,
                  snap_ui("Smoking in school children", "summ_tob_school"),
                  snap_ui("Smoking cessation & smoking cessation products", "summ_tob_cess")
@@ -608,14 +588,12 @@ function(input, output, session) {
         )#taglist bracket
       } else if (input$profile_summary == "POP") {
         tagList(#Population profile
-          explanation_text,
           snap_ui("Population", "summ_pop_pop")
         )#taglist bracket
       }
     } else if (input$chart_summary == "Trend") { #IF SELECTED HEATMAP
       if (input$profile_summary == "HWB") {
         tagList(#Health and Wellbeing profile
-          explanation_text,
           heat_ui("Behaviours", "heat_hwb_beha"),
           heat_ui("Social care & housing", "heat_hwb_socare"),
           heat_ui("Environment", "heat_hwb_env"),
@@ -630,7 +608,6 @@ function(input, output, session) {
         )
       } else if (input$profile_summary == "CYP") {
         tagList(#Children and young people profile
-          explanation_text,
           heat_ui("Active", "heat_cyp_active"),
           heat_ui("Healthy", "heat_cyp_health"),
           heat_ui("Included", "heat_cyp_includ"),
@@ -641,7 +618,6 @@ function(input, output, session) {
         )# taglist bracket
       } else if (input$profile_summary == "ALC") {
         tagList(#Alcohol profile
-          explanation_text,
           heat_ui("Environment", "heat_alc_env"),
           heat_ui("Services", "heat_alc_serv"),
           heat_ui("Community safety", "heat_alc_commsaf"),
@@ -651,7 +627,6 @@ function(input, output, session) {
         )#taglist bracket
       } else if (input$profile_summary == "DRG") {
         tagList(#Drugs profile
-          explanation_text,
           heat_ui("Environment", "heat_drg_env"),
           heat_ui("Services", "heat_drg_serv"),
           heat_ui("Data quality", "heat_drg_dat"),
@@ -662,14 +637,12 @@ function(input, output, session) {
         )#taglist bracket
       } else if (input$profile_summary == "MEN") {
         tagList(#Mental Health profile
-          explanation_text,
           heat_ui("Female adult", "heat_men_fem"),
           heat_ui("Male adult", "heat_men_male"),
           heat_ui("CYP Mental Health", "heat_men_cyp")
         )#taglist bracket
       } else if (input$profile_summary == "TOB") {
         tagList(#Tobacco profile
-          explanation_text,
           heat_ui("Smoking in school children", "heat_tob_school"),
           heat_ui("Smoking cessation & smoking cessation products", "heat_tob_cess"),
           heat_ui("Smoking attributable deaths & diseases", "heat_tob_attrib"),
@@ -679,14 +652,12 @@ function(input, output, session) {
         )#taglist bracket
       } else if (input$profile_summary == "POP") {
         tagList(#Population profile
-          explanation_text,
           heat_ui("Population", "heat_pop_pop")
         )#taglist bracket
       } # end of if else == "Trend"
     } else if (input$chart_summary == "Spine") {
       # Resize plot height for display in app
       tagList(
-        explanation_text,
         withSpinner( plotOutput("spine_plot", height=spine_plot_height(), width="90%")),
               br(), br()
               )
@@ -701,7 +672,7 @@ function(input, output, session) {
     if (input$chart_summary == "Snapshot") {
       format_csv(snapshot_data())
     } else if (input$chart_summary == "Trend") {
-      format_csv(summary_chosen_area())
+      format_csv(summary_data())
     } else if (input$chart_summary == "Spine") {
       spine_csv()
     }
@@ -765,7 +736,7 @@ function(input, output, session) {
     
     # only selecting maximum year for each indicator
     prof_snap_data <- snapshot_data() %>% subset(domain == domainchosen) %>% 
-      droplevels() 
+      create_pal_sum() %>% droplevels() 
     
     #If no data available for that period then plot message saying data is missing
     if (is.data.frame(prof_snap_data) && nrow(prof_snap_data) == 0)
@@ -775,14 +746,13 @@ function(input, output, session) {
 
    # Tooltip
     if (input$comp_summary == 1) {#depending if time or area comparison
-      tooltip_summary <-  c(paste0(prof_snap_data$trend_axis, "<br>",
-                                   input$geoname_summary, ": ", prof_snap_data$measure, "  ||  ",
+      tooltip_summary <-  c(paste0(input$geoname_summary, ": ", prof_snap_data$measure, "<br>",
                                    input$geocomp_summary, ": ", prof_snap_data$comp_m, "<br>",
-                                   prof_snap_data$type_definition))
+                                   prof_snap_data$trend_axis, ". ", prof_snap_data$type_definition))
     } else if (input$comp_summary == 2) {
       tooltip_summary <-  c(paste0(prof_snap_data$trend_axis, ": ",
-                                   prof_snap_data$measure, "<br>",
-                                   "Baseline period: ", prof_snap_data$comp_m, "<br>",
+                                   prof_snap_data$measure, "  ||  ",
+                                   "Baseline: ", prof_snap_data$comp_m, "<br>",
                                    prof_snap_data$type_definition))
     } 
 
@@ -808,7 +778,6 @@ function(input, output, session) {
              font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif')) %>% # to get hover compare mode as default
       config(displayModeBar = FALSE, displaylogo = F, collaborate=F, editable =F)
     }
- 
   }
   
   ###############################################.
@@ -868,9 +837,10 @@ function(input, output, session) {
     n_ind <- snapshot_data() %>% subset(domain == title) %>% 
       droplevels() %>% nrow()
 # when 0 or 1 indicators the plot needs at least that size to 
-# prevent the spinner from showing
-    height_plot <- case_when(n_ind>1 ~ 38*n_ind+10,
-                             TRUE ~ 67)
+# prevent the spinner from showing and let the tooltip work
+    height_plot <- case_when(n_ind > 1 ~ 38*n_ind+10,
+                             n_ind == 1 ~ 78,
+                             n_ind == 0 ~ 50)
     
     tagList(
       h5(title, style="color: black; text-align: center; font-weight: bold;"),
@@ -885,7 +855,8 @@ function(input, output, session) {
   #Heatmap plot
   #Function to create ggplot, then used in renderPlot
   plot_heat <- function(domain_plot){
-    heat <- summary_data() %>% subset(domain == domain_plot) %>% droplevels()
+    heat <- summary_data() %>% subset(domain == domain_plot) %>% droplevels() %>% 
+      create_pal_sum()
     
     #If no data available for that period then plot message saying data is missing
     if (is.data.frame(heat) && nrow(heat) == 0)
@@ -991,9 +962,7 @@ function(input, output, session) {
   ##############################################.
   ## Spine/Barcode ----
   ###############################################.    
-  
-
-  ############################################.
+    ############################################.
   ## Reactive controls
   
   # Reactive controls for domain depending on profile
@@ -1002,11 +971,9 @@ function(input, output, session) {
     selectInput("topic_spine", "Domain", choices = domain_list, selected='')
   })
   
-  
   ############################################.
   ## Spine Data
-  
-  #Barcode all area data
+    #Barcode all area data
   spine_allareas <- reactive({
     
     optdata %>%

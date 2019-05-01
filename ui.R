@@ -236,6 +236,9 @@ tabPanel("Summary", icon = icon("list-ul"), value = "summary",
            ),
            column(3,
                   p(tags$b("Step 3. Select a comparator ")),
+                  awesomeRadio("comp_summary", label = "Compare against",
+                               choices = list("Area" = 1, "Time" = 2), 
+                               selected = 1, inline=TRUE, checkbox = TRUE),
                   uiOutput("comp_ui_summary") # comparator options
            ),
            column(4,
@@ -246,7 +249,7 @@ tabPanel("Summary", icon = icon("list-ul"), value = "summary",
                spine compares indicators with the rest of areas of the same level."),
              radioGroupButtons("chart_summary", status = "primary", justified = TRUE,
                              choices = c("Snapshot", "Trend", "Spine"), label=NULL  )),
-           div(#style = "width:60%; ", # centering div
+           fluidRow(#style = "width:60%; ", # centering div
                   actionButton("help_summary",label="Help", icon= icon('question-circle'), class ="down"),
                   actionButton("defs_summary",label="Definitions", icon= icon('info'), class ="down"),
                   downloadButton('download_summary', 'Download data', class = "down"),
@@ -281,6 +284,7 @@ tabPanel("Summary", icon = icon("list-ul"), value = "summary",
                           uiOutput("ui_spine_legend_areatype"),
                           uiOutput("ui_spine_legend_comparator")))),
                    # Depending what users selects different visualizations
+                          uiOutput("summary_expl_text"),
                           uiOutput("summary_ui_plots")
         )
   ), #Tab panel bracket

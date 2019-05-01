@@ -19,7 +19,8 @@ library(shinyjs)
 library(shinydashboard) #for valuebox on techdoc tab
 library(sp)
 library(lubridate) #for automated list of dates in welcome modal
-library(shinycssloaders) #for loading icons
+library(shinycssloaders) #for loading icons, see line below
+# it uses github version devtools::install_github("andrewsali/shinycssloaders")
 library(webshot) #to download plotly charts
 # As well as webshot phantomjs is needed l to download Plotly charts
 # https://github.com/rstudio/shinyapps-package-dependencies/pull/180
@@ -95,6 +96,19 @@ heat_ui <- function(title, plot_name) {
     h5(title, style="color: black; text-align: center; font-weight: bold;"),
     div(align = "center", withSpinner(plotlyOutput(plot_name, height = "auto")))
   )
+}
+
+#Creating a palette of colours based on statistical significance
+create_pal_sum <- function(dataset) {
+  dataset %>% 
+    mutate(color = case_when(lowci <= comp_m & upci >= comp_m 
+                             & interpret %in% c("H", "L") ~'gray',
+                             lowci > comp_m & interpret == "H" ~ 'blue',
+                             lowci > comp_m & interpret == "L" ~ 'red',
+                             upci < comp_m & interpret == "L" ~ 'blue',
+                             upci < comp_m & interpret == "H" ~ 'red', 
+                             interpret == "O" ~ 'white',
+                             TRUE ~ 'white'))
 }
 
 ###############################################.
