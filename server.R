@@ -2406,6 +2406,33 @@ function(input, output, session) {
                 file, row.names=FALSE) } 
   )
   
+  ## IntroJS----
+  # hintjs(session, options = list("hintButtonLabel"="Hope this hint was helpful"),
+  #        events = list("onhintclose"=I('alert("Wasn\'t that hint helpful")')))
+  # 
+  # # start introjs when button is pressed with custom options and events
+  # observeEvent(input$help,
+  #              introjs(session, options = list("nextLabel"="Onwards and Upwards",
+  #                                              "prevLabel"="Did you forget something?",
+  #                                              "skipLabel"="Don't be a quitter"),
+  #                      events = list("oncomplete"=I('alert("Glad that is over")')))
+  # )
+  
+  
+  # steps <- reactive(data.frame(element = c(NA,"#btn"),
+  #                              intro = c(input$intro,"Keep clicking for help")))
+  # 
+  # observeEvent(input$btn,{
+  #   introjs(session,options = list(steps=steps()))
+  #     })
+  # 
+  
+  observeEvent(input$btn_landing,
+               introjs(session))
+  
+  observeEvent(input$btn2,
+               introjs(session))
+  
 } #server closing bracket
 
 #########################  END ----
