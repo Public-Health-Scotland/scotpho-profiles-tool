@@ -118,7 +118,7 @@ tabPanel(
     fluidRow(
       #Summary box
       column(6, class="landing-page-column",
-             br(),
+             br(), #spacing
              ## temporary hide title line 
              # fluidRow(h4("Explore data by profile", style="margin-top:0px; 
              #             color:black; text-align: center; ")),
@@ -134,7 +134,7 @@ tabPanel(
                  Hover over buttons to see a brief description of what each button does")),
              #Table box 
       column(6, class="landing-page-column",
-             br(),
+             br(), #spacing
              ## temporary hide title line 
              #fluidRow(h4("Access the data behind the tool", style="margin-top:0px; 
              #           color:black; text-align: center; ")),
@@ -153,6 +153,7 @@ tabPanel(
     #                     color:black; text-align: center; ")),
     #2nd row of boxes
     fluidRow(
+      br(), #spacing
       #Trend plot box
       introBox(
       column(4, class="landing-page-column",
@@ -193,48 +194,63 @@ tabPanel(
     # end of second row
     fluidRow(h4("Find supporting information", style="margin-top:0px; 
                          color:black; text-align: center; ")),
-    fluidRow(
-      #About box
-      column(6, class="landing-page-column",
-             div(class="landing-page-box-about", 
-                 div("About", class = "landing-page-box-title"),
-                 div(class = "landing-page-about-icon", style="background-image: url(about_2.png);
+  fluidRow(
+          #About box
+    column(4, class="landing-page-column",
+           div(class="landing-page-box-about", 
+               div("About", class = "landing-page-box-title"),
+               div(class = "landing-page-about-icon", style="background-image: url(about_2.png);
                      background-size: auto 80%; background-position: center; background-repeat: no-repeat; "),
-                 actionButton('jump_to_about', 'About ScotPHO Profiles', 
-                              class="landing-page-button-about", 
-                              icon = icon("arrow-circle-right", "icon-lp"))
-             ),
-             #Evidence box
-             div(class="landing-page-box-about", 
-                 div("Evidence for action", class = "landing-page-box-title" ),
-                 div(class = "landing-page-about-icon", div(img(src="other_profile.png", class="centerabout"))),
-                 actionButton('jump_to_efa', 'Links to ScotPHO evidence for action briefings', 
-                              onclick ="window.open('https://www.scotpho.org.uk/comparative-health/profiles/resources/evidence-for-action/', '_blank')",
-                              class="landing-page-button-about", 
-                              icon = icon("arrow-circle-right", "icon-lp")))
-      ),
-      #Resources box
-      column(6, class="landing-page-column", 
-             div(class="landing-page-box-about",
-                 div("Resources", class = "landing-page-box-title"),
-                 div(class = "landing-page-about-icon", style="background-image: url(technical_resources.png);
+               actionButton('jump_to_about', 'About ScotPHO Profiles', 
+                            class="landing-page-button-about", 
+                            icon = icon("arrow-circle-right", "icon-lp"))),
+           #Evidence box
+           div(class="landing-page-box-about", 
+               div("Evidence for action", class = "landing-page-box-title" ),
+               div(class = "landing-page-about-icon", div(img(src="other_profile.png", class="centerabout"))),
+               actionButton('jump_to_efa', 'Links to ScotPHO evidence for action briefings', 
+                            onclick ="window.open('https://www.scotpho.org.uk/comparative-health/profiles/resources/evidence-for-action/', '_blank')",
+                            class="landing-page-button-about", 
+                            icon = icon("arrow-circle-right", "icon-lp")))),
+          
+    column(4, class="landing-page-column", 
+           #Indicator updates
+           div(class="landing-page-box-about",
+               div("Indicator Updates", class = "landing-page-box-title"),
+               div(class = "landing-page-about-icon", style="background-image: url(technical_resources.png);
                      background-size: auto 80%; background-position: center; background-repeat: no-repeat; "),
-                 actionButton('jump_to_resources', 'Find technical information about the ScotPHO profile definitions and methodology', 
-                              class="landing-page-button-about", 
-                              icon = icon("arrow-circle-right", "icon-lp"))
-             ),
-             #Other profiles
-             div(class="landing-page-box-about", 
-                 div("Other profiles", class = "landing-page-box-title"),
-                 div(class = "landing-page-about-icon", style="background-image: url(related_links.png);
+               actionButton('btn_indicator_updates', 'Find out which indicators have been updated in the last 60 days', 
+                            class="landing-page-button-about", 
+                            icon = icon("arrow-circle-right", "icon-lp"))),
+          #Resources box
+           div(class="landing-page-box-about",
+               div("Resources", class = "landing-page-box-title"),
+               div(class = "landing-page-about-icon", style="background-image: url(technical_resources.png);
                      background-size: auto 80%; background-position: center; background-repeat: no-repeat; "),
-                 actionButton('jump_to_others', 'Links to alternative profiling tools', 
-                              class="landing-page-button-about", 
-                              icon = icon("arrow-circle-right", "icon-lp")))
-      )
+               actionButton('jump_to_resources', 'Find technical information about the ScotPHO profile definitions and methodology', 
+                            class="landing-page-button-about", 
+                            icon = icon("arrow-circle-right", "icon-lp")))),
+
+    column(4, class="landing-page-column",
+           #Definitions
+           div(class="landing-page-box-about",
+               div("Definitions", class = "landing-page-box-title"),
+               div(class = "landing-page-about-icon", style="background-image: url(technical_resources.png);
+                     background-size: auto 80%; background-position: center; background-repeat: no-repeat; "),
+               actionButton('jump_to_definitions', 'Find out about indicator definitions and data sources', 
+                            class="landing-page-button-about", 
+                            icon = icon("arrow-circle-right", "icon-lp"))),
+           #Other profiles
+           div(class="landing-page-box-about", 
+               div("Other profiles", class = "landing-page-box-title"),
+               div(class = "landing-page-about-icon", style="background-image: url(related_links.png);
+                     background-size: auto 80%; background-position: center; background-repeat: no-repeat; "),
+               actionButton('jump_to_others', 'Links to alternative profiling tools', 
+                            class="landing-page-button-about", 
+                            icon = icon("arrow-circle-right", "icon-lp"))))
   )#Fluidrow bracket
-) #main Panel bracket
-  ),# tab panel bracket
+  ) #main Panel bracket
+),# tab panel bracket
 ###############################################.
 ## Summary ----
 ###############################################.
@@ -520,11 +536,15 @@ tabPanel("Data", icon = icon("table"), value = "table",
          )
            ) # main panel bracket
   ), #Tab panel bracket  
+
 ###############################################.             
-##############About----    
+##############NavBar Menu----
 ###############################################.
 #Starting navbarMenu to have tab with dropdown list
 navbarMenu("Info", icon = icon("info-circle"), 
+           ###############################################.
+           ## About ----
+           ###############################################.
            tabPanel("About", value = "about",
                     sidebarPanel(width=1),
                     mainPanel(width=8,
@@ -543,31 +563,31 @@ navbarMenu("Info", icon = icon("info-circle"),
                                 "and we will be happy to help.")),
                     br()
            ),#Tab panel
-           ###############################################.
-           ## Definitions ----
-           ###############################################.
-           tabPanel("Indicator definitions", value = "definition",
+           # ###############################################.
+           # ## Definitions nabar ----
+           # ###############################################.
+           tabPanel("Indicator definitions", value = "definitions",
                     #Sidepanel for filtering data
                     fluidRow(
                       column(width = 5, offset= 1,
                              p("Indicator definitions and technical information", style = "font-weight: bold; color: black;"),
                              div(style="display:inline-block",
                                  selectizeInput("profile_defined", label = "Filter by Profile",
-                                                width = "250px", choices = profile_list_filter, 
+                                                width = "250px", choices = profile_list_filter,
                                                 selected = "Show all", multiple=FALSE)),
-                             div(style="display:inline-block", 
+                             div(style="display:inline-block",
                                  selectizeInput("topic_defined", label = "Or by Topic",
-                                                width = "250px", choices = topic_list_filter, 
+                                                width = "250px", choices = topic_list_filter,
                                                 selected = "Show all", multiple=FALSE)),
                              uiOutput("indicator_chosen")
-                      ), # column bracket 
+                      ), # column bracket
                       column(width=6,
                              br(), br(), br(),
-                             downloadButton("definitions_by_indicator", 
+                             downloadButton("definitions_by_indicator",
                                             'Download indicator definition', class = "down")
                       )#column bracket
                     ), #fluidRow bracket
-                    fluidRow(      
+                    fluidRow(
                       column(width=10, offset=1,
                              useShinydashboard(),
                              conditionalPanel(
@@ -580,42 +600,42 @@ navbarMenu("Info", icon = icon("info-circle"),
                                div(class="definitionbox",
                                    p(paste("Definition"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
                                    h5(textOutput("definition"))),
-                               div(class="definitionbox",   
+                               div(class="definitionbox",
                                    p(paste("Data source"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
                                    h5(textOutput("source"))),
-                               div(class="definitionbox",   
+                               div(class="definitionbox",
                                    p(paste("Numerator"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
                                    h5(textOutput("numerator"))),
-                               div(class="definitionbox",   
+                               div(class="definitionbox",
                                    p(paste("Measure"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
                                    h5(textOutput("measure"))),
-                               div(class="definitionbox",   
+                               div(class="definitionbox",
                                    p(paste("Rounding and imputation"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
                                    h5(textOutput("rounding"))),
-                               div(class="definitionbox",   
+                               div(class="definitionbox",
                                    p(paste("Year type"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
                                    h5(textOutput("year"))),
-                               div(class="definitionbox",   
+                               div(class="definitionbox",
                                    p(paste("Trends from"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
                                    h5(textOutput("trends_from"))),
-                               div(class="definitionbox",   
+                               div(class="definitionbox",
                                    p(paste("Geographies available"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
                                    h5(textOutput("geos"))),
-                               div(class="definitionbox",   
+                               div(class="definitionbox",
                                    p(paste("Notes,caveats and other info"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
                                    h5(textOutput("notes"))),
-                               div(class="definitionbox",   
+                               div(class="definitionbox",
                                    p(paste("Date last updated"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
                                    h5(textOutput("last_updated")))
                              ) # conditionalPanel bracket
                       ), #column bracket
-                      column(width=5, 
+                      column(width=5,
                              conditionalPanel(
                                condition="input.indicator_defined != null",
                                div(class="definitionbox",
                                    p(paste("Rationale for inclusion"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
                                    h5(textOutput("rationale"))),
-                               div(class="definitionbox",   
+                               div(class="definitionbox",
                                    p(paste("Diagnostic codes & position"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
                                    h5(textOutput("diagnosis"))),
                                div(class="definitionbox",
@@ -645,10 +665,10 @@ navbarMenu("Info", icon = icon("info-circle"),
                                div(class="definitionbox",
                                    p(paste("Next update due"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
                                    h5(textOutput("next_update")))
-                             ) #conditional Panel bracket 
+                             ) #conditional Panel bracket
                       )  #column bracket
                     )#fluidRow bracket
-           ), #Tab panel bracket             
+           ), #Tab panel bracket
 ###############################################.             
 ##############Resources----    
 ###############################################.      
