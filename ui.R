@@ -187,12 +187,9 @@ tabPanel(
                               class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp")))),
     data.step = 4,
     data.intro = "inequalities")),
-    #   ),
-    # data.step = 3,
-    # data.intro = "test"
-    #),
     # end of second row
-    fluidRow(h4("Find supporting information", style="margin-top:0px; 
+ 
+   fluidRow(h4("Find supporting information", style="margin-top:0px; 
                          color:black; text-align: center; ")),
   fluidRow(
           #About box
