@@ -2464,15 +2464,34 @@ function(input, output, session) {
   # 
   
   ## Event that launches the help intro boxes linked to landing page button.
-  observeEvent(input$btn_landing,
-               introjs(session))
+  # observeEvent(input$btn_landing,
+  #              introjs(session))
   
   ##button 2 appears on data tab but currently when clicked cycles through all the intro steps on landing page
   ##i need to find a way to set up intro for only data tab - perhaps i can tell it to skip certain steps?
   ##this might get complicated if we insert steps on different tabs and things get out of sequence?
-  
-  observeEvent(input$btn2,
-               introjs(session))
+  # 
+  # observeEvent(input$btn2,
+  #              introjs(session))
+  #              
+  observeEvent(input$btn_landing, {
+    introjs(
+      session,
+      events = list(
+        "onchange" = I("if (this._currentStep<5) {
+        $('a[data-value=\"Summary\"]').removeClass('active');
+        $('a[data-value=\"Home\"]').addClass('active');
+        $('a[data-value=\"Home\"]').trigger('click');
+  }
+        if (this._currentStep==5) {
+        $('a[data-value=\"Home\"]').removeClass('active');
+        $('a[data-value=\"Summary\"]').addClass('active');
+        $('a[data-value=\"Summary\"]').trigger('click');
+        }")
+)
+      )
+    
+})
   
 } #server closing bracket
 

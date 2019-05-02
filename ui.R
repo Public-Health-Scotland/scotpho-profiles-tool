@@ -252,7 +252,8 @@ tabPanel(
 ## Summary ----
 ###############################################.
 tabPanel("Summary", icon = icon("list-ul"), value = "summary",
-         wellPanel( #Filter options
+         introBox(data.step = 5, data.intro = "in another tab",
+           wellPanel( #Filter options
            column(3,
                   p(tags$b("Step 1. Select your area")),
                   selectInput("geotype_summary", "Geography level", choices=areatype_list,
@@ -289,7 +290,7 @@ tabPanel("Summary", icon = icon("list-ul"), value = "summary",
                   snapshot is a comparison with the latest data available, 
                              trend will show how things are changing over time, and 
                              spine compares indicators with the rest of areas of the same level." )) 
-         ), #well panel bracket
+         )), #well panel bracket
          mainPanel(width = 12,
                    bsModal("mod_defs_summary", "Definitions", "defs_summary",
                            htmlOutput('defs_text_summary')),
