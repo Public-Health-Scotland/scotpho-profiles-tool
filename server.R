@@ -2475,22 +2475,8 @@ function(input, output, session) {
   #              introjs(session))
   #              
   observeEvent(input$btn_landing, {
-    introjs(
-      session,
-      events = list(
-        "onchange" = I("if (this._currentStep<5) {
-        $('a[data-value=\"Summary\"]').removeClass('active');
-        $('a[data-value=\"Home\"]').addClass('active');
-        $('a[data-value=\"Home\"]').trigger('click');
-  }
-        if (this._currentStep==5) {
-        $('a[data-value=\"Home\"]').removeClass('active');
-        $('a[data-value=\"Summary\"]').addClass('active');
-        $('a[data-value=\"Summary\"]').trigger('click');
-        }")
-)
-      )
-    
+    introjs(session,
+      events = list(onbeforechange = readCallback("switchTabs")))
 })
   
 } #server closing bracket

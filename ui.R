@@ -295,7 +295,7 @@ tabPanel("Summary", icon = icon("list-ul"), value = "summary",
                    bsModal("mod_defs_summary", "Definitions", "defs_summary",
                            htmlOutput('defs_text_summary')),
                    fluidRow(column(4,
-                          h4(textOutput("summary_title"), style="color: black; text-align: left"),
+                                   introBox(data.step = 6, data.intro = "in another tab",h4(textOutput("summary_title"), style="color: black; text-align: left")),
                           h5(textOutput("summary_subtitle"), style="color: black; text-align: left")
                           ),
                    column(3,
