@@ -1434,7 +1434,7 @@ function(input, output, session) {
   trend_data <- reactive({ 
     
     trend <- optdata %>% 
-      subset((areaname %in% input$hbname_trend &  areatype == "Health board" |
+      subset((areaname %in% input$hbname_trend & areatype == "Health board" |
                 areaname %in% input$caname_trend & areatype == "Council area" |
                 input$scotname_trend == TRUE & areatype == "Scotland"  |
                 areaname %in% input$adpname_trend  & areatype == "Alcohol & drug partnership" |
@@ -1446,7 +1446,7 @@ function(input, output, session) {
       mutate(areaname_full = as.factor(areaname_full),
              # adjusting levels of areatype, so Scotland always plotted as black
              areatype = factor(areatype,
-                               levels = c("Scotland", "Health board ", "Council area",
+                               levels = c("Scotland", "Health board", "Council area",
                                           "Alcohol & drug partnership", "HSC partnership",
                                           "HSC locality", "Intermediate zone"))) %>% 
       arrange(year, areatype, areaname_full) #Needs to be sorted by year for Plotly
