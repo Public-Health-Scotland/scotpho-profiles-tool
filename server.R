@@ -1136,7 +1136,7 @@ function(input, output, session) {
   # Create barcode plot function
   plot_spine <- function(){
     
-    ind_count <- length(unique(spine_allareas()$ind_id)) #facet_wrap requires how many chart rows to render
+    ind_count <- length(unique(spine_allareas()$indicator)) #facet_wrap requires how many chart rows to render
     
     #Merging comparator and chosen area
     spine <- merge(spine_allareas(), spine_chosencomp(), by=c("indicator"))
