@@ -2,13 +2,6 @@
 #This script includes the data manipulation necessary to produce data in the way
 #the Shiny app needs.
 
-
-# TODO:
-# do we need ind_id at the end? 
-# do we need all the domain1,2 and 3?
-# what about creating a backup somewhere of the old data?
-# need to check if update date will work fine as slightly different format.
-
 ############################.
 ##Filepaths ----
 ############################.
@@ -28,12 +21,13 @@ if (sessionInfo()$platform == "x86_64-redhat-linux-gnu (64-bit)") {
 ############################.
 ##Packages ----
 ############################.
-library(readr)
 library(dplyr) 
+library(readr)
 library(scales) #rescaling variables
 library(haven) #for SPPS file reading
 library(data.table) #reading data
 library(zoo) # dealing with dates
+library(lubridate) #for automated list of dates in welcome modal
 library(janitor) #cleaning names
 library (rgdal) #for reading shapefiles
 library(rgeos) #for reducing size of shapefiles
@@ -45,7 +39,13 @@ library(rmapshaper) #for reducing size of shapefiles
 #This code updates the Technical Document table based on an online Google Drive version of the table
 #Run every time you want to refresh the data in the local copy to represent what's in the online copy
 definition_table <- read_csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vTzrwAG7IFBjLvxuxUO0vJ7mn2AgilWVA1ZJQ9oVaLOSG4mgkquMKWga8MY5g2OFkFn-3awM_GYaHjL/pub?gid=94312583&single=true&output=csv") %>%
-  as.data.frame() %>% mutate(indicator_number = as.factor(indicator_number))
+  as.data.frame() %>% mutate(indicator_number = as.factor(indicator_number)) 
+
+#automating dates
+new_date <- fast_strptime(paste("01",definition_table$last_updated,sep="-"),"%d-%b-%Y")
+
+definition_table <- definition_table %>% 
+  mutate(days_since_update=day(as.period(new_date %--% today(), unit="days")))
 
 saveRDS(definition_table,"data/techdoc.rds") #for opt
 techdoc <- readRDS("data/techdoc.rds")
@@ -55,7 +55,7 @@ write_csv(definition_table,"/PHI_conf/ScotPHO/Profiles/Shiny Tool/techdoc_backup
 ###############################################.
 ## Lookups ---- 
 ###############################################.
-# Lookup with all geography codes information.
+# Lookup with all geography codes information. This file is created in the lookup repo
 geo_lookup <- readRDS(paste0(lookups, "Geography/codedictionary.rds")) %>% 
   mutate_all(factor) %>% # converting variables into factors
   #Creating geography type variable
@@ -191,20 +191,17 @@ geo_lookup <- geo_lookup %>%
 saveRDS(geo_lookup, "data/geo_lookup.rds")
 geo_lookup <- readRDS("data/geo_lookup.rds") 
 
-######.
-#Indicator information lookup table 
-#Many variables might not be needed
+###############################################.
+## Indicator lookup table 
 ind_lookup<- read_csv(paste0(lookups, "indicator_lookup.csv")) %>% 
   setNames(tolower(names(.))) %>% #variables to lower case
   select(c(ind_id, indicator, interpret, supression, supress_less_than, 
-           type_id, type_definition, domain1, domain2, domain3, 
-           profile_domain1, profile_domain2)) %>% 
+           type_id, type_definition, profile_domain1, profile_domain2)) %>% 
   mutate_if(is.character, factor) %>%  # converting variables into factors
   mutate(ind_id = as.factor(ind_id))
 
 ###############################################.
-## Profile lookup ----
-###############################################.
+## Profile lookup 
 #Creating a file with a column for profile and another one for domain
 profile_lookup <- data.frame(profile_domain = c(paste(unique(optdata$profile_domain1)),
                                                 paste(unique(optdata$profile_domain2)))) %>%
@@ -219,7 +216,11 @@ profile_lookup <- readRDS("data/profile_lookup.rds")
 ## Indicator data ----
 ###############################################.   
 # Brings data prepared by spss and then delete all the one already present in shiny files
-# Eventually the spss data will be deleted
+# Eventually the spss data will be deleted.
+
+#Start creating a backup of the old file 
+optdata <- readRDS("data/optdata.rds")
+saveRDS(optdata, "/PHI_conf/ScotPHO/Profiles/Data/shiny_tool_backup_data.rds")
 
 #Finds all the csv files in the shiny folder
 files <-  list.files(path = shiny_files, pattern = "*.csv", full.names = TRUE)
@@ -228,11 +229,11 @@ View(file.info(files,  extra_cols = TRUE))
 
 # reads the data and combines it, variables to lower case and variable with filename
 optdata <- do.call(rbind, lapply(files, function(x){ 
-  fread(x)[,file_name:= x] %>% clean_names()})) %>% 
+  fread(x)[,file_name:= x] %>% clean_names() })) %>% 
   mutate(file_name = gsub("/PHI_conf/ScotPHO/Profiles/Data/Shiny Data//", "", file_name)) %>% 
   rename(measure = rate)
 
-# to check if there are more then one file for the same indicator
+# to check if there is more then one file for the same indicator
 optdata %>% select(ind_id, file_name) %>% unique %>% group_by(ind_id) %>% 
   add_tally() %>% filter(n >1) %>% View()
 
@@ -245,6 +246,7 @@ data_spss <- read_csv(paste0(basefiles, "All Data for Shiny.csv"),
   # excluding indicators already present in shiny folder data files
   filter(!(ind_id %in% unique(optdata$ind_id))) %>% droplevels()
 
+# Merging together spss and shiny data folder datasets
 optdata <- bind_rows(optdata, data_spss) %>% 
   mutate_if(is.character, factor) %>%  #converting characters into factors
   mutate(ind_id = as.factor(ind_id)) %>% 
@@ -252,7 +254,6 @@ optdata <- bind_rows(optdata, data_spss) %>%
   mutate(code = recode(code, "S12000015"='S12000047', "S12000024"='S12000048',
                        "S08000018"='S08000029', "S08000027"= 'S08000030',
                        "S37000014"='S37000032', "S37000023"='S37000033'))
-
 
 # Adding update date for all indicators based on technical document
 update_table <- techdoc %>% rename(ind_id = indicator_number, update_date = last_updated) %>% 
@@ -274,7 +275,8 @@ optdata <- optdata %>% filter(!(ind_id %in% c("20205", "20403", "20204", "20402"
                                               "20301", "20401", "21001", "21002") & 
                                   substr(code, 1, 3) == "S02"))
 
-# some counts, original optdata 552,518
+# some counts, original optdata 552,518 (there are still several duplicated files
+# and some indicators updated: quit attempts and bowel)
 
 #Merging with indicator and geography information
 optdata <- left_join(x=optdata, y=ind_lookup, by="ind_id") 
@@ -305,24 +307,22 @@ optdata <- optdata %>%
   )
 
 # Scaling measures (0 to 1) in groups by year, area type and indicator.
-#Does not work well for Scotland totals. TRUE?
 optdata <- optdata %>% group_by(ind_id, year, areatype) %>%
-  mutate(measure_sc = case_when(interpret=="H"~ as.vector(rescale(measure, to=c(1,0))),
-                                interpret=="L" ~ as.vector(rescale(measure, to=c(0,1))),
+  mutate(measure_sc = case_when(interpret=="H"~ as.vector(scales::rescale(measure, to=c(1,0))),
+                                interpret=="L" ~ as.vector(scales::rescale(measure, to=c(0,1))),
                                 TRUE ~ 0))  %>% ungroup()
 
 # Tidying up the format
-optdata <- optdata %>%
-  select(-c(supression, supress_less_than, type_id, file_name)) %>%  #taking out some variables
+optdata <- optdata %>% #taking out some variables
+  select(-c(supression, supress_less_than, type_id, file_name, ind_id)) %>%  
   #rounding variables
-  mutate(numerator = round(numerator, 1), measure = round(measure, 1),
-         lowci = round(lowci, 1), upci = round(upci, 1)) %>%
+  mutate(numerator = round(numerator, 2), measure = round(measure, 2),
+         lowci = round(lowci, 2), upci = round(upci, 2)) %>%
   droplevels() %>%  #to get rid of factor levels not present in data set.
   #Making the numerator the measure for a few indicators, so it plots correctly
   mutate(measure = ifelse(indicator %in% c('Mid-year population estimate - all ages',
                                            'S2 pupils - SALSUS', 'S4 pupils - SALSUS',
-                                           "Quit attempts"), numerator, measure),
-         ind_id = as.factor(ind_id))
+                                           "Quit attempts"), numerator, measure))
 
 ###TEMPORARY FIXES HOPEFULLY
 #Dealing with lack of data for certain years and hb for Healthy weight at P1.
