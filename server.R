@@ -1136,7 +1136,7 @@ function(input, output, session) {
   # Create barcode plot function
   plot_spine <- function(){
     
-    ind_count <- length(unique(spine_allareas()$ind_id)) #facet_wrap requires how many chart rows to render
+    ind_count <- length(unique(spine_allareas()$indicator)) #facet_wrap requires how many chart rows to render
     
     #Merging comparator and chosen area
     spine <- merge(spine_allareas(), spine_chosencomp(), by=c("indicator"))
@@ -2186,8 +2186,8 @@ function(input, output, session) {
         if (input$all_data == TRUE) {
           filtered_geos <- optdata %>%  
             filter(year>=input$date_from[1] & year<=input$date_from[2] &
-                     (domain1 %in% input$topic_filter|domain2 %in% input$topic_filter|
-                        domain3 %in% input$topic_filter))
+          (substr(profile_domain1, 5, nchar(as.vector(profile_domain1))) %in%  input$topic_filter |
+          substr(profile_domain2, 5, nchar(as.vector(profile_domain2))) %in%  input$topic_filter))
           
         } else {
           
@@ -2200,15 +2200,15 @@ function(input, output, session) {
                      (areaname %in% input$hscp_true & areatype == "HSC partnership")|
                      code %in% input$code) %>% 
             filter(year>=input$date_from[1] & year<=input$date_from[2] & 
-                     (domain1 %in% input$topic_filter|domain2 %in% input$topic_filter|
-                        domain3 %in% input$topic_filter))
+                     (substr(profile_domain1, 5, nchar(as.vector(profile_domain1))) == input$topic_filter |
+                        substr(profile_domain2, 5, nchar(as.vector(profile_domain2))) == input$topic_filter))
           
           filtered_geo2 <- if (input$scotland == TRUE) {
             optdata %>% 
               filter(areaname == "Scotland" & 
                        year>=input$date_from[1] & year<=input$date_from[2] & 
-                       (domain1 %in% input$topic_filter|domain2 %in% input$topic_filter|
-                          domain3 %in% input$topic_filter))
+                       (substr(profile_domain1, 5, nchar(as.vector(profile_domain1))) %in%  input$topic_filter |
+                          substr(profile_domain2, 5, nchar(as.vector(profile_domain2))) %in%  input$topic_filter))
           }  
           
           # Merging together Scotland and other areas selected
@@ -2329,9 +2329,12 @@ function(input, output, session) {
       indic_selection <- sort(unique(c(as.character(optdata$indicator[grep(input$profile_defined,optdata$profile_domain1)]),
                                        as.character(optdata$indicator[grep(input$profile_defined,optdata$profile_domain2)] ))))
     } else if (input$topic_defined != "Show all"){
-      indic_selection <- sort(unique(optdata$indicator[optdata$domain1==input$topic_defined|
-                                                         optdata$domain2==input$topic_defined|
-                                                         optdata$domain3==input$topic_defined]))
+      indic_selection <- sort(unique(
+        optdata$indicator[substr(optdata$profile_domain1, 5, nchar(as.vector(optdata$profile_domain1)))
+                            == input$topic_defined |
+                          substr(optdata$profile_domain2, 5, nchar(as.vector(optdata$profile_domain2)))
+                            == input$topic_defined]))
+
     } else { 
       indic_selection <- indicator_list
     }

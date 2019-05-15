@@ -18,7 +18,6 @@ library(tidyr) #for string maniupulations in ring plot
 library(shinyjs)
 library(shinydashboard) #for valuebox on techdoc tab
 library(sp)
-library(lubridate) #for automated list of dates in welcome modal
 library(shinycssloaders) #for loading icons
 library(webshot) #to download plotly charts
 # As well as webshot phantomjs is needed l to download Plotly charts
@@ -87,16 +86,16 @@ plot_nodata_gg <- function() {
 ###############################################.
 ## Data ----
 ###############################################.    
-optdata <- readRDS("./data/optdata.rds") #main dataset
-techdoc <- readRDS("./data/techdoc.rds") #technical documents data including definitions
-geo_lookup <- readRDS("./data/geo_lookup.rds") #geography lookup
-profile_lookup <- readRDS("./data/profile_lookup.rds") #profile lookup
+optdata <- readRDS("data/optdata.rds") #main dataset
+techdoc <- readRDS("data/techdoc.rds") #technical documents data including definitions
+geo_lookup <- readRDS("data/geo_lookup.rds") #geography lookup
+profile_lookup <- readRDS("data/profile_lookup.rds") #profile lookup
 
 #Map-shapefile data
-ca_bound<-readRDS("./data/CA_boundary.rds") #Council area 
-hb_bound<-readRDS("./data/HB_boundary.rds") #Health board
-hscp_bound <- readRDS("./data/HSCP_boundary.rds") #HSC Partnerships
-iz_bound <- readRDS("./data/IZ_boundary.rds") #Intermediate zone
+ca_bound<-readRDS("data/CA_boundary.rds") #Council area 
+hb_bound<-readRDS("data/HB_boundary.rds") #Health board
+hscp_bound <- readRDS("data/HSCP_boundary.rds") #HSC Partnerships
+iz_bound <- readRDS("data/IZ_boundary.rds") #Intermediate zone
 
 ###############################################.
 ## Names ----
@@ -132,10 +131,11 @@ indicator_list <- sort(unique(optdata$indicator))
 indicator_map_list <- sort(unique(optdata$indicator[optdata$interpret != 'O']))
 
 #Profile names
-topic_list_filter <- (as.factor(c("Show all",unique(sort(c(as.character(optdata$domain1), 
-                                                           as.character(optdata$domain2),
-                                                           as.character(optdata$domain3)))))))
-topic_list <- topic_list_filter[-1]
+topic_list_filter <- as.factor(c("Show all",unique(sort(c(
+  substr(optdata$profile_domain1, 5, nchar(as.vector(optdata$profile_domain1))), 
+  substr(optdata$profile_domain2, 5, nchar(as.vector(optdata$profile_domain2)))))))) 
+
+topic_list <- topic_list_filter[-1] #taking out show all from list
 
 profile_list <- setNames(c('HWB','CYP','ALC','DRG','MEN', "TOB", "POP"),
                          c('Health & wellbeing','Children & young people','Alcohol',
@@ -196,11 +196,6 @@ cookie_box <- div(class="alert alert-info", style = "margin-bottom: 0",
       tags$a(href='https://www.scotpho.org.uk/about-us/scotpho-website-policies-and-statements/privacy-and-cookies',
   " Privacy and Cookies"), "statement.",
       HTML('<a href="#" class="close" data-dismiss="alert" aria-label="close">&check;</a>'))
-
-#automating dates
-new_date <- fast_strptime(paste("01",techdoc$last_updated,sep="-"),"%d-%b-%Y")
-#time_between <- as.period(new_date %--% today(), unit="days")
-techdoc <- mutate(techdoc,days_since_update=day(as.period(new_date %--% today(), unit="days")))
 
 # Identify which geographies have data for each indicator
 # indic <- unique(optdata$indicator[!is.na(optdata$measure)])
