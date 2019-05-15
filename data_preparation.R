@@ -38,6 +38,7 @@ library(rmapshaper) #for reducing size of shapefiles
 ###############################################.
 #This code updates the Technical Document table based on an online Google Drive version of the table
 #Run every time you want to refresh the data in the local copy to represent what's in the online copy
+#This file is where indicator names and definitions are stored and are loaded into the shiny tool.
 definition_table <- read_csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vTzrwAG7IFBjLvxuxUO0vJ7mn2AgilWVA1ZJQ9oVaLOSG4mgkquMKWga8MY5g2OFkFn-3awM_GYaHjL/pub?gid=94312583&single=true&output=csv") %>%
   as.data.frame() %>% mutate(indicator_number = as.factor(indicator_number)) 
 
@@ -177,7 +178,7 @@ geo_lookup <- geo_lookup %>%
   #Creating variable that includeas area name and type for trend plotting
   mutate(areaname_full = paste(areaname, "-", areatype)) %>% 
   mutate_if(is.character, factor) %>% #transforming into factors
-  #select(-c(parent_code)) %>% 
+  select(-c(parent_code)) %>% 
 #Reducing length of the area type descriptor
   mutate(areaname_full = ifelse(areaname == "Scotland", "Scotland",
                                 paste(areaname_full)),
@@ -199,18 +200,6 @@ ind_lookup<- read_csv(paste0(lookups, "indicator_lookup.csv")) %>%
            type_id, type_definition, profile_domain1, profile_domain2)) %>% 
   mutate_if(is.character, factor) %>%  # converting variables into factors
   mutate(ind_id = as.factor(ind_id))
-
-###############################################.
-## Profile lookup 
-#Creating a file with a column for profile and another one for domain
-profile_lookup <- data.frame(profile_domain = c(paste(unique(optdata$profile_domain1)),
-                                                paste(unique(optdata$profile_domain2)))) %>%
-  mutate(profile = substr(profile_domain, 1, 3),
-         domain = substr(profile_domain, 5, nchar(as.vector(profile_domain)))) %>%
-  select(-profile_domain)
-
-saveRDS(profile_lookup, "data/profile_lookup.rds")
-profile_lookup <- readRDS("data/profile_lookup.rds")
 
 ###############################################.
 ## Indicator data ----
@@ -314,7 +303,7 @@ optdata <- optdata %>% group_by(ind_id, year, areatype) %>%
 
 # Tidying up the format
 optdata <- optdata %>% #taking out some variables
-  select(-c(supression, supress_less_than, type_id, file_name, ind_id)) %>%  
+  select(-c(supression, supress_less_than, type_id, file_name)) %>%  
   #rounding variables
   mutate(numerator = round(numerator, 2), measure = round(measure, 2),
          lowci = round(lowci, 2), upci = round(upci, 2)) %>%
@@ -350,8 +339,23 @@ optdata <- optdata %>%
         ) #negation
       )#subset
 
+optdata <- optdata %>% select(-ind_id)
+
 saveRDS(optdata, "data/optdata.rds")
 optdata <- readRDS("data/optdata.rds")
+
+###############################################.
+## Profile lookup ----
+###############################################.
+#Creating a file with a column for profile and another one for domain
+profile_lookup <- data.frame(profile_domain = c(paste(unique(optdata$profile_domain1)),
+                                                paste(unique(optdata$profile_domain2)))) %>%
+  mutate(profile = substr(profile_domain, 1, 3),
+         domain = substr(profile_domain, 5, nchar(as.vector(profile_domain)))) %>%
+  select(-profile_domain)
+
+saveRDS(profile_lookup, "data/profile_lookup.rds")
+profile_lookup <- readRDS("data/profile_lookup.rds")
 
 ###############################################.
 ## Shapefiles ----
