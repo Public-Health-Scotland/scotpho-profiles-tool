@@ -113,26 +113,26 @@ tabPanel(
   title = " Home", icon = icon("home"),
   mainPanel(
     width = 11, style="margin-left:4%; margin-right:4%",
-    fluidRow(h3("Welcome to the ScotPHO profiles", style="margin-top:0px;"), #do i need introbox here?
-             actionButton("btn_landing","Guide me around this page")),
+    fluidRow((h3("Welcome to the ScotPHO profiles", style="margin-top:0px;")),
+             actionButton("btn_landing",label="HELP! Guide through the profiles tool",class="down")),
     fluidRow(
       #Summary box
       column(6, class="landing-page-column",
              br(), #spacing
              ## temporary hide title line 
-             # fluidRow(h4("Explore data by profile", style="margin-top:0px; 
-             #             color:black; text-align: center; ")),
-             introBox(div(class="landing-page-box", 
-                 div("Profile summary", class = "landing-page-box-title"),
-                 div(class = "landing-page-icon", style="background-image: url(heatmap_2.png);
+              #fluidRow(h4("Explore data by profile", style="margin-top:0px; 
+               #           color:black; text-align: center; ")),
+                      introBox(div(class="landing-page-box", 
+                                   div("Profile summary", class = "landing-page-box-title"),
+                                   div(class = "landing-page-icon", style="background-image: url(heatmap_2.png);
                      background-size: auto 80%; background-position: center; background-repeat: no-repeat; "),
-                 actionButton('jump_to_summary', 'A high level view of an area across a suit of indicators', 
-                              class="landing-page-button", 
-                              icon = icon("arrow-circle-right", "icon-lp"))),
-                 data.step = 1,
-                 data.intro = "This is the profiles landing page. The button take you to different profile elements such as visualisations, data tables or background information. 
+                                   actionButton('jump_to_summary', 'A high level view of an area across a suit of indicators', 
+                                                class="landing-page-button", 
+                                                icon = icon("arrow-circle-right", "icon-lp"))),
+                               data.step = 1,
+                               data.intro = "This is the profiles landing page. The button take you to different profile elements such as visualisations, data tables or background information. 
                  Hover over buttons to see a brief description of what each button does")),
-             #Table box 
+               #Table box 
       column(6, class="landing-page-column",
              br(), #spacing
              ## temporary hide title line 
@@ -562,7 +562,7 @@ navbarMenu("Info", icon = icon("info-circle"),
                     br()
            ),#Tab panel
            # ###############################################.
-           # ## Definitions nabar ----
+           # ## Definitions navbar ----
            # ###############################################.
            tabPanel("Indicator definitions", value = "definitions",
                     #Sidepanel for filtering data

@@ -264,7 +264,9 @@ function(input, output, session) {
                                 collapse='<br>')))
       )),
     br(),
-    p(tags$h5("Thanks for stopping by!")),
+    p(tags$h5("To find out when an indicator is due to be updated please refer to our ", 
+                          tags$a(href="https://docs.google.com/spreadsheets/d/e/2PACX-1vQUQMORMqe9RrMnS9WJSu51Q6ef0rubiF1M-QN3BYZIBueErtTvvbRe_kTZbWmnupiO_Uie80BoZCnK/pubhtml", "updates schedule.", class="externallink"))),
+    br(),
     p(tags$h5("For any further questions or other developments you would like to 
               suggest for our current tool, please contact us at", 
               tags$a(href="mailto:ScotPHO@nhs.net", "ScotPHO@nhs.net", class="externallink"), 
