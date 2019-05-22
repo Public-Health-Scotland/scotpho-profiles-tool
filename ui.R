@@ -103,9 +103,18 @@ tagList( #needed for shinyjs
                ".externallink{text-decoration: underline;} ",
                ".definitionbox {width:100%; height:100%; text-align:left ;background-color:white;
         border: 2px solid #2FA4E7; padding: 10px; margin-top: 0px; margin-bottom: 5px; float: left; transition: 0.5s ease; position: relative; object-fit: scale-down;}"),
-               HTML("<base target='_blank'>")
-               ),
-       
+               HTML("<base target='_blank'>"),
+               #),
+               #introBox(data.step = 1,data.intro =(h3("Welcome to the ScotPHO profiles. ", style="margin-top:0px;")))
+               introBox(data.step = 1,data.intro =(p(tags$h4("Welcome to the ScotPHO Profiles Tool"), tags$br(),
+                                                     tags$div(h5("This interactive tool provides access to a range of public 
+                              health related indicators at different geographies including NHS boards, council areas and health and 
+                              social care partnerships.")),
+                                                     tags$br(),
+                                                     tags$div(h5("Use the menu bar at the top of the screen or buttons on the home page to navigate around the tool.")),
+                                                     tags$div(h5("Hover over buttons to see a brief description of what each button does.")),
+                                                     style = "color:0E3E5D; font-size:20px")))
+             ),
 ###############################################.
 ## Landing page ----
 ###############################################.
@@ -126,12 +135,11 @@ tabPanel(
                                    div("Profile summary", class = "landing-page-box-title"),
                                    div(class = "landing-page-icon", style="background-image: url(heatmap_2.png);
                      background-size: auto 80%; background-position: center; background-repeat: no-repeat; "),
-                                   actionButton('jump_to_summary', 'A high level view of an area across a suit of indicators', 
+                                   actionButton('jump_to_summary', 'A high level view of an area across a set of indicators', 
                                                 class="landing-page-button", 
                                                 icon = icon("arrow-circle-right", "icon-lp"))),
-                               data.step = 1,
-                               data.intro = "This is the profiles landing page. The button take you to different profile elements such as visualisations, data tables or background information. 
-                 Hover over buttons to see a brief description of what each button does")),
+                               data.step = 2,
+                               data.intro = "The profile summary allows you to look at multiple indicators within an area")),
                #Table box 
       column(6, class="landing-page-column",
              br(), #spacing
@@ -145,7 +153,7 @@ tabPanel(
                  actionButton('jump_to_table', 'View and download the data behind the tool', 
                               class="landing-page-button", 
                               icon = icon("arrow-circle-right", "icon-lp"))),
-                 data.step = 2,
+                 data.step = 8,
                  data.intro = "Data behind the profiles can be downloaded through this data table"))),
     
     #temp hide this line - doesn't seem right now we include health inequalities box anyway
@@ -173,7 +181,7 @@ tabPanel(
                         actionButton('jump_to_rank', 'Compare geographical variation for an indicator', 
                                      class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp")))),
              data.step = 3,
-             data.intro = "test"),
+             data.intro = "The trend and rank charts allow detailed exploration of one indicator at a time."),
   #Inequalities box
   introBox(
       column(4, class="landing-page-column",
@@ -185,8 +193,8 @@ tabPanel(
                  actionButton('jump_to_simd', 'Explore how an indicator varies with socioeconomic deprivation', 
                               onclick ="window.open('https://scotland.shinyapps.io/scotpho-health-inequalities', '_blank')",
                               class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp")))),
-    data.step = 4,
-    data.intro = "inequalities")),
+    data.step = 9,
+    data.intro = "There is also an inequalities module tha explore how levels of deprivation affect indicators.")),
     # end of second row
  
    fluidRow(h4("Find supporting information", style="margin-top:0px; 
@@ -252,9 +260,14 @@ tabPanel(
 ## Summary ----
 ###############################################.
 tabPanel("Summary", icon = icon("list-ul"), value = "summary",
-         introBox(data.step = 5, data.intro = "in another tab",
+         # introBox(data.step = 4, data.intro =(p(tags$div("Tables and charts within the tool are controlled by drop-down menus."),tags$br(),
+         #          tags$div("Select from available options or just click in a box, hit 'backspace' and start typing what you are looking for."),tags$br(),
+         #          tags$div("Some fields allow multiple selections, so you can add more than one item."))),
            wellPanel( #Filter options
            column(3,
+                  introBox(data.step = 4, data.intro =(p(tags$div("Tables and charts within the tool are controlled by drop-down menus."),tags$br(),
+                                                         tags$div("Select from available options or just click in a box, hit 'backspace' and start typing what you are looking for."),tags$br(),
+                                                         tags$div("Some fields allow multiple selections, so you can add more than one item."))),
                   p(tags$b("Step 1. Select your area")),
                   selectInput("geotype_summary", "Geography level", choices=areatype_list,
                               selected = "Health board"),
@@ -263,7 +276,7 @@ tabPanel("Summary", icon = icon("list-ul"), value = "summary",
                     selectInput("loc_iz_summary", label = "Partnership for localities/intermediate zones",
                                 choices = partnership_name)
                   ),
-                  uiOutput("geoname_ui_summary")
+                  uiOutput("geoname_ui_summary"))
            ),
            column(3,
                   p(tags$b("Step 2. Select a profile ")),
@@ -277,13 +290,15 @@ tabPanel("Summary", icon = icon("list-ul"), value = "summary",
                   uiOutput("comp_ui_summary") # comparator options
            ),
            column(3,
+                  introBox(
                   actionButton("help_summary",label="Help", icon= icon('question-circle'), class ="down"),
                   actionButton("defs_summary",label="Definitions", icon= icon('info'), class ="down"),
                   downloadButton('download_summary', 'Download data', class = "down"),
                   conditionalPanel(condition = 'input.chart_summary == "Spine"',
-                    savechart_button('download_spineplot', 'Save chart',  class = "down"))
+                    savechart_button('download_spineplot', 'Save chart',  class = "down")),
                   # savechart_button('download_summaryplot', 'Save chart',  class = "down")
-           ),
+           data.step = 5, data.intro="Each visualisation contains options to get help to read the chart, the definitions behind indicators and to download the data behind the chart or an image of the chart"
+                  )),
            div(style = "width:60%; margin-left: 20%; min-width: 350px", # centering div
              radioGroupButtons("chart_summary", status = "primary", justified = TRUE,
                              choices = c("Snapshot", "Trend", "Spine"), label= "Step 4. Select what type of summary you want to see: 
@@ -295,9 +310,7 @@ tabPanel("Summary", icon = icon("list-ul"), value = "summary",
                    bsModal("mod_defs_summary", "Definitions", "defs_summary",
                            htmlOutput('defs_text_summary')),
                    fluidRow(column(4,
-                                   introBox(data.step = 6, data.intro = "in another tab",h4(textOutput("summary_title"), style="color: black; text-align: left")),
-                          h5(textOutput("summary_subtitle"), style="color: black; text-align: left")
-                          ),
+                                   h5(textOutput("summary_subtitle"), style="color: black; text-align: left")),
                    column(3,
                           br(),
                           br(),
@@ -318,7 +331,7 @@ tabPanel("Summary", icon = icon("list-ul"), value = "summary",
                           uiOutput("ui_spine_legend_comparator")))),
                    # Depending what users selects different visualizations
                           uiOutput("summary_ui_plots")
-        )
+        #) #intro box bracket
   ), #Tab panel bracket
 ###############################################.
 ## Time trend ----
@@ -539,7 +552,7 @@ tabPanel("Data", icon = icon("table"), value = "table",
 ##############NavBar Menu----
 ###############################################.
 #Starting navbarMenu to have tab with dropdown list
-navbarMenu("Info", icon = icon("info-circle"), 
+navbarMenu("Info", icon = icon("info-circle"),
            ###############################################.
            ## About ----
            ###############################################.
@@ -759,7 +772,6 @@ tabPanel("Other profiles", value = "others",
            br()
            ) # mainPanel bracket
            ) #tabPanel bracket
-
 )# NavbarMenu bracket
   ), #Bracket  navbarPage
 
