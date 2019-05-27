@@ -22,6 +22,7 @@ if (sessionInfo()$platform == "x86_64-redhat-linux-gnu (64-bit)") {
 ##Packages ----
 ############################.
 library(dplyr) 
+library(tidyr)
 library(readr)
 library(scales) #rescaling variables
 library(haven) #for SPPS file reading
@@ -75,38 +76,19 @@ geo_lookup <- readRDS(paste0(lookups, "Geography/codedictionary.rds")) %>%
          areaname = gsub(" and ", " & ", areaname),
          areaname = gsub(" - ", "-", areaname))
 
-#Bringing parent geography information
+#Bringing parent geography information and formatting in one column with no duplicates
 geo_parents <- readRDS(paste0(lookups, "Geography/IZtoPartnership_parent_lookup.rds")) %>% 
   #TEMPORARY FIX. dealing with change in ca, hb and hscp codes
   mutate(hscp_partnership = recode(hscp_partnership, "S37000014"='S37000032', 
-                                   "S37000023"='S37000033'))
+                                   "S37000023"='S37000033')) %>% 
+  gather(geotype, code, c(intzone2011, hscp_locality)) %>% distinct() %>% 
+  select(-geotype) %>% rename(parent_code = hscp_partnership)
 
-#Creating parent geography for IZ level.
-geo_par_iz <- geo_parents %>% 
-  select(c(intzone2011, hscp_partnership)) %>% 
-  rename(code = intzone2011, parent_code = hscp_partnership) %>% 
-  distinct() # eliminating duplicates
+# Merging to geo_lookup to obtain parent area name
+geo_parents <- left_join(x=geo_parents, y=geo_lookup, by=c("parent_code" = "code")) %>% 
+  select(-c(areatype)) %>% rename(parent_area = areaname)
 
-#Creating parent geography for locality level.
-geo_par_loc <- geo_parents %>% 
-  select(c(hscp_locality, hscp_partnership)) %>% 
-  rename(code = hscp_locality, parent_code = hscp_partnership) %>% 
-  distinct() # eliminating duplicates
-
-#bringing area names for parent geographies
-geo_partnership <- geo_parents %>% 
-  select(c(hscp_partnership)) %>% 
-  rename(code = hscp_partnership) %>% 
-  distinct() # eliminating duplicates
-
-geo_partnership <- left_join(x=geo_partnership, y=geo_lookup, by=c("code"))
-geo_partnership <- geo_partnership %>% select(-c(areatype)) %>% 
-  rename(parent_code = code, parent_area = areaname)
-
-#Merging together
-geo_parents <- rbind(geo_par_iz, geo_par_loc)
-geo_parents <- left_join(x=geo_parents, y=geo_partnership, by=c("parent_code")) 
-
+#Merging parents to geo_lookup
 geo_lookup <- left_join(x=geo_lookup, y=geo_parents, by="code", all.x = TRUE) 
 
 ##No IZ seem to be assigned to more than one partnership in this file.
@@ -184,10 +166,10 @@ geo_lookup <- geo_lookup %>%
                                 paste(areaname_full)),
          areaname_full = gsub("Health board", "HB", areaname_full), 
          areaname_full = gsub("Council area", "CA", areaname_full), 
-         areaname_full =gsub("Alcohol & drug partnership", "ADP", areaname_full), 
-         areaname_full =gsub("HSC partnership", "HSCP", areaname_full), 
-         areaname_full =gsub("HSC locality", "HSCL", areaname_full), 
-         areaname_full =gsub("Intermediate zone", "IZ", areaname_full))
+         areaname_full = gsub("Alcohol & drug partnership", "ADP", areaname_full), 
+         areaname_full = gsub("HSC partnership", "HSCP", areaname_full), 
+         areaname_full = gsub("HSC locality", "HSCL", areaname_full), 
+         areaname_full = gsub("Intermediate zone", "IZ", areaname_full))
 
 saveRDS(geo_lookup, "data/geo_lookup.rds")
 geo_lookup <- readRDS("data/geo_lookup.rds") 
@@ -303,7 +285,7 @@ optdata <- optdata %>% group_by(ind_id, year, areatype) %>%
 
 # Tidying up the format
 optdata <- optdata %>% #taking out some variables
-  select(-c(supression, supress_less_than, type_id, file_name)) %>%  
+  select(-c(supression, supress_less_than, type_id, file_name, ind_id)) %>%  
   #rounding variables
   mutate(numerator = round(numerator, 2), measure = round(measure, 2),
          lowci = round(lowci, 2), upci = round(upci, 2)) %>%
@@ -312,34 +294,6 @@ optdata <- optdata %>% #taking out some variables
   mutate(measure = ifelse(indicator %in% c('Mid-year population estimate - all ages',
                                            'S2 pupils - SALSUS', 'S4 pupils - SALSUS',
                                            "Quit attempts"), numerator, measure))
-
-###TEMPORARY FIXES HOPEFULLY
-#Dealing with lack of data for certain years and hb for Healthy weight at P1.
-#Excluding those under 5 as most are lack of data and also avoids excess of variation from non-representative years
-optdata <- optdata %>%
-  subset(!(ind_id == "21106" & (numerator<5 |
-            (((code %in% c('S37000001', 'S37000002', "S12000033", "S12000034", 'S12000020',
-                         'S37000019', 'S08000020') |
-                parent_area %in% c("Aberdeen City", 'Aberdeenshire', 'Moray'))
-              & year <2009) |
-            ((code %in% c('S12000035', 'S37000004', 'S12000017', 'S37000016', "S12000027", 'S37000026',
-                         'S12000040', 'S37000030', 'S08000022', 'S08000026')  |
-                parent_area %in% c("Argyll & Bute", 'Shetland Islands', 'West Lothian', 'Highland'))
-              & year %in% c('2007') ) |
-            ((code %in% c('S12000039', 'S37000029', 'S12000011', 'S37000011', 'S12000046', 'S37000015') |
-                parent_area %in% c("East Renfrewshire", 'Glasgow City', 'West Dunbartonshire'))
-          & year %in% c('2007', "2008", "2010")) |
-            ((code %in% c('S12000045', 'S37000009') | parent_area %in% c("East Dunbartonshire")
-              ) & year %in% c('2007', "2008", "2010", "2016")) |
-            ((code %in% c('S12000018', 'S37000017') | parent_area %in% c("Inverclyde")
-              ) & year %in% c('2007', "2008", "2009", "2010")) |
-            ((code %in% c('S12000023', 'S37000022', 'S08000025') |
-                parent_area %in% c("Orkney Islands") ) & year %in% c('2007', "2008", "2009")))
-          )#numerator plus code conditions
-        ) #negation
-      )#subset
-
-optdata <- optdata %>% select(-ind_id)
 
 saveRDS(optdata, "data/optdata.rds")
 optdata <- readRDS("data/optdata.rds")
