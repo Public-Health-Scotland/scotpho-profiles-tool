@@ -503,7 +503,12 @@ function(input, output, session) {
     if (input$chart_summary == "Snapshot") {
       if (input$profile_summary == "HWB") {
         tagList(#Health and Wellbeing profile
+          fluidRow(
+            textOutput("test_beha"),
+            textOutput("test_crime")
+          ),
           column(4,
+                 snap_module_ui("snap_beha"),
                  snap_ui("Behaviours", "summ_hwb_beha"),
                  snap_ui("Social care & housing", "summ_hwb_socare"),
                  snap_ui("Environment", "summ_hwb_env"),
@@ -518,7 +523,8 @@ function(input, output, session) {
           column(4,
                  snap_ui("Mental health", "summ_hwb_mh"),
                  snap_ui("Ill health & injury", "summ_hwb_injury"),
-                 snap_ui("Education", "summ_hwb_educ")
+                 snap_ui("Education", "summ_hwb_educ"),
+                 snap_module_ui("snap_crime")
           )
         ) #taglist bracket
       } else if (input$profile_summary == "CYP") {
@@ -741,7 +747,8 @@ function(input, output, session) {
   
   ###############################################.
   # Function that creates a snapshot plot for a domain 
-  plot_profile_snapshot <- function(domainchosen) {
+  plot_module_snap <- function(input, output, session, domainchosen) {
+    ns <- session$ns
     
     # only selecting decided domain
     prof_snap_data <- snapshot_data() %>% subset(domain == domainchosen) %>% 
@@ -750,44 +757,100 @@ function(input, output, session) {
     #If no data available for that period then plot message saying data is missing
     if (is.data.frame(prof_snap_data) && nrow(prof_snap_data) == 0)
     {
-      plot_nodata()
+      sum_plot <- plot_nodata()
     } else { 
       
-   # Tooltip
-    if (input$comp_summary == 1) {#depending if time or area comparison
-      tooltip_summary <-  c(paste0("Area: ", prof_snap_data$measure, "<br>",
-                                   "Comparator: ", prof_snap_data$comp_m, "<br>",
-                                   prof_snap_data$trend_axis, ". ", prof_snap_data$type_definition))
-    } else if (input$comp_summary == 2) {
-      tooltip_summary <-  c(paste0(prof_snap_data$trend_axis, ": ",
-                                   prof_snap_data$measure, "  ||  ",
-                                   "Baseline: ", prof_snap_data$comp_m, "<br>",
-                                   prof_snap_data$type_definition))
-    } 
-
-    # eliminating both axis
-    axis_layout <- list(title = "", fixedrange=TRUE, zeroline = FALSE, showline = FALSE,
-                        showticklabels = FALSE, showgrid = FALSE)
-    
-    # defining plot function
-    plot_ly(prof_snap_data, y = ~indicator,   color = ~color, 
-               colors=  c(blue = "#4da6ff", gray = "gray88", red = "#ffa64d", white = "#ffffff")
-            ) %>% 
-      add_bars(x =1, showlegend= FALSE, width=1, 
-               hoverinfo="text", hovertext = tooltip_summary,
-               marker = list(line= list(color="black", width = 0.5))) %>% 
-      # adding indicator name at center of each bar
-      add_text(text = ~indic_multiline, x =0.5,  showlegend= FALSE, 
-               textfont = list(color='black'), hoverinfo="skip" ) %>% 
-      layout(yaxis = axis_layout, xaxis = axis_layout,
-             margin = list(b= 10 , t=5, l = 5, r = 0),
-             font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif')) %>% # to get hover compare mode as default
-      config(displayModeBar = FALSE, displaylogo = F, collaborate=F, editable =F)
+      # Tooltip
+      if (input$comp_summary == 1) {#depending if time or area comparison
+        tooltip_summary <-  c(paste0("Area: ", prof_snap_data$measure, "<br>",
+                                     "Comparator: ", prof_snap_data$comp_m, "<br>",
+                                     prof_snap_data$trend_axis, ". ", prof_snap_data$type_definition))
+      } else if (input$comp_summary == 2) {
+        tooltip_summary <-  c(paste0(prof_snap_data$trend_axis, ": ",
+                                     prof_snap_data$measure, "  ||  ",
+                                     "Baseline: ", prof_snap_data$comp_m, "<br>",
+                                     prof_snap_data$type_definition))
+      } 
+      
+      # eliminating both axis
+      axis_layout <- list(title = "", fixedrange=TRUE, zeroline = FALSE, showline = FALSE,
+                          showticklabels = FALSE, showgrid = FALSE)
+      
+      # defining plot function
+      sum_plot <- plot_ly(prof_snap_data, y = ~indicator,   color = ~color, 
+                          colors=  c(blue = "#4da6ff", gray = "gray88", red = "#ffa64d", white = "#ffffff")
+      ) %>% 
+        add_bars(x =1, showlegend= FALSE, width=1, 
+                 hoverinfo="text", hovertext = tooltip_summary,
+                 marker = list(line= list(color="black", width = 0.5))) %>% 
+        # adding indicator name at center of each bar
+        add_text(text = ~indic_multiline, x =0.5,  showlegend= FALSE, 
+                 textfont = list(color='black'), hoverinfo="skip" ) %>% 
+        layout(yaxis = axis_layout, xaxis = axis_layout,
+               margin = list(b= 10 , t=5, l = 5, r = 0),
+               font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif')) %>% # to get hover compare mode as default
+        config(displayModeBar = FALSE, displaylogo = F, collaborate=F, editable =F)
     }
+    
+    output$snap_plot <- renderPlotly({ sum_plot })
+    
   }
+
   
   ###############################################.
   # Creating output plots for each domain of each profile 
+  # Charts for Health and wellbeing profile
+  callModule({plot_module_snap("snap_beha", "Behaviours" )})
+  callModule({plot_module_snap("snap_crime", "Crime" )})
+  
+  
+  plot_profile_snapshot <- function(domainchosen) {
+
+    # only selecting decided domain
+    prof_snap_data <- snapshot_data() %>% subset(domain == domainchosen) %>%
+      droplevels()
+
+    #If no data available for that period then plot message saying data is missing
+    if (is.data.frame(prof_snap_data) && nrow(prof_snap_data) == 0)
+    {
+      plot_nodata()
+    } else {
+
+      # Tooltip
+      if (input$comp_summary == 1) {#depending if time or area comparison
+        tooltip_summary <-  c(paste0("Area: ", prof_snap_data$measure, "<br>",
+                                     "Comparator: ", prof_snap_data$comp_m, "<br>",
+                                     prof_snap_data$trend_axis, ". ", prof_snap_data$type_definition))
+      } else if (input$comp_summary == 2) {
+        tooltip_summary <-  c(paste0(prof_snap_data$trend_axis, ": ",
+                                     prof_snap_data$measure, "  ||  ",
+                                     "Baseline: ", prof_snap_data$comp_m, "<br>",
+                                     prof_snap_data$type_definition))
+      }
+
+      # eliminating both axis
+      axis_layout <- list(title = "", fixedrange=TRUE, zeroline = FALSE, showline = FALSE,
+                          showticklabels = FALSE, showgrid = FALSE)
+
+      # defining plot function
+      plot_ly(prof_snap_data, y = ~indicator,   color = ~color,
+              colors=  c(blue = "#4da6ff", gray = "gray88", red = "#ffa64d", white = "#ffffff")
+      ) %>%
+        add_bars(x =1, showlegend= FALSE, width=1,
+                 hoverinfo="text", hovertext = tooltip_summary,
+                 marker = list(line= list(color="black", width = 0.5))) %>%
+        # adding indicator name at center of each bar
+        add_text(text = ~indic_multiline, x =0.5,  showlegend= FALSE,
+                 textfont = list(color='black'), hoverinfo="skip" ) %>%
+        layout(yaxis = axis_layout, xaxis = axis_layout,
+               margin = list(b= 10 , t=5, l = 5, r = 0),
+               font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif')) %>% # to get hover compare mode as default
+        config(displayModeBar = FALSE, displaylogo = F, collaborate=F, editable =F)
+    }
+  }
+
+  ###############################################.
+  # Creating output plots for each domain of each profile
   # Charts for Health and wellbeing profile
   output$summ_hwb_beha <- renderPlotly({ plot_profile_snapshot("Behaviours")})
   output$summ_hwb_socare <- renderPlotly({ plot_profile_snapshot("Social care & housing")})
@@ -836,7 +899,7 @@ function(input, output, session) {
   output$summ_tob_retail <- renderPlotly({ plot_profile_snapshot("Retailer information")})
   # Charts for population profile
   output$summ_pop_pop <- renderPlotly({ plot_profile_snapshot("Population")})
-  
+
   # UI for snapshot plots
   snap_ui <- function(title, plot_name) {
     # obtaining height for plot based on number of rows of indicators
@@ -845,14 +908,26 @@ function(input, output, session) {
 # when 0 or 1 indicators the plot needs at least that size to 
 # prevent the spinner from showing and let the tooltip work
     height_plot <- case_when(n_ind > 1 ~ 38*n_ind+10,
-                             n_ind < 2 ~ 78,
-                             TRUE ~ 38*n_ind+10)
+                             TRUE ~ 75)
     
     tagList(
       h5(title, style="color: black; text-align: center; font-weight: bold;"),
-      div(align = "center", withSpinner(plotlyOutput(plot_name, height = height_plot)))
+      div(align = "center", plotlyOutput(plot_name, height = height_plot))
     )
   }
+  
+  snap_test <- function(title) {
+    # obtaining height for plot based on number of rows of indicators
+    n_ind <- snapshot_data() %>% subset(domain == title) %>% 
+      droplevels() %>% nrow()
+    # when 0 or 1 indicators the plot needs at least that size to 
+    # prevent the spinner from showing and let the tooltip work
+    case_when(n_ind > 1 ~ 38*n_ind+10, TRUE ~ 75)
+    
+  }
+  
+  output$test_beha <- renderText({snap_test("Behaviours")})
+  output$test_crime <- renderText({snap_test("Crime")})
   
   ###############################################.        
   #### Heatmap ----

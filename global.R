@@ -85,11 +85,6 @@ plot_nodata_gg <- function() {
           axis.title.x=element_text(size=20, colour ='#555555'))
 }
 
-#Title for each section summary
-h5_sum <- function(title) {
-}
-
-
 # UI for heatmap plots
 heat_ui <- function(title, plot_name) {
   tagList(
@@ -97,6 +92,15 @@ heat_ui <- function(title, plot_name) {
     div(align = "center", withSpinner(plotlyOutput(plot_name, height = "auto")))
   )
 }
+
+
+
+snap_module_ui <- function(id) {
+  ns <- NS(id)
+  
+  plotlyOutput(ns("snap_plot"))           
+}
+
 
 ###############################################.
 ## Data ----
@@ -146,9 +150,10 @@ indicator_list <- sort(unique(optdata$indicator))
 indicator_map_list <- sort(unique(optdata$indicator[optdata$interpret != 'O']))
 
 #Profile names
-topic_list_filter <- (as.factor(c("Show all",unique(sort(c(as.character(optdata$domain1), 
-                                                           as.character(optdata$domain2),
-                                                           as.character(optdata$domain3)))))))
+topic_list_filter <- as.factor(c("Show all",unique(sort(c(
+  substr(optdata$profile_domain1, 5, nchar(as.vector(optdata$profile_domain1))), 
+  substr(optdata$profile_domain2, 5, nchar(as.vector(optdata$profile_domain2)))))))) 
+
 topic_list <- topic_list_filter[-1]
 
 profile_list <- setNames(c('HWB','CYP','ALC','DRG','MEN', "TOB", "POP"),
