@@ -6,7 +6,7 @@
 ###############################################.
 tagList( #needed for shinyjs
   useShinyjs(),  # Include shinyjs
-  introjsUI(),   # Enable introjs scripts
+  introjsUI(),   # Required to enable introjs scripts
   navbarPage(id = "intabset", #needed for landing page
            title = div(tags$a(img(src="scotpho_reduced.png", height=40), href= "http://www.scotpho.org.uk/"),
                        style = "position: relative; top: -5px;"), # Navigation bar
@@ -155,10 +155,6 @@ tabPanel(
                               icon = icon("arrow-circle-right", "icon-lp"))),
                  data.step = 8,
                  data.intro = "Data behind the profiles can be downloaded through this data table"))),
-    
-    #temp hide this line - doesn't seem right now we include health inequalities box anyway
-    #fluidRow(h4("Explore a single indicator in more detail", style="margin-top:0px; 
-    #                     color:black; text-align: center; ")),
     #2nd row of boxes
     fluidRow(
       br(), #spacing
@@ -222,7 +218,7 @@ tabPanel(
            #Indicator updates
            div(class="landing-page-box-about",
                div("Indicator Updates", class = "landing-page-box-title"),
-               div(class = "landing-page-about-icon", style="background-image: url(technical_resources.png);
+               div(class = "landing-page-about-icon", style="background-image: url(landing_calendar.png);
                      background-size: auto 80%; background-position: center; background-repeat: no-repeat; "),
                actionButton('btn_indicator_updates', 'Find out which indicators have been updated in the last 60 days', 
                             class="landing-page-button-about", 
@@ -230,7 +226,7 @@ tabPanel(
           #Resources box
            div(class="landing-page-box-about",
                div("Resources", class = "landing-page-box-title"),
-               div(class = "landing-page-about-icon", style="background-image: url(technical_resources.png);
+               div(class = "landing-page-about-icon", style="background-image: url(landing_resources.png);
                      background-size: auto 80%; background-position: center; background-repeat: no-repeat; "),
                actionButton('jump_to_resources', 'Find technical information about the ScotPHO profile definitions and methodology', 
                             class="landing-page-button-about", 
