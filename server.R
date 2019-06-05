@@ -508,7 +508,7 @@ function(input, output, session) {
             textOutput("test_crime")
           ),
           column(4,
-                 snap_module_ui("snap_beha"),
+                 snap_module_ui("Behaviours", "snap_beha"),
                  snap_ui("Behaviours", "summ_hwb_beha"),
                  snap_ui("Social care & housing", "summ_hwb_socare"),
                  snap_ui("Environment", "summ_hwb_env"),
@@ -518,13 +518,13 @@ function(input, output, session) {
                  snap_ui("Women's & children's health", "summ_hwb_women"),
                  snap_ui("Immunisations & screening", "summ_hwb_imm"),
                  snap_ui("Economy", "summ_hwb_econ"),
-                 snap_ui("Crime", "summ_hwb_crime")
+                 snap_module_ui("Crime", "snap_crime")
+                 # snap_ui("Crime", "summ_hwb_crime")
           ),
           column(4,
                  snap_ui("Mental health", "summ_hwb_mh"),
                  snap_ui("Ill health & injury", "summ_hwb_injury"),
-                 snap_ui("Education", "summ_hwb_educ"),
-                 snap_module_ui("snap_crime")
+                 snap_ui("Education", "summ_hwb_educ")
           )
         ) #taglist bracket
       } else if (input$profile_summary == "CYP") {
@@ -747,37 +747,38 @@ function(input, output, session) {
   
   ###############################################.
   # Function that creates a snapshot plot for a domain 
-  plot_module_snap <- function(input, output, session, domainchosen) {
-    ns <- session$ns
+  plot_module_snap <- function(input, output, session, domainchosen, comp_summary) {
+    # ns <- session$ns
     
-    # only selecting decided domain
-    prof_snap_data <- snapshot_data() %>% subset(domain == domainchosen) %>% 
-      droplevels() 
+    # only selecting selected domain
+    prof_snap_data <- reactive({snapshot_data() %>% subset(domain == domainchosen) %>% 
+      droplevels() })
     
     #If no data available for that period then plot message saying data is missing
-    if (is.data.frame(prof_snap_data) && nrow(prof_snap_data) == 0)
+    output$snap_plot <- renderPlotly({
+      if (nrow(prof_snap_data()) == 0)
     {
-      sum_plot <- plot_nodata()
-    } else { 
-      
+      plot_nodata()
+    } else {
+
       # Tooltip
-      if (input$comp_summary == 1) {#depending if time or area comparison
-        tooltip_summary <-  c(paste0("Area: ", prof_snap_data$measure, "<br>",
-                                     "Comparator: ", prof_snap_data$comp_m, "<br>",
-                                     prof_snap_data$trend_axis, ". ", prof_snap_data$type_definition))
-      } else if (input$comp_summary == 2) {
-        tooltip_summary <-  c(paste0(prof_snap_data$trend_axis, ": ",
-                                     prof_snap_data$measure, "  ||  ",
-                                     "Baseline: ", prof_snap_data$comp_m, "<br>",
-                                     prof_snap_data$type_definition))
-      } 
+      if (comp_summary == 1) {#depending if time or area comparison
+        tooltip_summary <-  c(paste0("Area: ", prof_snap_data()$measure, "<br>",
+                                     "Comparator: ", prof_snap_data()$comp_m, "<br>",
+                                     prof_snap_data()$trend_axis, ". ", prof_snap_data()$type_definition))
+      } else if (comp_summary == 2) {
+        tooltip_summary <-  c(paste0(prof_snap_data()$trend_axis, ": ",
+                                     prof_snap_data()$measure, "  ||  ",
+                                     "Baseline: ", prof_snap_data()$comp_m, "<br>",
+                                     prof_snap_data()$type_definition))
+      }
       
       # eliminating both axis
       axis_layout <- list(title = "", fixedrange=TRUE, zeroline = FALSE, showline = FALSE,
                           showticklabels = FALSE, showgrid = FALSE)
       
       # defining plot function
-      sum_plot <- plot_ly(prof_snap_data, y = ~indicator,   color = ~color, 
+      plot_ly(prof_snap_data(), y = ~indicator,   color = ~color, 
                           colors=  c(blue = "#4da6ff", gray = "gray88", red = "#ffa64d", white = "#ffffff")
       ) %>% 
         add_bars(x =1, showlegend= FALSE, width=1, 
@@ -792,23 +793,23 @@ function(input, output, session) {
         config(displayModeBar = FALSE, displaylogo = F, collaborate=F, editable =F)
     }
     
-    output$snap_plot <- renderPlotly({ sum_plot })
+     })
     
   }
-
   
   ###############################################.
   # Creating output plots for each domain of each profile 
   # Charts for Health and wellbeing profile
-  callModule({plot_module_snap("snap_beha", "Behaviours" )})
-  callModule({plot_module_snap("snap_crime", "Crime" )})
+  callModule(plot_module_snap, "snap_beha", domainchosen = "Behaviours", input$comp_summary )
+  callModule(plot_module_snap, "snap_crime", domainchosen = "Crime", input$comp_summary )
   
   
   plot_profile_snapshot <- function(domainchosen) {
 
     # only selecting decided domain
     prof_snap_data <- snapshot_data() %>% subset(domain == domainchosen) %>%
-      droplevels()
+      droplevels() %>% 
+      mutate(indicator = as.factor(indicator))
 
     #If no data available for that period then plot message saying data is missing
     if (is.data.frame(prof_snap_data) && nrow(prof_snap_data) == 0)
@@ -907,12 +908,30 @@ function(input, output, session) {
       droplevels() %>% nrow()
 # when 0 or 1 indicators the plot needs at least that size to 
 # prevent the spinner from showing and let the tooltip work
-    height_plot <- case_when(n_ind > 1 ~ 38*n_ind+10,
-                             TRUE ~ 75)
+    height_plot <- reactiveValues({case_when(n_ind > 1 ~ 38*n_ind+10,
+                             TRUE ~ 75) })
     
     tagList(
       h5(title, style="color: black; text-align: center; font-weight: bold;"),
       div(align = "center", plotlyOutput(plot_name, height = height_plot))
+    )
+  }
+  
+  snap_module_ui <- function(title, id) {
+    ns <- NS(id)
+    # obtaining height for plot based on number of rows of indicators
+
+    # when 0 or 1 indicators the plot needs at least that size to 
+    # prevent the spinner from showing and let the tooltip work
+    height_plot <- reactiveValues({ 
+      n_ind <- snapshot_data() %>% subset(domain == title) %>% 
+        droplevels() %>% nrow()
+      case_when(n_ind > 1 ~ 38*n_ind+10,
+                             TRUE ~ 75) })
+    
+    tagList(
+      h5(title, style="color: black; text-align: center; font-weight: bold;"),
+      div(align = "center", plotlyOutput(ns("snap_plot"), height = height_plot()))
     )
   }
   

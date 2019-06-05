@@ -74,7 +74,7 @@ plot_nodata <- function() {
            xaxis = list(showline = FALSE, showticklabels = FALSE, showgrid = FALSE, fixedrange=TRUE),
            font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif')) %>% 
     config( displayModeBar = FALSE) # taking out plotly logo and collaborate button
-}
+} 
 
 #Function to create plot when no data available for ggplot visuals
 plot_nodata_gg <- function() {
@@ -95,11 +95,11 @@ heat_ui <- function(title, plot_name) {
 
 
 
-snap_module_ui <- function(id) {
-  ns <- NS(id)
-  
-  plotlyOutput(ns("snap_plot"))           
-}
+# snap_module_ui <- function(id) {
+#   ns <- NS(id)
+#   
+#   plotlyOutput(ns("snap_plot"))           
+# }
 
 
 ###############################################.
