@@ -103,58 +103,70 @@ tagList( #needed for shinyjs
                ".externallink{text-decoration: underline;} ",
                ".definitionbox {width:100%; height:100%; text-align:left ;background-color:white;
         border: 2px solid #2FA4E7; padding: 10px; margin-top: 0px; margin-bottom: 5px; float: left; transition: 0.5s ease; position: relative; object-fit: scale-down;}"),
-               HTML("<base target='_blank'>"),
+               HTML("<base target='_blank'>")
                #),
                #introBox(data.step = 1,data.intro =(h3("Welcome to the ScotPHO profiles. ", style="margin-top:0px;")))
-               introBox(data.step = 1,data.intro =(p(tags$h4("Welcome to the ScotPHO Profiles Tool"), tags$br(),
-                                                     tags$div(h5("This interactive tool provides access to a range of public 
-                              health related indicators at different geographies including NHS boards, council areas and health and 
-                              social care partnerships.")),
-                                                     tags$br(),
-                                                     tags$div(h5("Use the menu bar at the top of the screen or buttons on the home page to navigate around the tool.")),
-                                                     tags$div(h5("Hover over buttons to see a brief description of what each button does.")),
-                                                     style = "color:0E3E5D; font-size:20px")))
+               # introBox(data.step = 7,data.intro =(p(tags$h4("Welcome to the ScotPHO Profiles Tool"), tags$br(),
+               #                                       tags$div(h5("This interactive tool provides access to a range of public 
+               #                health related indicators at different geographies including NHS boards, council areas and health and 
+               #                social care partnerships.")),
+               #                                       tags$br(),
+               #                                       tags$div(h5("Use the menu bar at the top of the screen or buttons on the home page to navigate around the tool.")),
+               #                                       tags$div(h5("Hover over buttons to see a brief description of what each button does.")),
+               #                                       style = "color:0E3E5D; font-size:20px")))
              ),
 ###############################################.
 ## Landing page ----
 ###############################################.
 tabPanel(
   title = " Home", icon = icon("home"),
-  mainPanel(
-    width = 11, style="margin-left:4%; margin-right:4%",
-    fluidRow((h3("Welcome to the ScotPHO profiles", style="margin-top:0px;")),
-             actionButton("btn_landing",label="HELP! Guide through the profiles tool",class="down")),
+  mainPanel(width = 11, style="margin-left:4%; margin-right:4%",
+ #   fluidRow((h3("Welcome to the ScotPHO profiles", style="margin-top:0px;")),
+    fluidRow(
+             introBox((h3("Welcome to the ScotPHO profiles", style="margin-top:0px;")),
+               data.step = 1,
+               data.intro =(p(tags$h4("Welcome to the ScotPHO Profiles Tool"), tags$br(),
+                            tags$div(h5("This interactive tool provides access to a range of public 
+                              health related indicators at different geographies including NHS boards, council areas and health and 
+                              social care partnerships.")),
+                            tags$br(),
+                            tags$div(h5("There are different ways to navigate through this tool")),
+                            tags$br(),
+                            tags$div(h5("Use the menu bar ('the blue strip') at the top of the screen")),
+                            img(src='introjs_select_tab.png'),
+                            tags$div(h5("OR use the icon buttons on the homepage")),
+                            img(src='introjs_select_landing_button.PNG'),
+                            tags$div(h5("Hover over buttons for a description of what each button does.")),
+                            style = "color:0E3E5D; font-size:20px")),
+               data.position = "bottom-right-aligned"), #position of box doesn't seem to work
+             actionButton("btn_landing",label="HELP! Guide through the profiles tool",class="down")
+             ),
     fluidRow(
       #Summary box
       column(6, class="landing-page-column",
              br(), #spacing
-             ## temporary hide title line 
-              #fluidRow(h4("Explore data by profile", style="margin-top:0px; 
-               #           color:black; text-align: center; ")),
-                      introBox(div(class="landing-page-box", 
-                                   div("Profile summary", class = "landing-page-box-title"),
-                                   div(class = "landing-page-icon", style="background-image: url(heatmap_2.png);
+             introBox(div(class="landing-page-box", 
+                          div("Profile summary", class = "landing-page-box-title"),
+                          div(class = "landing-page-icon", style="background-image: url(landing_button_heatmap_2.png);
                      background-size: auto 80%; background-position: center; background-repeat: no-repeat; "),
-                                   actionButton('jump_to_summary', 'A high level view of an area across a set of indicators', 
-                                                class="landing-page-button", 
-                                                icon = icon("arrow-circle-right", "icon-lp"))),
-                               data.step = 2,
-                               data.intro = "The profile summary allows you to look at multiple indicators within an area")),
-               #Table box 
+                          actionButton('jump_to_summary', 'A high level view of an area across a set of indicators', 
+                                       class="landing-page-button", 
+                                       icon = icon("arrow-circle-right", "icon-lp"))),
+                      data.step = 2,
+                      data.intro = "The profile summary allows you to look at multiple indicators within an area at the same time",
+                      data.position = "bottom-right-aligned")),
+      #Table box 
       column(6, class="landing-page-column",
              br(), #spacing
-             ## temporary hide title line 
-             #fluidRow(h4("Access the data behind the tool", style="margin-top:0px; 
-             #           color:black; text-align: center; ")),
              introBox(div(class="landing-page-box", 
                  div("Data", class = "landing-page-box-title"),
-                 div(class = "landing-page-icon", style="background-image: url(data_table.png);
+                 div(class = "landing-page-icon", style="background-image: url(landing_button_data_table.png);
                      background-size: auto 80%; background-position: center; background-repeat: no-repeat; "),
                  actionButton('jump_to_table', 'View and download the data behind the tool', 
                               class="landing-page-button", 
                               icon = icon("arrow-circle-right", "icon-lp"))),
-                 data.step = 8,
-                 data.intro = "Data behind the profiles can be downloaded through this data table"))),
+                 data.step = 6,
+                 data.intro = "The 'Data' window can be used to filter and download profiles data"))),
     #2nd row of boxes
     fluidRow(
       br(), #spacing
@@ -163,7 +175,7 @@ tabPanel(
       column(4, class="landing-page-column",
              div(class="landing-page-box", 
                  div("Trend", class = "landing-page-box-title"),
-                 div(class = "landing-page-icon", style="background-image: url(time_trend.png);
+                 div(class = "landing-page-icon", style="background-image: url(landing_button_time_trend.png);
                      background-size: auto 80%; background-position: center; background-repeat: no-repeat; "),
                  actionButton('jump_to_trend', 'Look at how an indicator changes over time',
                               class="landing-page-button", 
@@ -172,7 +184,7 @@ tabPanel(
              column(4, class="landing-page-column",
                     div(class="landing-page-box", 
                         div("Rank", class = "landing-page-box-title"),
-                        div(class = "landing-page-icon", style="background-image: url(maprank.png);
+                        div(class = "landing-page-icon", style="background-image: url(landing_button_maprank.png);
                      background-size: auto 75%; background-position: center; background-repeat: no-repeat; "),
                         actionButton('jump_to_rank', 'Compare geographical variation for an indicator', 
                                      class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp")))),
@@ -183,24 +195,28 @@ tabPanel(
       column(4, class="landing-page-column",
              div(class="landing-page-box", 
                  div("Health inequalities", class = "landing-page-box-title"),
-                 div(class = "landing-page-icon", style="background-image: url(health_inequality.png);
+                 div(class = "landing-page-icon", style="background-image: url(landing_button_health_inequality.png);
                      background-size: auto 85%; background-position: center; background-repeat: no-repeat; "),
                  # Currently a link to the health inequalities app
                  actionButton('jump_to_simd', 'Explore how an indicator varies with socioeconomic deprivation', 
                               onclick ="window.open('https://scotland.shinyapps.io/scotpho-health-inequalities', '_blank')",
                               class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp")))),
-    data.step = 9,
-    data.intro = "There is also an inequalities module tha explore how levels of deprivation affect indicators.")),
+    data.step = 7,
+    data.intro = "The inequalities module allows exploration of deprivation affects a selection of indicators from the main profiles tool.")),
     # end of second row
  
-   fluidRow(h4("Find supporting information", style="margin-top:0px; 
-                         color:black; text-align: center; ")),
   fluidRow(
-          #About box
-    column(4, class="landing-page-column",
+    h4("Find supporting information", style="margin-top:0px; text-align: center; ")),
+ 
+  fluidRow(
+    introBox(data.step=8,
+             data.intro = "There are also options to find out information such as detailed descriptions of the profile indicators, indicator update schedules and links to evidence for action briefings",
+             #About box
+    column(4, 
+           class="landing-page-column",
            div(class="landing-page-box-about", 
                div("About", class = "landing-page-box-title"),
-               div(class = "landing-page-about-icon", style="background-image: url(about_2.png);
+               div(class = "landing-page-about-icon", style="background-image: url(landing_button_about_2.png);
                      background-size: auto 80%; background-position: center; background-repeat: no-repeat; "),
                actionButton('jump_to_about', 'About ScotPHO Profiles', 
                             class="landing-page-button-about", 
@@ -208,7 +224,7 @@ tabPanel(
            #Evidence box
            div(class="landing-page-box-about", 
                div("Evidence for action", class = "landing-page-box-title" ),
-               div(class = "landing-page-about-icon", div(img(src="other_profile.png", class="centerabout"))),
+               div(class = "landing-page-about-icon", div(img(src="landing_button_other_profile.png", class="centerabout"))),
                actionButton('jump_to_efa', 'Links to ScotPHO evidence for action briefings', 
                             onclick ="window.open('https://www.scotpho.org.uk/comparative-health/profiles/resources/evidence-for-action/', '_blank')",
                             class="landing-page-button-about", 
@@ -218,7 +234,7 @@ tabPanel(
            #Indicator updates
            div(class="landing-page-box-about",
                div("Indicator Updates", class = "landing-page-box-title"),
-               div(class = "landing-page-about-icon", style="background-image: url(landing_calendar.png);
+               div(class = "landing-page-about-icon", style="background-image: url(landing_button_calendar.png);
                      background-size: auto 80%; background-position: center; background-repeat: no-repeat; "),
                actionButton('btn_indicator_updates', 'Find out which indicators have been updated in the last 60 days', 
                             class="landing-page-button-about", 
@@ -226,7 +242,7 @@ tabPanel(
           #Resources box
            div(class="landing-page-box-about",
                div("Resources", class = "landing-page-box-title"),
-               div(class = "landing-page-about-icon", style="background-image: url(landing_resources.png);
+               div(class = "landing-page-about-icon", style="background-image: url(landing_button_resources.png);
                      background-size: auto 80%; background-position: center; background-repeat: no-repeat; "),
                actionButton('jump_to_resources', 'Find technical information about the ScotPHO profile definitions and methodology', 
                             class="landing-page-button-about", 
@@ -236,7 +252,7 @@ tabPanel(
            #Definitions
            div(class="landing-page-box-about",
                div("Definitions", class = "landing-page-box-title"),
-               div(class = "landing-page-about-icon", style="background-image: url(technical_resources.png);
+               div(class = "landing-page-about-icon", style="background-image: url(landing_button_technical_resources.png);
                      background-size: auto 80%; background-position: center; background-repeat: no-repeat; "),
                actionButton('jump_to_definitions', 'Find out about indicator definitions and data sources', 
                             class="landing-page-button-about", 
@@ -244,26 +260,22 @@ tabPanel(
            #Other profiles
            div(class="landing-page-box-about", 
                div("Other profiles", class = "landing-page-box-title"),
-               div(class = "landing-page-about-icon", style="background-image: url(related_links.png);
+               div(class = "landing-page-about-icon", style="background-image: url(landing_button_related_links.png);
                      background-size: auto 80%; background-position: center; background-repeat: no-repeat; "),
                actionButton('jump_to_others', 'Links to alternative profiling tools', 
                             class="landing-page-button-about", 
                             icon = icon("arrow-circle-right", "icon-lp"))))
-  )#Fluidrow bracket
+    ) #Close IntroBox
+    )#Fluidrow bracket
   ) #main Panel bracket
 ),# tab panel bracket
 ###############################################.
 ## Summary ----
 ###############################################.
 tabPanel("Summary", icon = icon("list-ul"), value = "summary",
-         # introBox(data.step = 4, data.intro =(p(tags$div("Tables and charts within the tool are controlled by drop-down menus."),tags$br(),
-         #          tags$div("Select from available options or just click in a box, hit 'backspace' and start typing what you are looking for."),tags$br(),
-         #          tags$div("Some fields allow multiple selections, so you can add more than one item."))),
-           wellPanel( #Filter options
-           column(3,
-                  introBox(data.step = 4, data.intro =(p(tags$div("Tables and charts within the tool are controlled by drop-down menus."),tags$br(),
-                                                         tags$div("Select from available options or just click in a box, hit 'backspace' and start typing what you are looking for."),tags$br(),
-                                                         tags$div("Some fields allow multiple selections, so you can add more than one item."))),
+         introBox(
+         wellPanel( #Filter options
+               column(3,
                   p(tags$b("Step 1. Select your area")),
                   selectInput("geotype_summary", "Geography level", choices=areatype_list,
                               selected = "Health board"),
@@ -272,7 +284,7 @@ tabPanel("Summary", icon = icon("list-ul"), value = "summary",
                     selectInput("loc_iz_summary", label = "Partnership for localities/intermediate zones",
                                 choices = partnership_name)
                   ),
-                  uiOutput("geoname_ui_summary"))
+                  uiOutput("geoname_ui_summary")
            ),
            column(3,
                   p(tags$b("Step 2. Select a profile ")),
@@ -286,27 +298,32 @@ tabPanel("Summary", icon = icon("list-ul"), value = "summary",
                   uiOutput("comp_ui_summary") # comparator options
            ),
            column(3,
-                  introBox(
                   actionButton("help_summary",label="Help", icon= icon('question-circle'), class ="down"),
                   actionButton("defs_summary",label="Definitions", icon= icon('info'), class ="down"),
                   downloadButton('download_summary', 'Download data', class = "down"),
                   conditionalPanel(condition = 'input.chart_summary == "Spine"',
-                    savechart_button('download_spineplot', 'Save chart',  class = "down")),
+                                   savechart_button('download_spineplot', 'Save chart',  class = "down"))
                   # savechart_button('download_summaryplot', 'Save chart',  class = "down")
-           data.step = 5, data.intro="Each visualisation contains options to get help to read the chart, the definitions behind indicators and to download the data behind the chart or an image of the chart"
-                  )),
+           ),
            div(style = "width:60%; margin-left: 20%; min-width: 350px", # centering div
-             radioGroupButtons("chart_summary", status = "primary", justified = TRUE,
-                             choices = c("Snapshot", "Trend", "Spine"), label= "Step 4. Select what type of summary you want to see: 
-                  snapshot is a comparison with the latest data available, 
-                             trend will show how things are changing over time, and 
-                             spine compares indicators with the rest of areas of the same level." )) 
-         )), #well panel bracket
+               radioGroupButtons("chart_summary", status = "primary", justified = TRUE,
+                                 choices = c("Snapshot", "Trend", "Spine"), label= "Step 4. Select what type of summary you want to see: 
+                                 snapshot is a comparison with the latest data available, 
+                                 trend will show how things are changing over time, and 
+                                 spine compares indicators with the rest of areas of the same level." ))),
+         data.step = 4, 
+         data.intro =(p(tags$div("Use the dropdown menus to change which indicators or geographies are displayed in the charts."),
+                      tags$br(),
+                      tags$div("While using dropdown menus hit backspace ('<-') and start typing a word to quickly find the options you are looking for"),
+                      img(src='introjs_how_to_select.png')))
+         ), #well panel bracket
          mainPanel(width = 12,
                    bsModal("mod_defs_summary", "Definitions", "defs_summary",
                            htmlOutput('defs_text_summary')),
                    fluidRow(column(4,
-                                   h5(textOutput("summary_subtitle"), style="color: black; text-align: left")),
+                                   h4(textOutput("summary_title"), style="color: black; text-align: left"),
+                                   h5(textOutput("summary_subtitle"), style="color: black; text-align: left")
+                   ),
                    column(3,
                           br(),
                           br(),
@@ -319,16 +336,16 @@ tabPanel("Summary", icon = icon("list-ul"), value = "summary",
                             img(src='signif_nocalc.png', height=18, style="padding-right: 2px; vertical-align:middle"), 
                             "No differences can be calculated")),
                    conditionalPanel(condition = 'input.chart_summary == "Spine"', 
-                        column(5,
-                          br(),
-                          br(),
-                          uiOutput("ui_spine_legend_selected"),
-                          uiOutput("ui_spine_legend_areatype"),
-                          uiOutput("ui_spine_legend_comparator")))),
+                                    column(5,
+                                           br(),
+                                           br(),
+                                           uiOutput("ui_spine_legend_selected"),
+                                           uiOutput("ui_spine_legend_areatype"),
+                                           uiOutput("ui_spine_legend_comparator")))),
                    # Depending what users selects different visualizations
-                          uiOutput("summary_ui_plots")
-        #) #intro box bracket
-  ), #Tab panel bracket
+                   uiOutput("summary_ui_plots")
+         )
+               ), #Tab panel bracket
 ###############################################.
 ## Time trend ----
 ###############################################.
@@ -410,12 +427,18 @@ tabPanel("Rank", icon = icon("signal"), value = "rank",
                     "Baseline year comparison")
            ),
            column(width = 2,
+                  introBox(
                   actionButton("defs_rank", label="Definitions", icon= icon('info'), class ="down"), 
                   downloadButton('download_rank', 'Download data', class = "down"),
                   savechart_button('download_rankplot', 'Save chart', class = "down"),
-                  savechart_button('download_mapplot', 'Save map', class = "down")
-           )
-         ), #well pannel bracket
+                  savechart_button('download_mapplot', 'Save map', class = "down"),
+                  data.step = 5,
+                  data.intro =(p(tags$div("Look out for options in each window that provide"),
+                               tags$li("indicator defintions or help to interpret a visualisation,"),
+                               tags$li("data download data options for individual charts,"),
+                               tags$li("image downloads for individual charts.")
+                               )))
+         )), #well pannel bracket
          mainPanel(width = 12, #Main panel
                    bsModal("mod_defs_rank", "Definitions", "defs_rank", htmlOutput('defs_text_rank')),
                    column(width = 7, #rank bar
