@@ -503,12 +503,7 @@ function(input, output, session) {
     if (input$chart_summary == "Snapshot") {
       if (input$profile_summary == "HWB") {
         tagList(#Health and Wellbeing profile
-          fluidRow(
-            textOutput("test_beha"),
-            textOutput("test_crime")
-          ),
           column(4,
-                 snap_module_ui("Behaviours", "snap_beha"),
                  snap_ui("Behaviours", "summ_hwb_beha"),
                  snap_ui("Social care & housing", "summ_hwb_socare"),
                  snap_ui("Environment", "summ_hwb_env"),
@@ -518,8 +513,7 @@ function(input, output, session) {
                  snap_ui("Women's & children's health", "summ_hwb_women"),
                  snap_ui("Immunisations & screening", "summ_hwb_imm"),
                  snap_ui("Economy", "summ_hwb_econ"),
-                 snap_module_ui("Crime", "snap_crime")
-                 # snap_ui("Crime", "summ_hwb_crime")
+                 snap_ui("Crime", "summ_hwb_crime")
           ),
           column(4,
                  snap_ui("Mental health", "summ_hwb_mh"),
@@ -747,63 +741,6 @@ function(input, output, session) {
   
   ###############################################.
   # Function that creates a snapshot plot for a domain 
-  plot_module_snap <- function(input, output, session, domainchosen, comp_summary) {
-    # ns <- session$ns
-    
-    # only selecting selected domain
-    prof_snap_data <- reactive({snapshot_data() %>% subset(domain == domainchosen) %>% 
-      droplevels() })
-    
-    #If no data available for that period then plot message saying data is missing
-    output$snap_plot <- renderPlotly({
-      if (nrow(prof_snap_data()) == 0)
-    {
-      plot_nodata()
-    } else {
-
-      # Tooltip
-      if (comp_summary == 1) {#depending if time or area comparison
-        tooltip_summary <-  c(paste0("Area: ", prof_snap_data()$measure, "<br>",
-                                     "Comparator: ", prof_snap_data()$comp_m, "<br>",
-                                     prof_snap_data()$trend_axis, ". ", prof_snap_data()$type_definition))
-      } else if (comp_summary == 2) {
-        tooltip_summary <-  c(paste0(prof_snap_data()$trend_axis, ": ",
-                                     prof_snap_data()$measure, "  ||  ",
-                                     "Baseline: ", prof_snap_data()$comp_m, "<br>",
-                                     prof_snap_data()$type_definition))
-      }
-      
-      # eliminating both axis
-      axis_layout <- list(title = "", fixedrange=TRUE, zeroline = FALSE, showline = FALSE,
-                          showticklabels = FALSE, showgrid = FALSE)
-      
-      # defining plot function
-      plot_ly(prof_snap_data(), y = ~indicator,   color = ~color, 
-                          colors=  c(blue = "#4da6ff", gray = "gray88", red = "#ffa64d", white = "#ffffff")
-      ) %>% 
-        add_bars(x =1, showlegend= FALSE, width=1, 
-                 hoverinfo="text", hovertext = tooltip_summary,
-                 marker = list(line= list(color="black", width = 0.5))) %>% 
-        # adding indicator name at center of each bar
-        add_text(text = ~indic_multiline, x =0.5,  showlegend= FALSE, 
-                 textfont = list(color='black'), hoverinfo="skip" ) %>% 
-        layout(yaxis = axis_layout, xaxis = axis_layout,
-               margin = list(b= 10 , t=5, l = 5, r = 0),
-               font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif')) %>% # to get hover compare mode as default
-        config(displayModeBar = FALSE, displaylogo = F, collaborate=F, editable =F)
-    }
-    
-     })
-    
-  }
-  
-  ###############################################.
-  # Creating output plots for each domain of each profile 
-  # Charts for Health and wellbeing profile
-  callModule(plot_module_snap, "snap_beha", domainchosen = "Behaviours", input$comp_summary )
-  callModule(plot_module_snap, "snap_crime", domainchosen = "Crime", input$comp_summary )
-  
-  
   plot_profile_snapshot <- function(domainchosen) {
 
     # only selecting decided domain
@@ -819,9 +756,9 @@ function(input, output, session) {
 
       # Tooltip
       if (input$comp_summary == 1) {#depending if time or area comparison
-        tooltip_summary <-  c(paste0("Area: ", prof_snap_data$measure, "<br>",
+        tooltip_summary <-  c(paste0("Area: ", prof_snap_data$measure, " || ",
                                      "Comparator: ", prof_snap_data$comp_m, "<br>",
-                                     prof_snap_data$trend_axis, ". ", prof_snap_data$type_definition))
+                                     prof_snap_data$trend_axis, "<br>", prof_snap_data$type_definition))
       } else if (input$comp_summary == 2) {
         tooltip_summary <-  c(paste0(prof_snap_data$trend_axis, ": ",
                                      prof_snap_data$measure, "  ||  ",
@@ -832,9 +769,17 @@ function(input, output, session) {
       # eliminating both axis
       axis_layout <- list(title = "", fixedrange=TRUE, zeroline = FALSE, showline = FALSE,
                           showticklabels = FALSE, showgrid = FALSE)
+      
 
+      # obtaining height for plot based on number of rows of indicators
+      n_ind <- prof_snap_data %>% nrow()
+      # when 0 or 1 indicators the plot needs at least that size to 
+      # prevent the spinner from showing and let the tooltip work
+      height_plot <- case_when(n_ind > 1 ~ 38*n_ind+10,
+                               TRUE ~ 75) 
+      
       # defining plot function
-      plot_ly(prof_snap_data, y = ~indicator,   color = ~color,
+      plot_ly(prof_snap_data, y = ~indicator,   color = ~color, height = height_plot,
               colors=  c(blue = "#4da6ff", gray = "gray88", red = "#ffa64d", white = "#ffffff")
       ) %>%
         add_bars(x =1, showlegend= FALSE, width=1,
@@ -908,46 +853,16 @@ function(input, output, session) {
       droplevels() %>% nrow()
 # when 0 or 1 indicators the plot needs at least that size to 
 # prevent the spinner from showing and let the tooltip work
-    height_plot <- reactiveValues({case_when(n_ind > 1 ~ 38*n_ind+10,
-                             TRUE ~ 75) })
+    height_plot <- case_when(n_ind > 1 ~ 38*n_ind+10,
+                             TRUE ~ 75)
     
     tagList(
       h5(title, style="color: black; text-align: center; font-weight: bold;"),
-      div(align = "center", plotlyOutput(plot_name, height = height_plot))
+      div(align = "center", plotlyOutput(plot_name, height = "100%"))
     )
   }
   
-  snap_module_ui <- function(title, id) {
-    ns <- NS(id)
-    # obtaining height for plot based on number of rows of indicators
 
-    # when 0 or 1 indicators the plot needs at least that size to 
-    # prevent the spinner from showing and let the tooltip work
-    height_plot <- reactiveValues({ 
-      n_ind <- snapshot_data() %>% subset(domain == title) %>% 
-        droplevels() %>% nrow()
-      case_when(n_ind > 1 ~ 38*n_ind+10,
-                             TRUE ~ 75) })
-    
-    tagList(
-      h5(title, style="color: black; text-align: center; font-weight: bold;"),
-      div(align = "center", plotlyOutput(ns("snap_plot"), height = height_plot()))
-    )
-  }
-  
-  snap_test <- function(title) {
-    # obtaining height for plot based on number of rows of indicators
-    n_ind <- snapshot_data() %>% subset(domain == title) %>% 
-      droplevels() %>% nrow()
-    # when 0 or 1 indicators the plot needs at least that size to 
-    # prevent the spinner from showing and let the tooltip work
-    case_when(n_ind > 1 ~ 38*n_ind+10, TRUE ~ 75)
-    
-  }
-  
-  output$test_beha <- renderText({snap_test("Behaviours")})
-  output$test_crime <- renderText({snap_test("Crime")})
-  
   ###############################################.        
   #### Heatmap ----
   ###############################################.  
@@ -1791,24 +1706,24 @@ function(input, output, session) {
   
   #####################################.    
   ### Map ----
-  #####################################. 
+  #####################################.
   #####################.
   # Reactive controls: it uses the ones from the rank section
   ###############################################.
   # Indicator definitions
-  #Subsetting by domain and profile. Profile is fiddly as vector uses abbreviations 
+  #Subsetting by domain and profile. Profile is fiddly as vector uses abbreviations
   # so needs to be converted to the names to match techdoc.
   defs_data_map <- reactive({techdoc %>% subset(input$indic_rank == indicator_name)})
-  
+
   output$defs_text_map <- renderUI({
-    
-    HTML(paste(sprintf("<b><u>%s</b></u> <br> %s ", defs_data_map()$indicator_name, 
+
+    HTML(paste(sprintf("<b><u>%s</b></u> <br> %s ", defs_data_map()$indicator_name,
                        defs_data_map()$indicator_definition), collapse = "<br><br>"))
   })
-  
+
   #####################.
   # # Dynamic data - uses some of the rank ones
-  
+
   #Merging shapefile with dynamic selection of data
   poly_map <- reactive({
     if (input$geotype_rank == "Council area"){
@@ -1823,50 +1738,50 @@ function(input, output, session) {
     } else {
       map_pol <- data.frame(matrix(vector(), 0, 3)) #empty data frame
     }
-    
-  }) 
-  
+
+  })
+
   #####################.
   # Plotting map
   #Function to create color palette based on if signicantly different from comparator
   create_map_palette <- function(){
     case_when(
       poly_map()$interpret == "O" ~ '#999966',
-      is.na(poly_map()$lowci) | is.na(poly_map()$upci) | 
+      is.na(poly_map()$lowci) | is.na(poly_map()$upci) |
         is.na(poly_map()$comp_value) | is.na(poly_map()$measure) |
         poly_map()$measure == 0 ~ '#999966',
       poly_map()$lowci <= poly_map()$comp_value & poly_map()$upci >= poly_map()$comp_value ~'#999999',
       poly_map()$lowci > poly_map()$comp_value & poly_map()$interpret == "H" ~ '#3d99f5',
       poly_map()$lowci > poly_map()$comp_value & poly_map()$interpret == "L" ~ '#ff9933',
       poly_map()$upci < poly_map()$comp_value & poly_map()$interpret == "L" ~ '#3d99f5',
-      poly_map()$upci < poly_map()$comp_value & poly_map()$interpret == "H" ~ '#ff9933', 
+      poly_map()$upci < poly_map()$comp_value & poly_map()$interpret == "H" ~ '#ff9933',
       TRUE ~ '#ffffff')
   }
-  
+
   #Plotting map
   output$map <- renderLeaflet({
-    
+
     #For some reason it needs the second line to work correctly in the map, if not
     #areas with no data are shown as dark grey.
     color_map <- create_map_palette() #palette
     color_map[is.na(color_map)] <- "#ffffff"
-    
+
     #Actual map
-    leaflet() %>% 
+    leaflet() %>%
       addProviderTiles(providers$CartoDB.Positron) %>%
-      addPolygons(data=poly_map(), 
-                  color = "#444444", weight = 2, smoothFactor = 0.5, 
+      addPolygons(data=poly_map(),
+                  color = "#444444", weight = 2, smoothFactor = 0.5,
                   #tooltip
                   label = (sprintf(
                     "<strong>%s</strong><br/>Total: %g<br/>Measure: %g<br/>%s",
-                    poly_map()$area_name, poly_map()$numerator, poly_map()$measure, 
+                    poly_map()$area_name, poly_map()$numerator, poly_map()$measure,
                     poly_map()$type_definition) %>% lapply(htmltools::HTML)),
                   opacity = 1.0, fillOpacity = 0.5, fillColor = color_map, #Colours
                   highlightOptions = highlightOptions(color = "white", weight = 2,
                                                       bringToFront = TRUE)
-      ) 
+      )
   })
-  
+
   # If no data or shapefile plot no map available
   output$map_ui <- renderUI({
     if(is.data.frame(poly_map()) && nrow(poly_map()) == 0) {
@@ -1875,37 +1790,37 @@ function(input, output, session) {
       withSpinner(leafletOutput("map", width="100%",height="600px"))
     }
   })
-  
+
   #####################.
   # Downloading data
   #Function to create map that can be downloaded
   plot_map_download <- function(){
-    
+
     if(is.data.frame(poly_map()) && nrow(poly_map()) == 0) {
       plot.new()
       text(0.5,0.5,"No map available for that geographic level.")
     } else {
       color_map <- create_map_palette() #palette
       title_map <- paste0(input$indic_rank, "\n", make_rank_subtitle())
-      
+
       plot(poly_map(), col=color_map)
       title(title_map, cex.main = 3,  line = -1) # adding title
     }
   }
-  
-  
-  #Function to filter the data needed for downloading data 
+
+
+  #Function to filter the data needed for downloading data
   map_csv <- function(){
-    optdata %>% 
+    optdata %>%
       subset(areatype == input$geotype_map &
-               trend_axis==input$year_map & indicator==input$indic_map) %>% 
+               trend_axis==input$year_map & indicator==input$indic_map) %>%
       format_csv()
-  }  
-  
+  }
+
   #Downloading map data
   output$download_map <- downloadHandler(filename =  'map_data.csv',
                                          content = function(file) { write.csv(map_csv(), file, row.names=FALSE)})
-  
+
   #Donwloading map chart
   output$download_mapplot <- downloadHandler(
     filename = 'map.png',

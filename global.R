@@ -93,15 +93,6 @@ heat_ui <- function(title, plot_name) {
   )
 }
 
-
-
-# snap_module_ui <- function(id) {
-#   ns <- NS(id)
-#   
-#   plotlyOutput(ns("snap_plot"))           
-# }
-
-
 ###############################################.
 ## Data ----
 ###############################################.    
