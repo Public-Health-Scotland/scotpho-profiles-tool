@@ -154,6 +154,8 @@ geo_lookup <- geo_lookup %>%
     code == "S02002476" ~ "IZ17-West Dunbartonshire",
     code == "S02001551" ~ "IZ18-East Lothian",
     code == "S02002477" ~ "IZ18-West Dunbartonshire",
+    # THIS ONE IS A MISSPELLING - TEMPORARY UNTIL LOOKups fixed
+    code == "S02002007" ~ "Lochalsh",
     TRUE  ~  paste(areaname))) #Last line for the rest of cases
 
 geo_lookup <- geo_lookup %>% 
