@@ -121,40 +121,37 @@ tagList( #needed for shinyjs
 tabPanel(
   title = " Home", icon = icon("home"),
   mainPanel(width = 11, style="margin-left:4%; margin-right:4%",
- #   fluidRow((h3("Welcome to the ScotPHO profiles", style="margin-top:0px;")),
-    fluidRow(
-             introBox((h3("Welcome to the ScotPHO profiles", style="margin-top:0px;")),
-               data.step = 1,
-               data.intro =(p(tags$h4("Welcome to the ScotPHO Profiles Tool"), tags$br(),
-                            tags$div(h5("This interactive tool provides access to a range of public 
-                              health related indicators at different geographies including NHS boards, council areas and health and 
+            introBox(  
+              fluidRow(column(9,(h3("Welcome to the ScotPHO profiles", style="margin-top:0px;"))),
+                       (column(2,actionButton("btn_landing",label="Help: Walk through this tool",icon=icon('question-circle'),class="down")))),
+              data.step = 1,
+              data.intro =(p(tags$h4("Welcome to the ScotPHO Profiles Tool"), tags$br(),
+                             tags$div(h5("This interactive tool provides access to a range of public
+                              health related indicators at different geographies including NHS boards, council areas and health and
                               social care partnerships.")),
-                            tags$br(),
-                            tags$div(h5("There are different ways to navigate through this tool")),
-                            tags$br(),
-                            tags$div(h5("Use the menu bar ('the blue strip') at the top of the screen")),
-                            img(src='introjs_select_tab.png'),
-                            tags$div(h5("OR use the icon buttons on the homepage")),
-                            img(src='introjs_select_landing_button.PNG'),
-                            tags$div(h5("Hover over buttons for a description of what each button does.")),
-                            style = "color:0E3E5D; font-size:20px")),
-               data.position = "bottom-right-aligned"), #position of box doesn't seem to work
-             actionButton("btn_landing",label="HELP! Guide through the profiles tool",class="down")
-             ),
-    fluidRow(
-      #Summary box
-      column(6, class="landing-page-column",
-             br(), #spacing
-             introBox(div(class="landing-page-box", 
-                          div("Profile summary", class = "landing-page-box-title"),
-                          div(class = "landing-page-icon", style="background-image: url(landing_button_heatmap_2.png);
+                             tags$br(),
+                             tags$div(h5("There are different ways to navigate through this tool")),
+                             tags$br(),
+                             tags$div(h5("Use the menu bar ('the blue strip') at the top of the screen")),
+                             img(src='introjs_tabset_panel.PNG',width=300),
+                             tags$div(h5("OR use the icon buttons on the homepage")),
+                             img(src='introjs_select_landing_button.PNG'),
+                             tags$div(h5("Hover over buttons for a description of what each button does.")),
+                             style = "color:0E3E5D; font-size:20px"))),
+            fluidRow(
+              #Summary box
+              column(6, class="landing-page-column",
+                     br(), #spacing
+                     introBox(div(class="landing-page-box", 
+                                  div("Profile summary", class = "landing-page-box-title"),
+                                  div(class = "landing-page-icon", style="background-image: url(landing_button_heatmap_2.png);
                      background-size: auto 80%; background-position: center; background-repeat: no-repeat; "),
-                          actionButton('jump_to_summary', 'A high level view of an area across a set of indicators', 
-                                       class="landing-page-button", 
-                                       icon = icon("arrow-circle-right", "icon-lp"))),
-                      data.step = 2,
-                      data.intro = "The profile summary allows you to look at multiple indicators within an area at the same time",
-                      data.position = "bottom-right-aligned")),
+                                  actionButton('jump_to_summary', 'A high level view of an area across a set of indicators', 
+                                               class="landing-page-button", 
+                                               icon = icon("arrow-circle-right", "icon-lp"))),
+                              data.step = 2,
+                              data.intro = "The profile summary allows you to look at multiple indicators within an area at the same time",
+                              data.position = "bottom-right-aligned")),
       #Table box 
       column(6, class="landing-page-column",
              br(), #spacing
