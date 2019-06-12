@@ -104,16 +104,6 @@ tagList( #needed for shinyjs
                ".definitionbox {width:100%; height:100%; text-align:left ;background-color:white;
         border: 2px solid #2FA4E7; padding: 10px; margin-top: 0px; margin-bottom: 5px; float: left; transition: 0.5s ease; position: relative; object-fit: scale-down;}"),
                HTML("<base target='_blank'>")
-               #),
-               #introBox(data.step = 1,data.intro =(h3("Welcome to the ScotPHO profiles. ", style="margin-top:0px;")))
-               # introBox(data.step = 7,data.intro =(p(tags$h4("Welcome to the ScotPHO Profiles Tool"), tags$br(),
-               #                                       tags$div(h5("This interactive tool provides access to a range of public 
-               #                health related indicators at different geographies including NHS boards, council areas and health and 
-               #                social care partnerships.")),
-               #                                       tags$br(),
-               #                                       tags$div(h5("Use the menu bar at the top of the screen or buttons on the home page to navigate around the tool.")),
-               #                                       tags$div(h5("Hover over buttons to see a brief description of what each button does.")),
-               #                                       style = "color:0E3E5D; font-size:20px")))
              ),
 ###############################################.
 ## Landing page ----
@@ -134,9 +124,11 @@ tabPanel(
                              tags$br(),
                              tags$div(h5("Use the menu bar ('the blue strip') at the top of the screen")),
                              img(src='introjs_tabset_panel.PNG',width=300),
-                             tags$div(h5("OR use the icon buttons on the homepage")),
+                             tags$div(h5("OR")),
+                             tags$br(),
+                             tags$div(h5("use the icon buttons on the homepage, hover over buttons for a description")),
                              img(src='introjs_select_landing_button.PNG'),
-                             tags$div(h5("Hover over buttons for a description of what each button does.")),
+                             tags$div(h5("The 'Home' option will take you back to the profiles main page.")),
                              style = "color:0E3E5D; font-size:20px"))),
             fluidRow(
               #Summary box
@@ -169,6 +161,8 @@ tabPanel(
       br(), #spacing
       #Trend plot box
       introBox(
+        data.step = 3,
+        data.intro = "The trend and rank charts allow detailed exploration of one indicator at a time.",
       column(4, class="landing-page-column",
              div(class="landing-page-box", 
                  div("Trend", class = "landing-page-box-title"),
@@ -184,11 +178,12 @@ tabPanel(
                         div(class = "landing-page-icon", style="background-image: url(landing_button_maprank.png);
                      background-size: auto 75%; background-position: center; background-repeat: no-repeat; "),
                         actionButton('jump_to_rank', 'Compare geographical variation for an indicator', 
-                                     class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp")))),
-             data.step = 3,
-             data.intro = "The trend and rank charts allow detailed exploration of one indicator at a time."),
+                                     class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp"))))
+      ),#introBox 3 close
   #Inequalities box
   introBox(
+    data.step = 7,
+    data.intro = "The inequalities module allows exploration of deprivation affects a selection of indicators from the main profiles tool.",
       column(4, class="landing-page-column",
              div(class="landing-page-box", 
                  div("Health inequalities", class = "landing-page-box-title"),
@@ -197,10 +192,11 @@ tabPanel(
                  # Currently a link to the health inequalities app
                  actionButton('jump_to_simd', 'Explore how an indicator varies with socioeconomic deprivation', 
                               onclick ="window.open('https://scotland.shinyapps.io/scotpho-health-inequalities', '_blank')",
-                              class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp")))),
-    data.step = 7,
-    data.intro = "The inequalities module allows exploration of deprivation affects a selection of indicators from the main profiles tool.")),
-    # end of second row
+                            class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp"))))
+    ) #introBox 7 close
+  ), # fluid row close
+
+  # end of landing page second row
  
   fluidRow(
     h4("Find supporting information", style="margin-top:0px; text-align: center; ")),
