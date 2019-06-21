@@ -85,6 +85,12 @@ plot_nodata_gg <- function() {
           axis.title.x=element_text(size=20, colour ='#555555'))
 }
 
+#set format of text used in introJS help walkthrough
+text_intro <- function(text) {
+  p(tags$div(text, 
+             style = "color:0E3E5D; font-size:20px; width: 90%; text-align: left; "))  
+}
+
 ###############################################.
 ## Data ----
 ###############################################.    
