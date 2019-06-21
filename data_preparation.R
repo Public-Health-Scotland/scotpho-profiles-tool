@@ -181,7 +181,9 @@ geo_lookup <- readRDS("data/geo_lookup.rds")
 ind_lookup<- read_csv(paste0(lookups, "indicator_lookup.csv")) %>% 
   setNames(tolower(names(.))) %>% #variables to lower case
   select(c(ind_id, indicator, interpret, supression, supress_less_than, 
-           type_id, type_definition, profile_domain1, profile_domain2)) %>% 
+           type_id, type_definition, profile_domain1, profile_domain2, 
+           # This ones can be deleted once release 2.0 comes out
+           domain1, domain2, domain3)) %>% 
   mutate_if(is.character, factor) %>%  # converting variables into factors
   mutate(ind_id = as.factor(ind_id))
 
@@ -287,7 +289,8 @@ optdata <- optdata %>% group_by(ind_id, year, areatype) %>%
 
 # Tidying up the format
 optdata <- optdata %>% #taking out some variables
-  select(-c(supression, supress_less_than, type_id, file_name, ind_id)) %>%  
+  # we will be able to exclude ind_id here once release2.0 comes out
+  select(-c(supression, supress_less_than, type_id, file_name)) %>%  
   #rounding variables
   mutate(numerator = round(numerator, 2), measure = round(measure, 2),
          lowci = round(lowci, 2), upci = round(upci, 2)) %>%
