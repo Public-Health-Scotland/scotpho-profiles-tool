@@ -206,7 +206,7 @@ optdata <- do.call(rbind, lapply(files, function(x){
   mutate(file_name = gsub("/PHI_conf/ScotPHO/Profiles/Data/Shiny Data//", "", file_name)) %>% 
   rename(measure = rate)
 
-# to check if there is more then one file for the same indicator
+# to check if there is more then one file for the same indicator. This should be empty
 optdata %>% select(ind_id, file_name) %>% unique %>% group_by(ind_id) %>% 
   add_tally() %>% filter(n >1) %>% View()
 
@@ -217,12 +217,12 @@ data_spss <- read_csv(paste0(basefiles, "All Data for Shiny.csv"),
   rename(ind_id = indicator_id, code = geography_code) %>% 
   select(-update_date) %>% 
   # excluding indicators already present in shiny folder data files
-  filter(!(ind_id %in% unique(optdata$ind_id))) %>% droplevels()
+  filter(!(ind_id %in% unique(optdata$ind_id))) %>% droplevels() %>% 
+  mutate(ind_id = as.character(ind_id))
 
 # Merging together spss and shiny data folder datasets
 optdata <- bind_rows(optdata, data_spss) %>% 
   mutate_if(is.character, factor) %>%  #converting characters into factors
-  mutate(ind_id = as.factor(ind_id)) %>% 
   #TEMPORARY FIX. dealing with change in ca, hb and hscp codes
   mutate(code = recode(code, "S12000015"='S12000047', "S12000024"='S12000048',
                        "S08000018"='S08000029', "S08000027"= 'S08000030',
