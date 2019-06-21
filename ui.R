@@ -115,21 +115,22 @@ tabPanel(
               fluidRow(column(9,(h3("Welcome to the ScotPHO profiles", style="margin-top:0px;"))),
                        (column(2,actionButton("btn_landing",label="Help: Walk through this tool",icon=icon('question-circle'),class="down")))),
               data.step = 1,
-              data.intro =(p(tags$h4("Welcome to the ScotPHO Profiles Tool"), tags$br(),
-                             tags$div(h5("This interactive tool provides access to a range of public
+              data.intro =(p(h4("Welcome to the ScotPHO Profiles Tool"),
+                             br(),
+                             h5("This interactive tool provides access to a range of public
                               health related indicators at different geographies including NHS boards, council areas and health and
-                              social care partnerships.")),
-                             tags$br(),
-                             tags$div(h5("There are different ways to navigate through this tool")),
-                             tags$br(),
-                             tags$div(h5("Use the menu bar ('the blue strip') at the top of the screen")),
+                              social care partnerships."),
+                             br(),
+                             h5("There are different ways to navigate around the tool."),
+                             h5("Different visualisation can be opened using the menu bar ('the blue strip') at the top of the screen"),
                              img(src='introjs_tabset_panel.PNG',width=300),
-                             tags$div(h5("OR")),
-                             tags$br(),
-                             tags$div(h5("use the icon buttons on the homepage, hover over buttons for a description")),
-                             img(src='introjs_select_landing_button.PNG'),
-                             tags$div(h5("The 'Home' option will take you back to the profiles main page.")),
-                             style = "color:0E3E5D; font-size:20px"))),
+                             br(),
+                             #h5("OR"),
+                             #h5("use the icon buttons on the homepage, hover over buttons for a description"),
+                             #img(src='introjs_select_landing_button.PNG'),
+                             h5("The 'Home' option in the menu bar will return to the profiles tool home page."),
+                             style = "color:0E3E5D; font-size:20px")),
+              data.position = "left"),
             fluidRow(
               #Summary box
               column(6, class="landing-page-column",
@@ -142,10 +143,13 @@ tabPanel(
                                                class="landing-page-button", 
                                                icon = icon("arrow-circle-right", "icon-lp"))),
                               data.step = 2,
-                              data.intro = "The profile summary allows you to look at multiple indicators within an area at the same time",
-                              data.position = "bottom-right-aligned")),
-      #Table box 
-      column(6, class="landing-page-column",
+                              data.intro = p(
+                                h5("The icon buttons on the homepage are an alternate way to reach the same visualisations. Hovering over buttons for a description"),
+                                br(),
+                                h5("This button will open the profile summary allowing you to look at multiple indicators within an area at the same time"),
+                                data.position = "bottom-right-aligned"))),
+              #Table box 
+              column(6, class="landing-page-column",
              br(), #spacing
              introBox(div(class="landing-page-box", 
                  div("Data", class = "landing-page-box-title"),
@@ -155,14 +159,14 @@ tabPanel(
                               class="landing-page-button", 
                               icon = icon("arrow-circle-right", "icon-lp"))),
                  data.step = 6,
-                 data.intro = "The 'Data' window can be used to filter and download profiles data"))),
+                 data.intro = h5("The 'Data' window can be used to filter and download profiles data")))),
     #2nd row of boxes
     fluidRow(
       br(), #spacing
       #Trend plot box
       introBox(
         data.step = 3,
-        data.intro = "The trend and rank charts allow detailed exploration of one indicator at a time.",
+        data.intro = h5("The trend and rank charts allow detailed exploration of one indicator at a time."),
       column(4, class="landing-page-column",
              div(class="landing-page-box", 
                  div("Trend", class = "landing-page-box-title"),
@@ -183,7 +187,7 @@ tabPanel(
   #Inequalities box
   introBox(
     data.step = 7,
-    data.intro = "The inequalities module allows exploration of deprivation affects a selection of indicators from the main profiles tool.",
+    data.intro = h5("The inequalities module allows exploration of deprivation affects a selection of indicators from the main profiles tool."),
       column(4, class="landing-page-column",
              div(class="landing-page-box", 
                  div("Health inequalities", class = "landing-page-box-title"),
@@ -203,7 +207,7 @@ tabPanel(
  
   fluidRow(
     introBox(data.step=8,
-             data.intro = "There are also options to find out information such as detailed descriptions of the profile indicators, indicator update schedules and links to evidence for action briefings",
+             data.intro = h5("There are also options to find out information such as detailed descriptions of the profile indicators, indicator update schedules and links to evidence for action briefings"),
              #About box
     column(4, 
            class="landing-page-column",
@@ -305,9 +309,9 @@ tabPanel("Summary", icon = icon("list-ul"), value = "summary",
                                  trend will show how things are changing over time, and 
                                  spine compares indicators with the rest of areas of the same level." ))),
          data.step = 4, 
-         data.intro =(p(tags$div("Use the dropdown menus to change which indicators or geographies are displayed in the charts."),
+         data.intro =(p(tags$div("Throughout the tool use the dropdown menus to change which indicators or geographies are displayed in the charts."),
                       tags$br(),
-                      tags$div("While using dropdown menus hit backspace ('<-') and start typing a word to quickly find the options you are looking for"),
+                      tags$div("While using dropdown menus mouse click within a dropdown menu and press backspace on your keyboard ('<-') then start typing a word to quickly find the options you are looking for"),
                       img(src='introjs_how_to_select.png')))
          ), #well panel bracket
          mainPanel(width = 12,
@@ -426,7 +430,7 @@ tabPanel("Rank", icon = icon("signal"), value = "rank",
                   savechart_button('download_rankplot', 'Save chart', class = "down"),
                   savechart_button('download_mapplot', 'Save map', class = "down"),
                   data.step = 5,
-                  data.intro =(p(tags$div("Look out for options in each window that provide"),
+                  data.intro =(p(tags$div("Throughout the tool look out for options in each window that provide"),
                                tags$li("indicator defintions or help to interpret a visualisation,"),
                                tags$li("data download data options for individual charts,"),
                                tags$li("image downloads for individual charts.")
