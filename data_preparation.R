@@ -206,7 +206,8 @@ View(file.info(files,  extra_cols = TRUE))
 optdata <- do.call(rbind, lapply(files, function(x){ 
   fread(x)[,file_name:= x] %>% clean_names() })) %>% 
   mutate(file_name = gsub("/PHI_conf/ScotPHO/Profiles/Data/Shiny Data//", "", file_name)) %>% 
-  rename(measure = rate)
+  rename(measure = rate) %>% 
+  mutate_at(c("numerator", "measure", "lowci", "upci"), as.numeric)
 
 # to check if there is more then one file for the same indicator. This should be empty
 optdata %>% select(ind_id, file_name) %>% unique %>% group_by(ind_id) %>% 
