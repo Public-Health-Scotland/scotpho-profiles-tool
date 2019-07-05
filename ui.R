@@ -626,6 +626,30 @@ navbarMenu("Info", icon = icon("info-circle"),
                       )  #column bracket
                     )#fluidRow bracket
            ), #Tab panel bracket             
+           ###############################################.
+           ## Definitions2 ----
+           ###############################################.
+           tabPanel("Indicator definitions2", value = "definition2",
+                    # sidebarLayout(
+                    #   sidebarPanel(
+                    #     sliderInput("mpg", "mpg Limit", min = 11, max = 33, value = 20),
+                    #     sliderInput("wd", "width...", min = 0.1, max = 8, value = 1)
+                    #   ),
+                    #   
+                    #Sidepanel for filtering data
+                     fluidRow(
+                       column(width = 6,offset=1,
+                              p("test title", style = "font-weight: bold; color: black;"),
+                              selectizeInput("profile_picked", label = "Filter Profile",
+                                                  width = "250px", choices = profile_list_filter,
+                                                  selected = "CYP", multiple=FALSE))),
+                      mainPanel(
+                               #p("test2 "))
+                               #uiOutput("mtcars_ft"))
+                               uiOutput("tech_tbl"))
+                      ),#tab panel
+           
+           
 ###############################################.             
 ##############Resources----    
 ###############################################.      
