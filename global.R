@@ -14,11 +14,13 @@ library (DT) # for data tables
 library(leaflet) #javascript maps
 library(plotly) #interactive graphs
 library(shinyWidgets) # for extra widgets
-library(tidyr) #for string maniupulations in ring plot
+library(tidyr) #for string maniupulations in ring plot (are we still using this as no long ring plot?)
+library(tibble) # rownames to column in techdoc
 library(shinyjs)
 library(shinydashboard) #for valuebox on techdoc tab
 library(sp)
 library(shinycssloaders) #for loading icons
+library(flextable) #for tech document table
 library(webshot) #to download plotly charts
 # As well as webshot phantomjs is needed l to download Plotly charts
 # https://github.com/rstudio/shinyapps-package-dependencies/pull/180
@@ -88,6 +90,8 @@ plot_nodata_gg <- function() {
 ###############################################.    
 optdata <- readRDS("data/optdata.rds") #main dataset
 techdoc <- readRDS("data/techdoc.rds") #technical documents data including definitions
+
+techdoc_ve <- readRDS("data/techdoc_ve.rds") #technical documents data including definitions
 geo_lookup <- readRDS("data/geo_lookup.rds") #geography lookup
 profile_lookup <- readRDS("data/profile_lookup.rds") #profile lookup
 
