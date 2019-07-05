@@ -2315,6 +2315,106 @@ function(input, output, session) {
   )
   
   #################################################.
+  ##  Technical Doc Page2 ----
+  #################################################.
+#   
+ tech_indicators <- reactive({  
+ #filter techdoc for either a single profile or all indicators
+   if (input$profile_picked != "Show all"){ #if single profile selected
+ 
+     techdoc_ve %>%
+      subset(grepl(names(profile_list[unname(profile_list) == input$profile_picked]),profile)) %>% #filter on selected profile
+      mutate(test=regexpr((names(profile_list[unname(profile_list) == input$profile_picked])), domain), #find start position of profile name in domain column
+             test2=substr(domain,test, nchar(domain)),  #generate column that starts with filtered profile
+             findcomma=regexpr(",",test2), #find position of comma (where domain description ends
+             findhyp=regexpr("-",test2), #find position of hyphen (where domain description starts)
+             domain1= case_when(findcomma<0 ~ substr(test2,findhyp+1,nchar(test2)),
+                                findcomma>0 ~ substr(test2,findhyp+1,findcomma-1),
+                                TRUE ~ "")) %>% # extract domain string linked to seletec profile
+      mutate (profilename=input$profile_picked) %>%  #sort on profile name since some indicators in multiple profiles
+      arrange(profilename, domain1, indicator_name) %>%
+      rownames_to_column(var="ind_number") %>% #add numbering
+      select (domain1, ind_number,indicator_name, indicator_definition)
+
+  } else { #else show all profile indicators
+     techdoc_ve %>%
+      arrange(profile, domain) %>%
+      rownames_to_column(var="ind_number") %>%
+      select (profile, domain, ind_number,indicator_name, indicator_definition)}
+  })
+
+  
+
+  plot_techdoc <- function(){
+   #output$tech_indicator_tbl <- renderUI({
+    #   #set up flextable for eithe single profile or all indicators
+    if (input$profile_picked != "Show all"){ # table if single profile selected
+      
+      tech_indicators() %>%
+      flextable() %>%
+        add_header_lines(paste0(input$profile_picked," Profile")) %>%
+        set_header_labels (domain1="Domain",ind_number= "",indicator_name="Indicator",indicator_definition="Indicator Definition") %>%
+        theme_box() %>%
+        merge_v(j = ~ domain1) %>%
+        align_text_col(align = "left") %>%
+        autofit()
+    } 
+    else { #table if all profiles selected
+      
+      tech_indicators() %>%
+        flextable() %>%
+        set_header_labels (profile="Profile(s)",domain="Domain(s)",ind_number= "a",indicator_name="Indicator",indicator_definition="Indicator Definition") %>%
+        theme_box() %>%
+        merge_v(j = ~ profile) %>%
+        merge_v(j = ~ domain) %>%
+        align_text_col(align = "left") %>%
+        autofit()
+    }
+  }
+
+  
+  output$tech_tbl <-renderUI(plot_techdoc())
+  
+  # output$mtcars_ft <- renderUI({
+  #   mtcars %>%
+  #     mutate(car = rownames(.)) %>%
+  #     select(car, everything()) %>%
+  #     filter(mpg <= input$mpg) %>%
+  #     regulartable() %>%
+  #     theme_booktabs() %>%
+  #     width(width = input$wd) %>%
+  #     htmltools_value()
+  # })
+
+
+#output$tech_indicator_tbl <- renderUI({
+# #   #set up flextable for eithe single profile or all indicators
+# if (input$profile_picked != "Show all"){ # table if single profile selected
+#   
+#   tech_indicators() %>%
+#     flextable() %>%
+#     add_header_lines(paste0(input$profile_picked," Profile")) %>%
+#     set_header_labels (domain1="Domain",ind_number= "",indicator_name="Indicator",indicator_definition="Indicator Definition") %>%
+#     theme_box() %>%
+#     merge_v(j = ~ domain1) %>%
+#     align_text_col(align = "left") %>%
+#     autofit()
+# } 
+# else { #table if all profiles selected
+#   
+#   tech_indicators() %>%
+#     flextable() %>%
+#     set_header_labels (profile="Profile(s)",domain="Domain(s)",ind_number= "a",indicator_name="Indicator",indicator_definition="Indicator Definition") %>%
+#     theme_box() %>%
+#     merge_v(j = ~ profile) %>%
+#     merge_v(j = ~ domain) %>%
+#     align_text_col(align = "left") %>%
+#     autofit()
+# }
+# })
+
+
+  #################################################.
   ##  Technical Doc Page ----
   #################################################.
   # Reactive data
