@@ -134,57 +134,44 @@ tabPanel(
               #Summary box
               column(6, class="landing-page-column",
                      br(), #spacing
-                     introBox(div(class="landing-page-box", 
-                                  div("Profile summary", class = "landing-page-box-title"),
-                                  div(class = "landing-page-icon", style="background-image: url(landing_button_heatmap_2.png);
-                     background-size: auto 80%; background-position: center; background-repeat: no-repeat; "),
-                                  actionButton('jump_to_summary', 'A high level view of an area across a set of indicators', 
-                                               class="landing-page-button", 
-                                               icon = icon("arrow-circle-right", "icon-lp"))),
+                     introBox(
+                       lp_main_box(image_name= "landing_button_heatmap_2", 
+                                   button_name = 'jump_to_summary', title_box = "Profile summary", 
+                                   description = 'A high level view of an area across a set of indicators'),
                               data.step = 2,
                               data.intro = "The profile summary allows you to look at multiple indicators within an area at the same time",
                               data.position = "bottom-right-aligned")),
       #Table box 
       column(6, class="landing-page-column",
              br(), #spacing
-             introBox(div(class="landing-page-box", 
-                 div("Data", class = "landing-page-box-title"),
-                 div(class = "landing-page-icon", style="background-image: url(landing_button_data_table.png);
-                     background-size: auto 80%; background-position: center; background-repeat: no-repeat; "),
-                 actionButton('jump_to_table', 'View and download the data behind the tool', 
-                              class="landing-page-button", 
-                              icon = icon("arrow-circle-right", "icon-lp"))),
+             introBox( # tour of the tool
+               lp_main_box(image_name= "landing_button_data_table", 
+                           button_name = 'jump_to_table', title_box = "Data", 
+                           description = 'View and download the data behind the tool'),
                  data.step = 6,
                  data.intro = "The 'Data' window can be used to filter and download profiles data"))),
     #2nd row of boxes
     fluidRow(
       br(), #spacing
-      #Trend plot box
-      introBox(
+      column(8, introBox( #tour of the rank and trend tabs
         data.step = 3,
         data.intro = "The trend and rank charts allow detailed exploration of one indicator at a time.",
-      column(4, class="landing-page-column",
-             div(class="landing-page-box", 
-                 div("Trend", class = "landing-page-box-title"),
-                 div(class = "landing-page-icon", style="background-image: url(landing_button_time_trend.png);
-                     background-size: auto 80%; background-position: center; background-repeat: no-repeat; "),
-                 actionButton('jump_to_trend', 'Look at how an indicator changes over time',
-                              class="landing-page-button", 
-                              icon = icon("arrow-circle-right", "icon-lp")))),
-             #Rank/map plot box
-             column(4, class="landing-page-column",
-                    div(class="landing-page-box", 
-                        div("Rank", class = "landing-page-box-title"),
-                        div(class = "landing-page-icon", style="background-image: url(landing_button_maprank.png);
-                     background-size: auto 75%; background-position: center; background-repeat: no-repeat; "),
-                        actionButton('jump_to_rank', 'Compare geographical variation for an indicator', 
-                                     class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp"))))
-      ),#introBox 3 close
+        #Trend plot box
+        column(6, class="landing-page-column",
+               lp_main_box(image_name= "landing_button_time_trend", 
+                           button_name = 'jump_to_trend', title_box = "Trend", 
+                           description = 'Look at how an indicator changes over time')),
+        #Rank/map plot box
+        column(6, class="landing_button_maprank",
+               lp_main_box(image_name= "landing_button_maprank", 
+                           button_name = 'jump_to_rank', title_box = "Rank", 
+                           description = 'Compare geographical variation for an indicator'))
+      )),#introBox 3 close
   #Inequalities box
-  introBox(
-    data.step = 7,
-    data.intro = "The inequalities module allows exploration of deprivation affects a selection of indicators from the main profiles tool.",
       column(4, class="landing-page-column",
+             introBox(
+               data.step = 7,
+               data.intro = "The inequalities module allows exploration of deprivation affects a selection of indicators from the main profiles tool.",
              div(class="landing-page-box", 
                  div("Health inequalities", class = "landing-page-box-title"),
                  div(class = "landing-page-icon", style="background-image: url(landing_button_health_inequality.png);
@@ -195,25 +182,15 @@ tabPanel(
                             class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp"))))
     ) #introBox 7 close
   ), # fluid row close
-
-  # end of landing page second row
- 
+# end of landing page second row
+# third row of landing page 
   fluidRow(
-    h4("Find supporting information", style="margin-top:0px; text-align: center; ")),
- 
-  fluidRow(
-    introBox(data.step=8,
+    introBox(data.step=8, # tour around the tool
              data.intro = "There are also options to find out information such as detailed descriptions of the profile indicators, indicator update schedules and links to evidence for action briefings",
              #About box
-    column(4, 
-           class="landing-page-column",
-           div(class="landing-page-box-about", 
-               div("About", class = "landing-page-box-title"),
-               div(class = "landing-page-about-icon", style="background-image: url(landing_button_about_2.png);
-                     background-size: auto 80%; background-position: center; background-repeat: no-repeat; "),
-               actionButton('jump_to_about', 'About ScotPHO Profiles', 
-                            class="landing-page-button-about", 
-                            icon = icon("arrow-circle-right", "icon-lp"))),
+    column(4, class="landing-page-column",
+           lp_about_box(image_name= "landing_button_about_2", button_name = 'jump_to_about', 
+                        title_box = "About", description = 'About ScotPHO Profiles'),
            #Evidence box
            div(class="landing-page-box-about", 
                div("Evidence for action", class = "landing-page-box-title" ),
@@ -225,39 +202,21 @@ tabPanel(
           
     column(4, class="landing-page-column", 
            #Indicator updates
-           div(class="landing-page-box-about",
-               div("Indicator Updates", class = "landing-page-box-title"),
-               div(class = "landing-page-about-icon", style="background-image: url(landing_button_calendar.png);
-                     background-size: auto 80%; background-position: center; background-repeat: no-repeat; "),
-               actionButton('btn_indicator_updates', 'Find out which indicators have been updated in the last 60 days', 
-                            class="landing-page-button-about", 
-                            icon = icon("arrow-circle-right", "icon-lp"))),
+           lp_about_box(image_name= "landing_button_calendar", button_name = 'btn_indicator_updates', 
+                        title_box = "Indicator updates", 
+                        description = 'Find out which indicators have been updated in the last 60 days'),
           #Resources box
-           div(class="landing-page-box-about",
-               div("Resources", class = "landing-page-box-title"),
-               div(class = "landing-page-about-icon", style="background-image: url(landing_button_resources.png);
-                     background-size: auto 80%; background-position: center; background-repeat: no-repeat; "),
-               actionButton('jump_to_resources', 'Find technical information about the ScotPHO profile definitions and methodology', 
-                            class="landing-page-button-about", 
-                            icon = icon("arrow-circle-right", "icon-lp")))),
-
+          lp_about_box(image_name= "landing_button_resources", button_name = 'jump_to_resources', 
+                       title_box = "Resources", 
+                       description = 'Find technical information about the ScotPHO profile definitions and methodology')),
     column(4, class="landing-page-column",
            #Definitions
-           div(class="landing-page-box-about",
-               div("Definitions", class = "landing-page-box-title"),
-               div(class = "landing-page-about-icon", style="background-image: url(landing_button_technical_resources.png);
-                     background-size: auto 80%; background-position: center; background-repeat: no-repeat; "),
-               actionButton('jump_to_definitions', 'Find out about indicator definitions and data sources', 
-                            class="landing-page-button-about", 
-                            icon = icon("arrow-circle-right", "icon-lp"))),
+           lp_about_box(image_name= "landing_button_technical_resources",
+                        button_name = 'jump_to_definitions', title_box = "Definitions", 
+                        description = 'Find out about indicator definitions and data sources'),
            #Other profiles
-           div(class="landing-page-box-about", 
-               div("Other profiles", class = "landing-page-box-title"),
-               div(class = "landing-page-about-icon", style="background-image: url(landing_button_related_links.png);
-                     background-size: auto 80%; background-position: center; background-repeat: no-repeat; "),
-               actionButton('jump_to_others', 'Links to alternative profiling tools', 
-                            class="landing-page-button-about", 
-                            icon = icon("arrow-circle-right", "icon-lp"))))
+           lp_about_box(image_name= "landing_button_related_links", button_name = 'jump_to_others', 
+                        title_box = "Other profiles", description = 'Links to alternative profiling tools'))
     ) #Close IntroBox
     )#Fluidrow bracket
   ) #main Panel bracket
