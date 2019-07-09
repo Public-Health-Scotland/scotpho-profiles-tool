@@ -242,22 +242,21 @@ tabPanel("Summary", icon = icon("list-ul"), value = "summary",
                   uiOutput("comp_ui_summary") # comparator options
            ),
            column(4,
-           #div(style = "width:60%; margin-left: 20%; min-width: 350px", # centering div
              p(tags$b("Step 4. Select what type of summary you want to see:"), 
                " snapshot is a comparison with the latest data available, 
                trend will show how things are changing over time, and 
                spine compares indicators with the rest of areas of the same level."),
              radioGroupButtons("chart_summary", status = "primary", justified = TRUE,
-                             choices = c("Snapshot", "Trend", "Spine"), label=NULL  )),
-           fluidRow(#style = "width:60%; ", # centering div
-                  actionButton("help_summary",label="Help", icon= icon('question-circle'), class ="down"),
-                  actionButton("defs_summary",label="Definitions", icon= icon('info'), class ="down"),
-                  downloadButton('download_summary', 'Download data', class = "down"),
-                  # conditionalPanel(condition = 'input.chart_summary == "Spine"',
-                  #                  savechart_button('download_spineplot', 'Save chart',  class = "down"))
-                  savechart_button('download_summaryplot', 'Save chart',  class = "down")
-           )
+                             choices = c("Snapshot", "Trend", "Spine"), label=NULL  ))
          ), #well panel bracket
+         wellPanel( style = "margin-left: 15%;",
+           actionButton("help_summary",label="Help", icon= icon('question-circle'), class ="down"),
+           actionButton("defs_summary",label="Definitions", icon= icon('info'), class ="down"),
+           downloadButton('download_summary', 'Download data', class = "down"),
+           # conditionalPanel(condition = 'input.chart_summary == "Spine"',
+           #                  savechart_button('download_spineplot', 'Save chart',  class = "down"))
+           savechart_button('download_summaryplot', 'Save chart',  class = "down")
+         ),
          mainPanel(width = 12,
                    bsModal("mod_defs_summary", "Definitions", "defs_summary",
                            htmlOutput('defs_text_summary')),
