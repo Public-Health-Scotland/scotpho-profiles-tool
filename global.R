@@ -85,12 +85,7 @@ plot_nodata_gg <- function() {
           axis.title.x=element_text(size=20, colour ='#555555'))
 }
 
-<<<<<<< HEAD
-#set format of text used in introJS help walkthrough
-text_intro <- function(text) {
-  p(tags$div(text, 
-             style = "color:0E3E5D; font-size:20px; width: 90%; text-align: left; "))  
-=======
+
 #Creating big boxes for main tabs in the landing page
 lp_main_box <- function(title_box, image_name, button_name, description) {
   div(class="landing-page-box", 
@@ -111,7 +106,6 @@ lp_about_box <- function(title_box, image_name, button_name, description) {
       actionButton(button_name, description, 
                    class="landing-page-button-about", 
                    icon = icon("arrow-circle-right", "icon-lp")))
->>>>>>> 0f476154bce6614f3387563868d1b1e98cdb57a7
 }
 
 ###############################################.
