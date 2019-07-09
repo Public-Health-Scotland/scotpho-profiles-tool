@@ -751,7 +751,7 @@ function(input, output, session) {
     #If no data available for that period then plot message saying data is missing
     if (is.data.frame(prof_snap_data) && nrow(prof_snap_data) == 0)
     {
-      plot_nodata()
+      plot_nodata(height = 50)
     } else {
 
       # Tooltip
