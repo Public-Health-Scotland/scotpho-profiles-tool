@@ -111,16 +111,27 @@ tagList( #needed for shinyjs
 tabPanel(
   title = " Home", icon = icon("home"),
   mainPanel(width = 11, style="margin-left:4%; margin-right:4%",
+<<<<<<< HEAD
             introBox(  
               fluidRow(column(9,(h3("Welcome to the ScotPHO profiles", style="margin-top:0px;"))),
                        (column(2,actionButton("btn_landing",label="Help: Walk through this tool",icon=icon('question-circle'),class="down")))),
               data.step = 1,
               data.intro =(p(h4("Welcome to the ScotPHO Profiles Tool"),
                              br(),
+=======
+            introBox( 
+              fluidRow( #title and help/tour button
+                column(9,(h3("Welcome to the ScotPHO profiles", style="margin-top:0px;"))),
+                       column(2, actionButton("btn_landing", label="Help: Walk through this tool",
+                                              icon=icon('question-circle'),class="down"))),
+              data.step = 1, #intro of tour of the tool 
+              data.intro =p(h4("Welcome to the ScotPHO Profiles Tool"), br(),
+>>>>>>> 0f476154bce6614f3387563868d1b1e98cdb57a7
                              h5("This interactive tool provides access to a range of public
                               health related indicators at different geographies including NHS boards, council areas and health and
                               social care partnerships."),
                              br(),
+<<<<<<< HEAD
                              h5("There are different ways to navigate around the tool."),
                              h5("Different visualisation can be opened using the menu bar ('the blue strip') at the top of the screen"),
                              img(src='introjs_tabset_panel.PNG',width=300),
@@ -264,6 +275,106 @@ tabPanel(
                             icon = icon("arrow-circle-right", "icon-lp"))))
     ) #Close IntroBox
     )#Fluidrow bracket
+=======
+                             h5("There are different ways to navigate through this tool:"),
+                             br(),
+                             h5("Use the menu bar ('the blue strip') at the top of the screen"),
+                             img(src='introjs_tabset_panel.PNG', width=300),
+                             h5("OR"),
+                             br(),
+                             h5("use the icon buttons on the homepage, hover over buttons for a description"),
+                             img(src='introjs_select_landing_button.PNG'),
+                             h5("The 'Home' option will take you back to the profiles main page."),
+                             style = "color:0E3E5D; font-size:20px")),
+            fluidRow( #1st row of boxes
+              #Summary box
+              column(6, class="landing-page-column",
+                     br(), #spacing
+                     introBox(
+                       lp_main_box(image_name= "landing_button_heatmap_2", 
+                                   button_name = 'jump_to_summary', title_box = "Profile summary", 
+                                   description = 'A high level view of an area across a set of indicators'),
+                       data.step = 2,
+                       data.intro = "The profile summary allows you to look at multiple indicators within an area at the same time",
+                       data.position = "bottom-right-aligned")),
+              #Table box 
+              column(6, class="landing-page-column",
+                     br(), #spacing
+                     introBox( # tour of the tool
+                       lp_main_box(image_name= "landing_button_data_table", 
+                                   button_name = 'jump_to_table', title_box = "Data", 
+                                   description = 'View and download the data behind the tool'),
+                       data.step = 6,
+                       data.intro = "The 'Data' window can be used to filter and download profiles data"))),
+            fluidRow( #2nd row of boxes
+              br(), #spacing
+              column(8, introBox( #tour of the rank and trend tabs
+                data.step = 3,
+                data.intro = "The trend and rank charts allow detailed exploration of one indicator at a time.",
+                #Trend plot box
+                column(6, class="landing-page-column",
+                       lp_main_box(image_name= "landing_button_time_trend", 
+                                   button_name = 'jump_to_trend', title_box = "Trend", 
+                                   description = 'Look at how an indicator changes over time')),
+                #Rank/map plot box
+                column(6, class="landing_button_maprank",
+                       lp_main_box(image_name= "landing_button_maprank", 
+                                   button_name = 'jump_to_rank', title_box = "Rank", 
+                                   description = 'Compare geographical variation for an indicator'))
+              )),#introBox 3 close
+              #Inequalities box
+              column(4, class="landing-page-column",
+                     introBox(
+                       data.step = 7,
+                       data.intro = "The inequalities module allows exploration of deprivation affects a selection of indicators from the main profiles tool.",
+                       div(class="landing-page-box", 
+                           div("Health inequalities", class = "landing-page-box-title"),
+                           div(class = "landing-page-icon", style="background-image: url(landing_button_health_inequality.png);
+                     background-size: auto 85%; background-position: center; background-repeat: no-repeat; "),
+                           # Currently a link to the health inequalities app
+                           actionButton('jump_to_simd', 'Explore how an indicator varies with socioeconomic deprivation', 
+                                        onclick ="window.open('https://scotland.shinyapps.io/scotpho-health-inequalities', '_blank')",
+                                        class="landing-page-button", icon = icon("arrow-circle-right", "icon-lp"))))
+              ) #introBox 7 close
+            ), # fluid row close
+            # end of landing page second row
+            # third row of landing page 
+            fluidRow(
+              introBox(data.step=8, # tour around the tool
+                       data.intro = "There are also options to find out information such as detailed descriptions of the profile indicators, indicator update schedules and links to evidence for action briefings",
+                       #About box
+                       column(4, class="landing-page-column",
+                              lp_about_box(image_name= "landing_button_about_2", button_name = 'jump_to_about', 
+                                           title_box = "About", description = 'About ScotPHO Profiles'),
+                              #Evidence box
+                              div(class="landing-page-box-about", 
+                                  div("Evidence for action", class = "landing-page-box-title" ),
+                                  div(class = "landing-page-about-icon", div(img(src="landing_button_other_profile.png", class="centerabout"))),
+                                  actionButton('jump_to_efa', 'Links to ScotPHO evidence for action briefings', 
+                                               onclick ="window.open('https://www.scotpho.org.uk/comparative-health/profiles/resources/evidence-for-action/', '_blank')",
+                                               class="landing-page-button-about", 
+                                               icon = icon("arrow-circle-right", "icon-lp")))),
+                       
+                       column(4, class="landing-page-column", 
+                              #Indicator updates
+                              lp_about_box(image_name= "landing_button_calendar", button_name = 'btn_indicator_updates', 
+                                           title_box = "Indicator updates", 
+                                           description = 'Find out which indicators have been updated in the last 60 days'),
+                              #Resources box
+                              lp_about_box(image_name= "landing_button_resources", button_name = 'jump_to_resources', 
+                                           title_box = "Resources", 
+                                           description = 'Find technical information about the ScotPHO profile definitions and methodology')),
+                       column(4, class="landing-page-column",
+                              #Definitions
+                              lp_about_box(image_name= "landing_button_technical_resources",
+                                           button_name = 'jump_to_definitions', title_box = "Definitions", 
+                                           description = 'Find out about indicator definitions and data sources'),
+                              #Other profiles
+                              lp_about_box(image_name= "landing_button_related_links", button_name = 'jump_to_others', 
+                                           title_box = "Other profiles", description = 'Links to alternative profiling tools'))
+              ) #Close IntroBox
+            )#Fluidrow bracket
+>>>>>>> 0f476154bce6614f3387563868d1b1e98cdb57a7
   ) #main Panel bracket
 ),# tab panel bracket
 ###############################################.
