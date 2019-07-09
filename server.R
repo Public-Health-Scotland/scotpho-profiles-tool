@@ -351,13 +351,23 @@ function(input, output, session) {
   
   #####################.
   # Reactive controls
+  ## Remember the selected samples
+  # creates reactive values to remember user selection of the profile
+  # so it only changes when the user changes it on purpose
+  prof_chosen <- reactiveValues(value_profile = "HWB")
+  observeEvent(input$profile_summary, 
+               isolate({ prof_chosen$value_profile <- input$profile_summary})
+  )
+  
   # Reactive controls for profile depending on area selected
   output$profile_ui_summary <- renderUI({
     
     profiles <- profile_areatype[input$geotype_summary]
-    selectInput("profile_summary", label = NULL, choices = profiles)
+    selectInput("profile_summary", label = NULL, choices = profiles, 
+                prof_chosen$value_profile)
     
   })
+
   
   # Reactive controls for heatmap:area name depending on areatype selected
   output$geoname_ui_summary <- renderUI({
@@ -385,10 +395,8 @@ function(input, output, session) {
           selectInput("geocomp_summary", "Select a comparison area", choices = comparator_list,
                       selectize=TRUE, selected = "Scotland")
       } else if (input$comp_summary == 2) {
-        min_year <- min(summary_data()$year)
-        max_year <- max(summary_data()$year)
-        # years <- 2002:2018
-        years <- c(min_year:max_year)
+        
+        years <- 2002:2018 #####. NEEDS TO BE UPDATED EVERY YEAR ######.
         
           selectizeInput("yearcomp_summary", "Baseline year", choices = years)
       }
@@ -557,7 +565,7 @@ function(input, output, session) {
           column(4,
                  snap_ui("Environment", "summ_drg_env"),
                  snap_ui("Services", "summ_drg_serv"),
-                 snap_ui("Data quality", "summ_drg_dat")
+                 snap_ui("Data quality", "summ_drg_data")
           ),
           column(4,
                  snap_ui("Community safety", "summ_drg_commsaf"),
@@ -638,7 +646,7 @@ function(input, output, session) {
         tagList(#Drugs profile
           heat_ui("Environment", "heat_drg_env"),
           heat_ui("Services", "heat_drg_serv"),
-          heat_ui("Data quality", "heat_drg_dat"),
+          heat_ui("Data quality", "heat_drg_data"),
           heat_ui("Community safety", "heat_drg_commsaf"),
           heat_ui("CAPSM/Families", "heat_drg_family"),
           heat_ui("Prevalence", "heat_drg_preval"),
@@ -717,6 +725,9 @@ function(input, output, session) {
   ###############################################.
   ## Snapshot  ----
   ###############################################. 
+  
+  observeEvent(input$browser, browser())
+  
   # Reactive dataset
   snapshot_data <- reactive({
     summary_data() %>% group_by(indicator) %>% top_n(1, year) %>% 
@@ -871,7 +882,9 @@ function(input, output, session) {
   #Function to create ggplot, then used in renderPlot
   plot_heat <- function(domain_plot){
     heat <- summary_data() %>% subset(domain == domain_plot) %>% droplevels() %>% 
-       mutate(indicator = as.factor(indicator)) 
+       mutate(indicator = as.factor(indicator))
+    # %>% 
+    #   subset(year >= input$yearcomp_summary) #so it only shows years after baseline
     
     #If no data available for that period then plot message saying data is missing
     if (is.data.frame(heat) && nrow(heat) == 0)
