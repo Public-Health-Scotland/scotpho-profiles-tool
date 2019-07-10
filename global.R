@@ -20,6 +20,7 @@ library(shinydashboard) #for valuebox on techdoc tab
 library(sp)
 library(lubridate) #for automated list of dates in welcome modal
 library(shinycssloaders) #for loading icons, see line below
+library(rmarkdown)
 # it uses github version devtools::install_github("andrewsali/shinycssloaders")
 library(webshot) #to download plotly charts
 # As well as webshot phantomjs is needed l to download Plotly charts

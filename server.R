@@ -700,27 +700,51 @@ function(input, output, session) {
       write.csv(summary_csv(), file, row.names=FALSE) })
   
   # Downloading chart  
-  # output$download_summaryplot <- downloadHandler(
-  #   filename = 'heatmap.png',
-  #   content = function(file){
-  #     if (input$chart_summary == "Snapshot") {
-  # 
-  #       export(p = plot_snapshot_download(), file = file, zoom = 1)
-  #     } else if (input$chart_summary == "Trend") {
-  #       ggsave(file, plot = plot_heat()+
-  #                ggtitle(paste0(names(profile_list[unname(profile_list) == input$profile_summary]),
-  #                               " profile: "),
-  #                        subtitle =       if(input$comp_heat == 1){
-  #                          paste0(input$geoname_heat," (", input$geotype_heat, ") compared against ",
-  #                                 input$geocomp_heat)
-  #                        } else if(input$comp_heat==2){
-  #                          paste0("Changes within ",input$geoname_heat,": latest data available",
-  #                                 " compared to ", input$yearcomp_heat)
-  #                        }
-  #                ),
-  #              device = "png", scale=4, limitsize=FALSE)     
-  #     }
-  #   })
+  output$download_summaryplot <- downloadHandler(
+    filename = 'report.pdf',
+    content = function(file){
+      # if (input$chart_summary == "Snapshot") {
+      
+      # Copy the report file to a temporary directory before processing it, in
+      # case we don't have write permissions to the current working dir (which
+      # can happen when deployed).
+      tempReport <- file.path(tempdir(), "summary_charts.Rmd")
+      file.copy("summary_charts.Rmd", tempReport, overwrite = TRUE)
+      
+      # Set up parameters to pass to Rmd document
+      params <- list(chart_summary = input$chart_summary,
+                     snapshot_data = snapshot_data(),
+                     summary_data = summary_data(),
+                     profile_summary = input$profile_summary,
+                     comp_summary = input$comp_summary,
+                     geoname_summary = input$geoname_summary,
+                     geotype_summary = input$geotype_summary,
+                     geocomp_summary = input$geocomp_summary)
+      
+      # Knit the document, passing in the `params` list, and eval it in a
+      # child of the global environment (this isolates the code in the document
+      # from the code in this app).
+      rmarkdown::render(tempReport, output_file = file,
+                        params = params,
+                        envir = new.env(parent = globalenv())
+      )
+      
+        #export(p = plot_snapshot_download(), file = file, zoom = 1)
+      # } else if (input$chart_summary == "Trend") {
+      #   ggsave(file, plot = plot_heat()+
+      #            ggtitle(paste0(names(profile_list[unname(profile_list) == input$profile_summary]),
+      #                           " profile: "),
+      #                    subtitle =       if(input$comp_heat == 1){
+      #                      paste0(input$geoname_heat," (", input$geotype_heat, ") compared against ",
+      #                             input$geocomp_heat)
+      #                    } else if(input$comp_heat==2){
+      #                      paste0("Changes within ",input$geoname_heat,": latest data available",
+      #                             " compared to ", input$yearcomp_heat)
+      #                    }
+      #            ),
+      #          device = "png", scale=4, limitsize=FALSE)
+      # }
+    })
   
   ###############################################.
   ## Snapshot  ----
@@ -802,7 +826,7 @@ function(input, output, session) {
         layout(yaxis = axis_layout, xaxis = axis_layout,
                margin = list(b= 10 , t=5, l = 5, r = 0),
                font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif')) %>% # to get hover compare mode as default
-        config(displayModeBar = FALSE, displaylogo = F, collaborate=F, editable =F)
+        config(displayModeBar = FALSE, displaylogo = F, editable =F)
     }
   }
 
@@ -932,7 +956,7 @@ function(input, output, session) {
         layout(margin = list(l = 400, t = 50, b =0),
                xaxis = list(side = 'top', fixedrange=TRUE), yaxis= list(fixedrange=TRUE),
                font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif')) %>%
-        config(displayModeBar = FALSE, displaylogo = F, collaborate=F, editable =F) # taking out plotly logo and collaborate button
+        config(displayModeBar = FALSE, displaylogo = F, editable =F) # taking out plotly logo 
     }
   }
   
@@ -1409,7 +1433,7 @@ function(input, output, session) {
                font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif'),
                showlegend = TRUE,
                legend = list(orientation = 'h', x = 0, y = 1.18)) %>%  #legend on top
-        config(displayModeBar = FALSE, displaylogo = F, collaborate=F, editable =F) # taking out plotly logo and collaborate button
+        config(displayModeBar = FALSE, displaylogo = F, editable =F) # taking out plotly logo and collaborate button
       
       #Adding confidence intervals depending on user input
       if (input$ci_trend == TRUE & input$var_plot_trend != "Numerator") {
@@ -1666,7 +1690,7 @@ function(input, output, session) {
                              font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif'),
                              margin=list(b = 180, t = 5), # to prevent labels getting cut out
                              hovermode = 'false') %>% # to get hover compare mode as default
-          config(displayModeBar = FALSE, displaylogo = F, collaborate=F, editable =F)
+          config(displayModeBar = FALSE, displaylogo = F, editable =F)
         
       } else if (input$comp_rank == 2) {#if time comparison selected, plot dumbbell plot
         
@@ -1691,7 +1715,7 @@ function(input, output, session) {
                               categoryarray = rev(order_areas)),
                  font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif'),
                  margin=list(l = 170, t=40)) %>%  # to prevent labels getting cut out
-          config(displayModeBar = FALSE, displaylogo = F, collaborate=F, editable =F)
+          config(displayModeBar = FALSE, displaylogo = F, editable =F)
         
       }
     } # bracket for "plot if data"
