@@ -300,7 +300,7 @@ function(input, output, session) {
         easyClose = TRUE, fade=FALSE
       ))
       
-    } else {
+    } else if (input$chart_summary == "Trend") {
 
     showModal(modalDialog(
       title = "How to use this chart",
@@ -323,6 +323,19 @@ function(input, output, session) {
       
       size = "l", easyClose = TRUE, fade=FALSE
       ))
+    } else if (input$chart_summary == "Snapshot") {
+      showModal(modalDialog(
+        title = "How to use this chart",
+        p(column(6,"Select 'Area' to compare against another region, or select 'Time' to compare
+                 against a baseline year of the same area."),
+          column(6, img(src="help_heatmap1.png"))),
+        p("Hover over each box to see indicator values and time periods."),
+        p("Colours are used to indicate if the value for an indicator is 
+          statistically different from the comparator."),
+        p("The interpretation could be very different if you compare against a
+          baseline year. What comparator you should choose will depend on which are your aims."),
+        size = "l", easyClose = TRUE, fade=FALSE
+        ))
     }
   })
   
@@ -701,7 +714,7 @@ function(input, output, session) {
   
   # Downloading chart  
   output$download_summaryplot <- downloadHandler(
-    filename = 'report.pdf',
+    filename = 'report.doc',
     content = function(file){
       # if (input$chart_summary == "Snapshot") {
       
