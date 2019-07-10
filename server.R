@@ -2334,13 +2334,13 @@ function(input, output, session) {
       mutate (profilename=input$profile_picked) %>%  #sort on profile name since some indicators in multiple profiles
       arrange(profilename, domain1, indicator_name) %>%
       rownames_to_column(var="ind_number") %>% #add numbering
-      select (domain1, ind_number,indicator_name, indicator_definition)
+      select (domain1, ind_number,indicator_name, indicator_definition,available_geographies,aggregation)
 
   } else { #else show all profile indicators
      techdoc_ve %>%
       arrange(profile, domain) %>%
       rownames_to_column(var="ind_number") %>%
-      select (profile, domain, ind_number,indicator_name, indicator_definition)}
+      select (profile, domain, ind_number,indicator_name, indicator_definition,available_geographies, aggregation)}
   })
 
   
@@ -2353,65 +2353,31 @@ function(input, output, session) {
       tech_indicators() %>%
       flextable() %>%
         add_header_lines(paste0(input$profile_picked," Profile")) %>%
-        set_header_labels (domain1="Domain",ind_number= "",indicator_name="Indicator",indicator_definition="Indicator Definition") %>%
+        set_header_labels (domain1="Domain",ind_number= "",indicator_name="Indicator",indicator_definition="Indicator Definition",
+                           available_geographies="Available geographies", aggregation="Level of aggregation") %>%
         theme_box() %>%
         merge_v(j = ~ domain1) %>%
         align_text_col(align = "left") %>%
-        autofit()
+        autofit() %>%
+        htmltools_value()
     } 
     else { #table if all profiles selected
       
       tech_indicators() %>%
         flextable() %>%
-        set_header_labels (profile="Profile(s)",domain="Domain(s)",ind_number= "a",indicator_name="Indicator",indicator_definition="Indicator Definition") %>%
+        set_header_labels (profile="Profile(s)",domain="Domain(s)",ind_number="",indicator_name="Indicator",indicator_definition="Indicator Definition",
+                           available_geographies="Available geographies", aggregation="Level of aggregation") %>%
         theme_box() %>%
         merge_v(j = ~ profile) %>%
         merge_v(j = ~ domain) %>%
         align_text_col(align = "left") %>%
-        autofit()
+        autofit() %>%
+        htmltools_value()
     }
   }
 
-  
   output$tech_tbl <-renderUI(plot_techdoc())
   
-  # output$mtcars_ft <- renderUI({
-  #   mtcars %>%
-  #     mutate(car = rownames(.)) %>%
-  #     select(car, everything()) %>%
-  #     filter(mpg <= input$mpg) %>%
-  #     regulartable() %>%
-  #     theme_booktabs() %>%
-  #     width(width = input$wd) %>%
-  #     htmltools_value()
-  # })
-
-
-#output$tech_indicator_tbl <- renderUI({
-# #   #set up flextable for eithe single profile or all indicators
-# if (input$profile_picked != "Show all"){ # table if single profile selected
-#   
-#   tech_indicators() %>%
-#     flextable() %>%
-#     add_header_lines(paste0(input$profile_picked," Profile")) %>%
-#     set_header_labels (domain1="Domain",ind_number= "",indicator_name="Indicator",indicator_definition="Indicator Definition") %>%
-#     theme_box() %>%
-#     merge_v(j = ~ domain1) %>%
-#     align_text_col(align = "left") %>%
-#     autofit()
-# } 
-# else { #table if all profiles selected
-#   
-#   tech_indicators() %>%
-#     flextable() %>%
-#     set_header_labels (profile="Profile(s)",domain="Domain(s)",ind_number= "a",indicator_name="Indicator",indicator_definition="Indicator Definition") %>%
-#     theme_box() %>%
-#     merge_v(j = ~ profile) %>%
-#     merge_v(j = ~ domain) %>%
-#     align_text_col(align = "left") %>%
-#     autofit()
-# }
-# })
 
 
   #################################################.

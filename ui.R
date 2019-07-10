@@ -630,22 +630,16 @@ navbarMenu("Info", icon = icon("info-circle"),
            ## Definitions2 ----
            ###############################################.
            tabPanel("Indicator definitions2", value = "definition2",
-                    # sidebarLayout(
-                    #   sidebarPanel(
-                    #     sliderInput("mpg", "mpg Limit", min = 11, max = 33, value = 20),
-                    #     sliderInput("wd", "width...", min = 0.1, max = 8, value = 1)
-                    #   ),
-                    #   
                     #Sidepanel for filtering data
                      fluidRow(
-                       column(width = 6,offset=1,
-                              p("test title", style = "font-weight: bold; color: black;"),
-                              selectizeInput("profile_picked", label = "Filter Profile",
-                                                  width = "250px", choices = profile_list_filter,
-                                                  selected = "CYP", multiple=FALSE))),
-                      mainPanel(
-                               #p("test2 "))
-                               #uiOutput("mtcars_ft"))
+                       column(width = 12,
+                              p("Indicator defintions and technical information", style = "font-weight: bold; color: black;"),
+                              br(),
+                              selectizeInput("profile_picked", label = "Use filter to limit indicators within a single profile (e.g. Health & wellbeing) or show all ScotPHO profile indicators or",
+                                             width = "800px",choices = profile_list_filter,
+                                                  selected = "Show all", multiple=FALSE))),
+                      mainPanel(width=12,
+                               p("Test"),
                                uiOutput("tech_tbl"))
                       ),#tab panel
            
