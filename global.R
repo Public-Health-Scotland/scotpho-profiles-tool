@@ -87,7 +87,7 @@ plot_nodata_gg <- function() {
 }
 
 # UI for heatmap plots
-heat_ui <- function(title, plot_name) {
+sum_ui <- function(title, plot_name) {
   tagList(
     h5(title, style="color: black; text-align: center; font-weight: bold;"),
     div(align = "center", withSpinner(plotlyOutput(plot_name, height = "auto")))

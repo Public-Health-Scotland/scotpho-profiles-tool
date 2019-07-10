@@ -512,164 +512,164 @@ function(input, output, session) {
       if (input$profile_summary == "HWB") {
         tagList(#Health and Wellbeing profile
           column(4,
-                 snap_ui("Behaviours", "summ_hwb_beha"),
-                 snap_ui("Social care & housing", "summ_hwb_socare"),
-                 snap_ui("Environment", "summ_hwb_env"),
-                 snap_ui("Life expectancy & mortality", "summ_hwb_lifexp")
+                 sum_ui("Behaviours", "summ_hwb_beha"),
+                 sum_ui("Social care & housing", "summ_hwb_socare"),
+                 sum_ui("Environment", "summ_hwb_env"),
+                 sum_ui("Life expectancy & mortality", "summ_hwb_lifexp")
           ),
           column(4,
-                 snap_ui("Women's & children's health", "summ_hwb_women"),
-                 snap_ui("Immunisations & screening", "summ_hwb_imm"),
-                 snap_ui("Economy", "summ_hwb_econ"),
-                 snap_ui("Crime", "summ_hwb_crime")
+                 sum_ui("Women's & children's health", "summ_hwb_women"),
+                 sum_ui("Immunisations & screening", "summ_hwb_imm"),
+                 sum_ui("Economy", "summ_hwb_econ"),
+                 sum_ui("Crime", "summ_hwb_crime")
           ),
           column(4,
-                 snap_ui("Mental health", "summ_hwb_mh"),
-                 snap_ui("Ill health & injury", "summ_hwb_injury"),
-                 snap_ui("Education", "summ_hwb_educ")
+                 sum_ui("Mental health", "summ_hwb_mh"),
+                 sum_ui("Ill health & injury", "summ_hwb_injury"),
+                 sum_ui("Education", "summ_hwb_educ")
           )
         ) #taglist bracket
       } else if (input$profile_summary == "CYP") {
         tagList(#Children and young people profile
           column(4,
-                 snap_ui("Active", "summ_cyp_active"),
-                 snap_ui("Healthy", "summ_cyp_health")
+                 sum_ui("Active", "summ_cyp_active"),
+                 sum_ui("Healthy", "summ_cyp_health")
           ),
           column(4,
-                 snap_ui("Included", "summ_cyp_includ"),
-                 snap_ui("Nurtured", "summ_cyp_nurt"),
-                 snap_ui("Safe", "summ_cyp_safe")
+                 sum_ui("Included", "summ_cyp_includ"),
+                 sum_ui("Nurtured", "summ_cyp_nurt"),
+                 sum_ui("Safe", "summ_cyp_safe")
           ),
           column(4,
-                 snap_ui("Achieving", "summ_cyp_achiev"),
-                 snap_ui("Responsible", "summ_cyp_respon")
+                 sum_ui("Achieving", "summ_cyp_achiev"),
+                 sum_ui("Responsible", "summ_cyp_respon")
           )
         )# taglist bracket
       } else if (input$profile_summary == "ALC") {
         tagList(#Alcohol profile
           column(4,
-                 snap_ui("Environment", "summ_alc_env"),
-                 snap_ui("Services", "summ_alc_serv")
+                 sum_ui("Environment", "summ_alc_env"),
+                 sum_ui("Services", "summ_alc_serv")
           ),
           column(4,
-                 snap_ui("Community safety", "summ_alc_commsaf"),
-                 snap_ui("CAPSM/Families", "summ_alc_family")
+                 sum_ui("Community safety", "summ_alc_commsaf"),
+                 sum_ui("CAPSM/Families", "summ_alc_family")
           ),
           column(4,
-                 snap_ui("Prevalence", "summ_alc_preval"),
-                 snap_ui("Health", "summ_alc_health")
+                 sum_ui("Prevalence", "summ_alc_preval"),
+                 sum_ui("Health", "summ_alc_health")
           )
         )#taglist bracket
       } else if (input$profile_summary == "DRG") {
         tagList(#Drugs profile
           column(4,
-                 snap_ui("Environment", "summ_drg_env"),
-                 snap_ui("Services", "summ_drg_serv"),
-                 snap_ui("Data quality", "summ_drg_data")
+                 sum_ui("Environment", "summ_drg_env"),
+                 sum_ui("Services", "summ_drg_serv"),
+                 sum_ui("Data quality", "summ_drg_data")
           ),
           column(4,
-                 snap_ui("Community safety", "summ_drg_commsaf"),
-                 snap_ui("CAPSM/Families", "summ_drg_family")
+                 sum_ui("Community safety", "summ_drg_commsaf"),
+                 sum_ui("CAPSM/Families", "summ_drg_family")
           ),
           column(4,
-                 snap_ui("Prevalence", "summ_drg_preval"),
-                 snap_ui("Health", "summ_drg_health")
+                 sum_ui("Prevalence", "summ_drg_preval"),
+                 sum_ui("Health", "summ_drg_health")
           )
         )#taglist bracket
       } else if (input$profile_summary == "MEN") {
         tagList(#Mental Health profile
           column(4,
-                 snap_ui("Female adult", "summ_men_fem")
+                 sum_ui("Female adult", "summ_men_fem")
           ),
           column(4,
-                 snap_ui("Male adult", "summ_men_male")
+                 sum_ui("Male adult", "summ_men_male")
           ),
           column(4,
-                 snap_ui("CYP Mental Health", "summ_men_cyp")
+                 sum_ui("CYP Mental Health", "summ_men_cyp")
           )
         )#taglist bracket
       } else if (input$profile_summary == "TOB") {
         tagList(#Tobacco profile
           column(4,
-                 snap_ui("Smoking in school children", "summ_tob_school"),
-                 snap_ui("Smoking cessation & smoking cessation products", "summ_tob_cess")
+                 sum_ui("Smoking in school children", "summ_tob_school"),
+                 sum_ui("Smoking cessation & smoking cessation products", "summ_tob_cess")
           ),
           column(4,
-                 snap_ui("Smoking attributable deaths & diseases", "summ_tob_attrib"),
-                 snap_ui("Smoking during and post pregnancy", "summ_tob_pregn")
+                 sum_ui("Smoking attributable deaths & diseases", "summ_tob_attrib"),
+                 sum_ui("Smoking during and post pregnancy", "summ_tob_pregn")
           ),
           column(4,
-                 snap_ui("Adult prevalence", "summ_tob_preval"),
-                 snap_ui("Retailer information", "summ_tob_retail")
+                 sum_ui("Adult prevalence", "summ_tob_preval"),
+                 sum_ui("Retailer information", "summ_tob_retail")
           )
         )#taglist bracket
       } else if (input$profile_summary == "POP") {
         tagList(#Population profile
-          snap_ui("Population", "summ_pop_pop")
+          sum_ui("Population", "summ_pop_pop")
         )#taglist bracket
       }
     } else if (input$chart_summary == "Trend") { #IF SELECTED HEATMAP
       if (input$profile_summary == "HWB") {
         tagList(#Health and Wellbeing profile
-          heat_ui("Behaviours", "heat_hwb_beha"),
-          heat_ui("Social care & housing", "heat_hwb_socare"),
-          heat_ui("Environment", "heat_hwb_env"),
-          heat_ui("Life expectancy & mortality", "heat_hwb_lifexp"),
-          heat_ui("Women's & children's health", "heat_hwb_women"),
-          heat_ui("Immunisations & screening", "heat_hwb_imm"),
-          heat_ui("Economy", "heat_hwb_econ"),
-          heat_ui("Crime", "heat_hwb_crime"),
-          heat_ui("Mental health", "heat_hwb_mh"),
-          heat_ui("Ill health & injury", "heat_hwb_injury"),
-          heat_ui("Education", "heat_hwb_educ")
+          sum_ui("Behaviours", "heat_hwb_beha"),
+          sum_ui("Social care & housing", "heat_hwb_socare"),
+          sum_ui("Environment", "heat_hwb_env"),
+          sum_ui("Life expectancy & mortality", "heat_hwb_lifexp"),
+          sum_ui("Women's & children's health", "heat_hwb_women"),
+          sum_ui("Immunisations & screening", "heat_hwb_imm"),
+          sum_ui("Economy", "heat_hwb_econ"),
+          sum_ui("Crime", "heat_hwb_crime"),
+          sum_ui("Mental health", "heat_hwb_mh"),
+          sum_ui("Ill health & injury", "heat_hwb_injury"),
+          sum_ui("Education", "heat_hwb_educ")
         )
       } else if (input$profile_summary == "CYP") {
         tagList(#Children and young people profile
-          heat_ui("Active", "heat_cyp_active"),
-          heat_ui("Healthy", "heat_cyp_health"),
-          heat_ui("Included", "heat_cyp_includ"),
-          heat_ui("Nurtured", "heat_cyp_nurt"),
-          heat_ui("Safe", "heat_cyp_safe"),
-          heat_ui("Achieving", "heat_cyp_achiev"),
-          heat_ui("Responsible", "heat_cyp_respon")
+          sum_ui("Active", "heat_cyp_active"),
+          sum_ui("Healthy", "heat_cyp_health"),
+          sum_ui("Included", "heat_cyp_includ"),
+          sum_ui("Nurtured", "heat_cyp_nurt"),
+          sum_ui("Safe", "heat_cyp_safe"),
+          sum_ui("Achieving", "heat_cyp_achiev"),
+          sum_ui("Responsible", "heat_cyp_respon")
         )# taglist bracket
       } else if (input$profile_summary == "ALC") {
         tagList(#Alcohol profile
-          heat_ui("Environment", "heat_alc_env"),
-          heat_ui("Services", "heat_alc_serv"),
-          heat_ui("Community safety", "heat_alc_commsaf"),
-          heat_ui("CAPSM/Families", "heat_alc_family"),
-          heat_ui("Prevalence", "heat_alc_preval"),
-          heat_ui("Health", "heat_alc_health")
+          sum_ui("Environment", "heat_alc_env"),
+          sum_ui("Services", "heat_alc_serv"),
+          sum_ui("Community safety", "heat_alc_commsaf"),
+          sum_ui("CAPSM/Families", "heat_alc_family"),
+          sum_ui("Prevalence", "heat_alc_preval"),
+          sum_ui("Health", "heat_alc_health")
         )#taglist bracket
       } else if (input$profile_summary == "DRG") {
         tagList(#Drugs profile
-          heat_ui("Environment", "heat_drg_env"),
-          heat_ui("Services", "heat_drg_serv"),
-          heat_ui("Data quality", "heat_drg_data"),
-          heat_ui("Community safety", "heat_drg_commsaf"),
-          heat_ui("CAPSM/Families", "heat_drg_family"),
-          heat_ui("Prevalence", "heat_drg_preval"),
-          heat_ui("Health", "heat_drg_health")
+          sum_ui("Environment", "heat_drg_env"),
+          sum_ui("Services", "heat_drg_serv"),
+          sum_ui("Data quality", "heat_drg_data"),
+          sum_ui("Community safety", "heat_drg_commsaf"),
+          sum_ui("CAPSM/Families", "heat_drg_family"),
+          sum_ui("Prevalence", "heat_drg_preval"),
+          sum_ui("Health", "heat_drg_health")
         )#taglist bracket
       } else if (input$profile_summary == "MEN") {
         tagList(#Mental Health profile
-          heat_ui("Female adult", "heat_men_fem"),
-          heat_ui("Male adult", "heat_men_male"),
-          heat_ui("CYP Mental Health", "heat_men_cyp")
+          sum_ui("Female adult", "heat_men_fem"),
+          sum_ui("Male adult", "heat_men_male"),
+          sum_ui("CYP Mental Health", "heat_men_cyp")
         )#taglist bracket
       } else if (input$profile_summary == "TOB") {
         tagList(#Tobacco profile
-          heat_ui("Smoking in school children", "heat_tob_school"),
-          heat_ui("Smoking cessation & smoking cessation products", "heat_tob_cess"),
-          heat_ui("Smoking attributable deaths & diseases", "heat_tob_attrib"),
-          heat_ui("Smoking during and post pregnancy", "heat_tob_pregn"),
-          heat_ui("Adult prevalence", "heat_tob_preval"),
-          heat_ui("Retailer information", "heat_tob_retail")
+          sum_ui("Smoking in school children", "heat_tob_school"),
+          sum_ui("Smoking cessation & smoking cessation products", "heat_tob_cess"),
+          sum_ui("Smoking attributable deaths & diseases", "heat_tob_attrib"),
+          sum_ui("Smoking during and post pregnancy", "heat_tob_pregn"),
+          sum_ui("Adult prevalence", "heat_tob_preval"),
+          sum_ui("Retailer information", "heat_tob_retail")
         )#taglist bracket
       } else if (input$profile_summary == "POP") {
         tagList(#Population profile
-          heat_ui("Population", "heat_pop_pop")
+          sum_ui("Population", "heat_pop_pop")
         )#taglist bracket
       } # end of if else == "Trend"
     } else if (input$chart_summary == "Spine") {
@@ -880,22 +880,6 @@ function(input, output, session) {
   output$summ_tob_retail <- renderPlotly({ plot_profile_snapshot("Retailer information")})
   # Charts for population profile
   output$summ_pop_pop <- renderPlotly({ plot_profile_snapshot("Population")})
-
-  # UI for snapshot plots
-  snap_ui <- function(title, plot_name) {
-    # obtaining height for plot based on number of rows of indicators
-    n_ind <- snapshot_data() %>% subset(domain == title) %>% 
-      droplevels() %>% nrow()
-# when 0 or 1 indicators the plot needs at least that size to 
-# prevent the spinner from showing and let the tooltip work
-    height_plot <- case_when(n_ind > 1 ~ 38*n_ind+10,
-                             TRUE ~ 75)
-    
-    tagList(
-      h5(title, style="color: black; text-align: center; font-weight: bold;"),
-      div(align = "center", plotlyOutput(plot_name, height = "100%"))
-    )
-  }
   
 
   ###############################################.        
