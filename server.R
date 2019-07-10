@@ -714,7 +714,6 @@ function(input, output, session) {
       # Set up parameters to pass to Rmd document
       params <- list(chart_summary = input$chart_summary,
                      snapshot_data = snapshot_data(),
-                     summary_data = summary_data(),
                      profile_summary = input$profile_summary,
                      comp_summary = input$comp_summary,
                      geoname_summary = input$geoname_summary,

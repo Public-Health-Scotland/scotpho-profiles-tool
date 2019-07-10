@@ -86,7 +86,7 @@ plot_nodata_gg <- function() {
           axis.title.x=element_text(size=20, colour ='#555555'))
 }
 
-# UI for heatmap plots
+# UI for heatmap and snapshot plots
 sum_ui <- function(title, plot_name) {
   tagList(
     h5(title, style="color: black; text-align: center; font-weight: bold;"),

@@ -1,0 +1,6 @@
+\usepackage{multicol}
+%% Note: Pandoc (which is doing all of the output conversion behind the scenes) does not parse the content of LaTeX environments. This creates problems when you try to include LaTeX commands with curly brackets directly in your Rmd file. E.g. You can't just use `\begin{multicols}{2}` directly in your Rmd file. Luckily, a straightforward workaround is to simply define some new shortcut commands yourself as per the below.
+%% See: https://stackoverflow.com/questions/25849814/rstudio-rmarkdown-both-portrait-and-landscape-layout-in-a-single-pdf/27334272#27334272
+\newcommand{\btwocol}{\begin{multicols}{2}}
+\newcommand{\bthreecol}{\begin{multicols}{3}}
+\newcommand{\etwocol}{\end{multicols}}

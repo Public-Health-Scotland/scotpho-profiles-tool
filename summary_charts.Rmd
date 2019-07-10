@@ -1,28 +1,36 @@
 ---
-title: "Untitled"
 params:
   chart_summary: NA
   snapshot_data: NA
-  plot_profile_snapshot: NA
   profile_summary: NA
   summary_data: NA
   comp_summary: NA
   geoname_summary: NA
   geotype_summary: NA
   geocomp_summary: NA
-output: pdf_document
+geometry:  margin=0.5cm
+output: 
+  pdf_document:
+    includes:
+      in_header: preamble.tex
 ---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F, cache = T)
+```
 
-A plot of `params$n` random points.
 
-```{r echo=FALSE}
+```{r eval=FALSE, include=FALSE}
+###############################################.
+## Functions ----
+###############################################.
+
   ###############################################.
-  # Function that creates a snapshot plot for a domain 
+  # Function that creates a snapshot plot for a domain
   plot_profile_snapshot <- function(domainchosen) {
 
     # only selecting decided domain
     prof_snap_data <- params$snapshot_data %>% subset(domain == domainchosen) %>%
-      droplevels() %>% 
+      droplevels() %>%
       mutate(indicator = as.factor(indicator))
 
     #If no data available for that period then plot message saying data is missing
@@ -46,15 +54,15 @@ A plot of `params$n` random points.
       # eliminating both axis
       axis_layout <- list(title = "", fixedrange=TRUE, zeroline = FALSE, showline = FALSE,
                           showticklabels = FALSE, showgrid = FALSE)
-      
+
 
       # obtaining height for plot based on number of rows of indicators
       n_ind <- prof_snap_data %>% nrow()
-      # when 0 or 1 indicators the plot needs at least that size to 
+      # when 0 or 1 indicators the plot needs at least that size to
       # prevent the spinner from showing and let the tooltip work
       height_plot <- case_when(n_ind > 1 ~ 38*n_ind+10,
-                               TRUE ~ 75) 
-      
+                               TRUE ~ 75)
+
       # defining plot function
       plot_ly(prof_snap_data, y = ~indicator,   color = ~color, height = height_plot,
               colors=  c(blue = "#4da6ff", gray = "gray88", red = "#ffa64d", white = "#ffffff")
@@ -71,10 +79,48 @@ A plot of `params$n` random points.
         config(displayModeBar = FALSE, displaylogo = F, editable =F)
     }
   }
+
+
 ```
 
-```{r}
-params$chart_summary
+A plot of `params$profile_summary` random points.
 
+\btwocol
+
+#### Behaviours
+```{r, eval=F}
+plot_profile_snapshot("Behaviours") 
+plot_profile_snapshot("Behaviours") 
+```
+\columnbreak
+
+#### R
+```{r, eval=F}
+plot_profile_snapshot("Behaviours")
 plot_profile_snapshot("Behaviours")
 ```
+\etwocol
+some random text
+
+\bthreecol
+
+#### Behaviours
+```{r, eval=F}
+plot_profile_snapshot("Behaviours")
+plot_profile_snapshot("Behaviours")
+```
+\columnbreak
+
+#### R
+```{r, eval=F}
+plot_profile_snapshot("Behaviours")
+plot_profile_snapshot("Behaviours")
+```
+\columnbreak
+
+#### R
+```{r }
+plot_profile_snapshot("Behaviours")
+plot_profile_snapshot("Behaviours")
+```
+\etwocol
