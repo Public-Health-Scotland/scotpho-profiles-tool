@@ -523,127 +523,216 @@ navbarMenu("Info", icon = icon("info-circle"),
            ###############################################.
            ## Definitions ----
            ###############################################.
-           tabPanel("Indicator definitions", value = "definition",
-                    #Sidepanel for filtering data
-                    fluidRow(
-                      column(width = 5, offset= 1,
-                             p("Indicator definitions and technical information", style = "font-weight: bold; color: black;"),
-                             div(style="display:inline-block",
-                                 selectizeInput("profile_defined", label = "Filter by Profile",
-                                                width = "250px", choices = profile_list_filter, 
-                                                selected = "Show all", multiple=FALSE)),
-                             div(style="display:inline-block", 
-                                 selectizeInput("topic_defined", label = "Or by Topic",
-                                                width = "250px", choices = topic_list_filter, 
-                                                selected = "Show all", multiple=FALSE)),
-                             uiOutput("indicator_chosen")
-                      ), # column bracket 
-                      column(width=6,
-                             br(), br(), br(),
-                             downloadButton("definitions_by_indicator", 
-                                            'Download indicator definition', class = "down")
-                      )#column bracket
-                    ), #fluidRow bracket
-                    fluidRow(      
-                      column(width=10, offset=1,
-                             useShinydashboard(),
-                             conditionalPanel(
-                               condition="input.indicator_defined != null",
-                               valueBoxOutput("indicator", width=12)))),
-                    fluidRow(
-                      column(width=5, offset=1,
-                             conditionalPanel(
-                               condition="input.indicator_defined != null",
-                               div(class="definitionbox",
-                                   p(paste("Definition"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                                   h5(textOutput("definition"))),
-                               div(class="definitionbox",   
-                                   p(paste("Data source"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                                   h5(textOutput("source"))),
-                               div(class="definitionbox",   
-                                   p(paste("Numerator"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                                   h5(textOutput("numerator"))),
-                               div(class="definitionbox",   
-                                   p(paste("Measure"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                                   h5(textOutput("measure"))),
-                               div(class="definitionbox",   
-                                   p(paste("Rounding and imputation"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                                   h5(textOutput("rounding"))),
-                               div(class="definitionbox",   
-                                   p(paste("Year type"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                                   h5(textOutput("year"))),
-                               div(class="definitionbox",   
-                                   p(paste("Trends from"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                                   h5(textOutput("trends_from"))),
-                               div(class="definitionbox",   
-                                   p(paste("Geographies available"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                                   h5(textOutput("geos"))),
-                               div(class="definitionbox",   
-                                   p(paste("Notes,caveats and other info"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                                   h5(textOutput("notes"))),
-                               div(class="definitionbox",   
-                                   p(paste("Date last updated"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                                   h5(textOutput("last_updated")))
-                             ) # conditionalPanel bracket
-                      ), #column bracket
-                      column(width=5, 
-                             conditionalPanel(
-                               condition="input.indicator_defined != null",
-                               div(class="definitionbox",
-                                   p(paste("Rationale for inclusion"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                                   h5(textOutput("rationale"))),
-                               div(class="definitionbox",   
-                                   p(paste("Diagnostic codes & position"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                                   h5(textOutput("diagnosis"))),
-                               div(class="definitionbox",
-                                   p(paste("Denominator"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                                   h5(textOutput("denominator"))),
-                               div(class="definitionbox",
-                                   p(paste("Disclosure control"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                                   h5(textOutput("disclosure"))),
-                               div(class="definitionbox",
-                                   p(paste("Age group"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                                   h5(textOutput("age"))),
-                               div(class="definitionbox",
-                                   p(paste("Sex"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                                   h5(textOutput("sex"))),
-                               div(class="definitionbox",
-                                   p(paste("Aggregation"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                                   h5(textOutput("aggregation"))),
-                               div(class="definitionbox",
-                                   p(paste("Frequency of update"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                                   h5(textOutput("update_frequency"))),
-                               div(class="definitionbox",
-                                   p(paste("Confidence interval method"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                                   h5(textOutput("confidence_interval"))),
-                               div(class="definitionbox",
-                                   p(paste("Links to supporting information"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                                   h5(textOutput("supporting_info"))),
-                               div(class="definitionbox",
-                                   p(paste("Next update due"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                                   h5(textOutput("next_update")))
-                             ) #conditional Panel bracket 
-                      )  #column bracket
-                    )#fluidRow bracket
-           ), #Tab panel bracket             
+           # tabPanel("Indicator definitions", value = "definition",
+           #          #Sidepanel for filtering data
+           #          fluidRow(
+           #            column(width = 5, offset= 1,
+           #                   p("Indicator definitions and technical information", style = "font-weight: bold; color: black;"),
+           #                   div(style="display:inline-block",
+           #                       selectizeInput("profile_defined", label = "Filter by Profile",
+           #                                      width = "250px", choices = profile_list_filter,
+           #                                      selected = "Show all", multiple=FALSE)),
+           #                   div(style="display:inline-block",
+           #                       selectizeInput("topic_defined", label = "Or by Topic",
+           #                                      width = "250px", choices = topic_list_filter,
+           #                                      selected = "Show all", multiple=FALSE)),
+           #                   uiOutput("indicator_chosen")
+           #            ), # column bracket
+           #            column(width=6,
+           #                   br(), br(), br(),
+           #                   downloadButton("definitions_by_indicator",
+           #                                  'Download indicator definition', class = "down")
+           #            )#column bracket
+           #          ), #fluidRow bracket
+                    # fluidRow(
+                    #   column(width=10, offset=1,
+                    #          useShinydashboard(),
+                    #          conditionalPanel(
+                    #            condition="input.indicator_defined != null",
+                    #            valueBoxOutput("indicator", width=12)))),
+                    # fluidRow(
+                    #   column(width=5, offset=1,
+                    #          conditionalPanel(
+                    #            condition="input.indicator_defined != null",
+                    #            div(class="definitionbox",
+                    #                p(paste("Definition"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
+                    #                h5(textOutput("definition"))),
+                    #            div(class="definitionbox",
+                    #                p(paste("Data source"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
+                    #                h5(textOutput("source"))),
+                    #            div(class="definitionbox",
+                    #                p(paste("Numerator"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
+                    #                h5(textOutput("numerator"))),
+                    #            div(class="definitionbox",
+                    #                p(paste("Measure"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
+                    #                h5(textOutput("measure"))),
+                    #            div(class="definitionbox",
+                    #                p(paste("Rounding and imputation"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
+                    #                h5(textOutput("rounding"))),
+                    #            div(class="definitionbox",
+                    #                p(paste("Year type"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
+                    #                h5(textOutput("year"))),
+                    #            div(class="definitionbox",
+                    #                p(paste("Trends from"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
+                    #                h5(textOutput("trends_from"))),
+                    #            div(class="definitionbox",
+                    #                p(paste("Geographies available"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
+                    #                h5(textOutput("geos"))),
+                    #            div(class="definitionbox",
+                    #                p(paste("Notes,caveats and other info"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
+                    #                h5(textOutput("notes"))),
+                    #            div(class="definitionbox",
+                    #                p(paste("Date last updated"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
+                    #                h5(textOutput("last_updated")))
+                    #          ) # conditionalPanel bracket
+                    #   ), #column bracket
+                    #   column(width=5,
+                    #          conditionalPanel(
+                    #            condition="input.indicator_defined != null",
+                    #            div(class="definitionbox",
+                    #                p(paste("Rationale for inclusion"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
+                    #                h5(textOutput("rationale"))),
+                    #            div(class="definitionbox",
+                    #                p(paste("Diagnostic codes & position"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
+                    #                h5(textOutput("diagnosis"))),
+                    #            div(class="definitionbox",
+                    #                p(paste("Denominator"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
+                    #                h5(textOutput("denominator"))),
+                    #            div(class="definitionbox",
+                    #                p(paste("Disclosure control"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
+                    #                h5(textOutput("disclosure"))),
+                    #            div(class="definitionbox",
+                    #                p(paste("Age group"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
+                    #                h5(textOutput("age"))),
+                    #            div(class="definitionbox",
+                    #                p(paste("Sex"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
+                    #                h5(textOutput("sex"))),
+                    #            div(class="definitionbox",
+                    #                p(paste("Aggregation"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
+                    #                h5(textOutput("aggregation"))),
+                    #            div(class="definitionbox",
+                    #                p(paste("Frequency of update"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
+                    #                h5(textOutput("update_frequency"))),
+                    #            div(class="definitionbox",
+                    #                p(paste("Confidence interval method"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
+                    #                h5(textOutput("confidence_interval"))),
+                    #            div(class="definitionbox",
+                    #                p(paste("Links to supporting information"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
+                    #                h5(textOutput("supporting_info"))),
+                    #            div(class="definitionbox",
+                    #                p(paste("Next update due"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
+                    #                h5(textOutput("next_update")))
+                    #          ) #conditional Panel bracket
+                    #   )  #column bracket
+                    # )#fluidRow bracket
+           # ), #Tab panel bracket
            ###############################################.
            ## Definitions2 ----
            ###############################################.
            tabPanel("Indicator definitions2", value = "definition2",
                     #Sidepanel for filtering data
-                     fluidRow(
-                       column(width = 12,
-                              p("Indicator defintions and technical information", style = "font-weight: bold; color: black;"),
-                              br(),
-                              selectizeInput("profile_picked", label = "Use filter to limit indicators within a single profile (e.g. Health & wellbeing) or show all ScotPHO profile indicators or",
-                                             width = "800px",choices = profile_list_filter,
-                                                  selected = "Show all", multiple=FALSE))),
-                      mainPanel(width=12,
-                               p("Test"),
-                               uiOutput("tech_tbl"))
-                      ),#tab panel
-           
-           
+                    fluidRow(
+                      column(width = 12, offset=1,
+                             p(h3("Indicator definitions and technical information")),
+                             br(),
+                             div(style = "width:60%; margin-left: 20%; min-width: 350px", # centering div
+                                 radioGroupButtons("techdoc_selection", status = "primary",
+                                                   choices = c("Summary of indicators available", "Detailed information about single indicator"), label= "Step 1. Select what you want to see:" )),
+                             br(),
+                             selectizeInput("profile_picked", label = "2. Use filter to display indicators within a single profile (e.g. Health & wellbeing) or show all available ScotPHO indicators",
+                                            width = "500px",choices = profile_list_filter, selected = "Show all", multiple=FALSE),
+                             br(),
+                             #conditional panel for profile summary
+                             conditionalPanel(condition = 'input.techdoc_selection == "Summary of indicators available"',
+                                              savechart_button('download_techdoc1', 'Save Indicator Summary',  class = "down"),
+                                              downloadButton("definitions_by_indicator",'Download indicator definition', class = "down")),
+                             #conditional panel for single indicator
+                             conditionalPanel(condition = 'input.techdoc_selection == "Detailed information about single indicator"',
+                                              div(style="display:inline-block", 
+                                                  selectizeInput("topic_defined", label = "2b. or use this filter to display indicators within a single topic",
+                                                                 width = "250px", choices = topic_list_filter, 
+                                                                 selected = "Show all", multiple=FALSE)),
+                                              uiOutput("indicator_chosen"),
+                                              savechart_button('download_techdoc', 'Save chart',  class = "down")
+                             ))),
+                    wellPanel(
+                    column(11,
+                           # display flextable   
+                           conditionalPanel(condition = 'input.techdoc_selection == "Summary of indicators available"',
+                                              uiOutput("techdoc_display")),
+                             #techdoc single indicator
+                             conditionalPanel(condition = 'input.techdoc_selection == "Detailed information about single indicator" & input.indicator_defined != null',
+                                              useShinydashboard(),
+                                              valueBoxOutput("indicator", width=12))),
+                    column(5,
+                           conditionalPanel(condition = 'input.techdoc_selection == "Detailed information about single indicator" & input.indicator_defined != null',
+                                            div(class="definitionbox",
+                                                p(paste("Definition"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
+                                                h5(textOutput("definition"))),
+                                            div(class="definitionbox",
+                                                             p(paste("Data source"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
+                                                             h5(textOutput("source"))),
+                                                         div(class="definitionbox",
+                                                             p(paste("Numerator"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
+                                                             h5(textOutput("numerator"))),
+                                                         div(class="definitionbox",
+                                                             p(paste("Measure"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
+                                                             h5(textOutput("measure"))),
+                                                         div(class="definitionbox",
+                                                             p(paste("Rounding and imputation"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
+                                                             h5(textOutput("rounding"))),
+                                                         div(class="definitionbox",
+                                                             p(paste("Year type"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
+                                                             h5(textOutput("year"))),
+                                                         div(class="definitionbox",
+                                                             p(paste("Trends from"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
+                                                             h5(textOutput("trends_from"))),
+                                                         div(class="definitionbox",
+                                                             p(paste("Geographies available"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
+                                                             h5(textOutput("geos"))),
+                                                         div(class="definitionbox",
+                                                             p(paste("Notes,caveats and other info"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
+                                                             h5(textOutput("notes"))),
+                                                         div(class="definitionbox",
+                                                             p(paste("Date last updated"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
+                                                             h5(textOutput("last_updated"))))),
+                                 column(5,
+                                        conditionalPanel(condition = 'input.techdoc_selection == "Detailed information about single indicator" & input.indicator_defined != null',
+                                                         div(class="definitionbox",
+                                                             p(paste("Rationale for inclusion"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
+                                                             h5(textOutput("rationale"))),
+                                                         div(class="definitionbox",
+                                                             p(paste("Diagnostic codes & position"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
+                                                             h5(textOutput("diagnosis"))),
+                                                         div(class="definitionbox",
+                                                             p(paste("Denominator"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
+                                                             h5(textOutput("denominator"))),
+                                                         div(class="definitionbox",
+                                                             p(paste("Disclosure control"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
+                                                             h5(textOutput("disclosure"))),
+                                                         div(class="definitionbox",
+                                                             p(paste("Age group"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
+                                                             h5(textOutput("age"))),
+                                                         div(class="definitionbox",
+                                                             p(paste("Sex"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
+                                                             h5(textOutput("sex"))),
+                                                         div(class="definitionbox",
+                                                             p(paste("Aggregation"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
+                                                             h5(textOutput("aggregation"))),
+                                                         div(class="definitionbox",
+                                                             p(paste("Frequency of update"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
+                                                             h5(textOutput("update_frequency"))),
+                                                         div(class="definitionbox",
+                                                             p(paste("Confidence interval method"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
+                                                             h5(textOutput("confidence_interval"))),
+                                                         div(class="definitionbox",
+                                                             p(paste("Links to supporting information"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
+                                                             h5(textOutput("supporting_info"))),
+                                                         div(class="definitionbox",
+                                                             p(paste("Next update due"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
+                                                             h5(textOutput("next_update"))))))
+                    ), #tab panel
+
 ###############################################.             
 ##############Resources----    
 ###############################################.      

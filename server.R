@@ -2317,7 +2317,9 @@ function(input, output, session) {
   #################################################.
   ##  Technical Doc Page2 ----
   #################################################.
-#   
+
+  
+ #Reactive filtering of the technical docment dataset to used in flextable displaying available profile indicators   
  tech_indicators <- reactive({  
  #filter techdoc for either a single profile or all indicators
    if (input$profile_picked != "Show all"){ #if single profile selected
@@ -2344,14 +2346,13 @@ function(input, output, session) {
   })
 
   
-
+ #Function to construct flextable - set up depends on whether sinlge profile or all indicators selected
   plot_techdoc <- function(){
    #output$tech_indicator_tbl <- renderUI({
     #   #set up flextable for eithe single profile or all indicators
     if (input$profile_picked != "Show all"){ # table if single profile selected
-      
-      tech_indicators() %>%
-      flextable() %>%
+        tech_indicators() %>%
+        flextable() %>%
         add_header_lines(paste0(input$profile_picked," Profile")) %>%
         set_header_labels (domain1="Domain",ind_number= "",indicator_name="Indicator",indicator_definition="Indicator Definition",
                            available_geographies="Available geographies", aggregation="Level of aggregation") %>%
@@ -2359,11 +2360,9 @@ function(input, output, session) {
         merge_v(j = ~ domain1) %>%
         align_text_col(align = "left") %>%
         autofit() %>%
-        htmltools_value()
-    } 
+        htmltools_value()} 
     else { #table if all profiles selected
-      
-      tech_indicators() %>%
+        tech_indicators() %>%
         flextable() %>%
         set_header_labels (profile="Profile(s)",domain="Domain(s)",ind_number="",indicator_name="Indicator",indicator_definition="Indicator Definition",
                            available_geographies="Available geographies", aggregation="Level of aggregation") %>%
@@ -2376,9 +2375,23 @@ function(input, output, session) {
     }
   }
 
-  output$tech_tbl <-renderUI(plot_techdoc())
-  
+  #render flextable - simple version before additional buttons #to be deleted when full flexibility set up
+  #output$tech_tbl <-renderUI(plot_techdoc())  #to be deleted when full flexibility set up
 
+  
+  
+  #RenderUI for what to display on techdoc page - what is displayed depends on selection for summary of multiple indicators or single indicator in detial.
+  output$techdoc_display <- renderUI({  #render techincal info depending on whether selected to see summary of available indictors or single indicator definition
+    
+    # Preparing a brief explanation for each visualisation 
+    if (input$techdoc_selection == "Summary of indicators available") {
+      plot_techdoc()
+    } else if (input$techdoc_selection == "Detailed information about single indicator")
+      p("loading..")}
+    )
+  
+  
+  
 
   #################################################.
   ##  Technical Doc Page ----
@@ -2391,9 +2404,9 @@ function(input, output, session) {
   #Filter indicator list by  profile or by domain 
   output$indicator_chosen <- renderUI ({
     
-    if (input$profile_defined != "Show all"){
-      indic_selection <- sort(unique(c(as.character(optdata$indicator[grep(input$profile_defined,optdata$profile_domain1)]),
-                                       as.character(optdata$indicator[grep(input$profile_defined,optdata$profile_domain2)] ))))
+    if (input$profile_picked != "Show all"){
+      indic_selection <- sort(unique(c(as.character(optdata$indicator[grep(input$profile_picked,optdata$profile_domain1)]),
+                                       as.character(optdata$indicator[grep(input$profile_picked,optdata$profile_domain2)] ))))
     } else if (input$topic_defined != "Show all"){
       indic_selection <- sort(unique(
         optdata$indicator[substr(optdata$profile_domain1, 5, nchar(as.vector(optdata$profile_domain1)))
@@ -2405,23 +2418,23 @@ function(input, output, session) {
       indic_selection <- indicator_list
     }
     
-    selectizeInput("indicator_defined", label = "Select indicator to see technical information for",
+    selectizeInput("indicator_defined", label = "3.Select an indicator here to see detailed technical information",
                    width = "510px", choices = indic_selection, 
                    selected = character(0), multiple=TRUE, 
                    options = list(placeholder = "Select your indicator of interest", maxItems = 1)) 
   }) 
   
   #To keep it simple, when you change profile, reset topic and vice versa.
-  observeEvent(input$profile_defined, { 
-    if (input$topic_defined != "Show all" && input$profile_defined != "Show all"){ 
+  observeEvent(input$profile_picked, { 
+    if (input$topic_defined != "Show all" && input$profile_picked != "Show all"){ 
       updateSelectizeInput(session,"topic_defined", label = "Or by domain",
                            choices = topic_list_filter, selected = "Show all")
     }
   })
   
   observeEvent(input$topic_defined, { 
-    if (input$profile_defined != "Show all" && input$topic_defined != "Show all"){ 
-      updateSelectizeInput(session,"profile_defined", label = "Filter by profile",
+    if (input$profile_picked != "Show all" && input$topic_defined != "Show all"){ 
+      updateSelectizeInput(session,"profile_picked", label = "Filter by profile",
                            choices = profile_list_filter, selected = "Show all")
     }
   })
