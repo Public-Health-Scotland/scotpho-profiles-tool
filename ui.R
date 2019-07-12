@@ -57,20 +57,23 @@ tagList( #needed for shinyjs
                           ".down{background-color:#4da6ff; color: white; background-image:none; min-width: 23vh;
                           font-size: 14px; padding: 5px 10px; margin-top: 5px; margin-left: 3px}",
                           #landing page boxes
-                          ".landing-page-box {width:100%; height:100%; min-height:22vh; background-color:white;
+                          ".landing-page-box {width:100%; height:100%; min-height:23vh; background-color:white;
                           border: 1px solid #AAAAAA; margin-bottom: 5px; float: left; transition: 0.5s ease; position: relative; object-fit: scale-down;}",
-                          ".landing-page-box-about {width:100%; height:100%; min-height:10.7vh; background-color:white;
+                          ".landing-page-box-about {width:100%; height:100%; min-height:11vh; background-color:white;
                           border: 1px solid #AAAAAA; margin-bottom: 5px; float: left; position: relative; object-fit: scale-down;}",
                           ".landing-page-box:hover, .landing-page-box-about:hover {-webkit-transform: scale(1.05); 
                           -ms-transform: scale(1.05); transform: scale(1.05); }", #hover effect on boxes
                           #landing page icons
-                          ".landing-page-icon {width:100%; height:85%; min-height:12vh; background-color: white;
+                          ".landing-page-icon {width:100%; height:75%; min-height:12vh; background-color: white;
                           border: 0px ; position: absolute; object-fit: scale-down;}",
                           ".landing-page-about-icon {width:100%; height:65%; min-height:5vh; background-color: white;
                           border: 0px; position: absolute; object-fit: scale-down;}",
                           #landing-page titles for boxes
                           ".landing-page-box-title {font-size: 16px; text-align:center; color: darkblue;
                           font-weight: bold; background-color: none; width:100%; max-height: 20px; margin-top: 10px; }",
+                          #landing-page description text of boxes
+                          ".landing-page-box-description {font-size: 12px; text-align:center; color: darkblue;
+                          background-color: none; width:100%; max-height: 20px; margin-top: 10px; }",
                           #landing page titles for ABOUT boxes
                           ".landing-page-box-about-title {font-size: 16px; text-align:center; color: darkblue;
                           font-weight: bold; background-color: none; width:100%; max-height: 20px; margin-top: 5px; }",
@@ -81,14 +84,14 @@ tagList( #needed for shinyjs
                           ".landing-page-button-about {text-align:center;
                           background-image:none; color: black; white-space: normal; border-radius: 0; border:0px ;
                           font-size: 14px; position: absolute; min-height: 7vh; margin-bottom: 0px; margin-top: 1px; float: middle; width: 100%; opacity:0;}",
-                          #hover effect on landing page buttons
-                           ".landing-page-button:hover , .landing-page-button:active , .landing-page-button-about:hover, .landing-page-button-about:active {opacity: 1; 
-                          background-color: #fff; /* fallback */
-                          background-color: rgba(255, 255, 255, 0.8);
-                          color: darkblue;
-                          border-color: #fff; /* fallback */
-                          border-color: rgba(255, 255, 255, 0.8); transition: background-color 0.3s ease-in,
-                          color 0.3s ease-in;}",
+                          #hover effect on landing page buttons #remove if including text in button
+                          #  ".landing-page-button:hover , .landing-page-button:active , .landing-page-button-about:hover, .landing-page-button-about:active {opacity: 1; 
+                          # background-color: #fff; /* fallback */
+                          # background-color: rgba(255, 255, 255, 0.8);
+                          # color: darkblue;
+                          # border-color: #fff; /* fallback */
+                          # border-color: rgba(255, 255, 255, 0.8); transition: background-color 0.3s ease-in,
+                          # color 0.3s ease-in;}",
                  #center image - for normal icons
                  "img.center {object-fit: scale-down; position:absolute; width:100%; height:100%; margin-left:auto; margin-right: auto; display: block; padding:20px;}",
                  #center image - for about icons
@@ -136,7 +139,7 @@ tabPanel(
               column(6, class="landing-page-column",br(), #spacing
                      introBox(
                        lp_main_box(image_name= "landing_button_heatmap_2", 
-                                   button_name = 'jump_to_summary', title_box = "Profile summary", 
+                                   button_name = 'jump_to_summary', title_box = "Profile summary",
                                    description = 'A high level view of an area across a set of indicators'),
                        data.step = 2,
                        data.intro = h5("The profile summary allows you to look at multiple indicators within an area at the same time"),
@@ -146,7 +149,7 @@ tabPanel(
                      br(), #spacing
                      introBox( # tour of the tool
                        lp_main_box(image_name= "landing_button_data_table", 
-                                   button_name = 'jump_to_table', title_box = "Data", 
+                                   button_name = 'jump_to_table', title_box = "Data",
                                    description = 'View and download the data behind the tool'),
                        data.step = 6,
                        data.intro = h5("The 'Data' window can be used to filter and download profiles data")))),
@@ -159,12 +162,12 @@ tabPanel(
                 #Trend plot box
                 column(6, class="landing-page-column",
                        lp_main_box(image_name= "landing_button_time_trend", 
-                                   button_name = 'jump_to_trend', title_box = "Trend", 
+                                                     button_name = 'jump_to_trend', title_box = "Trend",
                                    description = 'Look at how an indicator changes over time')),
                 #Rank/map plot box
                 column(6, class="landing_button_maprank",
                        lp_main_box(image_name= "landing_button_maprank", 
-                                   button_name = 'jump_to_rank', title_box = "Rank", 
+                                   button_name = 'jump_to_rank', title_box = "Rank",
                                    description = 'Compare geographical variation for an indicator'))
               )),#introBox 3 close
               #Inequalities box
@@ -174,6 +177,7 @@ tabPanel(
                        data.intro = h5("The inequalities module allows exploration of deprivation affects a selection of indicators from the main profiles tool."),
                        div(class="landing-page-box", 
                            div("Health inequalities", class = "landing-page-box-title"),
+                           div("Explore how an indicator varies with deprivation", class = "landing-page-box-description"),
                            div(class = "landing-page-icon", style="background-image: url(landing_button_health_inequality.png);
                      background-size: auto 85%; background-position: center; background-repeat: no-repeat; "),
                            # Currently a link to the health inequalities app
@@ -189,12 +193,12 @@ tabPanel(
                        data.intro =h5("There are also options to find out information such as detailed descriptions of the profile indicators, indicator update schedules and links to evidence for action briefings"),
                        #About box
                        column(4, class="landing-page-column",
-                              lp_about_box(image_name= "landing_button_about_2", button_name = 'jump_to_about', 
+                              lp_about_box(image_name= "landing_button_about_2", button_name = 'jump_to_about',
                                            title_box = "About", description = 'About ScotPHO Profiles'),
                               #Evidence box
                               div(class="landing-page-box-about", 
-                                  div("Evidence for action", class = "landing-page-box-title" ),
-                                  div(class = "landing-page-about-icon", div(img(src="landing_button_other_profile.png", class="centerabout"))),
+                                  div("Evidence for action",title="Links to briefing documents containing practical actions for improvement", class = "landing-page-box-title" ),
+                                  div(class = "landing-page-about-icon", div(img(src="landing_button_other_profile.png",class="centerabout"))),
                                   actionButton('jump_to_efa', 'Links to ScotPHO evidence for action briefings', 
                                                onclick ="window.open('https://www.scotpho.org.uk/comparative-health/profiles/resources/evidence-for-action/', '_blank')",
                                                class="landing-page-button-about", 
