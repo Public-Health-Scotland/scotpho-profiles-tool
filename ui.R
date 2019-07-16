@@ -632,18 +632,24 @@ navbarMenu("Info", icon = icon("info-circle"),
            tabPanel("Indicator definitions2", value = "definition2",
                     #Sidepanel for filtering data
                     fluidRow(
-                      column(width = 12, offset=1,
+                      column(width = 12,
+                             div(style = "width:60%; margin-left: 5%; min-width: 350px",
                              p(h3("Indicator definitions and technical information")),
+                             p(h5("This page provides information about available ScotPHO indicators.ScotPHO Profiles consists of a collection of indicators related to a specific theme 
+                                e.g. 'Alcohol' or 'Drugs'.Indicators within a profile are grouped into topics to keep indicators about a similar topic together.")),
                              br(),
-                             div(style = "width:60%; margin-left: 20%; min-width: 350px", # centering div
+                             #div(style = "width:60%; margin-left: 5%; min-width: 350px", # centering div
                                  radioGroupButtons("techdoc_selection", status = "primary",
-                                                   choices = c("Summary of indicators available", "Detailed information about single indicator"), label= "Step 1. Select what you want to see:" )),
+                                                   choices = c("List of available indicators", "Detailed information about single indicator"), label= "Step 1. Select what you want to see:" ),
                              br(),
-                             selectizeInput("profile_picked", label = "2. Use filter to display indicators within a single profile (e.g. Health & wellbeing) or show all available ScotPHO indicators",
-                                            width = "500px",choices = profile_list_filter, selected = "Show all", multiple=FALSE),
+                             selectizeInput("profile_picked", label = "2. Select a single profile (e.g. Health & wellbeing) or show all available ScotPHO indicators",
+                                            width = "600px",choices = profile_list_filter, selected = "Show all", multiple=FALSE),
                              br(),
                              #conditional panel for profile summary
-                             conditionalPanel(condition = 'input.techdoc_selection == "Summary of indicators available"',
+                             conditionalPanel(condition = 'input.techdoc_selection == "List of available indicators"',
+                                              # selectizeInput("techdoc_geotype", label = "3. limit geo type",
+                                              #                width = "500px",choices = c("Show all", areatype_list), selected = "Show all", multiple=FALSE),
+                                              uiOutput("tecdoc_geographies"),
                                               savechart_button('download_techdoc1', 'Save Indicator Summary',  class = "down"),
                                               downloadButton("definitions_by_indicator",'Download indicator definition', class = "down")),
                              #conditional panel for single indicator
@@ -654,11 +660,15 @@ navbarMenu("Info", icon = icon("info-circle"),
                                                                  selected = "Show all", multiple=FALSE)),
                                               uiOutput("indicator_chosen"),
                                               savechart_button('download_techdoc', 'Save chart',  class = "down")
-                             ))),
+                                              # downloadButton("definitions_by_indicator",
+                                              #                'Download indicator definition', class = "down")
+                             )))),
                     wellPanel(
-                    column(11,
-                           # display flextable   
-                           conditionalPanel(condition = 'input.techdoc_selection == "Summary of indicators available"',
+                      column(11,
+                             # display flextable   
+                             conditionalPanel(condition = 'input.techdoc_selection == "List of available indicators"',
+                                              br(),
+                                              br(),
                                               uiOutput("techdoc_display")),
                              #techdoc single indicator
                              conditionalPanel(condition = 'input.techdoc_selection == "Detailed information about single indicator" & input.indicator_defined != null',
