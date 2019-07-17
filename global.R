@@ -43,7 +43,7 @@ format_csv <- function(reactive_dataset) {
 
 format_definitions_csv <- function(reactive_dataset) {
   reactive_dataset %>% 
-    select(c(indicator_name, indicator_number, profile, domain, indicator_definition, inclusion_rationale, data_source,
+    select(c(profile, domain,indicator_name, indicator_number, indicator_definition, inclusion_rationale, data_source,
              diagnostic_code_position, numerator, denominator, measure, disclosure_control, rounding, age_group, sex, year_type,
              trends_from, aggregation, update_frequency, available_geographies, confidence_interval_method, notes_caveats, 
              related_publications, supporting_information, last_updated, next_update

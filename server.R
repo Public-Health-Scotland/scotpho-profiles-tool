@@ -2315,15 +2315,14 @@ function(input, output, session) {
   )
   
   #################################################.
-  ##  Technical Doc Page2 ----
+  ##  Technical Doc Page ----
   #################################################.
-
-  ## Profile summary 
   
+  
+  #### Techdoc(1) summary conditional panel.
   
   ## Reactive filters 
-  
-  # Reative list of available geography types based on which profile is selected.
+  # Reactive list of available geography types based on which profile is selected.
   output$tecdoc_geographies <- renderUI ({
     
     if (input$profile_picked != "Show all"){
@@ -2368,11 +2367,13 @@ function(input, output, session) {
  #      select (profile, domain, ind_number,indicator_name, indicator_definition,available_geographies, aggregation)}
  #  })
 
- # Reactive dataset for flextable of profile indicator summary    
+## Reactive dataset for flextable - four possible combinations of data
   
- tech_indicators <- reactive({  
+
+  
+ techdoc_indicator_data <- reactive({  
    
-   if (input$profile_picked != "Show all"){ #subset applied if a single profile selected
+   if (input$profile_picked != "Show all"){ # if a single profile selected
      if(input$techdoc_geotype != "Show all"){ #further filter if user selects a geography type
          techdoc_ve %>%
          subset(grepl(input$techdoc_geotype,available_geographies)) %>%
@@ -2391,7 +2392,7 @@ function(input, output, session) {
          # select(domain1, ind_number,indicator_name, indicator_definition,available_geographies,aggregation)
        } 
      
-     else { # dataset if user only wants a single profile but all geography types 
+     else { # dataset if user wants a single profile but all geography types 
        techdoc_ve %>%
          subset(grepl(names(profile_list[unname(profile_list) == input$profile_picked]),profile)) 
        #%>% #filter on selected profile
@@ -2410,27 +2411,27 @@ function(input, output, session) {
    
    else if (input$profile_picked == "Show all"){ #subset applied if user selects all profiles
      if(input$techdoc_geotype == "Show all"){  # user selects all geography types
-       techdoc_ve %>%
-         arrange(profile, domain) 
+       techdoc_ve 
+       #  arrange(profile, domain) 
        # %>%
        #   rownames_to_column(var="ind_number") %>%
        #   select (profile, domain, ind_number,indicator_name, indicator_definition,available_geographies, aggregation)
        }
      else { # user selects a single geography type
        techdoc_ve %>%
-         subset(grepl(input$techdoc_geotype,available_geographies)) %>%
-         arrange(profile, domain) 
+         subset(grepl(input$techdoc_geotype,available_geographies))
+       #%>%
+         #arrange(profile, domain) 
        #%>%
          #rownames_to_column(var="ind_number") %>%
          #select (profile, domain, ind_number,indicator_name, indicator_definition,available_geographies, aggregation)
          }}
  })
 
- # Function to construct flextable displaying techdoc info
- plot_techdoc <- function(){
-   
-   if (input$profile_picked != "Show all"){ # table for a single profile selection
-       tech_indicators() %>%
+ # Format filtered data - easier for data download if separate function
+ formatted_techdoc_data <- function(){
+   if (input$profile_picked != "Show all"){
+     techdoc_indicator_data() %>%
        mutate(test=regexpr((names(profile_list[unname(profile_list) == input$profile_picked])), domain), #find start position of profile name in domain column
               test2=substr(domain,test, nchar(domain)),  #generate column that starts with filtered profile
               findcomma=regexpr(",",test2), #find position of comma (where domain description ends
@@ -2440,12 +2441,25 @@ function(input, output, session) {
                                  TRUE ~ "")) %>% # extract domain string linked to seletec profile
        mutate (profilename=input$profile_picked) %>%  #sort on profile name since some indicators in multiple profiles
        arrange(profilename, domain1, indicator_name) %>%
-       rownames_to_column(var="ind_number") %>%
-       select(domain1, ind_number,indicator_name, indicator_definition,available_geographies,aggregation) %>%
-      # select(domain1, ind_number,indicator_name, indicator_definition,available_geographies,aggregation) %>%
+       rownames_to_column(var="ind_index")} 
+   else{
+     techdoc_indicator_data() 
+     #%>%
+       #arrange(profile, domain) %>%
+       #rownames_to_column(var="ind_index")
+       }}
+ 
+ 
+ 
+ # Function to format data and construct flextable displaying techdoc info
+ plot_techdoc <- function(){
+   
+   if (input$profile_picked != "Show all"){ # table for a single profile selection
+     formatted_techdoc_data() %>%
+       select(domain1, ind_index,indicator_name, indicator_definition,available_geographies,aggregation) %>%
        flextable() %>%
        add_header_lines(paste0(input$profile_picked," Profile")) %>%
-       set_header_labels (domain1="Domain",ind_number= "",indicator_name="Indicator",indicator_definition="Indicator Definition",
+       set_header_labels (domain1="Domain",ind_index= "",indicator_name="Indicator",indicator_definition="Indicator Definition",
                           available_geographies="Available geographies", aggregation="Level of aggregation") %>%
        theme_box() %>%
        merge_v(j = ~ domain1) %>%
@@ -2455,12 +2469,12 @@ function(input, output, session) {
        autofit() %>%
        htmltools_value()}
    else { #table all indicators (ie "show all") profiles selected - additional column for profile(s)
-       tech_indicators() %>%
-       rownames_to_column(var="ind_number") %>%
-       #select (profile, domain, ind_number,indicator_name, indicator_definition,available_geographies, aggregation)
-       select (profile, domain, ind_number,indicator_name, indicator_definition,available_geographies, aggregation) %>%
+     formatted_techdoc_data() %>%
+       arrange(profile, domain) %>%
+       rownames_to_column(var="ind_index") %>%
+       select (profile, domain,ind_index,indicator_name, indicator_definition,available_geographies, aggregation) %>%
        flextable() %>%
-       set_header_labels (profile="Profile(s)",domain="Domain(s)",ind_number="",indicator_name="Indicator",indicator_definition="Indicator Definition",
+       set_header_labels (profile="Profile(s)",domain="Domain(s)",ind_index="",indicator_name="Indicator",indicator_definition="Indicator Definition",
                           available_geographies="Available geographies", aggregation="Level of aggregation") %>%
        theme_box() %>%
        merge_v(j = ~ profile) %>%
@@ -2471,35 +2485,60 @@ function(input, output, session) {
 
  }
 
-  #render flextable - simple version before additional buttons #to be deleted when full flexibility set up
-  #output$tech_tbl <-renderUI(plot_techdoc())  #to be deleted when full flexibility set up
 
-
-  #RenderUI for display on techdoc page - displayed dependent on selection of 'summary of multiple indicators' or 'single indicator in detial'
-  output$techdoc_display <- renderUI({  #render techincal info depending on whether selected to see summary of available indictors or single indicator definition
-    
-    # Preparing a brief explanation for each visualisation 
-    if (input$techdoc_selection == "List of available indicators") {
-      plot_techdoc()
-    } else if (input$techdoc_selection == "Detailed information about single indicator")
-      p("loading..")}  #shows 'loading' as there can be a small delay while switching between views
-    )
+ ## RenderUI for display on techdoc page - displayed dependent on selection of 'summary of multiple indicators' or 'single indicator in detial'
+ output$techdoc_display <- renderUI({  #render techincal info depending on whether selected to see summary of available indictors or single indicator definition
+   
+   # Preparing a brief explanation for each visualisation 
+   if (input$techdoc_selection == "List of available indicators") {
+     plot_techdoc()
+   } else if (input$techdoc_selection == "Detailed information about single indicator")
+     p("loading..")}  #shows 'loading' as there can be a small delay while switching between views
+ )
+ 
+ ## Downloads for techdoc1
+ # CSV data
+ 
+ #techdoc_csv <- reactive({ format_definitions_csv(formatted_techdoc_data()) }) # if using formatting function in global script.
+ 
+ techdoc_csv <- function() {
+   if (input$profile_picked != "Show all"){
+     formatted_techdoc_data() %>%
+       rename(profile_selection=profilename, all_profiles=profile, domain_selection=domain1) %>%  
+       select(c(profile_selection, domain_selection,ind_index,indicator_name, indicator_number, indicator_definition, all_profiles, domain,inclusion_rationale, data_source,
+                diagnostic_code_position, numerator, denominator, measure, disclosure_control, rounding, age_group, sex, year_type,
+                trends_from, aggregation, update_frequency, available_geographies, confidence_interval_method, notes_caveats, 
+                related_publications, supporting_information, last_updated, next_update))}
+   else { #table all indicators (ie "show all") profiles selected - additional column for profile(s)
+     formatted_techdoc_data() %>%
+       arrange(indicator_name) %>%
+       select(c(indicator_name, indicator_number, indicator_definition,profile, domain, inclusion_rationale, data_source,
+                diagnostic_code_position, numerator, denominator, measure, disclosure_control, rounding, age_group, sex, year_type,
+                trends_from, aggregation, update_frequency, available_geographies, confidence_interval_method, notes_caveats, 
+                related_publications, supporting_information, last_updated, next_update))}
+ }
+ 
+ output$download_techdoc1_csv <- downloadHandler(
+   filename ="indicator_definitions.csv",
+   content = function(file) {
+     write.csv(techdoc_csv(),
+               file, row.names=FALSE) } 
+ )
+ 
+ #PNG - not working...
+ output$download_techdoc1_png <- downloadHandler(
+   filename = 'techdoc1.png',
+   content = function(file){
+     save_as_image(plot_techdoc())
+   })
+ 
   
   
+  #################################################.  
+  #### Techdoc(2) details conditional panel.
   
   
-  
-
-  #################################################.
-  ##  Technical Doc Page ----
-  #################################################.
-  # Reactive data
-  indicator_selected <- reactive({ filter(techdoc,techdoc$indicator_name==input$indicator_defined)})
-  
-  ###############################################.
-  
-  # Reactive filters for technical details document
-  #Filter indicator list by  profile or by domain 
+  # Reactive filters for technical details document - filter for indicator dependent on profile/topic selected
   output$indicator_chosen <- renderUI ({
     
     if (input$profile_picked != "Show all"){
@@ -2508,10 +2547,10 @@ function(input, output, session) {
     } else if (input$topic_defined != "Show all"){
       indic_selection <- sort(unique(
         optdata$indicator[substr(optdata$profile_domain1, 5, nchar(as.vector(optdata$profile_domain1)))
-                            == input$topic_defined |
-                          substr(optdata$profile_domain2, 5, nchar(as.vector(optdata$profile_domain2)))
-                            == input$topic_defined]))
-
+                          == input$topic_defined |
+                            substr(optdata$profile_domain2, 5, nchar(as.vector(optdata$profile_domain2)))
+                          == input$topic_defined]))
+      
     } else { 
       indic_selection <- indicator_list
     }
@@ -2521,8 +2560,6 @@ function(input, output, session) {
                    selected = character(0), multiple=TRUE, 
                    options = list(placeholder = "Select your indicator of interest", maxItems = 1)) 
   }) 
-  
-  
   
   
   #To keep it simple, when you change profile, reset topic and vice versa.
@@ -2543,6 +2580,10 @@ function(input, output, session) {
   ###############################################.
   # Creating text and titles for info
   # Title box
+  
+  #reactive selection for single indicator
+  indicator_selected <- reactive({ filter(techdoc,techdoc$indicator_name==input$indicator_defined)})
+  
   output$indicator <- renderValueBox({
     
     valueBox(tags$p(indicator_selected()$indicator_name, style="color: white; font-size: 30px; font-weight: bold;"), 
@@ -2594,23 +2635,6 @@ function(input, output, session) {
   
   
   
-  
-  
-#Downloads for techdoc1
-#CSV data
-    output$download_techdoc1_csv <- downloadHandler(
-    filename ="indicator_definitions.csv",
-    content = function(file) {
-      write.csv(tech_indicators(),
-                file, row.names=FALSE) } 
-  )
-  
-#PNG - not working...
-   output$download_techdoc1_png <- downloadHandler(
-     filename = 'techdoc1.png',
-     content = function(file){
-         save_as_image(plot_techdoc())
-            })
   
   
 

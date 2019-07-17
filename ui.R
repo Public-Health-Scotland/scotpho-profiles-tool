@@ -633,7 +633,7 @@ navbarMenu("Info", icon = icon("info-circle"),
                     #Sidepanel for filtering data
                     fluidRow(
                       column(width = 12,
-                             div(style = "width:60%; margin-left: 5%; min-width: 350px",
+                             div(style = "width:60%; margin-left: 2%; min-width: 350px",
                              p(h3("Indicator definitions and technical information")),
                              p(h5("This page provides information about available ScotPHO indicators.ScotPHO Profiles consists of a collection of indicators related to a specific theme 
                                 e.g. 'Alcohol' or 'Drugs'.Indicators within a profile are grouped into topics to keep indicators about a similar topic together.")),
@@ -642,7 +642,7 @@ navbarMenu("Info", icon = icon("info-circle"),
                                  radioGroupButtons("techdoc_selection", status = "primary",
                                                    choices = c("List of available indicators", "Detailed information about single indicator"), label= "Step 1. Select what you want to see:" ),
                              br(),
-                             selectizeInput("profile_picked", label = "2. Select a single profile (e.g. Health & wellbeing) or show all available ScotPHO indicators",
+                             selectizeInput("profile_picked", label = "2. Select a single profile e.g. Health & wellbeing (optional)",
                                             width = "600px",choices = profile_list_filter, selected = "Show all", multiple=FALSE),
                              br(),
                              #conditional panel for profile summary
