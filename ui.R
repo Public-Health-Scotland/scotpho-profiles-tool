@@ -650,8 +650,9 @@ navbarMenu("Info", icon = icon("info-circle"),
                                               # selectizeInput("techdoc_geotype", label = "3. limit geo type",
                                               #                width = "500px",choices = c("Show all", areatype_list), selected = "Show all", multiple=FALSE),
                                               uiOutput("tecdoc_geographies"),
-                                              savechart_button('download_techdoc1', 'Save Indicator Summary',  class = "down"),
-                                              downloadButton("definitions_by_indicator",'Download indicator definition', class = "down")),
+                                              savechart_button('download_techdoc1_png', 'Save Indicator Summary (.png)',  class = "down"),
+                                              #downloadButton("definitions_by_indicator",'Download Indicator Summary (.csv)', class = "down")),
+                                              downloadButton("download_techdoc1_csv",'Download Indicator Summary (.csv)', class = "down")),
                              #conditional panel for single indicator
                              conditionalPanel(condition = 'input.techdoc_selection == "Detailed information about single indicator"',
                                               div(style="display:inline-block", 
@@ -659,9 +660,9 @@ navbarMenu("Info", icon = icon("info-circle"),
                                                                  width = "250px", choices = topic_list_filter, 
                                                                  selected = "Show all", multiple=FALSE)),
                                               uiOutput("indicator_chosen"),
-                                              savechart_button('download_techdoc', 'Save chart',  class = "down")
-                                              # downloadButton("definitions_by_indicator",
-                                              #                'Download indicator definition', class = "down")
+                                              savechart_button('download_detailtechdoc_png', 'Save Indicator Description (.png)',  class = "down"),
+                                              downloadButton("download_detailtechdoc_csv",'Download All Definitions', class = "down")
+                                              #downloadButton("definitions_by_indicator",'Download indicator definition', class = "down")
                              )))),
                     wellPanel(
                       column(11,

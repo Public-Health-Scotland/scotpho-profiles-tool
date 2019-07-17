@@ -2374,56 +2374,75 @@ function(input, output, session) {
    
    if (input$profile_picked != "Show all"){ #subset applied if a single profile selected
      if(input$techdoc_geotype != "Show all"){ #further filter if user selects a geography type
-       
-       techdoc_ve %>%
+         techdoc_ve %>%
          subset(grepl(input$techdoc_geotype,available_geographies)) %>%
-         subset(grepl(names(profile_list[unname(profile_list) == input$profile_picked]),profile)) %>% #filter on selected profile
-         mutate(test=regexpr((names(profile_list[unname(profile_list) == input$profile_picked])), domain), #find start position of profile name in domain column
-                test2=substr(domain,test, nchar(domain)),  #generate column that starts with filtered profile
-                findcomma=regexpr(",",test2), #find position of comma (where domain description ends
-                findhyp=regexpr("-",test2), #find position of hyphen (where domain description starts)
-                domain1= case_when(findcomma<0 ~ substr(test2,findhyp+1,nchar(test2)),
-                                   findcomma>0 ~ substr(test2,findhyp+1,findcomma-1),
-                                   TRUE ~ "")) %>% # extract domain string linked to seletec profile
-         mutate (profilename=input$profile_picked) %>%  #sort on profile name since some indicators in multiple profiles
-         arrange(profilename, domain1, indicator_name) %>%
-         rownames_to_column(var="ind_number") %>% #add numbering
-         select (domain1, ind_number,indicator_name, indicator_definition,available_geographies,aggregation)}
+         subset(grepl(names(profile_list[unname(profile_list) == input$profile_picked]),profile)) 
+        #%>% #filter on selected profile
+         # mutate(test=regexpr((names(profile_list[unname(profile_list) == input$profile_picked])), domain), #find start position of profile name in domain column
+         #        test2=substr(domain,test, nchar(domain)),  #generate column that starts with filtered profile
+         #        findcomma=regexpr(",",test2), #find position of comma (where domain description ends
+         #        findhyp=regexpr("-",test2), #find position of hyphen (where domain description starts)
+         #        domain1= case_when(findcomma<0 ~ substr(test2,findhyp+1,nchar(test2)),
+         #                           findcomma>0 ~ substr(test2,findhyp+1,findcomma-1),
+         #                           TRUE ~ "")) %>% # extract domain string linked to seletec profile
+         # mutate (profilename=input$profile_picked) %>%  #sort on profile name since some indicators in multiple profiles
+         # arrange(profilename, domain1, indicator_name) %>%
+         # rownames_to_column(var="ind_number") %>%
+         # select(domain1, ind_number,indicator_name, indicator_definition,available_geographies,aggregation)
+       } 
      
      else { # dataset if user only wants a single profile but all geography types 
        techdoc_ve %>%
-         subset(grepl(names(profile_list[unname(profile_list) == input$profile_picked]),profile)) %>% #filter on selected profile
-         mutate(test=regexpr((names(profile_list[unname(profile_list) == input$profile_picked])), domain), #find start position of profile name in domain column
-                test2=substr(domain,test, nchar(domain)),  #generate column that starts with filtered profile
-                findcomma=regexpr(",",test2), #find position of comma (where domain description ends
-                findhyp=regexpr("-",test2), #find position of hyphen (where domain description starts)
-                domain1= case_when(findcomma<0 ~ substr(test2,findhyp+1,nchar(test2)),
-                                   findcomma>0 ~ substr(test2,findhyp+1,findcomma-1),
-                                   TRUE ~ "")) %>% # extract domain string linked to seletec profile
-         mutate (profilename=input$profile_picked) %>%  #sort on profile name since some indicators in multiple profiles
-         arrange(profilename, domain1, indicator_name) %>%
-         rownames_to_column(var="ind_number") %>% #add numbering
-         select (domain1, ind_number,indicator_name, indicator_definition,available_geographies,aggregation)}}
-        
-     else if (input$profile_picked == "Show all"){ #subset applied if user selects all profiles
-       if(input$techdoc_geotype == "Show all"){  # user selects all geography types
-         techdoc_ve %>%
-           arrange(profile, domain) %>%
-           rownames_to_column(var="ind_number") %>%
-           select (profile, domain, ind_number,indicator_name, indicator_definition,available_geographies, aggregation)}
-       else { # user selects a single geography type
-         techdoc_ve %>%
-           subset(grepl(input$techdoc_geotype,available_geographies)) %>%
-           arrange(profile, domain) %>%
-           rownames_to_column(var="ind_number") %>%
-           select (profile, domain, ind_number,indicator_name, indicator_definition,available_geographies, aggregation)}}
+         subset(grepl(names(profile_list[unname(profile_list) == input$profile_picked]),profile)) 
+       #%>% #filter on selected profile
+         # mutate(test=regexpr((names(profile_list[unname(profile_list) == input$profile_picked])), domain), #find start position of profile name in domain column
+         #        test2=substr(domain,test, nchar(domain)),  #generate column that starts with filtered profile
+         #        findcomma=regexpr(",",test2), #find position of comma (where domain description ends
+         #        findhyp=regexpr("-",test2), #find position of hyphen (where domain description starts)
+         #        domain1= case_when(findcomma<0 ~ substr(test2,findhyp+1,nchar(test2)),
+         #                           findcomma>0 ~ substr(test2,findhyp+1,findcomma-1),
+         #                           TRUE ~ "")) %>% # extract domain string linked to seletec profile
+         # mutate (profilename=input$profile_picked) %>%  #sort on profile name since some indicators in multiple profiles
+         # arrange(profilename, domain1, indicator_name) %>%
+         # rownames_to_column(var="ind_number") %>%
+         # select(domain1, ind_number,indicator_name, indicator_definition,available_geographies,aggregation)
+       }}
+   
+   else if (input$profile_picked == "Show all"){ #subset applied if user selects all profiles
+     if(input$techdoc_geotype == "Show all"){  # user selects all geography types
+       techdoc_ve %>%
+         arrange(profile, domain) 
+       # %>%
+       #   rownames_to_column(var="ind_number") %>%
+       #   select (profile, domain, ind_number,indicator_name, indicator_definition,available_geographies, aggregation)
+       }
+     else { # user selects a single geography type
+       techdoc_ve %>%
+         subset(grepl(input$techdoc_geotype,available_geographies)) %>%
+         arrange(profile, domain) 
+       #%>%
+         #rownames_to_column(var="ind_number") %>%
+         #select (profile, domain, ind_number,indicator_name, indicator_definition,available_geographies, aggregation)
+         }}
  })
 
  # Function to construct flextable displaying techdoc info
  plot_techdoc <- function(){
    
-   if (input$profile_picked != "Show all"){ # table if single profile selected
-     tech_indicators() %>%
+   if (input$profile_picked != "Show all"){ # table for a single profile selection
+       tech_indicators() %>%
+       mutate(test=regexpr((names(profile_list[unname(profile_list) == input$profile_picked])), domain), #find start position of profile name in domain column
+              test2=substr(domain,test, nchar(domain)),  #generate column that starts with filtered profile
+              findcomma=regexpr(",",test2), #find position of comma (where domain description ends
+              findhyp=regexpr("-",test2), #find position of hyphen (where domain description starts)
+              domain1= case_when(findcomma<0 ~ substr(test2,findhyp+1,nchar(test2)),
+                                 findcomma>0 ~ substr(test2,findhyp+1,findcomma-1),
+                                 TRUE ~ "")) %>% # extract domain string linked to seletec profile
+       mutate (profilename=input$profile_picked) %>%  #sort on profile name since some indicators in multiple profiles
+       arrange(profilename, domain1, indicator_name) %>%
+       rownames_to_column(var="ind_number") %>%
+       select(domain1, ind_number,indicator_name, indicator_definition,available_geographies,aggregation) %>%
+      # select(domain1, ind_number,indicator_name, indicator_definition,available_geographies,aggregation) %>%
        flextable() %>%
        add_header_lines(paste0(input$profile_picked," Profile")) %>%
        set_header_labels (domain1="Domain",ind_number= "",indicator_name="Indicator",indicator_definition="Indicator Definition",
@@ -2431,10 +2450,15 @@ function(input, output, session) {
        theme_box() %>%
        merge_v(j = ~ domain1) %>%
        align_text_col(align = "left") %>%
+       color(i = 1, color = "white", part = "header") %>% # format text colour of header to identify profile 
+       bg(i=1,bg="#007ba7",part="header") %>%  # format background colour of header to identify profile
        autofit() %>%
-       htmltools_value()} 
-   else { #table if all profiles selected
-     tech_indicators() %>%
+       htmltools_value()}
+   else { #table all indicators (ie "show all") profiles selected - additional column for profile(s)
+       tech_indicators() %>%
+       rownames_to_column(var="ind_number") %>%
+       #select (profile, domain, ind_number,indicator_name, indicator_definition,available_geographies, aggregation)
+       select (profile, domain, ind_number,indicator_name, indicator_definition,available_geographies, aggregation) %>%
        flextable() %>%
        set_header_labels (profile="Profile(s)",domain="Domain(s)",ind_number="",indicator_name="Indicator",indicator_definition="Indicator Definition",
                           available_geographies="Available geographies", aggregation="Level of aggregation") %>%
@@ -2443,8 +2467,8 @@ function(input, output, session) {
        merge_v(j = ~ domain) %>%
        align_text_col(align = "left") %>%
        autofit() %>%
-       htmltools_value()
-   }
+       htmltools_value()}
+
  }
 
   #render flextable - simple version before additional buttons #to be deleted when full flexibility set up
@@ -2565,7 +2589,43 @@ function(input, output, session) {
                 file, row.names=FALSE) } 
   )
   
+#Downloads for techdoc2  
+#CSV 
+  
+  
+  
+  
+  
+#Downloads for techdoc1
+#CSV data
+    output$download_techdoc1_csv <- downloadHandler(
+    filename ="indicator_definitions.csv",
+    content = function(file) {
+      write.csv(tech_indicators(),
+                file, row.names=FALSE) } 
+  )
+  
+#PNG - not working...
+   output$download_techdoc1_png <- downloadHandler(
+     filename = 'techdoc1.png',
+     content = function(file){
+         save_as_image(plot_techdoc())
+            })
+  
+  
+
 } #server closing bracket
 
 #########################  END ----
 
+
+
+# #Downloading chart
+# output$download_rankplot <- downloadHandler(
+#   filename = 'rank.png',
+#   content = function(file){
+#     export(p = plot_rank_charts() %>% 
+#              layout(title = paste0(input$indic_rank, "<br>", make_rank_subtitle()),
+#                     margin = list(t = 180)),
+#            file = file)
+#   })
