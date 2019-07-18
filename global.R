@@ -91,7 +91,7 @@ plot_nodata_gg <- function() {
 optdata <- readRDS("data/optdata.rds") #main dataset
 techdoc <- readRDS("data/techdoc.rds") #technical documents data including definitions
 
-techdoc_ve <- readRDS("data/techdoc_ve.rds") #technical documents data including definitions
+#techdoc_ve <- readRDS("data/techdoc_ve.rds") #technical documents data including definitions
 geo_lookup <- readRDS("data/geo_lookup.rds") #geography lookup
 profile_lookup <- readRDS("data/profile_lookup.rds") #profile lookup
 
