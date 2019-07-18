@@ -2318,189 +2318,106 @@ function(input, output, session) {
   ##  Technical Doc Page ----
   #################################################.
   
-  
   #### Techdoc(1) summary conditional panel.
   
-  ## Reactive filters 
-  # Reactive list of available geography types based on which profile is selected.
+  ## Reactive filter of available geography types based on which profile is selected.
   output$tecdoc_geographies <- renderUI ({
     
     if (input$profile_picked != "Show all"){
       geo_selection <- sort(unique(c(as.character(optdata$areatype[grep(input$profile_picked,optdata$profile_domain1)]),
                                      as.character(optdata$areatype[grep(input$profile_picked,optdata$profile_domain2)] ))))
-    } else { 
-      geo_selection <- areatype_list
-    }
+    } else {geo_selection <- areatype_list }
     
     selectizeInput("techdoc_geotype", label = "3. Select a geography type (optional)",
-                   width = "600px", choices = c("Show all", geo_selection), 
+                   width = "500px", choices = c("Show all", geo_selection), 
                    selected = "Show all", multiple=TRUE, 
                    options = list(placeholder = "Select....", maxItems = 1)) 
   }) 
   
-
- #Initial filter that didn't take into account a filter on geo type 
- #Reactive filtering of the technical docment dataset to used in flextable displaying available profile indicators   
- # tech_indicators <- reactive({  
- # #filter techdoc for either a single profile or all indicators
- #   if (input$profile_picked != "Show all"){ #if single profile selected
- # 
- #     techdoc_ve %>%
- #       subset(grepl(input$techdoc_geotype,available_geographies)) %>%
- #       subset(grepl(names(profile_list[unname(profile_list) == input$profile_picked]),profile)) %>% #filter on selected profile
- #             mutate(test=regexpr((names(profile_list[unname(profile_list) == input$profile_picked])), domain), #find start position of profile name in domain column
- #             test2=substr(domain,test, nchar(domain)),  #generate column that starts with filtered profile
- #             findcomma=regexpr(",",test2), #find position of comma (where domain description ends
- #             findhyp=regexpr("-",test2), #find position of hyphen (where domain description starts)
- #             domain1= case_when(findcomma<0 ~ substr(test2,findhyp+1,nchar(test2)),
- #                                findcomma>0 ~ substr(test2,findhyp+1,findcomma-1),
- #                                TRUE ~ "")) %>% # extract domain string linked to seletec profile
- #      mutate (profilename=input$profile_picked) %>%  #sort on profile name since some indicators in multiple profiles
- #      arrange(profilename, domain1, indicator_name) %>%
- #      rownames_to_column(var="ind_number") %>% #add numbering
- #      select (domain1, ind_number,indicator_name, indicator_definition,available_geographies,aggregation)
- # 
- #  } else { #else show all profile indicators
- #     techdoc_ve %>%
- #      arrange(profile, domain) %>%
- #      rownames_to_column(var="ind_number") %>%
- #      select (profile, domain, ind_number,indicator_name, indicator_definition,available_geographies, aggregation)}
- #  })
-
-## Reactive dataset for flextable - four possible combinations of data
+  ## Reactive dataset filtered for flextable - four possible combinations of data
+  techdoc_indicator_data <- reactive({  
+    if (input$profile_picked != "Show all"){ # if a single profile selected
+      if(input$techdoc_geotype != "Show all"){ #further filter if user selects a geography type
+        techdoc_ve %>%
+          subset(grepl(input$techdoc_geotype,available_geographies)) %>%
+          subset(grepl(names(profile_list[unname(profile_list) == input$profile_picked]),profile))} 
+      else { # dataset if user wants a single profile but all geography types 
+        techdoc_ve %>%
+          subset(grepl(names(profile_list[unname(profile_list) == input$profile_picked]),profile))}}
+    else if (input$profile_picked == "Show all"){ #subset applied if user selects all profiles
+      if(input$techdoc_geotype == "Show all"){  # user selects all geography types
+        techdoc_ve}
+      else { # user selects a single geography type
+        techdoc_ve %>%
+          subset(grepl(input$techdoc_geotype,available_geographies))}}
+  })
   
-
+  ## Function to manipulate filtered data - easier for data download if manipulations done after filters
+  formatted_techdoc_data <- function(){
+    if (input$profile_picked != "Show all"){
+      techdoc_indicator_data() %>%
+        mutate(test=regexpr((names(profile_list[unname(profile_list) == input$profile_picked])), domain), #find start position of profile name in domain column
+               test2=substr(domain,test, nchar(domain)),  #generate column that starts with filtered profile
+               findcomma=regexpr(",",test2), #find position of comma (where domain description ends
+               findhyp=regexpr("-",test2), #find position of hyphen (where domain description starts)
+               domain1= case_when(findcomma<0 ~ substr(test2,findhyp+1,nchar(test2)),
+                                  findcomma>0 ~ substr(test2,findhyp+1,findcomma-1),
+                                  TRUE ~ "")) %>% # extract domain string linked to seletec profile
+        mutate (profilename=input$profile_picked) %>%  #sort on profile name since some indicators in multiple profiles
+        arrange(profilename, domain1, indicator_name) %>%
+        rownames_to_column(var="ind_index")} 
+    else{
+      techdoc_indicator_data()}}
   
- techdoc_indicator_data <- reactive({  
-   
-   if (input$profile_picked != "Show all"){ # if a single profile selected
-     if(input$techdoc_geotype != "Show all"){ #further filter if user selects a geography type
-         techdoc_ve %>%
-         subset(grepl(input$techdoc_geotype,available_geographies)) %>%
-         subset(grepl(names(profile_list[unname(profile_list) == input$profile_picked]),profile)) 
-        #%>% #filter on selected profile
-         # mutate(test=regexpr((names(profile_list[unname(profile_list) == input$profile_picked])), domain), #find start position of profile name in domain column
-         #        test2=substr(domain,test, nchar(domain)),  #generate column that starts with filtered profile
-         #        findcomma=regexpr(",",test2), #find position of comma (where domain description ends
-         #        findhyp=regexpr("-",test2), #find position of hyphen (where domain description starts)
-         #        domain1= case_when(findcomma<0 ~ substr(test2,findhyp+1,nchar(test2)),
-         #                           findcomma>0 ~ substr(test2,findhyp+1,findcomma-1),
-         #                           TRUE ~ "")) %>% # extract domain string linked to seletec profile
-         # mutate (profilename=input$profile_picked) %>%  #sort on profile name since some indicators in multiple profiles
-         # arrange(profilename, domain1, indicator_name) %>%
-         # rownames_to_column(var="ind_number") %>%
-         # select(domain1, ind_number,indicator_name, indicator_definition,available_geographies,aggregation)
-       } 
-     
-     else { # dataset if user wants a single profile but all geography types 
-       techdoc_ve %>%
-         subset(grepl(names(profile_list[unname(profile_list) == input$profile_picked]),profile)) 
-       #%>% #filter on selected profile
-         # mutate(test=regexpr((names(profile_list[unname(profile_list) == input$profile_picked])), domain), #find start position of profile name in domain column
-         #        test2=substr(domain,test, nchar(domain)),  #generate column that starts with filtered profile
-         #        findcomma=regexpr(",",test2), #find position of comma (where domain description ends
-         #        findhyp=regexpr("-",test2), #find position of hyphen (where domain description starts)
-         #        domain1= case_when(findcomma<0 ~ substr(test2,findhyp+1,nchar(test2)),
-         #                           findcomma>0 ~ substr(test2,findhyp+1,findcomma-1),
-         #                           TRUE ~ "")) %>% # extract domain string linked to seletec profile
-         # mutate (profilename=input$profile_picked) %>%  #sort on profile name since some indicators in multiple profiles
-         # arrange(profilename, domain1, indicator_name) %>%
-         # rownames_to_column(var="ind_number") %>%
-         # select(domain1, ind_number,indicator_name, indicator_definition,available_geographies,aggregation)
-       }}
-   
-   else if (input$profile_picked == "Show all"){ #subset applied if user selects all profiles
-     if(input$techdoc_geotype == "Show all"){  # user selects all geography types
-       techdoc_ve 
-       #  arrange(profile, domain) 
-       # %>%
-       #   rownames_to_column(var="ind_number") %>%
-       #   select (profile, domain, ind_number,indicator_name, indicator_definition,available_geographies, aggregation)
-       }
-     else { # user selects a single geography type
-       techdoc_ve %>%
-         subset(grepl(input$techdoc_geotype,available_geographies))
-       #%>%
-         #arrange(profile, domain) 
-       #%>%
-         #rownames_to_column(var="ind_number") %>%
-         #select (profile, domain, ind_number,indicator_name, indicator_definition,available_geographies, aggregation)
-         }}
- })
-
- # Format filtered data - easier for data download if separate function
- formatted_techdoc_data <- function(){
-   if (input$profile_picked != "Show all"){
-     techdoc_indicator_data() %>%
-       mutate(test=regexpr((names(profile_list[unname(profile_list) == input$profile_picked])), domain), #find start position of profile name in domain column
-              test2=substr(domain,test, nchar(domain)),  #generate column that starts with filtered profile
-              findcomma=regexpr(",",test2), #find position of comma (where domain description ends
-              findhyp=regexpr("-",test2), #find position of hyphen (where domain description starts)
-              domain1= case_when(findcomma<0 ~ substr(test2,findhyp+1,nchar(test2)),
-                                 findcomma>0 ~ substr(test2,findhyp+1,findcomma-1),
-                                 TRUE ~ "")) %>% # extract domain string linked to seletec profile
-       mutate (profilename=input$profile_picked) %>%  #sort on profile name since some indicators in multiple profiles
-       arrange(profilename, domain1, indicator_name) %>%
-       rownames_to_column(var="ind_index")} 
-   else{
-     techdoc_indicator_data() 
-     #%>%
-       #arrange(profile, domain) %>%
-       #rownames_to_column(var="ind_index")
-       }}
- 
- 
- 
- # Function to format data and construct flextable displaying techdoc info
- plot_techdoc <- function(){
-   
-   if (input$profile_picked != "Show all"){ # table for a single profile selection
-     formatted_techdoc_data() %>%
-       select(domain1, ind_index,indicator_name, indicator_definition,available_geographies,aggregation) %>%
-       flextable() %>%
-       add_header_lines(paste0(input$profile_picked," Profile")) %>%
-       set_header_labels (domain1="Domain",ind_index= "",indicator_name="Indicator",indicator_definition="Indicator Definition",
-                          available_geographies="Available geographies", aggregation="Level of aggregation") %>%
-       theme_box() %>%
-       merge_v(j = ~ domain1) %>%
-       align_text_col(align = "left") %>%
-       color(i = 1, color = "white", part = "header") %>% # format text colour of header to identify profile 
-       bg(i=1,bg="#007ba7",part="header") %>%  # format background colour of header to identify profile
-       autofit() %>%
-       htmltools_value()}
-   else { #table all indicators (ie "show all") profiles selected - additional column for profile(s)
-     formatted_techdoc_data() %>%
-       arrange(profile, domain) %>%
-       rownames_to_column(var="ind_index") %>%
-       select (profile, domain,ind_index,indicator_name, indicator_definition,available_geographies, aggregation) %>%
-       flextable() %>%
-       set_header_labels (profile="Profile(s)",domain="Domain(s)",ind_index="",indicator_name="Indicator",indicator_definition="Indicator Definition",
-                          available_geographies="Available geographies", aggregation="Level of aggregation") %>%
-       theme_box() %>%
-       merge_v(j = ~ profile) %>%
-       merge_v(j = ~ domain) %>%
-       align_text_col(align = "left") %>%
-       autofit() %>%
-       htmltools_value()}
-
- }
+  ## Function to construct flextable displaying techdoc info
+  plot_techdoc <- function(){
+    
+    if (input$profile_picked != "Show all"){ # table for a single profile selection
+      formatted_techdoc_data() %>%
+        select(domain1, ind_index,indicator_name, indicator_definition,available_geographies,aggregation) %>%
+        flextable() %>%
+        add_header_lines(paste0(input$profile_picked," Profile")) %>%
+        set_header_labels (domain1="Domain",ind_index= "",indicator_name="Indicator",indicator_definition="Indicator Definition",
+                           available_geographies="Available geographies", aggregation="Level of aggregation") %>%
+        theme_box() %>%
+        merge_v(j = ~ domain1) %>%
+        align_text_col(align = "left") %>%
+        color(i = 1, color = "white", part = "header") %>% # format text colour of header to identify profile 
+        bg(i=1,bg="#007ba7",part="header") %>%  # format background colour of header to identify profile
+        autofit() %>%
+        htmltools_value()}
+    else { #table all indicators (ie "show all") profiles selected - additional column for profile(s)
+      formatted_techdoc_data() %>%
+        arrange(profile, domain) %>%
+        rownames_to_column(var="ind_index") %>%
+        select (profile, domain,ind_index,indicator_name, indicator_definition,available_geographies, aggregation) %>%
+        flextable() %>%
+        set_header_labels (profile="Profile(s)",domain="Domain(s)",ind_index="",indicator_name="Indicator",indicator_definition="Indicator Definition",
+                           available_geographies="Available geographies", aggregation="Level of aggregation") %>%
+        theme_box() %>%
+        merge_v(j = ~ profile) %>%
+        merge_v(j = ~ domain) %>%
+        align_text_col(align = "left") %>%
+        autofit() %>%
+        htmltools_value()}
+  }
 
 
- ## RenderUI for display on techdoc page - displayed dependent on selection of 'summary of multiple indicators' or 'single indicator in detial'
- output$techdoc_display <- renderUI({  #render techincal info depending on whether selected to see summary of available indictors or single indicator definition
-   
-   # Preparing a brief explanation for each visualisation 
-   if (input$techdoc_selection == "List of available indicators") {
-     plot_techdoc()
-   } else if (input$techdoc_selection == "Detailed information about single indicator")
-     p("loading..")}  #shows 'loading' as there can be a small delay while switching between views
- )
+  ## RenderUI for which version flextable to display on techdoc page
+  output$techdoc_display <- renderUI({  #render techincal info depending on whether selected to see summary of available indictors or single indicator definition
+    
+    # Preparing a brief explanation for each visualisation 
+    if (input$techdoc_selection == "List of available indicators") {
+      plot_techdoc()
+    } else if (input$techdoc_selection == "Detailed information about single indicator")
+      p("loading..")}  #shows 'loading' as there can be a small delay while switching back between views
+  )
  
  ## Downloads for techdoc1
- # CSV data
  
  #techdoc_csv <- reactive({ format_definitions_csv(formatted_techdoc_data()) }) # if using formatting function in global script.
  
+ ## Function to format data for csv according to whether showing sinle profile or all profiles
  techdoc_csv <- function() {
    if (input$profile_picked != "Show all"){
      formatted_techdoc_data() %>%
@@ -2518,6 +2435,7 @@ function(input, output, session) {
                 related_publications, supporting_information, last_updated, next_update))}
  }
  
+ ## Download techdoc data from conditional panel (flextable)
  output$download_techdoc1_csv <- downloadHandler(
    filename ="indicator_definitions.csv",
    content = function(file) {
@@ -2525,71 +2443,73 @@ function(input, output, session) {
                file, row.names=FALSE) } 
  )
  
- #PNG - not working...
- output$download_techdoc1_png <- downloadHandler(
-   filename = 'techdoc1.png',
-   content = function(file){
-     save_as_image(plot_techdoc())
-   })
+ #ideally want another action button to download png image of flextable
  
-  
-  
+ #PNG - not working...
+ # output$download_techdoc1_png <- downloadHandler(
+ #   filename = 'techdoc1.png',
+ #   content = function(file){
+ #     save_as_image(plot_techdoc(),path = "techdoc1.png")
+ #   })
+ 
+ # output$download_techdoc1_png <- downloadHandler(
+ #   filename = 'techdoc1.png',
+ #   content = function(file){
+ #     save_as_image(plot_techdoc(),path = "techdoc1.png")
+ #   })
+ # 
+
+ 
   #################################################.  
   #### Techdoc(2) details conditional panel.
   
-  
-  # Reactive filters for technical details document - filter for indicator dependent on profile/topic selected
-  output$indicator_chosen <- renderUI ({
-    
-    if (input$profile_picked != "Show all"){
-      indic_selection <- sort(unique(c(as.character(optdata$indicator[grep(input$profile_picked,optdata$profile_domain1)]),
-                                       as.character(optdata$indicator[grep(input$profile_picked,optdata$profile_domain2)] ))))
-    } else if (input$topic_defined != "Show all"){
-      indic_selection <- sort(unique(
-        optdata$indicator[substr(optdata$profile_domain1, 5, nchar(as.vector(optdata$profile_domain1)))
-                          == input$topic_defined |
-                            substr(optdata$profile_domain2, 5, nchar(as.vector(optdata$profile_domain2)))
-                          == input$topic_defined]))
-      
-    } else { 
-      indic_selection <- indicator_list
-    }
-    
-    selectizeInput("indicator_defined", label = "3.Select an indicator here to see detailed technical information",
-                   width = "510px", choices = indic_selection, 
-                   selected = character(0), multiple=TRUE, 
-                   options = list(placeholder = "Select your indicator of interest", maxItems = 1)) 
-  }) 
+ ## Reactive filters for technical details document - filter for indicator dependent on profile/topic selected
+ output$indicator_choices <- renderUI ({
+   
+   if (input$profile_picked != "Show all"){
+     indic_selection <- sort(unique(c(as.character(optdata$indicator[grep(input$profile_picked,optdata$profile_domain1)]),
+                                      as.character(optdata$indicator[grep(input$profile_picked,optdata$profile_domain2)] ))))
+   } else if (input$topic_defined != "Show all"){
+     indic_selection <- sort(unique(
+       optdata$indicator[substr(optdata$profile_domain1, 5, nchar(as.vector(optdata$profile_domain1)))
+                         == input$topic_defined |
+                           substr(optdata$profile_domain2, 5, nchar(as.vector(optdata$profile_domain2)))
+                         == input$topic_defined]))
+   } else {indic_selection <- indicator_list}
+   
+   selectizeInput("indicator_selection", label = "3.Select an indicator for detailed technical information",
+                  width = "510px", choices = indic_selection, 
+                  selected = character(0), multiple=TRUE, 
+                  options = list(placeholder = "Make a selection to see information", maxItems = 1)) 
+ }) 
   
   
   #To keep it simple, when you change profile, reset topic and vice versa.
   observeEvent(input$profile_picked, { 
     if (input$topic_defined != "Show all" && input$profile_picked != "Show all"){ 
       updateSelectizeInput(session,"topic_defined", label = "Or by domain",
-                           choices = topic_list_filter, selected = "Show all")
-    }
+                           choices = topic_list_filter, selected = "Show all")}
   })
   
   observeEvent(input$topic_defined, { 
     if (input$profile_picked != "Show all" && input$topic_defined != "Show all"){ 
       updateSelectizeInput(session,"profile_picked", label = "Filter by profile",
-                           choices = profile_list_filter, selected = "Show all")
-    }
+                           choices = profile_list_filter, selected = "Show all")}
   })
   
   ###############################################.
-  # Creating text and titles for info
-  # Title box
-  
+  # Creating text and titles for info to display
+ 
   #reactive selection for single indicator
-  indicator_selected <- reactive({ filter(techdoc,techdoc$indicator_name==input$indicator_defined)})
+  indicator_selected <- reactive({ filter(techdoc,techdoc$indicator_name==input$indicator_selection)})
   
+  #Text for title of indicator selected
   output$indicator <- renderValueBox({
-    
-    valueBox(tags$p(indicator_selected()$indicator_name, style="color: white; font-size: 30px; font-weight: bold;"), 
+        valueBox(tags$p(indicator_selected()$indicator_name, style="color: white; font-size: 30px; font-weight: bold;"), 
              HTML(paste("<b>","Profile:","</b>",indicator_selected()$profile,br(),
                         "<b>","Domain:","</b>",indicator_selected()$domain)), icon = icon ("book"),color = "blue")
   })
+  
   
   # Text for all metadata parts of the indicator
   output$definition <- renderText ({indicator_selected()$indicator_definition })
@@ -2617,19 +2537,32 @@ function(input, output, session) {
   output$next_update <- renderText ({indicator_selected()$next_update})
   
   
-  ###############################################.
-  #Download definitions table for selected indicator
-  indicator_definitions <- reactive({ techdoc %>% filter(indicator_name == input$indicator_defined)})
+  ## Download techdoc data from 2nd conditional panel (detailed indicator)
+  #Download definitions table for selected indicator - not
+
+  indicator_csv <- reactive({ format_definitions_csv(indicator_selected()) })
   
-  indicator_csv <- reactive({ format_definitions_csv(indicator_definitions()) })
+  allindicator_csv <- reactive({ format_definitions_csv(techdoc) })
   
-  output$definitions_by_indicator <- downloadHandler(
+  output$download_detailtechdoc_csv <- downloadHandler(
     filename ="indicator_definitions.csv",
     content = function(file) {
       write.csv(indicator_csv(),
                 file, row.names=FALSE) } 
   )
   
+  output$download_alltechdoc_csv <- downloadHandler(
+    filename ="indicator_definitions.csv",
+    content = function(file) {
+      write.csv(allindicator_csv(),
+                file, row.names=FALSE) } 
+  )
+
+  #indicator_selected <- reactive({ filter(techdoc,techdoc$indicator_name==input$indicator_chosen)})
+  #Download definitions table for selected indicator
+  #indicator_selected <- reactive({ techdoc %>% filter(indicator_name == input$indicator_selected)})
+  
+    
 #Downloads for techdoc2  
 #CSV 
   

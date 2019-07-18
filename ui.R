@@ -523,146 +523,39 @@ navbarMenu("Info", icon = icon("info-circle"),
            ###############################################.
            ## Definitions ----
            ###############################################.
-           # tabPanel("Indicator definitions", value = "definition",
-           #          #Sidepanel for filtering data
-           #          fluidRow(
-           #            column(width = 5, offset= 1,
-           #                   p("Indicator definitions and technical information", style = "font-weight: bold; color: black;"),
-           #                   div(style="display:inline-block",
-           #                       selectizeInput("profile_defined", label = "Filter by Profile",
-           #                                      width = "250px", choices = profile_list_filter,
-           #                                      selected = "Show all", multiple=FALSE)),
-           #                   div(style="display:inline-block",
-           #                       selectizeInput("topic_defined", label = "Or by Topic",
-           #                                      width = "250px", choices = topic_list_filter,
-           #                                      selected = "Show all", multiple=FALSE)),
-           #                   uiOutput("indicator_chosen")
-           #            ), # column bracket
-           #            column(width=6,
-           #                   br(), br(), br(),
-           #                   downloadButton("definitions_by_indicator",
-           #                                  'Download indicator definition', class = "down")
-           #            )#column bracket
-           #          ), #fluidRow bracket
-                    # fluidRow(
-                    #   column(width=10, offset=1,
-                    #          useShinydashboard(),
-                    #          conditionalPanel(
-                    #            condition="input.indicator_defined != null",
-                    #            valueBoxOutput("indicator", width=12)))),
-                    # fluidRow(
-                    #   column(width=5, offset=1,
-                    #          conditionalPanel(
-                    #            condition="input.indicator_defined != null",
-                    #            div(class="definitionbox",
-                    #                p(paste("Definition"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                    #                h5(textOutput("definition"))),
-                    #            div(class="definitionbox",
-                    #                p(paste("Data source"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                    #                h5(textOutput("source"))),
-                    #            div(class="definitionbox",
-                    #                p(paste("Numerator"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                    #                h5(textOutput("numerator"))),
-                    #            div(class="definitionbox",
-                    #                p(paste("Measure"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                    #                h5(textOutput("measure"))),
-                    #            div(class="definitionbox",
-                    #                p(paste("Rounding and imputation"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                    #                h5(textOutput("rounding"))),
-                    #            div(class="definitionbox",
-                    #                p(paste("Year type"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                    #                h5(textOutput("year"))),
-                    #            div(class="definitionbox",
-                    #                p(paste("Trends from"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                    #                h5(textOutput("trends_from"))),
-                    #            div(class="definitionbox",
-                    #                p(paste("Geographies available"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                    #                h5(textOutput("geos"))),
-                    #            div(class="definitionbox",
-                    #                p(paste("Notes,caveats and other info"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                    #                h5(textOutput("notes"))),
-                    #            div(class="definitionbox",
-                    #                p(paste("Date last updated"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                    #                h5(textOutput("last_updated")))
-                    #          ) # conditionalPanel bracket
-                    #   ), #column bracket
-                    #   column(width=5,
-                    #          conditionalPanel(
-                    #            condition="input.indicator_defined != null",
-                    #            div(class="definitionbox",
-                    #                p(paste("Rationale for inclusion"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                    #                h5(textOutput("rationale"))),
-                    #            div(class="definitionbox",
-                    #                p(paste("Diagnostic codes & position"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                    #                h5(textOutput("diagnosis"))),
-                    #            div(class="definitionbox",
-                    #                p(paste("Denominator"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                    #                h5(textOutput("denominator"))),
-                    #            div(class="definitionbox",
-                    #                p(paste("Disclosure control"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                    #                h5(textOutput("disclosure"))),
-                    #            div(class="definitionbox",
-                    #                p(paste("Age group"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                    #                h5(textOutput("age"))),
-                    #            div(class="definitionbox",
-                    #                p(paste("Sex"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                    #                h5(textOutput("sex"))),
-                    #            div(class="definitionbox",
-                    #                p(paste("Aggregation"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                    #                h5(textOutput("aggregation"))),
-                    #            div(class="definitionbox",
-                    #                p(paste("Frequency of update"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                    #                h5(textOutput("update_frequency"))),
-                    #            div(class="definitionbox",
-                    #                p(paste("Confidence interval method"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                    #                h5(textOutput("confidence_interval"))),
-                    #            div(class="definitionbox",
-                    #                p(paste("Links to supporting information"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                    #                h5(textOutput("supporting_info"))),
-                    #            div(class="definitionbox",
-                    #                p(paste("Next update due"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                    #                h5(textOutput("next_update")))
-                    #          ) #conditional Panel bracket
-                    #   )  #column bracket
-                    # )#fluidRow bracket
-           # ), #Tab panel bracket
-           ###############################################.
-           ## Definitions2 ----
-           ###############################################.
-           tabPanel("Indicator definitions2", value = "definition2",
+           tabPanel("Indicator definitions", value = "definition",
                     #Sidepanel for filtering data
                     fluidRow(
                       column(width = 12,
                              div(style = "width:60%; margin-left: 2%; min-width: 350px",
                              p(h3("Indicator definitions and technical information")),
-                             p(h5("This page provides information about available ScotPHO indicators.ScotPHO Profiles consists of a collection of indicators related to a specific theme 
-                                e.g. 'Alcohol' or 'Drugs'.Indicators within a profile are grouped into topics to keep indicators about a similar topic together.")),
+                             p(h5("ScotPHO Profiles are made up of a collection of indicators related to a specific theme 
+                                e.g. 'Alcohol' or 'Drugs'. Profiles are further divided into topic areas to group similar indicators together. 
+                                 This page allows users to see available indicators and geographies as well as finding detailed technical information 
+                                  about how incidators are created.")),
                              br(),
                              #div(style = "width:60%; margin-left: 5%; min-width: 350px", # centering div
                                  radioGroupButtons("techdoc_selection", status = "primary",
                                                    choices = c("List of available indicators", "Detailed information about single indicator"), label= "Step 1. Select what you want to see:" ),
                              br(),
                              selectizeInput("profile_picked", label = "2. Select a single profile e.g. Health & wellbeing (optional)",
-                                            width = "600px",choices = profile_list_filter, selected = "Show all", multiple=FALSE),
+                                            width = "500px",choices = profile_list_filter, selected = "Show all", multiple=FALSE),
                              br(),
                              #conditional panel for profile summary
                              conditionalPanel(condition = 'input.techdoc_selection == "List of available indicators"',
-                                              # selectizeInput("techdoc_geotype", label = "3. limit geo type",
-                                              #                width = "500px",choices = c("Show all", areatype_list), selected = "Show all", multiple=FALSE),
                                               uiOutput("tecdoc_geographies"),
-                                              savechart_button('download_techdoc1_png', 'Save Indicator Summary (.png)',  class = "down"),
-                                              #downloadButton("definitions_by_indicator",'Download Indicator Summary (.csv)', class = "down")),
+                                              #savechart_button('download_techdoc1_png', 'Save Indicator Summary (.png)',  class = "down"),
                                               downloadButton("download_techdoc1_csv",'Download Indicator Summary (.csv)', class = "down")),
                              #conditional panel for single indicator
                              conditionalPanel(condition = 'input.techdoc_selection == "Detailed information about single indicator"',
                                               div(style="display:inline-block", 
-                                                  selectizeInput("topic_defined", label = "2b. or use this filter to display indicators within a single topic",
-                                                                 width = "250px", choices = topic_list_filter, 
+                                                  selectizeInput("topic_defined", label = "2b. Select a topic within a particular profile (optional)",
+                                                                 width = "500px", choices = topic_list_filter, 
                                                                  selected = "Show all", multiple=FALSE)),
-                                              uiOutput("indicator_chosen"),
-                                              savechart_button('download_detailtechdoc_png', 'Save Indicator Description (.png)',  class = "down"),
-                                              downloadButton("download_detailtechdoc_csv",'Download All Definitions', class = "down")
-                                              #downloadButton("definitions_by_indicator",'Download indicator definition', class = "down")
+                                              uiOutput("indicator_choices"),
+                                              #savechart_button('download_detailtechdoc_png', 'Save Indicator Description (.png)',  class = "down"),
+                                              downloadButton("download_detailtechdoc_csv",'Download selected definition', class = "down"),
+                                              downloadButton("download_alltechdoc_csv",'Download all indicator definitions', class = "down")
                              )))),
                     wellPanel(
                       column(11,
@@ -672,11 +565,11 @@ navbarMenu("Info", icon = icon("info-circle"),
                                               br(),
                                               uiOutput("techdoc_display")),
                              #techdoc single indicator
-                             conditionalPanel(condition = 'input.techdoc_selection == "Detailed information about single indicator" & input.indicator_defined != null',
+                             conditionalPanel(condition = 'input.techdoc_selection == "Detailed information about single indicator" & input.indicator_selection != null',
                                               useShinydashboard(),
                                               valueBoxOutput("indicator", width=12))),
                     column(5,
-                           conditionalPanel(condition = 'input.techdoc_selection == "Detailed information about single indicator" & input.indicator_defined != null',
+                           conditionalPanel(condition = 'input.techdoc_selection == "Detailed information about single indicator" & input.indicator_selection != null',
                                             div(class="definitionbox",
                                                 p(paste("Definition"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
                                                 h5(textOutput("definition"))),
@@ -708,7 +601,7 @@ navbarMenu("Info", icon = icon("info-circle"),
                                                              p(paste("Date last updated"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
                                                              h5(textOutput("last_updated"))))),
                                  column(5,
-                                        conditionalPanel(condition = 'input.techdoc_selection == "Detailed information about single indicator" & input.indicator_defined != null',
+                                        conditionalPanel(condition = 'input.techdoc_selection == "Detailed information about single indicator" & input.indicator_selection != null',
                                                          div(class="definitionbox",
                                                              p(paste("Rationale for inclusion"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
                                                              h5(textOutput("rationale"))),
