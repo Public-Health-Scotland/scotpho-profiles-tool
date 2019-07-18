@@ -2338,17 +2338,17 @@ function(input, output, session) {
   techdoc_indicator_data <- reactive({  
     if (input$profile_picked != "Show all"){ # if a single profile selected
       if(input$techdoc_geotype != "Show all"){ #further filter if user selects a geography type
-        techdoc_ve %>%
+        techdoc %>%
           subset(grepl(input$techdoc_geotype,available_geographies)) %>%
           subset(grepl(names(profile_list[unname(profile_list) == input$profile_picked]),profile))} 
       else { # dataset if user wants a single profile but all geography types 
-        techdoc_ve %>%
+        techdoc %>%
           subset(grepl(names(profile_list[unname(profile_list) == input$profile_picked]),profile))}}
     else if (input$profile_picked == "Show all"){ #subset applied if user selects all profiles
       if(input$techdoc_geotype == "Show all"){  # user selects all geography types
-        techdoc_ve}
+        techdoc}
       else { # user selects a single geography type
-        techdoc_ve %>%
+        techdoc %>%
           subset(grepl(input$techdoc_geotype,available_geographies))}}
   })
   
