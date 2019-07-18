@@ -116,8 +116,8 @@ tabPanel(
   title = " Home", icon = icon("home"),
   mainPanel(width = 11, style="margin-left:4%; margin-right:4%",
             introBox(  
-              fluidRow(column(9,(h3("Welcome to the ScotPHO profiles", style="margin-top:0px;"))),
-                       (column(2,actionButton("btn_landing",label="Help: Take tour of the tool",icon=icon('question-circle'),class="down")))),
+              fluidRow(column(7,(h3("Welcome to the ScotPHO profiles", style="margin-top:0px;"))),
+                       (column(4,actionButton("btn_landing",label="Help: Take tour of the tool",icon=icon('question-circle'),class="down")))),
               data.step = 1,
               data.intro =(p(h4("Welcome to the ScotPHO Profiles Tool"),
                              h5("This interactive tool provides access to a range of public
