@@ -9,17 +9,24 @@ params:
   geotype_summary: NA
   geocomp_summary: NA
 geometry:  margin=0.5cm
-output: 
-  pdf_document:
-    includes:
-      in_header: preamble.tex
+output: word_document
+  # pdf_document:
+  #   includes:
+  #     in_header: preamble.tex
+  
+  # To do,:
+    # add column layout
+    # add conditions to input$chart_summary
+    # move to ggplot
+    # figure out width of plots
+    
 ---
-```{r setup, include=FALSE}
+```{r setup}
 knitr::opts_chunk$set(echo = F, cache = T)
 ```
 
 
-```{r eval=FALSE, include=FALSE}
+```{r include=FALSE}
 ###############################################.
 ## Functions ----
 ###############################################.
@@ -73,7 +80,8 @@ knitr::opts_chunk$set(echo = F, cache = T)
         # adding indicator name at center of each bar
         add_text(text = ~indic_multiline, x =0.5,  showlegend= FALSE,
                  textfont = list(color='black'), hoverinfo="skip" ) %>%
-        layout(yaxis = axis_layout, xaxis = axis_layout,
+        layout(title = domainchosen,
+               yaxis = axis_layout, xaxis = axis_layout,
                margin = list(b= 10 , t=5, l = 5, r = 0),
                font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif')) %>% # to get hover compare mode as default
         config(displayModeBar = FALSE, displaylogo = F, editable =F)
@@ -88,14 +96,14 @@ A plot of `params$profile_summary` random points.
 \btwocol
 
 #### Behaviours
-```{r, eval=F}
+```{r echo=FALSE}
 plot_profile_snapshot("Behaviours") 
 plot_profile_snapshot("Behaviours") 
 ```
 \columnbreak
 
 #### R
-```{r, eval=F}
+```{r echo=FALSE}
 plot_profile_snapshot("Behaviours")
 plot_profile_snapshot("Behaviours")
 ```
@@ -105,21 +113,21 @@ some random text
 \bthreecol
 
 #### Behaviours
-```{r, eval=F}
+```{r echo=FALSE}
 plot_profile_snapshot("Behaviours")
 plot_profile_snapshot("Behaviours")
 ```
 \columnbreak
 
 #### R
-```{r, eval=F}
+```{r echo=FALSE}
 plot_profile_snapshot("Behaviours")
 plot_profile_snapshot("Behaviours")
 ```
 \columnbreak
 
 #### R
-```{r }
+```{r echo=FALSE}
 plot_profile_snapshot("Behaviours")
 plot_profile_snapshot("Behaviours")
 ```
