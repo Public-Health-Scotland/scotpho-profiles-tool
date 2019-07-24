@@ -95,6 +95,8 @@ tagList( #needed for shinyjs
                ".landing-page-column {padding-right:3vh}",
                #landing-page icons
                ".icon-lp{font-size: 1.3em; padding-right: 4px;}",
+               # flextable wrapping text
+               ".tabwid table {white-space: normal;}",
                #to avoid red text error messages in the whole app, take out for testing
                # ".shiny-output-error { visibility: hidden; }",
                # ".shiny-output-error:before { visibility: hidden; }",
