@@ -2318,7 +2318,7 @@ function(input, output, session) {
   ##  Technical Doc Page ----
   #################################################.
   
-  #### Techdoc(1) summary conditional panel.
+  #### Techdoc for summary of indicators.
   
   ## Reactive filter of available geography types based on which profile is selected.
   output$tecdoc_geographies <- renderUI ({
@@ -2328,7 +2328,7 @@ function(input, output, session) {
                                      as.character(optdata$areatype[grep(input$profile_picked,optdata$profile_domain2)] ))))
     } else {geo_selection <- areatype_list }
     
-    selectizeInput("techdoc_geotype", label = "3. Select a geography type (optional)",
+    selectizeInput("techdoc_geotype", label = "Step 3. Select a geography type (optional)",
                    width = "500px", choices = c("Show all", geo_selection), 
                    selected = "Show all", multiple=TRUE, 
                    options = list(placeholder = "Select....", maxItems = 1)) 
@@ -2385,8 +2385,8 @@ function(input, output, session) {
         color(i = 1, color = "white", part = "header") %>% # format text colour of header to identify profile 
         bg(i=1,bg="#007ba7",part="header") %>%  # format background colour of header to identify profile
         autofit() %>%
-        htmltools_value()}
-    else { #table all indicators (ie "show all") profiles selected - additional column for profile(s)
+        htmltools_value()
+      } else { #table all indicators (ie "show all") profiles selected - additional column for profile(s)
       formatted_techdoc_data() %>%
         arrange(profile, domain) %>%
         rownames_to_column(var="ind_index") %>%
@@ -2402,22 +2402,18 @@ function(input, output, session) {
         htmltools_value()}
   }
 
-
   ## RenderUI for which version flextable to display on techdoc page
-  output$techdoc_display <- renderUI({  #render techincal info depending on whether selected to see summary of available indictors or single indicator definition
-    
+  #render techincal info depending on whether selected to see summary of 
+  # available indictors or single indicator definition
+  output$techdoc_display <- renderUI({  
     # Preparing a brief explanation for each visualisation 
     if (input$techdoc_selection == "List of available indicators") {
       plot_techdoc()
     } else if (input$techdoc_selection == "Detailed information about single indicator")
       p("loading..")}  #shows 'loading' as there can be a small delay while switching back between views
   )
- 
- ## Downloads for techdoc1
- 
- #techdoc_csv <- reactive({ format_definitions_csv(formatted_techdoc_data()) }) # if using formatting function in global script.
- 
- ## Function to format data for csv according to whether showing sinle profile or all profiles
+
+ ## Function to format data for csv according to whether showing single profile or all profiles
  techdoc_csv <- function() {
    if (input$profile_picked != "Show all"){
      formatted_techdoc_data() %>%
@@ -2443,25 +2439,8 @@ function(input, output, session) {
                file, row.names=FALSE) } 
  )
  
- #ideally want another action button to download png image of flextable
- 
- #PNG - not working...
- # output$download_techdoc1_png <- downloadHandler(
- #   filename = 'techdoc1.png',
- #   content = function(file){
- #     save_as_image(plot_techdoc(),path = "techdoc1.png")
- #   })
- 
- # output$download_techdoc1_png <- downloadHandler(
- #   filename = 'techdoc1.png',
- #   content = function(file){
- #     save_as_image(plot_techdoc(),path = "techdoc1.png")
- #   })
- # 
-
- 
   #################################################.  
-  #### Techdoc(2) details conditional panel.
+  #### Techdoc for individual indicator.
   
  ## Reactive filters for technical details document - filter for indicator dependent on profile/topic selected
  output$indicator_choices <- renderUI ({
@@ -2477,12 +2456,11 @@ function(input, output, session) {
                          == input$topic_defined]))
    } else {indic_selection <- indicator_list}
    
-   selectizeInput("indicator_selection", label = "3.Select an indicator for detailed technical information",
+   selectizeInput("indicator_selection", label = "Step 4. Select an indicator for detailed technical information",
                   width = "510px", choices = indic_selection, 
                   selected = character(0), multiple=TRUE, 
                   options = list(placeholder = "Make a selection to see information", maxItems = 1)) 
  }) 
-  
   
   #To keep it simple, when you change profile, reset topic and vice versa.
   observeEvent(input$profile_picked, { 
@@ -2501,7 +2479,9 @@ function(input, output, session) {
   # Creating text and titles for info to display
  
   #reactive selection for single indicator
-  indicator_selected <- reactive({ filter(techdoc,techdoc$indicator_name==input$indicator_selection)})
+  indicator_selected <- reactive({ 
+    filter(techdoc, techdoc$indicator_name==input$indicator_selection)
+    })
   
   #Text for title of indicator selected
   output$indicator <- renderValueBox({
@@ -2509,7 +2489,6 @@ function(input, output, session) {
              HTML(paste("<b>","Profile:","</b>",indicator_selected()$profile,br(),
                         "<b>","Domain:","</b>",indicator_selected()$domain)), icon = icon ("book"),color = "blue")
   })
-  
   
   # Text for all metadata parts of the indicator
   output$definition <- renderText ({indicator_selected()$indicator_definition })
@@ -2557,32 +2536,8 @@ function(input, output, session) {
       write.csv(allindicator_csv(),
                 file, row.names=FALSE) } 
   )
-
-  #indicator_selected <- reactive({ filter(techdoc,techdoc$indicator_name==input$indicator_chosen)})
-  #Download definitions table for selected indicator
-  #indicator_selected <- reactive({ techdoc %>% filter(indicator_name == input$indicator_selected)})
-  
-    
-#Downloads for techdoc2  
-#CSV 
-  
-  
-  
-  
   
 
 } #server closing bracket
 
 #########################  END ----
-
-
-
-# #Downloading chart
-# output$download_rankplot <- downloadHandler(
-#   filename = 'rank.png',
-#   content = function(file){
-#     export(p = plot_rank_charts() %>% 
-#              layout(title = paste0(input$indic_rank, "<br>", make_rank_subtitle()),
-#                     margin = list(t = 180)),
-#            file = file)
-#   })
