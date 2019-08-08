@@ -6,6 +6,7 @@
 ###############################################.
 tagList( #needed for shinyjs
   useShinyjs(),  # Include shinyjs
+  extendShinyjs("www/app-shinyjs.js", functions = c("updateHistory")),
   navbarPage(id = "intabset", #needed for landing page
            title = div(tags$a(img(src="scotpho_reduced.png", height=40), href= "http://www.scotpho.org.uk/"),
                        style = "position: relative; top: -5px;"), # Navigation bar

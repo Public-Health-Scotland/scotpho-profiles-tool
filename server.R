@@ -5,6 +5,43 @@
 
 ## Define a server for the Shiny app
 function(input, output, session) {
+  ###############################################.
+  ## To allow page navigation ----
+  ###############################################.
+  
+  # ----- navigation logic -----
+  
+  # when the app initializes, if there is a history in the URL, navigate to it
+  observeEvent(session$clientData$url_search, {
+    # if there is a history in the URL, restore the state
+    if (nchar(session$clientData$url_search) > 1) {
+      restore(session$clientData$url_search)
+    }
+  })
+  
+  # restore the Shiny app's state based on the URL
+  restore <- function(qs) {
+    data <- parseQueryString(qs)
+    
+    if (!is.null(data[['page']])) {
+      
+      # change to the correct tab
+      updateTabsetPanel(session, "intabset", data[['page']])
+      
+    }
+  }
+  
+  # when the user changes tabs, save the state in the URL
+  observeEvent(input$intabset, {
+  
+      shinyjs::js$updateHistory(page = input$intabset)
+  })
+  
+  # when the user clicks prev/next buttons in the browser, restore the state
+  observeEvent(input$navigatedTo, {
+    restore(input$navigatedTo)
+  })
+  
   ################################################################.
   #    Modal ----
   ################################################################.
@@ -714,7 +751,7 @@ function(input, output, session) {
   
   # Downloading chart  
   output$download_summaryplot <- downloadHandler(
-    filename = 'report.doc',
+    filename = 'summary.html',
     content = function(file){
       # if (input$chart_summary == "Snapshot") {
       
