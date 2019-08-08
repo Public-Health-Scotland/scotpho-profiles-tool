@@ -755,7 +755,7 @@ function(input, output, session) {
     content = function(file){
       # if (input$chart_summary == "Snapshot") {
       
-      webshot("https://scotland.shinyapps.io/ScotPHO_profiles_tool_test/?page=summary", 
+      webshot("https://scotland.shinyapps.io/ScotPHO_profiles_tool_test/?summary", 
               selector = c("#summary_div"))
     
       # Copy the report file to a temporary directory before processing it, in
