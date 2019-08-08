@@ -12,6 +12,6 @@ shinyjs.updateHistory = function(params) {
   for (var key in params) {
     queryString.push(encodeURIComponent(params[key]));
   }
-  queryString = '?' + queryString.join('&');
+  // queryString = '?' + queryString.join('&');
   history.pushState(null, null, queryString)
 }

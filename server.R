@@ -753,49 +753,47 @@ function(input, output, session) {
   output$download_summaryplot <- downloadHandler(
     filename = 'summary.html',
     content = function(file){
-      # if (input$chart_summary == "Snapshot") {
-      
-      webshot("https://scotland.shinyapps.io/ScotPHO_profiles_tool_test/?summary", 
-              selector = c("#summary_div"))
-    
+      if (input$chart_summary == "Snapshot") {
+
+
       # Copy the report file to a temporary directory before processing it, in
       # case we don't have write permissions to the current working dir (which
       # can happen when deployed).
-      # tempReport <- file.path(tempdir(), "summary_charts.Rmd")
-      # file.copy("summary_charts.Rmd", tempReport, overwrite = TRUE)
-      # 
-      # # Set up parameters to pass to Rmd document
-      # params <- list(chart_summary = input$chart_summary,
-      #                snapshot_data = snapshot_data(),
-      #                profile_summary = input$profile_summary,
-      #                comp_summary = input$comp_summary,
-      #                geoname_summary = input$geoname_summary,
-      #                geotype_summary = input$geotype_summary,
-      #                geocomp_summary = input$geocomp_summary)
-      # 
-      # # Knit the document, passing in the `params` list, and eval it in a
-      # # child of the global environment (this isolates the code in the document
-      # # from the code in this app).
-      # rmarkdown::render(tempReport, output_file = file,
-      #                   params = params,
-      #                   envir = new.env(parent = globalenv())
-      # )
-      
-        #export(p = plot_snapshot_download(), file = file, zoom = 1)
-      # } else if (input$chart_summary == "Trend") {
-      #   ggsave(file, plot = plot_heat()+
-      #            ggtitle(paste0(names(profile_list[unname(profile_list) == input$profile_summary]),
-      #                           " profile: "),
-      #                    subtitle =       if(input$comp_heat == 1){
-      #                      paste0(input$geoname_heat," (", input$geotype_heat, ") compared against ",
-      #                             input$geocomp_heat)
-      #                    } else if(input$comp_heat==2){
-      #                      paste0("Changes within ",input$geoname_heat,": latest data available",
-      #                             " compared to ", input$yearcomp_heat)
-      #                    }
-      #            ),
-      #          device = "png", scale=4, limitsize=FALSE)
-      # }
+      tempReport <- file.path(tempdir(), "summary_charts.Rmd")
+      file.copy("summary_charts.Rmd", tempReport, overwrite = TRUE)
+
+      # Set up parameters to pass to Rmd document
+      params <- list(chart_summary = input$chart_summary,
+                     snapshot_data = snapshot_data(),
+                     profile_summary = input$profile_summary,
+                     comp_summary = input$comp_summary,
+                     geoname_summary = input$geoname_summary,
+                     geotype_summary = input$geotype_summary,
+                     geocomp_summary = input$geocomp_summary)
+
+      # Knit the document, passing in the `params` list, and eval it in a
+      # child of the global environment (this isolates the code in the document
+      # from the code in this app).
+      rmarkdown::render(tempReport, output_file = file,
+                        params = params,
+                        envir = new.env(parent = globalenv())
+      )
+
+      # export(p = plot_snapshot_download(), file = file, zoom = 1)
+      } else if (input$chart_summary == "Trend") {
+        ggsave(file, plot = plot_heat()+
+                 ggtitle(paste0(names(profile_list[unname(profile_list) == input$profile_summary]),
+                                " profile: "),
+                         subtitle =       if(input$comp_heat == 1){
+                           paste0(input$geoname_heat," (", input$geotype_heat, ") compared against ",
+                                  input$geocomp_heat)
+                         } else if(input$comp_heat==2){
+                           paste0("Changes within ",input$geoname_heat,": latest data available",
+                                  " compared to ", input$yearcomp_heat)
+                         }
+                 ),
+               device = "png", scale=4, limitsize=FALSE)
+      }
     })
   
   ###############################################.
