@@ -230,7 +230,7 @@ tabPanel("Summary", icon = icon("list-ul"), value = "summary",
            ),
            column(2,
                   p(tags$b("Step 2. Select a profile ")),
-                  uiOutput("profile_ui_summary"),
+                  div(id= "summary_div", uiOutput("profile_ui_summary")),
                   # domain if spine selected
                   conditionalPanel(condition = 'input.chart_summary == "Spine"',
                                    uiOutput("topic_ui_spine"))
