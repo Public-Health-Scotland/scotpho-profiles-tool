@@ -1309,14 +1309,14 @@ function(input, output, session) {
     showModal(modalDialog(
       title = "How to use this chart",
       p("The trend chart is designed to explore how a single indicator has changed over time for one or more geograpical areas.
-               First select an indicator then add one or more geographical area to the chart using the geography filters in 'Step 2'"),
+               First select an indicator, then add one or more geographical areas to the chart using the geography filters in 'Step 2'."),
       p(column(7,img(src="help_trend_chart2.png")),
         column(5,
                p("You can add more than one area/area type to the trend chart, it is possible to show a mixture of areas like council area and NHS board."),
                p("Occasionally a complete time series data are not available."),
-               p("Use the mouse to hover over a data point to see detailed information."),
+               p("Use the mouse to hover over a data point to see detailed information on its value, time period and area."),
                br(),
-               p("Confidences intervals can be turned added/removed from the chart, there are shown as shaded areas."),
+               p("Confidences intervals (95%) can be added or removed from the chart; there are shown as shaded areas."),
                p("Confidence intervals give an indication of the precision of a rate or percentage. The width of a confidence interval is related to sample size, smaller geographies like intermediate zones often have wider intervals."),
                br(),
                p("Display controls in 'Step 3' allow you to switch the graph from a measure (e.g. rate or percentage) to actual numbers (e.g numbers of deaths/hospitalisations)."))),
@@ -1490,11 +1490,7 @@ function(input, output, session) {
       tooltip_trend <- c(paste0(trend_data()$areaname, "<br>", trend_data()$trend_axis,
                                 "<br>", paste0(unique(trend_data()$type_definition)),": ", trend_data()$measure,
                                 "<br>", "Numerator: ",trend_data()$numerator))
-      
-      # # y axis title
-      # yaxis_title <- case_when(input$var_plot_trend == "measure" ~ paste0(unique(trend_data()$type_definition)), 
-      #                          input$var_plot_trend == "numerator" ~ "Number")
-      
+
       #Creating time trend plot
       trend_plot <- plot_ly(data=trend_data(), x=~trend_axis,  y = ~get(input$var_plot_trend),
                             color = ~areaname_full, colors = trend_col, 
