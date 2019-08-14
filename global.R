@@ -14,7 +14,6 @@ library (DT) # for data tables
 library(leaflet) #javascript maps
 library(plotly) #interactive graphs
 library(shinyWidgets) # for extra widgets
-library(tidyr) #for string maniupulations in ring plot (are we still using this as no long ring plot?)
 library(tibble) # rownames to column in techdoc
 library(shinyjs)
 library(shinydashboard) #for valuebox on techdoc tab
@@ -85,13 +84,19 @@ plot_nodata_gg <- function() {
           axis.title.x=element_text(size=20, colour ='#555555'))
 }
 
+# Indicator definition boxes for indicator definition tab
+ind_def_box <- function(label, text_output) {
+  div(class="definitionbox",
+      p(paste(label), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
+      h5(textOutput(text_output)))
+}
+
 ###############################################.
 ## Data ----
 ###############################################.    
 optdata <- readRDS("data/optdata.rds") #main dataset
 techdoc <- readRDS("data/techdoc.rds") #technical documents data including definitions
 
-#techdoc_ve <- readRDS("data/techdoc_ve.rds") #technical documents data including definitions
 geo_lookup <- readRDS("data/geo_lookup.rds") #geography lookup
 profile_lookup <- readRDS("data/profile_lookup.rds") #profile lookup
 
