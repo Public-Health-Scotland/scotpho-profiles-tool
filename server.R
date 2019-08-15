@@ -2329,7 +2329,7 @@ function(input, output, session) {
     } else {geo_selection <- areatype_list }
     
     selectizeInput("techdoc_geotype", label = "Step 3. Select a geography type (optional)",
-                   width = "500px", choices = c("Show all", geo_selection), 
+                   width = "100%", choices = c("Show all", geo_selection), 
                    selected = "Show all", multiple=TRUE, 
                    options = list(placeholder = "Select....", maxItems = 1)) 
   }) 
