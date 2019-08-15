@@ -20,6 +20,7 @@ library(shinydashboard) #for valuebox on techdoc tab
 library(sp)
 library(shinycssloaders) #for loading icons
 library(webshot) #to download plotly charts
+library(rintrojs) # for help intros
 # As well as webshot phantomjs is needed l to download Plotly charts
 # https://github.com/rstudio/shinyapps-package-dependencies/pull/180
 if (is.null(suppressMessages(webshot:::find_phantom()))) {
@@ -82,6 +83,36 @@ plot_nodata_gg <- function() {
     theme(panel.background = element_blank(),
           axis.title.x=element_text(size=20, colour ='#555555'))
 }
+
+
+#Creating big boxes for main tabs in the landing page (see ui for formatting css)
+lp_main_box <- function(title_box, image_name, button_name, description) {
+  div(class="landing-page-box",
+      div(title_box, class = "landing-page-box-title"),
+      div(description, class = "landing-page-box-description"),
+      div(class = "landing-page-icon", style= paste0("background-image: url(", image_name, ".png);
+          background-size: auto 80%; background-position: center; background-repeat: no-repeat; ")),
+      actionButton(button_name, NULL,
+                   class="landing-page-button",
+                   icon = icon("arrow-circle-right", "icon-lp")))
+}
+
+
+#Creating small boxes for further information in the landing page (see ui for formatting css)
+lp_about_box <- function(title_box, image_name, button_name, description) {
+
+  div(class="landing-page-box-about",
+      div(title_box, class = "landing-page-box-title"),
+      div(class = "landing-page-about-icon", style= paste0("background-image: url(", image_name, ".png);
+          background-size: auto 80%; background-position: center; background-repeat: no-repeat; ")),
+          (actionButton(button_name, NULL,
+                   class="landing-page-button-about",
+                   icon = icon("arrow-circle-right", "icon-lp"),title=description)))
+}
+
+
+
+
 
 ###############################################.
 ## Data ----
