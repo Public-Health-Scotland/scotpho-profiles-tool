@@ -206,7 +206,9 @@ View(file.info(files,  extra_cols = TRUE))
 optdata <- do.call(rbind, lapply(files, function(x){ 
   fread(x)[,file_name:= x] %>% clean_names() })) %>% 
   mutate(file_name = gsub("/PHI_conf/ScotPHO/Profiles/Data/Shiny Data//", "", file_name)) %>% 
-  rename(measure = rate)
+  rename(measure = rate) %>% 
+  mutate_at(c("numerator", "measure", "lowci", "upci"), as.numeric) %>% 
+  mutate(ind_id = as.integer(ind_id))
 
 # to check if there is more then one file for the same indicator. This should be empty
 optdata %>% select(ind_id, file_name) %>% unique %>% group_by(ind_id) %>% 
@@ -219,8 +221,7 @@ data_spss <- read_csv(paste0(basefiles, "All Data for Shiny.csv"),
   rename(ind_id = indicator_id, code = geography_code) %>% 
   select(-update_date) %>% 
   # excluding indicators already present in shiny folder data files
-  filter(!(ind_id %in% unique(optdata$ind_id))) %>% droplevels() %>% 
-  mutate(ind_id = as.character(ind_id))
+  filter(!(ind_id %in% unique(optdata$ind_id))) %>% droplevels() 
 
 # Merging together spss and shiny data folder datasets
 optdata <- bind_rows(optdata, data_spss) %>% 
@@ -232,7 +233,9 @@ optdata <- bind_rows(optdata, data_spss) %>%
 
 # Adding update date for all indicators based on technical document
 update_table <- techdoc %>% rename(ind_id = indicator_number, update_date = last_updated) %>% 
-  select(ind_id, update_date) %>% mutate(update_date = as.yearmon(update_date, "%b-%Y"))
+  select(ind_id, update_date) %>% 
+  mutate(update_date = as.yearmon(update_date, "%b-%Y"),
+         ind_id = as.integer(ind_id))
 
 optdata <- left_join(x=optdata, y=update_table, by=c("ind_id"))
 
@@ -249,9 +252,6 @@ optdata <- left_join(x=optdata, y=update_table, by=c("ind_id"))
 optdata <- optdata %>% filter(!(ind_id %in% c("20205", "20403", "20204", "20402",
                                               "20301", "20401", "21001", "21002") & 
                                   substr(code, 1, 3) == "S02"))
-
-# some counts, original optdata 552,518 (there are still several duplicated files
-# and some indicators updated: quit attempts and bowel)
 
 #Merging with indicator and geography information
 optdata <- left_join(x=optdata, y=ind_lookup, by="ind_id") 

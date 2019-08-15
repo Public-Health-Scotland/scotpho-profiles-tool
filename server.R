@@ -8,244 +8,44 @@ function(input, output, session) {
   ################################################################.
   #    Modal ----
   ################################################################.
-  #Welcome Modal
-  welcome_modal <- modalDialog(
-    br(),
-    p(img(src="scotpho_reduced.png", height=100)),
-    br(),
-    br(),
-    p(tags$h4("Welcome to the ScotPHO Profiles Tool"), tags$br(),tags$br(),
-      tags$div(h5("This interactive tool provides access to a range of public 
-                  health related indicators at different"),
-               h5("geographies including NHS boards, council areas and health and 
-                  social care partnerships.")),
-      style = "color:0E3E5D; font-size:20px"),
-    br(),
-    p(tags$h5("Learn more about the tool or get started")),
-    actionButton("tour","Take a tour", icon("play-circle")),
-    HTML("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"),
-    #For when we make any updates in future
-    actionButton("updates","Latest updates", icon("wrench")),
-    HTML("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"),
-    modalButton("Go to the tool", icon("times-circle")),
-    size = "l", align= "center",
-    easyClose = TRUE, fade=FALSE, footer = NULL
-      )
   
-  showModal(welcome_modal)
-  
-  #"Take a Tour" Modal - first window
-  first_modal <- modalDialog(
-    fluidRow( 
-      column(12,
-             p(tags$div(" To begin, select the visualisation you want to see", 
-                        style = "color:0E3E5D; font-size:20px; width: 90%; text-align: left;")),
-             br(), tags$h5("There are different ways to navigate around the tool.", 
-                           style = "width: 90%; text-align: left; " ), br(), br())), 
-    fluidRow(
-      column(5, offset=1,tags$h5("You can select visualisations via the tabs at 
-                                 the top of the page")),
-      column(3, br(), img(src="tabs_select.png", height=43, width=400))),
-    fluidRow(
-      column(6, br(), br(), br(), br(), 
-             tags$a(img(src="landing_select.png", height=150, width=250, align="right"))),
-      column(4, br(), br(), br(),br(),  br(), br(), br(), br(), 
-             tags$h5("Or select to view a visualisation using the option buttons 
-                     shown on the Home Page"))),
-    fluidRow(
-      column(5, offset=1,  br(), br(), br(), br(), br(), 
-             h5("To return to the profiles Home Page at any point just click on 
-                the house button at the top of the page."),
-             h5("Clicking on the ScotPHO logo will take you to the main ScotPHO website.")),
-      column(3,br(),br(), br(), br(), br(), br(), br(), 
-             img(src="home_select.png", height=50, width=300))
-      ),
-    br(),
-    br(),
-    actionButton("next1","Next", icon("play-circle")),
-    HTML("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"),
-    modalButton("Exit", icon("times-circle")),
-    size = "l", align= "center",
-    easyClose = TRUE, fade=TRUE, footer = NULL
-    )
-  
-  #call from either tour button or back button from modal 2
-  observeEvent(input$tour,  {showModal(first_modal) })
-  
-  observeEvent(input$back1,  {showModal(first_modal) })
-  
-  #"Take a Tour" Modal - second window
-  second_modal <- modalDialog(
-    fluidRow(
-      column(12,
-             p(tags$div("Next use the menus to select the data you want to see", 
-                        style = "color:0E3E5D; font-size:20px; width: 90%; text-align: left; ")),                 
-             br(),
-             br(),
-             p(tags$h5("Some of our visualisations allow you to look at a predefined 
-                       set of indicators related to a particular domain or profile 
-                       e.g. ‘health and wellbeing’ or ‘children and young people’,
-                       while others are designed to look at a single indicator in 
-                       more detail. Using menus next to a visualisation you can select 
-                       the area you are interested in and the time period.", 
-                       style = "width: 90%; text-align: left; "))),
-      column(6,
-             br(),
-             br(),
-             br(),
-             br(),
-             br(),
-             tags$h5("Use the drop-down menus to select filters of interest",  
-                     style="width:300px; "),
-             p(tags$a(img(src="select_indic_single.png", height=200, width=300))),
-             br()
-      ),
-      column(6,
-             br(),
-             br(),
-             br(),
-             p(tags$a(img(src="select_indicator.png", height=180, width=260))),
-             p(tags$h5("Some fields may allow for multiple entries and most fields 
-                       can be searched by typing into the field, as well as scrolling 
-                       down the list of options", style = "width: 350px")),
-             p(tags$a(img(src="type_select.png", height=180, width=260))),
-             br()
-             )),
-    br(),
-    p(tags$h5("For more information about geographic areas within Scotland, 
-              please refer to" , 
-              tags$a(href="http://statistics.gov.scot/home", "statistics.gov.scot.", 
-                     class="externallink"))),
-    br(),
-    actionButton("back1","Back", icon("backward")),
-    HTML("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"),
-    actionButton("next2","Next", icon("play-circle")),
-    HTML("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"),
-    modalButton("Exit", icon("times-circle")),
-    size = "l", align= "center",
-    easyClose = TRUE, fade=TRUE, footer = NULL
-      )
-  
-  #call from either next1 button or back button from modal 3
-  observeEvent(input$next1,  {showModal(second_modal) })
-  
-  observeEvent(input$back2,  {showModal(second_modal) })
-  
-  
-  #"Take a Tour" Modal - third window
-  third_modal <- modalDialog(
-    fluidRow(
-      column(12,
-             p(tags$div("Finally, save the visualisation or download data", 
-                        style = "color:0E3E5D; font-size:20px; width: 90%; text-align: left; ")),                 
-             br(),
-             br(),
-             p(tags$h5("Our tool allows you to download the visualisation 
-                       images and the data behind them.", 
-                       style = "width: 90%; text-align: left; "))),
-      column(6,
-             br(),
-             br(),
-             br(),
-             tags$h5("Charts displayed can be saved by clicking on the 
-                     ‘Save chart’ button",  style="width:300px; "),
-             p(tags$a(img(src="save_chart2.png", height=60, width=230))),
-             br()
-             ),
-      column(6,
-             br(),
-             br(),
-             br(),
-             p(tags$h5("The raw data used to draw a chart can also be downloaded 
-                       in csv format", style = "width: 350px")),
-             p(tags$a(img(src="save.png", height=60, width=230))),
-             br()
-             )),
-    br(),
-    p(tags$h5("The ", tags$b("'Table'")," tab within our tool allows users to 
-              quickly and easily download larger selections of data covering 
-              multiple area or multiple indicators.", style = "width: 750px")),
-    br(),
-    actionButton("back2","Back", icon("backward")),
-    HTML("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"),
-    actionButton("next3","Next", icon("play-circle")),
-    HTML("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"),
-    modalButton("Exit", icon("times-circle")),
-    size = "l", align= "center",
-    easyClose = TRUE, fade=TRUE, footer = NULL
-    )
-  
-  #call from either next2 button or back button from modal 4
-  observeEvent(input$next2,  {showModal(third_modal) })
-  
-  observeEvent(input$back3,  {showModal(third_modal) })
-  
-  #"See latest updates" Modal window - Activate if Update is carried out once 
-  # rolled out live to users
+  ## Latest indicator updates modal window ----
   updates_modal <- modalDialog(
     fluidRow(
       column(12,
+             # text_intro("We are continuously updating and developing our tool"),                 
              p(tags$div("We are continuously updating and developing our tool", 
-                        style = "color:0E3E5D; font-size:20px; width: 90%; text-align: left; ")),                 
+                        style = "color:0E3E5D; font-size:20px; width: 90%; text-align: left; ")),
              br(),
              br(),
-             p(tags$h5("Recent indicator updates include:", 
-                       style = "width: 90%; text-align: left; font-weight: bold; "))),
+             p(h5("Recent indicator updates include:", 
+                  style = "width: 90%; text-align: left; font-weight: bold; "))),
       column(12, 
-             tags$h5(HTML(paste(techdoc$indicator_name[techdoc$days_since_update<60], 
+             tags$h5(HTML(paste(techdoc$indicator_name[techdoc$days_since_update<60], #tells to display indicators updated within 60 days
                                 collapse='<br>')))
       )),
     br(),
-    p(tags$h5("Thanks for stopping by!")),
+    p(tags$h5("To find out when an indicator is due to be updated please refer to our ", 
+                          tags$a(href="https://docs.google.com/spreadsheets/d/e/2PACX-1vQUQMORMqe9RrMnS9WJSu51Q6ef0rubiF1M-QN3BYZIBueErtTvvbRe_kTZbWmnupiO_Uie80BoZCnK/pubhtml", "updates schedule.", class="externallink"))),
+    br(),
     p(tags$h5("For any further questions or other developments you would like to 
               suggest for our current tool, please contact us at", 
               tags$a(href="mailto:ScotPHO@nhs.net", "ScotPHO@nhs.net", class="externallink"), 
               style = "width: 700px")),
     br(),
-    actionButton("updatesreturn","Back", icon("backward")),
-    HTML("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"),
     modalButton("Exit", icon("times-circle")),
     size = "l", align= "center",
     easyClose = TRUE, fade=TRUE, footer = NULL
   )
   
-  observeEvent(input$updates, {   showModal(updates_modal)  })
-  observeEvent(input$updatesreturn, {   showModal(welcome_modal)  })
+  observeEvent(input$btn_indicator_updates, { showModal(updates_modal) }) # Link action button click to modal launch 
   
-  #"Take a Tour" Modal - last window
-  fourth_modal <- modalDialog(
-    fluidRow(
-      column(12,
-             p(tags$div("Please note", style = "color:0E3E5D; font-size:20px; 
-                        width: 90%; text-align: left; ")))),          
-    br(),
-    p(tags$h5("The profiles are intended to increase understanding of local health 
-              and social issues and to prompt further investigation, rather than 
-              to be used as a performance management tool.
-              The information needs to be interpreted within a local framework; an indicator 
-              may be higher or lower in one area compared to another, but local 
-              knowledge is needed to understand and interpret differences.", 
-              style = "width: 700px")),
-    br(),
-    br(),
-    br(),
-    p(tags$h5("If you require any further information by bespoke geographies or 
-              have any questions regarding the tool, please", 
-              tags$a(href="mailto:ScotPHO@nhs.net", "contact us.", class="externallink"), 
-              style = "width: 600px")),
-    br(),
-    br(),
-    p(tags$h5("Please also note this tool is being continuously developed and we 
-              welcome any ", tags$a(href="mailto:ScotPHO@nhs.net", "feedback", 
-                                    class="externallink"), " you may have on it.", 
-              style = "width: 600px")),
-    br(),
-    modalButton("Exit", icon("times-circle")),
-    size = "l", align= "center",
-    easyClose = TRUE, fade=TRUE, footer = NULL
-             )
+  ## IntroJS allow switching between tabs----
+  observeEvent(input$btn_landing, {
+    introjs(session,
+            events = list(onbeforechange = readCallback("switchTabs")))
+  })
   
-  observeEvent(input$next3, { showModal(fourth_modal) })
   
   ###############################################.
   ## Landing page ----
@@ -277,6 +77,12 @@ function(input, output, session) {
     updateTabsetPanel(session, "intabset", selected = "about")
   })
   
+  
+  observeEvent(input$jump_to_definitions, {
+    updateTabsetPanel(session, "intabset", selected = "definitions")
+  })
+  
+  
   observeEvent(input$jump_to_resources, {
     updateTabsetPanel(session, "intabset", selected = "resources")
   })
@@ -284,7 +90,6 @@ function(input, output, session) {
   observeEvent(input$jump_to_others, {
     updateTabsetPanel(session, "intabset", selected = "others")
   })
-  
  
   ###############################################.
   ## Summary - common objects ----
@@ -1303,6 +1108,25 @@ function(input, output, session) {
   ###############################################.        
   #### Time trend plot ----
   ###############################################.  
+  # Trend help pop-up
+  observeEvent(input$help_trend, {
+    
+    showModal(modalDialog(
+      title = "How to use this chart",
+      p("The trend chart is designed to explore how a single indicator has changed over time for one or more geograpical area."),
+      p(column(7,img(src="help_trend_chart2.png")),
+        column(5,
+               p("First select an indicator using the 'step 1' filter."),
+               p("Then add one or more geographical area to the chart using the geography filters in 'Step 2'."),
+               p("You can add more than one area or area type (e.g. NHS board or council area) to the trend chart."),
+               p("There may be some indicators where data is not available for the full time series or at a particular geography level."),
+               p("Use the mouse to hover over a data point to see detailed information on its value, time period and area."),
+               p("Confidences intervals (95%) can be added or removed from the chart using the options in 'step 3'. These are shown as shaded areas."),
+               p("Confidence intervals give an indication of the precision of a rate or percentage. The width of a confidence interval is related to sample size, smaller geographies like intermediate zones often have wider intervals."),
+               p("Display controls in 'Step 3' allow you to switch the graph from a measure (e.g. rate or percentage) to actual numbers (e.g numbers of deaths/hospitalisations)."))),
+                 size = "l", easyClose = TRUE, fade=FALSE))
+    }) 
+      
   #####################.
   # Reactive controls
   #Controls for chart. Dynamic selection of locality and iz.
@@ -1421,6 +1245,14 @@ function(input, output, session) {
   #####################.
   # titles 
   output$title_trend <- renderText(paste0(input$indic_trend))
+  output$subtitle_trend <- renderText(paste0(trend_type()))                                     
+ 
+  trend_type <- function () {
+  # y axis title
+  yaxis_title <- case_when(input$var_plot_trend == "measure" ~ paste0(unique(trend_data()$type_definition)), 
+                           input$var_plot_trend == "numerator" ~ "Number")
+  }
+                              
   
   #####################.
   #Plot 
@@ -1460,12 +1292,9 @@ function(input, output, session) {
       
       #Text for tooltip
       tooltip_trend <- c(paste0(trend_data()$areaname, "<br>", trend_data()$trend_axis,
-                                "<br>", trend_data()$measure))
-      
-      # y axis title
-      yaxis_title <- case_when(input$var_plot_trend == "measure" ~ paste0(unique(trend_data()$type_definition)), 
-                               input$var_plot_trend == "numerator" ~ "Number")
-      
+                                "<br>", paste0(unique(trend_data()$type_definition)),": ", trend_data()$measure,
+                                "<br>", "Numerator: ",trend_data()$numerator))
+
       #Creating time trend plot
       trend_plot <- plot_ly(data=trend_data(), x=~trend_axis,  y = ~get(input$var_plot_trend),
                             color = ~areaname_full, colors = trend_col, 
@@ -1475,7 +1304,7 @@ function(input, output, session) {
         #Layout 
         layout(annotations = list(), #It needs this because of a buggy behaviour of Plotly
                margin = list(b = 160, t=5), #to avoid labels getting cut out
-               yaxis = list(title = yaxis_title, rangemode="tozero", fixedrange=TRUE,
+               yaxis = list(title = trend_type(), rangemode="tozero", fixedrange=TRUE,
                             size = 4, titlefont =list(size=14), tickfont =list(size=14)),
                xaxis = list(title = FALSE, tickfont =list(size=14), tickangle = 270, fixedrange=TRUE),
                font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif'),
