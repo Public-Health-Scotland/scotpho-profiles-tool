@@ -1108,6 +1108,25 @@ function(input, output, session) {
   ###############################################.        
   #### Time trend plot ----
   ###############################################.  
+  # Trend help pop-up
+  observeEvent(input$help_trend, {
+    
+    showModal(modalDialog(
+      title = "How to use this chart",
+      p("The trend chart is designed to explore how a single indicator has changed over time for one or more geograpical area."),
+      p(column(7,img(src="help_trend_chart2.png")),
+        column(5,
+               p("First select an indicator using the 'step 1' filter."),
+               p("Then add one or more geographical area to the chart using the geography filters in 'Step 2'."),
+               p("You can add more than one area or area type (e.g. NHS board or council area) to the trend chart."),
+               p("There may be some indicators where data is not available for the full time series or at a particular geography level."),
+               p("Use the mouse to hover over a data point to see detailed information on its value, time period and area."),
+               p("Confidences intervals (95%) can be added or removed from the chart using the options in 'step 3'. These are shown as shaded areas."),
+               p("Confidence intervals give an indication of the precision of a rate or percentage. The width of a confidence interval is related to sample size, smaller geographies like intermediate zones often have wider intervals."),
+               p("Display controls in 'Step 3' allow you to switch the graph from a measure (e.g. rate or percentage) to actual numbers (e.g numbers of deaths/hospitalisations)."))),
+                 size = "l", easyClose = TRUE, fade=FALSE))
+    }) 
+      
   #####################.
   # Reactive controls
   #Controls for chart. Dynamic selection of locality and iz.
@@ -1226,6 +1245,14 @@ function(input, output, session) {
   #####################.
   # titles 
   output$title_trend <- renderText(paste0(input$indic_trend))
+  output$subtitle_trend <- renderText(paste0(trend_type()))                                     
+ 
+  trend_type <- function () {
+  # y axis title
+  yaxis_title <- case_when(input$var_plot_trend == "measure" ~ paste0(unique(trend_data()$type_definition)), 
+                           input$var_plot_trend == "numerator" ~ "Number")
+  }
+                              
   
   #####################.
   #Plot 
@@ -1265,12 +1292,9 @@ function(input, output, session) {
       
       #Text for tooltip
       tooltip_trend <- c(paste0(trend_data()$areaname, "<br>", trend_data()$trend_axis,
-                                "<br>", "Rate/Percentage: ",trend_data()$measure, "<br>","Numerator: ", trend_data()$numerator))
-      
-      # y axis title
-      yaxis_title <- case_when(input$var_plot_trend == "measure" ~ paste0(unique(trend_data()$type_definition)), 
-                               input$var_plot_trend == "numerator" ~ "Number")
-      
+                                "<br>", paste0(unique(trend_data()$type_definition)),": ", trend_data()$measure,
+                                "<br>", "Numerator: ",trend_data()$numerator))
+
       #Creating time trend plot
       trend_plot <- plot_ly(data=trend_data(), x=~trend_axis,  y = ~get(input$var_plot_trend),
                             color = ~areaname_full, colors = trend_col, 
@@ -1280,7 +1304,7 @@ function(input, output, session) {
         #Layout 
         layout(annotations = list(), #It needs this because of a buggy behaviour of Plotly
                margin = list(b = 160, t=5), #to avoid labels getting cut out
-               yaxis = list(title = yaxis_title, rangemode="tozero", fixedrange=TRUE,
+               yaxis = list(title = trend_type(), rangemode="tozero", fixedrange=TRUE,
                             size = 4, titlefont =list(size=14), tickfont =list(size=14)),
                xaxis = list(title = FALSE, tickfont =list(size=14), tickangle = 270, fixedrange=TRUE),
                font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif'),
