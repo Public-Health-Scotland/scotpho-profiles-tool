@@ -1353,7 +1353,7 @@ function(input, output, session) {
     time_period <- sort(unique(optdata$trend_axis[optdata$indicator == input$indic_rank&
                                                     optdata$areatype == input$geotype_rank]))
     
-    selectInput("year_rank", "Time period",
+    selectInput("year_rank", "Step 3. Select time period",
                 choices = time_period, selected = last(time_period))
   })
   
@@ -1361,7 +1361,7 @@ function(input, output, session) {
   output$geotype_ui_rank <- renderUI({
     areas <- sort(unique(optdata$areatype[optdata$indicator == input$indic_rank]))
     areas <- areas [! areas %in% c("Scotland")] #taking out Scotland
-    selectInput("geotype_rank", label = "Geography level",
+    selectInput("geotype_rank", label = "Step 2. Select geography level",
                 choices = areas, selected = "Health board")
   })
   
