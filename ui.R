@@ -52,7 +52,7 @@ tagList( #needed for shinyjs
                           .col-md-11, .col-lg-11, .col-xs-12, .col-sm-12, .col-md-12, .col-lg-12 {
                           padding-left: 5px; padding-right: 5px;}",
                           #Style for download buttons
-                          ".down{background-color:#4da6ff; color: white; background-image:none; min-width: 20vh;
+                          ".down{background-color:#4da6ff; color: white; background-image:none; min-width: 23vh;
                           font-size: 14px; padding: 5px 10px; margin-top: 5px; margin-left: 3px}",
                           #landing page boxes
                           ".landing-page-box {width:100%; height:100%; min-height:22vh; background-color:white;
@@ -291,7 +291,7 @@ tabPanel("Trend", icon = icon("area-chart"), value = "trend",
          sidebarPanel(width=4,
                       column(6,
                              actionButton("help_trend",label="Help", icon= icon('question-circle'), class ="down")),
-                      column(5,
+                      column(6,
                              actionButton("defs_trend", label="Definitions", icon= icon('info'), class ="down")),
                       column(12,
                       shiny::hr(),
