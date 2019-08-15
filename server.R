@@ -40,6 +40,13 @@ function(input, output, session) {
   
   observeEvent(input$btn_indicator_updates, { showModal(updates_modal) }) # Link action button click to modal launch 
   
+  ## IntroJS allow switching between tabs----
+  observeEvent(input$btn_landing, {
+    introjs(session,
+            events = list(onbeforechange = readCallback("switchTabs")))
+  })
+  
+  
   ###############################################.
   ## Landing page ----
   ###############################################.
@@ -83,7 +90,6 @@ function(input, output, session) {
   observeEvent(input$jump_to_others, {
     updateTabsetPanel(session, "intabset", selected = "others")
   })
-  
  
   ###############################################.
   ## Summary - common objects ----
@@ -2204,28 +2210,6 @@ function(input, output, session) {
       write.csv(indicator_csv(),
                 file, row.names=FALSE) } 
   )
-
-  ## IntroJS allow switching between tabs----
-    observeEvent(input$btn_landing, {
-    introjs(session,
-      events = list(onbeforechange = readCallback("switchTabs")))
-})
-
-  
-  # ## IntroJS allow switching between tabs----
-  # observeEvent(input$btn_landing, {
-  #   introjs(session,
-  #           events = list(onbeforechange=
-  #                           readCallback("switchTabs"),
-  #                                    if (targetElement.getAttribute("data-step")==="1") {
-  #                                     $(".newClass").css("max-width", "50px").css("min-width","50px");  
-  #                                    } else {
-  #                                     $(".newClass").css("max-width", "500px").css("min-width","500px");
-  #                                    }))
-  # })
-  
-
-  
   
 } #server closing bracket
 

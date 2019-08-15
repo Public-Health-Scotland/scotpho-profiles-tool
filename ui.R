@@ -84,14 +84,6 @@ tagList( #needed for shinyjs
                           ".landing-page-button-about {text-align:center;
                           background-image:none; color: black; white-space: normal; border-radius: 0; border:0px ;
                           font-size: 14px; position: absolute; min-height: 7vh; margin-bottom: 0px; margin-top: 1px; float: middle; width: 100%; opacity:0;}",
-                          #hover effect on landing page buttons #remove if including text in button
-                          #  ".landing-page-button:hover , .landing-page-button:active , .landing-page-button-about:hover, .landing-page-button-about:active {opacity: 1; 
-                          # background-color: #fff; /* fallback */
-                          # background-color: rgba(255, 255, 255, 0.8);
-                          # color: darkblue;
-                          # border-color: #fff; /* fallback */
-                          # border-color: rgba(255, 255, 255, 0.8); transition: background-color 0.3s ease-in,
-                          # color 0.3s ease-in;}",
                  #center image - for normal icons
                  "img.center {object-fit: scale-down; position:absolute; width:100%; height:100%; margin-left:auto; margin-right: auto; display: block; padding:20px;}",
                  #center image - for about icons
@@ -128,9 +120,6 @@ tabPanel(
                              h5("Different visualisation can be opened using the menu bar ('the blue strip') at the top of the screen"),
                              img(src='introjs_tabset_panel.PNG',width=300),
                              br(),
-                             #h5("OR"),
-                             #h5("use the icon buttons on the homepage, hover over buttons for a description"),
-                             #img(src='introjs_select_landing_button.PNG'),
                              h5("The 'Home' option in the menu bar will return to the profiles tool home page."),
                              style = "color:0E3E5D; font-size:20px")),
               data.position = "left"),
