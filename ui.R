@@ -92,6 +92,8 @@ tagList( #needed for shinyjs
                ".landing-page-column {padding-right:3vh}",
                #landing-page icons
                ".icon-lp{font-size: 1.3em; padding-right: 4px;}",
+               # flextable wrapping text
+               ".tabwid table {white-space: normal;}",
                #to avoid red text error messages in the whole app, take out for testing
                # ".shiny-output-error { visibility: hidden; }",
                # ".shiny-output-error:before { visibility: hidden; }",
@@ -553,107 +555,68 @@ navbarMenu("Info", icon = icon("info-circle"),
            # ###############################################.
            tabPanel("Indicator definitions", value = "definitions",
                     #Sidepanel for filtering data
-                    fluidRow(
-                      column(width = 5, offset= 1,
-                             p("Indicator definitions and technical information", style = "font-weight: bold; color: black;"),
-                             div(style="display:inline-block",
-                                 selectizeInput("profile_defined", label = "Filter by Profile",
-                                                width = "250px", choices = profile_list_filter,
-                                                selected = "Show all", multiple=FALSE)),
-                             div(style="display:inline-block",
-                                 selectizeInput("topic_defined", label = "Or by Topic",
-                                                width = "250px", choices = topic_list_filter,
-                                                selected = "Show all", multiple=FALSE)),
-                             uiOutput("indicator_chosen")
-                      ), # column bracket
-                      column(width=6,
-                             br(), br(), br(),
-                             downloadButton("definitions_by_indicator",
-                                            'Download indicator definition', class = "down")
-                      )#column bracket
-                    ), #fluidRow bracket
-                    fluidRow(
-                      column(width=10, offset=1,
-                             useShinydashboard(),
-                             conditionalPanel(
-                               condition="input.indicator_defined != null",
-                               valueBoxOutput("indicator", width=12)))),
-                    fluidRow(
-                      column(width=5, offset=1,
-                             conditionalPanel(
-                               condition="input.indicator_defined != null",
-                               div(class="definitionbox",
-                                   p(paste("Definition"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                                   h5(textOutput("definition"))),
-                               div(class="definitionbox",
-                                   p(paste("Data source"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                                   h5(textOutput("source"))),
-                               div(class="definitionbox",
-                                   p(paste("Numerator"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                                   h5(textOutput("numerator"))),
-                               div(class="definitionbox",
-                                   p(paste("Measure"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                                   h5(textOutput("measure"))),
-                               div(class="definitionbox",
-                                   p(paste("Rounding and imputation"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                                   h5(textOutput("rounding"))),
-                               div(class="definitionbox",
-                                   p(paste("Year type"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                                   h5(textOutput("year"))),
-                               div(class="definitionbox",
-                                   p(paste("Trends from"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                                   h5(textOutput("trends_from"))),
-                               div(class="definitionbox",
-                                   p(paste("Geographies available"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                                   h5(textOutput("geos"))),
-                               div(class="definitionbox",
-                                   p(paste("Notes,caveats and other info"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                                   h5(textOutput("notes"))),
-                               div(class="definitionbox",
-                                   p(paste("Date last updated"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                                   h5(textOutput("last_updated")))
-                             ) # conditionalPanel bracket
-                      ), #column bracket
-                      column(width=5,
-                             conditionalPanel(
-                               condition="input.indicator_defined != null",
-                               div(class="definitionbox",
-                                   p(paste("Rationale for inclusion"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                                   h5(textOutput("rationale"))),
-                               div(class="definitionbox",
-                                   p(paste("Diagnostic codes & position"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                                   h5(textOutput("diagnosis"))),
-                               div(class="definitionbox",
-                                   p(paste("Denominator"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                                   h5(textOutput("denominator"))),
-                               div(class="definitionbox",
-                                   p(paste("Disclosure control"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                                   h5(textOutput("disclosure"))),
-                               div(class="definitionbox",
-                                   p(paste("Age group"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                                   h5(textOutput("age"))),
-                               div(class="definitionbox",
-                                   p(paste("Sex"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                                   h5(textOutput("sex"))),
-                               div(class="definitionbox",
-                                   p(paste("Aggregation"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                                   h5(textOutput("aggregation"))),
-                               div(class="definitionbox",
-                                   p(paste("Frequency of update"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                                   h5(textOutput("update_frequency"))),
-                               div(class="definitionbox",
-                                   p(paste("Confidence interval method"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                                   h5(textOutput("confidence_interval"))),
-                               div(class="definitionbox",
-                                   p(paste("Links to supporting information"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                                   h5(textOutput("supporting_info"))),
-                               div(class="definitionbox",
-                                   p(paste("Next update due"), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-                                   h5(textOutput("next_update")))
-                             ) #conditional Panel bracket
-                      )  #column bracket
-                    )#fluidRow bracket
-           ), #Tab panel bracket
+                    fluidRow(style = "width:60%; margin-left: 2%; min-width: 350px",
+                             h3("Indicator definitions and technical information"),
+                             h5("ScotPHO Profiles are made up of a collection of indicators related to a specific theme 
+                                e.g. 'Alcohol' or 'Drugs'. Profiles are further divided into topic areas to group similar indicators together. 
+                                 This page allows users to see available indicators and geographies as well as finding detailed technical information 
+                                  about how incidators are created."),
+                             br(),
+                             radioGroupButtons("techdoc_selection", status = "primary",
+                                               choices = c("List of available indicators", "Detailed information about single indicator"), label= "Step 1. Select what you want to see:" ),
+                             br(),
+                             selectizeInput("profile_picked", label = "Step 2. Select a single profile e.g. Health & wellbeing (optional)",
+                                            width = "100%",choices = profile_list_filter, selected = "Show all", multiple=FALSE),
+                             br(),
+                             #conditional panel for profile summary
+                             conditionalPanel(condition = 'input.techdoc_selection == "List of available indicators"',
+                                              uiOutput("tecdoc_geographies"),
+                                              downloadButton("download_techdoc1_csv",'Download Indicator summary (.csv)', class = "down")),
+                             #conditional panel for single indicator
+                             conditionalPanel(condition = 'input.techdoc_selection == "Detailed information about single indicator"',
+                                              div(style="display:inline-block", 
+                                                  selectizeInput("topic_defined", label = "Step 3. Select a topic within a particular profile (optional)",
+                                                                 width = "100%", choices = topic_list_filter, 
+                                                                 selected = "Show all", multiple=FALSE)),
+                                              uiOutput("indicator_choices"),
+                                              downloadButton("download_detailtechdoc_csv",'Download selected definition', class = "down"),
+                                              downloadButton("download_alltechdoc_csv",'Download all indicator definitions', class = "down")
+                             )),
+                    wellPanel(width = 11,
+                              # display flextable   
+                              conditionalPanel(condition = 'input.techdoc_selection == "List of available indicators"',
+                                               br(),
+                                               br(),
+                                               uiOutput("techdoc_display")),
+                              #techdoc single indicator
+                              conditionalPanel(condition = 'input.techdoc_selection == "Detailed information about single indicator" & input.indicator_selection != null',
+                                               useShinydashboard(),
+                                               valueBoxOutput("indicator", width=12),
+                                               column(5,
+                                                      ind_def_box("Definition", "definition"),
+                                                      ind_def_box("Data source", "source"),
+                                                      ind_def_box("Numerator", "numerator"),
+                                                      ind_def_box("Measure", "measure"),
+                                                      ind_def_box("Rounding and imputation", "rounding"),
+                                                      ind_def_box("Year type", "year"),
+                                                      ind_def_box("Trends from", "trends_from"),
+                                                      ind_def_box("Geographies available", "geos"),
+                                                      ind_def_box("Notes,caveats and other info", "notes"),
+                                                      ind_def_box("Date last updated", "last_updated")),
+                                               column(5,
+                                                      ind_def_box("Rationale for inclusion", "rationale"),
+                                                      ind_def_box("Diagnostic codes & position", "diagnosis"),
+                                                      ind_def_box("Denominator", "denominator"),
+                                                      ind_def_box("Disclosure control", "disclosure"),
+                                                      ind_def_box("Age group", "age"),
+                                                      ind_def_box("Sex", "sex"),
+                                                      ind_def_box("Aggregation", "aggregation"),
+                                                      ind_def_box("Frequency of update", "update_frequency"),
+                                                      ind_def_box("Confidence interval method", "confidence_interval"),
+                                                      ind_def_box("Links to supporting information", "supporting_info"),
+                                                      ind_def_box("Next update due", "next_update") ))
+                    ) # well panel
+           ), #tab panel
 ###############################################.             
 ##############Resources----    
 ###############################################.      

@@ -14,11 +14,12 @@ library (DT) # for data tables
 library(leaflet) #javascript maps
 library(plotly) #interactive graphs
 library(shinyWidgets) # for extra widgets
-library(tidyr) #for string maniupulations in ring plot
+library(tibble) # rownames to column in techdoc
 library(shinyjs)
 library(shinydashboard) #for valuebox on techdoc tab
 library(sp)
 library(shinycssloaders) #for loading icons
+library(flextable) #for tech document table
 library(webshot) #to download plotly charts
 library(rintrojs) # for help intros
 # As well as webshot phantomjs is needed l to download Plotly charts
@@ -42,7 +43,7 @@ format_csv <- function(reactive_dataset) {
 
 format_definitions_csv <- function(reactive_dataset) {
   reactive_dataset %>% 
-    select(c(indicator_name, indicator_number, profile, domain, indicator_definition, inclusion_rationale, data_source,
+    select(c(profile, domain,indicator_name, indicator_number, indicator_definition, inclusion_rationale, data_source,
              diagnostic_code_position, numerator, denominator, measure, disclosure_control, rounding, age_group, sex, year_type,
              trends_from, aggregation, update_frequency, available_geographies, confidence_interval_method, notes_caveats, 
              related_publications, supporting_information, last_updated, next_update
@@ -85,6 +86,14 @@ plot_nodata_gg <- function() {
 }
 
 
+# Indicator definition boxes for indicator definition tab
+ind_def_box <- function(label, text_output) {
+  div(class="definitionbox",
+      p(paste(label), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
+      h5(textOutput(text_output)))
+}
+
+
 #Creating big boxes for main tabs in the landing page (see ui for formatting css)
 lp_main_box <- function(title_box, image_name, button_name, description) {
   div(class="landing-page-box",
@@ -110,15 +119,12 @@ lp_about_box <- function(title_box, image_name, button_name, description) {
                    icon = icon("arrow-circle-right", "icon-lp"),title=description)))
 }
 
-
-
-
-
 ###############################################.
 ## Data ----
 ###############################################.    
 optdata <- readRDS("data/optdata.rds") #main dataset
 techdoc <- readRDS("data/techdoc.rds") #technical documents data including definitions
+
 geo_lookup <- readRDS("data/geo_lookup.rds") #geography lookup
 profile_lookup <- readRDS("data/profile_lookup.rds") #profile lookup
 
