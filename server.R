@@ -2356,12 +2356,12 @@ function(input, output, session) {
   formatted_techdoc_data <- function(){
     if (input$profile_picked != "Show all"){
       techdoc_indicator_data() %>%
-        mutate(test=regexpr((names(profile_list[unname(profile_list) == input$profile_picked])), domain), #find start position of profile name in domain column
-               test2=substr(domain,test, nchar(domain)),  #generate column that starts with filtered profile
-               findcomma=regexpr(",",test2), #find position of comma (where domain description ends
-               findhyp=regexpr("-",test2), #find position of hyphen (where domain description starts)
-               domain1= case_when(findcomma<0 ~ substr(test2,findhyp+1,nchar(test2)),
-                                  findcomma>0 ~ substr(test2,findhyp+1,findcomma-1),
+        mutate(prof_start=regexpr((names(profile_list[unname(profile_list) == input$profile_picked])), domain), #find start position of profile name in domain column
+               prof_name_text=substr(domain,prof_start, nchar(domain)),  #generate column that starts with filtered profile
+               findcomma=regexpr(",",prof_name_text), #find position of comma (where domain description ends
+               findhyp=regexpr("-",prof_name_text), #find position of hyphen (where domain description starts)
+               domain1= case_when(findcomma<0 ~ substr(prof_name_text,findhyp+1,nchar(prof_name_text)),
+                                  findcomma>0 ~ substr(prof_name_text,findhyp+1,findcomma-1),
                                   TRUE ~ "")) %>% # extract domain string linked to seletec profile
         mutate (profilename=input$profile_picked) %>%  #sort on profile name since some indicators in multiple profiles
         arrange(profilename, domain1, indicator_name) %>%
