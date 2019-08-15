@@ -10,16 +10,16 @@ function(input, output, session) {
   ################################################################.
   
   ## Latest indicator updates modal window ----
-
   updates_modal <- modalDialog(
     fluidRow(
       column(12,
+             # text_intro("We are continuously updating and developing our tool"),                 
              p(tags$div("We are continuously updating and developing our tool", 
-                        style = "color:0E3E5D; font-size:20px; width: 90%; text-align: left; ")),                 
+                        style = "color:0E3E5D; font-size:20px; width: 90%; text-align: left; ")),
              br(),
              br(),
-             p(tags$h5("Recent indicator updates include:", 
-                       style = "width: 90%; text-align: left; font-weight: bold; "))),
+             p(h5("Recent indicator updates include:", 
+                  style = "width: 90%; text-align: left; font-weight: bold; "))),
       column(12, 
              tags$h5(HTML(paste(techdoc$indicator_name[techdoc$days_since_update<60], #tells to display indicators updated within 60 days
                                 collapse='<br>')))
@@ -39,6 +39,13 @@ function(input, output, session) {
   )
   
   observeEvent(input$btn_indicator_updates, { showModal(updates_modal) }) # Link action button click to modal launch 
+  
+  ## IntroJS allow switching between tabs----
+  observeEvent(input$btn_landing, {
+    introjs(session,
+            events = list(onbeforechange = readCallback("switchTabs")))
+  })
+  
   
   ###############################################.
   ## Landing page ----
@@ -83,7 +90,6 @@ function(input, output, session) {
   observeEvent(input$jump_to_others, {
     updateTabsetPanel(session, "intabset", selected = "others")
   })
-  
  
   ###############################################.
   ## Summary - common objects ----
@@ -1259,7 +1265,7 @@ function(input, output, session) {
       
       #Text for tooltip
       tooltip_trend <- c(paste0(trend_data()$areaname, "<br>", trend_data()$trend_axis,
-                                "<br>", trend_data()$measure))
+                                "<br>", "Rate/Percentage: ",trend_data()$measure, "<br>","Numerator: ", trend_data()$numerator))
       
       # y axis title
       yaxis_title <- case_when(input$var_plot_trend == "measure" ~ paste0(unique(trend_data()$type_definition)), 
@@ -2207,43 +2213,6 @@ function(input, output, session) {
       write.csv(indicator_csv(),
                 file, row.names=FALSE) } 
   )
-  
-  ## IntroJS----
-  # hintjs(session, options = list("hintButtonLabel"="Hope this hint was helpful"),
-  #        events = list("onhintclose"=I('alert("Wasn\'t that hint helpful")')))
-  # 
-  # # start introjs when button is pressed with custom options and events
-  # observeEvent(input$help,
-  #              introjs(session, options = list("nextLabel"="Onwards and Upwards",
-  #                                              "prevLabel"="Did you forget something?",
-  #                                              "skipLabel"="Don't be a quitter"),
-  #                      events = list("oncomplete"=I('alert("Glad that is over")')))
-  # )
-  
-  
-  # steps <- reactive(data.frame(element = c(NA,"#btn"),
-  #                              intro = c(input$intro,"Keep clicking for help")))
-  # 
-  # observeEvent(input$btn,{
-  #   introjs(session,options = list(steps=steps()))
-  #     })
-  # 
-  
-  ## Event that launches the help intro boxes linked to landing page button.
-  # observeEvent(input$btn_landing,
-  #              introjs(session))
-  
-  ##button 2 appears on data tab but currently when clicked cycles through all the intro steps on landing page
-  ##i need to find a way to set up intro for only data tab - perhaps i can tell it to skip certain steps?
-  ##this might get complicated if we insert steps on different tabs and things get out of sequence?
-  # 
-  # observeEvent(input$btn2,
-  #              introjs(session))
-  #              
-  observeEvent(input$btn_landing, {
-    introjs(session,
-      events = list(onbeforechange = readCallback("switchTabs")))
-})
   
 } #server closing bracket
 

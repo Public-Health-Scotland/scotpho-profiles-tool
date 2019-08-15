@@ -21,6 +21,7 @@ tagList( #needed for shinyjs
                includeScript("google-analytics.js"),
                # HTML('<script src="https://cc.cdn.civiccomputing.com/8/cookieControl-8.x.min.js"></script>'),
                # includeScript("cookie-control.js"),
+               tags$style(HTML(".newClass {min-width: 50px;max-width: 50px;}")), #for introjs sizing
                #Style sidebars/well panels
                tags$style(".well {background-color:#ffffff; border: 0px solid #336699;
                           padding: 5px; box-shadow: none; }",
@@ -56,20 +57,23 @@ tagList( #needed for shinyjs
                           ".down{background-color:#4da6ff; color: white; background-image:none; min-width: 23vh;
                           font-size: 14px; padding: 5px 10px; margin-top: 5px; margin-left: 3px}",
                           #landing page boxes
-                          ".landing-page-box {width:100%; height:100%; min-height:22vh; background-color:white;
+                          ".landing-page-box {width:100%; height:100%; min-height:23vh; background-color:white;
                           border: 1px solid #AAAAAA; margin-bottom: 5px; float: left; transition: 0.5s ease; position: relative; object-fit: scale-down;}",
-                          ".landing-page-box-about {width:100%; height:100%; min-height:10.7vh; background-color:white;
+                          ".landing-page-box-about {width:100%; height:100%; min-height:11vh; background-color:white;
                           border: 1px solid #AAAAAA; margin-bottom: 5px; float: left; position: relative; object-fit: scale-down;}",
                           ".landing-page-box:hover, .landing-page-box-about:hover {-webkit-transform: scale(1.05); 
                           -ms-transform: scale(1.05); transform: scale(1.05); }", #hover effect on boxes
                           #landing page icons
-                          ".landing-page-icon {width:100%; height:85%; min-height:12vh; background-color: white;
+                          ".landing-page-icon {width:100%; height:75%; min-height:12vh; background-color: white;
                           border: 0px ; position: absolute; object-fit: scale-down;}",
                           ".landing-page-about-icon {width:100%; height:65%; min-height:5vh; background-color: white;
                           border: 0px; position: absolute; object-fit: scale-down;}",
                           #landing-page titles for boxes
                           ".landing-page-box-title {font-size: 16px; text-align:center; color: darkblue;
                           font-weight: bold; background-color: none; width:100%; max-height: 20px; margin-top: 10px; }",
+                          #landing-page description text of boxes
+                          ".landing-page-box-description {font-size: 12px; text-align:center; color: darkblue;
+                          background-color: none; width:100%; max-height: 20px; margin-top: 10px; }",
                           #landing page titles for ABOUT boxes
                           ".landing-page-box-about-title {font-size: 16px; text-align:center; color: darkblue;
                           font-weight: bold; background-color: none; width:100%; max-height: 20px; margin-top: 5px; }",
@@ -80,14 +84,6 @@ tagList( #needed for shinyjs
                           ".landing-page-button-about {text-align:center;
                           background-image:none; color: black; white-space: normal; border-radius: 0; border:0px ;
                           font-size: 14px; position: absolute; min-height: 7vh; margin-bottom: 0px; margin-top: 1px; float: middle; width: 100%; opacity:0;}",
-                          #hover effect on landing page buttons
-                           ".landing-page-button:hover , .landing-page-button:active , .landing-page-button-about:hover, .landing-page-button-about:active {opacity: 1; 
-                          background-color: #fff; /* fallback */
-                          background-color: rgba(255, 255, 255, 0.8);
-                          color: darkblue;
-                          border-color: #fff; /* fallback */
-                          border-color: rgba(255, 255, 255, 0.8); transition: background-color 0.3s ease-in,
-                          color 0.3s ease-in;}",
                  #center image - for normal icons
                  "img.center {object-fit: scale-down; position:absolute; width:100%; height:100%; margin-left:auto; margin-right: auto; display: block; padding:20px;}",
                  #center image - for about icons
@@ -111,70 +107,66 @@ tagList( #needed for shinyjs
 tabPanel(
   title = " Home", icon = icon("home"),
   mainPanel(width = 11, style="margin-left:4%; margin-right:4%",
-            introBox( 
-              fluidRow( #title and help/tour button
-                column(9,(h3("Welcome to the ScotPHO profiles", style="margin-top:0px;"))),
-                       column(2, actionButton("btn_landing", label="Help: Walk through this tool",
-                                              icon=icon('question-circle'),class="down"))),
-              data.step = 1, #intro of tour of the tool 
-              data.intro =p(h4("Welcome to the ScotPHO Profiles Tool"), br(),
+            introBox(  
+              fluidRow(column(7,(h3("Welcome to the ScotPHO profiles", style="margin-top:0px;"))),
+                       (column(4,actionButton("btn_landing",label="Help: Take tour of the tool",icon=icon('question-circle'),class="down")))),
+              data.step = 1,
+              data.intro =(p(h4("Welcome to the ScotPHO Profiles Tool"),
                              h5("This interactive tool provides access to a range of public
                               health related indicators at different geographies including NHS boards, council areas and health and
                               social care partnerships."),
                              br(),
-                             h5("There are different ways to navigate through this tool:"),
+                             h5("There are different ways to navigate around the tool."),
+                             h5("Different visualisation can be opened using the menu bar ('the blue strip') at the top of the screen"),
+                             img(src='introjs_tabset_panel.PNG',width=300),
                              br(),
-                             h5("Use the menu bar ('the blue strip') at the top of the screen"),
-                             img(src='introjs_tabset_panel.PNG', width=300),
-                             h5("OR"),
-                             br(),
-                             h5("use the icon buttons on the homepage, hover over buttons for a description"),
-                             img(src='introjs_select_landing_button.PNG'),
-                             h5("The 'Home' option will take you back to the profiles main page."),
+                             h5("The 'Home' option in the menu bar will return to the profiles tool home page."),
                              style = "color:0E3E5D; font-size:20px")),
-            fluidRow( #1st row of boxes
+              data.position = "left"),
+            fluidRow(
               #Summary box
-              column(6, class="landing-page-column",
-                     br(), #spacing
+              column(6, class="landing-page-column",br(), #spacing
                      introBox(
                        lp_main_box(image_name= "landing_button_heatmap_2", 
-                                   button_name = 'jump_to_summary', title_box = "Profile summary", 
+                                   button_name = 'jump_to_summary', title_box = "Profile summary",
                                    description = 'A high level view of an area across a set of indicators'),
                        data.step = 2,
-                       data.intro = "The profile summary allows you to look at multiple indicators within an area at the same time",
-                       data.position = "bottom-right-aligned")),
+                       data.intro = h5("The profile summary allows you to look at multiple indicators within an area at the same time"),
+                       data.position = "bottom-right-aligned")),       
               #Table box 
               column(6, class="landing-page-column",
                      br(), #spacing
                      introBox( # tour of the tool
                        lp_main_box(image_name= "landing_button_data_table", 
-                                   button_name = 'jump_to_table', title_box = "Data", 
+                                   button_name = 'jump_to_table', title_box = "Data",
                                    description = 'View and download the data behind the tool'),
                        data.step = 6,
-                       data.intro = "The 'Data' window can be used to filter and download profiles data"))),
-            fluidRow( #2nd row of boxes
+                       data.intro = h5("The 'Data' window can be used to filter and download profiles data")))),
+            #2nd row of boxes
+            fluidRow(
               br(), #spacing
               column(8, introBox( #tour of the rank and trend tabs
                 data.step = 3,
-                data.intro = "The trend and rank charts allow detailed exploration of one indicator at a time.",
+                data.intro = h5("The trend and rank charts allow detailed exploration of one indicator at a time."),
                 #Trend plot box
                 column(6, class="landing-page-column",
                        lp_main_box(image_name= "landing_button_time_trend", 
-                                   button_name = 'jump_to_trend', title_box = "Trend", 
+                                                     button_name = 'jump_to_trend', title_box = "Trend",
                                    description = 'Look at how an indicator changes over time')),
                 #Rank/map plot box
                 column(6, class="landing_button_maprank",
                        lp_main_box(image_name= "landing_button_maprank", 
-                                   button_name = 'jump_to_rank', title_box = "Rank", 
+                                   button_name = 'jump_to_rank', title_box = "Rank",
                                    description = 'Compare geographical variation for an indicator'))
               )),#introBox 3 close
               #Inequalities box
               column(4, class="landing-page-column",
                      introBox(
                        data.step = 7,
-                       data.intro = "The inequalities module allows exploration of deprivation affects a selection of indicators from the main profiles tool.",
+                       data.intro = h5("The inequalities module allows exploration of deprivation affects a selection of indicators from the main profiles tool."),
                        div(class="landing-page-box", 
                            div("Health inequalities", class = "landing-page-box-title"),
+                           div("Explore how an indicator varies with deprivation", class = "landing-page-box-description"),
                            div(class = "landing-page-icon", style="background-image: url(landing_button_health_inequality.png);
                      background-size: auto 85%; background-position: center; background-repeat: no-repeat; "),
                            # Currently a link to the health inequalities app
@@ -187,20 +179,19 @@ tabPanel(
             # third row of landing page 
             fluidRow(
               introBox(data.step=8, # tour around the tool
-                       data.intro = "There are also options to find out information such as detailed descriptions of the profile indicators, indicator update schedules and links to evidence for action briefings",
+                       data.intro =h5("There are also options to find out information such as detailed descriptions of the profile indicators, indicator update schedules and links to evidence for action briefings"),
                        #About box
                        column(4, class="landing-page-column",
-                              lp_about_box(image_name= "landing_button_about_2", button_name = 'jump_to_about', 
+                              lp_about_box(image_name= "landing_button_about_2", button_name = 'jump_to_about',
                                            title_box = "About", description = 'About ScotPHO Profiles'),
                               #Evidence box
                               div(class="landing-page-box-about", 
-                                  div("Evidence for action", class = "landing-page-box-title" ),
-                                  div(class = "landing-page-about-icon", div(img(src="landing_button_other_profile.png", class="centerabout"))),
+                                  div("Evidence for action",title="Links to briefing documents containing practical actions for improvement", class = "landing-page-box-title" ),
+                                  div(class = "landing-page-about-icon", div(img(src="landing_button_other_profile.png",class="centerabout"))),
                                   actionButton('jump_to_efa', 'Links to ScotPHO evidence for action briefings', 
                                                onclick ="window.open('https://www.scotpho.org.uk/comparative-health/profiles/resources/evidence-for-action/', '_blank')",
                                                class="landing-page-button-about", 
                                                icon = icon("arrow-circle-right", "icon-lp")))),
-                       
                        column(4, class="landing-page-column", 
                               #Indicator updates
                               lp_about_box(image_name= "landing_button_calendar", button_name = 'btn_indicator_updates', 
@@ -265,9 +256,9 @@ tabPanel("Summary", icon = icon("list-ul"), value = "summary",
                                  trend will show how things are changing over time, and 
                                  spine compares indicators with the rest of areas of the same level." ))),
          data.step = 4, 
-         data.intro =(p(tags$div("Use the dropdown menus to change which indicators or geographies are displayed in the charts."),
-                      tags$br(),
-                      tags$div("While using dropdown menus hit backspace ('<-') and start typing a word to quickly find the options you are looking for"),
+         data.intro =(p(h5("Throughout the tool use the dropdown menus to change which indicators or geographies are displayed in the charts."),
+                      br(),
+                      h5("While using dropdown menus mouse click within a dropdown menu and press backspace on your keyboard ('<-') then start typing a word to quickly find the options you are looking for"),
                       img(src='introjs_how_to_select.png')))
          ), #well panel bracket
          mainPanel(width = 12,
@@ -386,10 +377,10 @@ tabPanel("Rank", icon = icon("signal"), value = "rank",
                   savechart_button('download_rankplot', 'Save chart', class = "down"),
                   savechart_button('download_mapplot', 'Save map', class = "down"),
                   data.step = 5,
-                  data.intro =(p(tags$div("Look out for options in each window that provide"),
-                               tags$li("indicator defintions or help to interpret a visualisation,"),
-                               tags$li("data download data options for individual charts,"),
-                               tags$li("image downloads for individual charts.")
+                  data.intro =(p(h5("Throughout the tool look out for options in each window that provide"),
+                               tags$li("indicator defintions or help to interpret a visualisation,",style="color: #007ba7"),
+                               tags$li("data download data options for individual charts,",style="color: #007ba7"),
+                               tags$li("image downloads for individual charts.",style="color: #007ba7")
                                )))
          )), #well pannel bracket
          mainPanel(width = 12, #Main panel
