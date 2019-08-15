@@ -1,24 +1,29 @@
 ---
 params:
-  chart_summary: NA
-  snapshot_data: NA
-  profile_summary: NA
+  chart_summary: NA #used
+  snapshot_data: NA #used
+  profile_summary: NA #used
   summary_data: NA
   comp_summary: NA
   geoname_summary: NA
   geotype_summary: NA
   geocomp_summary: NA
-geometry:  margin=0.5cm
-output: word_document
+# geometry:  margin=0.5cm
+output: html_vignette
   # pdf_document:
   #   includes:
   #     in_header: preamble.tex
   
   # To do,:
-    # add column layout
+    # add column layout - still doesn't work in word. What if I create the charts in ggplot
+    # then merge each column using ggpubr putting all in line and then merge the columns
+    # will this respect the size 
+    # what about a solution exporting all charts as png within the rmd and then using the images
+    # in the report
     # add conditions to input$chart_summary
     # move to ggplot
     # figure out width of plots
+    # if using html size is an issue
     
 ---
 ```{r setup}
@@ -91,44 +96,47 @@ knitr::opts_chunk$set(echo = F, cache = T)
 
 ```
 
-A plot of `params$profile_summary` random points.
 
-\btwocol
+#### `params$profile_summary` profile: `params$geoname_summary` 
 
-#### Behaviours
 ```{r echo=FALSE}
-plot_profile_snapshot("Behaviours") 
-plot_profile_snapshot("Behaviours") 
-```
-\columnbreak
 
-#### R
-```{r echo=FALSE}
-plot_profile_snapshot("Behaviours")
-plot_profile_snapshot("Behaviours")
-```
-\etwocol
-some random text
-
-\bthreecol
-
-#### Behaviours
-```{r echo=FALSE}
-plot_profile_snapshot("Behaviours")
-plot_profile_snapshot("Behaviours")
-```
-\columnbreak
-
-#### R
-```{r echo=FALSE}
-plot_profile_snapshot("Behaviours")
-plot_profile_snapshot("Behaviours")
-```
-\columnbreak
-
-#### R
-```{r echo=FALSE}
-plot_profile_snapshot("Behaviours")
-plot_profile_snapshot("Behaviours")
-```
-\etwocol
+    if (params$chart_summary == "Snapshot") {
+      if (params$profile_summary == "HWB") {
+        tagList(#Health and Wellbeing profile
+          column(4,
+                 plot_profile_snapshot("Behaviours"),
+                 plot_profile_snapshot("Social care & housing"),
+                 plot_profile_snapshot("Environment"),
+                 plot_profile_snapshot("Life expectancy & mortality")
+          ),
+          column(4,
+                 plot_profile_snapshot("Women's & children's health"),
+                 plot_profile_snapshot("Immunisations & screening"),
+                 plot_profile_snapshot("Economy"),
+                 plot_profile_snapshot("Crime")
+          ),
+          column(4,
+                 plot_profile_snapshot("Mental health"),
+                 plot_profile_snapshot("Ill health & injury"),
+                 plot_profile_snapshot("Education")
+          )
+        ) #taglist bracket
+      } else if (params$profile_summary == "CYP") {
+        tagList(#Children and young people profile
+          column(4,
+                 plot_profile_snapshot("Active"),
+                 plot_profile_snapshot("Healthy")
+          ),
+          column(4,
+                 plot_profile_snapshot("Included"),
+                 plot_profile_snapshot("Nurtured"),
+                 plot_profile_snapshot("Safe")
+          ),
+          column(4,
+                 plot_profile_snapshot("Achieving"),
+                 plot_profile_snapshot("Responsible")
+          )
+        )# taglist bracket
+      }
+    }
