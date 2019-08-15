@@ -2376,7 +2376,7 @@ function(input, output, session) {
       formatted_techdoc_data() %>%
         select(domain1, ind_index,indicator_name, indicator_definition,available_geographies,aggregation) %>%
         flextable() %>%
-        add_header_lines(paste0(input$profile_picked," Profile")) %>%
+        add_header_lines(paste0((names(profile_list[unname(profile_list) == input$profile_picked]))," profile")) %>%
         set_header_labels (domain1="Domain",ind_index= "",indicator_name="Indicator",indicator_definition="Indicator Definition",
                            available_geographies="Available geographies", aggregation="Level of aggregation") %>%
         theme_box() %>%
