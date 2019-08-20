@@ -381,8 +381,19 @@ function(input, output, session) {
                 prof_chosen$value_profile)
     
   })
-
   
+  # Temporary fix for lack of saving charts functionality for snapshot and trend
+  output$save_chart_ui <- renderUI({
+    if (input$chart_summary %in% c("Trend", "Snapshot") ){
+      actionButton('download_summaryplot_no', 
+                               'Save chart (coming soon)',  
+                               class = "down")
+    } else if (input$chart_summary == "Spine") {
+      savechart_button('download_summaryplot', 'Save chart',  class = "down")
+    }
+    
+  })
+
   # Reactive controls for heatmap:area name depending on areatype selected
   output$geoname_ui_summary <- renderUI({
     

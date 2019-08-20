@@ -254,10 +254,8 @@ tabPanel("Summary", icon = icon("list-ul"), value = "summary",
            actionButton("help_summary",label="Help", icon= icon('question-circle'), class ="down"),
            actionButton("defs_summary",label="Definitions", icon= icon('info'), class ="down"),
            downloadButton('download_summary', 'Download data', class = "down"),
-           # conditionalPanel(condition = 'input.chart_summary == "Spine"',
-           #                  savechart_button('download_spineplot', 'Save chart',  class = "down"))
-           savechart_button('download_summaryplot', 'Save chart',  class = "down")
-         ),
+           uiOutput("save_chart_ui")
+                   ),
          mainPanel(width = 12,
                    bsModal("mod_defs_summary", "Definitions", "defs_summary",
                            htmlOutput('defs_text_summary')),
