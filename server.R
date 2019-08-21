@@ -1125,7 +1125,7 @@ function(input, output, session) {
                p("Confidences intervals (95%) can be added or removed from the chart using the options in 'step 3'. These are shown as shaded areas."),
                p("Confidence intervals give an indication of the precision of a rate or percentage. The width of a confidence interval is related to sample size, smaller geographies like intermediate zones often have wider intervals."),
                p("Display controls in 'Step 3' allow you to switch the graph from a measure (e.g. rate or percentage) to actual numbers (e.g numbers of deaths/hospitalisations)."))),
-                 size = "l", easyClose = TRUE, fade=FALSE))
+                 size = "l", easyClose = TRUE, fade=FALSE,footer = modalButton("Close (Esc)")))
     }) 
       
   #####################.
@@ -1413,7 +1413,8 @@ function(input, output, session) {
     p("In 'step 4' the compartor can be changed to 'Time', this changes the chart shown and adds an extra dimension to the area comparison."),
     actionButton("rank_area_help","How to use area comparisons chart"),
     actionButton("rank_time_help","How to use time comparisons chart"),
-    size = "l", easyClose = TRUE, fade=FALSE)
+    size = "l", easyClose = TRUE, fade=FALSE,
+    footer = modalButton("Close (Esc)"))
     
   #Help page for area comparison 
   rank_byarea_modal <- modalDialog(
@@ -1428,7 +1429,7 @@ function(input, output, session) {
     footer=tagList(
       actionButton("rank_time_help","Help for time comparison chart"),
       actionButton("rank_help_back","Back"),
-      modalButton("Dismiss (Esc)")))
+      modalButton("Close (Esc)")))
   
   #Help page for time comparison
   rank_bytime_modal <- modalDialog(
@@ -1442,7 +1443,7 @@ function(input, output, session) {
     footer=tagList(
       actionButton("rank_area_help","Help for area comparison chart"),
       actionButton("rank_help_back","Back"),
-      modalButton("Dismiss (Esc)")))
+      modalButton("Close (Esc)")))
 
 #####################.
 # Reactive data  
