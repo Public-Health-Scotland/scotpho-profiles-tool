@@ -64,16 +64,17 @@ tagList( #needed for shinyjs
                           ".landing-page-box:hover, .landing-page-box-about:hover {-webkit-transform: scale(1.05); 
                           -ms-transform: scale(1.05); transform: scale(1.05); }", #hover effect on boxes
                           #landing page icons
-                          ".landing-page-icon {width:100%; height:75%; min-height:12vh; background-color: white;
-                          border: 0px ; position: absolute; object-fit: scale-down;}",
+                          ".landing-page-icon {width:100%; height:65%; min-height:12vh; background-color: white;
+                          border: 0px ; position: relative; object-fit: scale-down; }",
                           ".landing-page-about-icon {width:100%; height:65%; min-height:5vh; background-color: white;
                           border: 0px; position: absolute; object-fit: scale-down;}",
                           #landing-page titles for boxes
                           ".landing-page-box-title {font-size: 16px; text-align:center; color: darkblue;
-                          font-weight: bold; background-color: none; width:100%; max-height: 20px; margin-top: 10px; }",
+                          font-weight: bold; background-color: none; width:100%; max-height: 20px; margin-top: 2vh;}",
                           #landing-page description text of boxes
                           ".landing-page-box-description {font-size: 12px; text-align:center; color: darkblue;
-                          background-color: none; width:100%; max-height: 20px; margin-top: 10px; }",
+                          background-color: none; width:100%; max-height: 20px; margin-top: 2vh; 
+                          padding-bottom: 3vh;}",
                           #landing page titles for ABOUT boxes
                           ".landing-page-box-about-title {font-size: 16px; text-align:center; color: darkblue;
                           font-weight: bold; background-color: none; width:100%; max-height: 20px; margin-top: 5px; }",
@@ -147,16 +148,17 @@ tabPanel(
             #2nd row of boxes
             fluidRow(
               br(), #spacing
-              column(8, introBox( #tour of the rank and trend tabs
-                data.step = 3,
-                data.intro = h5("The trend and rank charts allow detailed exploration of one indicator at a time."),
+              column(8, style = "padding-left: 0px; padding-right: 0px;", 
+                     introBox( #tour of the rank and trend tabs
+                        data.step = 3,
+                        data.intro = h5("The trend and rank charts allow detailed exploration of one indicator at a time."),
                 #Trend plot box
                 column(6, class="landing-page-column",
                        lp_main_box(image_name= "landing_button_time_trend", 
                                                      button_name = 'jump_to_trend', title_box = "Trend",
                                    description = 'Look at how an indicator changes over time')),
                 #Rank/map plot box
-                column(6, class="landing_button_maprank",
+                column(6, class="landing-page-column",
                        lp_main_box(image_name= "landing_button_maprank", 
                                    button_name = 'jump_to_rank', title_box = "Rank",
                                    description = 'Compare geographical variation for an indicator'))
