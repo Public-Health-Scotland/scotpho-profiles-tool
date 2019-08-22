@@ -311,11 +311,11 @@ function(input, output, session) {
       p(column(6, "Hover over each tile to see indicator definitions and time periods."),
         column(6, img(src="help_heatmap2.png"))), 
       p("Colours are used to indicate if the value for an indicator is significantly different to the comparator, statistical confidence intervals are used to decide if differences are 'significant'."),
-      h5("Area comparison example:  e.g. comparing against Scotland", style = "font-weight: bold; color: black; margin-bottom: 0px;"),
+      h5("Area comparison example:  e.g. comparing 'Area X' against Scotland", style = "font-weight: bold; color: black; margin-bottom: 0px;"),
       p("In the example below the first row shows an indicator significantly worse than Scotland up to the year 2010 but from 2013 onwards is significantly better than Scotland.
         The second row is an example of an indicator not significantly different to Scotland for the 4 years up to 2006 but from 2007 significantly worse than Scotland."),
       p(img(src="help_heatmap3.png")),      
-      h5("Time comparison example: e.g. area X yearly comparisons against 2003", style = "font-weight: bold; color: black; margin-bottom: 0px;"),
+      h5("Time comparison example: e.g. yearly comparisons of 'Area X' against the value for year 2003", style = "font-weight: bold; color: black; margin-bottom: 0px;"),
       p("Changing the comparison type to a time based comparison can provide differing insights.
         The example below is the same as that shown but viewed as a time comparison. Now the two rows both show indicators that are significantly better than in later years when compared to 2003.
         Combining the information from the area and time comparisons suggests that whilst both indicators are reducing for this area the reductions in admissions for heart disease in this area are not keeping pace with the reductions seen in Scotland as a whole."),
