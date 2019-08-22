@@ -298,44 +298,42 @@ function(input, output, session) {
       showModal(modalDialog(
         title = "How to use this chart",
         p(img(src="help_barcode2.png",height=600)),size = "l",
-        easyClose = TRUE, fade=FALSE
+        easyClose = TRUE, fade=FALSE,footer = modalButton("Close (Esc)")
       ))
       
     } else if (input$chart_summary == "Trend") {
 
     showModal(modalDialog(
       title = "How to use this chart",
-      p(column(6,"Select 'Area' to compare against another region, or select 'Time' to compare
-               against a baseline year of the same area."),
+      p(column(6,"Select 'Area' to compare one geographical area against another area, or select 'Time' to compare
+               against a baseline year for the same area."),
         column(6, img(src="help_heatmap1.png"))),
       p(column(6, "Hover over each tile to see indicator definitions and time periods."),
         column(6, img(src="help_heatmap2.png"))), 
-      p("Colours are used to indicate if the value for an indicator is 
-        statistically different from the comparator. Here, there are two indicators 
-        with different evolutions over time, the first one improves respecting 
-        the comparator, Scotland, and the second one gets worse. "),
-      h5("Comparing against Scotland", style = "font-weight: bold; color: black; margin-bottom: 0px;"),
-      p(img(src="help_heatmap3.png")),  
-      p("The interpretation could be very different if you compare against a
-        baseline year, as in this case when both are improving. What comparator 
-        you should choose will depend on which are your aims."),
-      h5("Comparing against 2003", style = "font-weight: bold; color: black; margin-bottom: 0px;"),
+      p("Colours are used to indicate if the value for an indicator is significantly different to the comparator, statistical confidence intervals are used to decide if differences are 'significant'."),
+      h5("Area comparison example:  e.g. comparing against Scotland", style = "font-weight: bold; color: black; margin-bottom: 0px;"),
+      p("In the example below the first row shows an indicator significantly worse than Scotland up to the year 2010 but from 2013 onwards is significantly better than Scotland.
+        The second row is an example of an indicator not significantly different to Scotland for the 4 years up to 2006 but from 2007 significantly worse than Scotland."),
+      p(img(src="help_heatmap3.png")),      
+      h5("Time comparison example: e.g. area X yearly comparisons against 2003", style = "font-weight: bold; color: black; margin-bottom: 0px;"),
+      p("Changing the comparison type to a time based comparison can provide differing insights.
+        The example below is the same as that shown but viewed as a time comparison. Now the two rows both show indicators that are significantly better than in later years when compared to 2003.
+        Combining the information from the area and time comparisons suggests that whilst both indicators are reducing for this area the reductions in admissions for heart disease in this area are not keeping pace with the reductions seen in Scotland as a whole."),
       p(img(src="help_heatmap4.png")),  
       
-      size = "l", easyClose = TRUE, fade=FALSE
+      size = "l", easyClose = TRUE, fade=FALSE,footer = modalButton("Close (Esc)")
       ))
     } else if (input$chart_summary == "Snapshot") {
       showModal(modalDialog(
         title = "How to use this chart",
-        p(column(6,"Select 'Area' to compare against another region, or select 'Time' to compare
-                 against a baseline year of the same area."),
+        p(column(6,"Select 'Area' to compare one geographical area against another area, or select 'Time' to compare
+                 against a baseline year for the same area."),
           column(6, img(src="help_heatmap1.png"))),
         p("Hover over each box to see indicator values and time periods."),
-        p("Colours are used to indicate if the value for an indicator is 
-          statistically different from the comparator."),
-        p("The interpretation could be very different if you compare against a
-          baseline year. What comparator you should choose will depend on which are your aims."),
-        size = "l", easyClose = TRUE, fade=FALSE
+        p("Colours are used to indicate if the value for an indicator is significantly different to the comparator, 
+          statistical confidence intervals are used to decide if differences are 'significant'."),
+        p("The different comparison types (area or time) can be used to provide different insights about the indicators."),
+        size = "l", easyClose = TRUE, fade=FALSE,footer = modalButton("Close (Esc)")
         ))
     }
   })
