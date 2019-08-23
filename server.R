@@ -773,8 +773,6 @@ function(input, output, session) {
   ## Snapshot  ----
   ###############################################. 
   
-  observeEvent(input$browser, browser())
-  
   # Reactive dataset
   snapshot_data <- reactive({
     summary_data() %>% group_by(indicator) %>% top_n(1, year) %>% 

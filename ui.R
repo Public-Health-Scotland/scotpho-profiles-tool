@@ -250,7 +250,6 @@ tabPanel("Summary", icon = icon("list-ul"), value = "summary",
                              choices = c("Snapshot", "Trend", "Spine"), label=NULL  ))
          ), #well panel bracket
          wellPanel( style = "margin-left: 15%;",
-                    actionButton("browser", "Browse"),
            actionButton("help_summary",label="Help", icon= icon('question-circle'), class ="down"),
            actionButton("defs_summary",label="Definitions", icon= icon('info'), class ="down"),
            downloadButton('download_summary', 'Download data', class = "down"),
