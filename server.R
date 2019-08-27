@@ -1807,7 +1807,7 @@ function(input, output, session) {
   #rank legend text
   output$rank_legend <- renderUI({
     if (input$comp_rank == 1) {
-      p(tags$b("Chart Legend"), 
+      p(tags$b("Legend"), 
         br(),
         img(src='signif_better.png', height=12, style="padding-right: 2px; vertical-align:middle"),"Better than comparator",
         img(src='non_signif.png', height=12, style="padding-right: 2px; vertical-align:middle"), "Not different to comparator", 
