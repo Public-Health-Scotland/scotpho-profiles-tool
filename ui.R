@@ -263,6 +263,7 @@ tabPanel("Summary", icon = icon("list-ul"), value = "summary",
          column(3) #empty column to replicate offset and center content
                    ), # column bracket
          mainPanel(width = 12,
+                   shiny::hr(),
                    bsModal("mod_defs_summary", "Definitions", "defs_summary",
                            htmlOutput('defs_text_summary')),
                    fluidRow(column(4,

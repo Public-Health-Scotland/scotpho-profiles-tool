@@ -518,7 +518,7 @@ function(input, output, session) {
         values for each indicator.")
     } else if (input$chart_summary == "Trend") {
       p("This visualisation shows all the indicators of the profile you
-        have chosen. The coloured boxes show comparisons of indicator values for your selected area against the comparator for over time. The colour of the boxes reflects if
+        have chosen. The coloured boxes show comparisons of indicator values for your selected area against the chosen comparator over time. The colour of the boxes reflects if
         the differences are significant or not. Hover over the boxes to see the
         values for each indicator.")
     } else if (input$chart_summary == "Spine") {
