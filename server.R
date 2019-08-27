@@ -1293,7 +1293,7 @@ function(input, output, session) {
       #Text for tooltip
       tooltip_trend <- c(paste0(trend_data()$areaname, "<br>", trend_data()$trend_axis,
                                 "<br>", paste0(unique(trend_data()$type_definition)),": ", trend_data()$measure,
-                                "<br>", "Numerator: ",trend_data()$numerator))
+                                "<br>", "Numerator: ", round(trend_data()$numerator, 1)))
 
       #Creating time trend plot
       trend_plot <- plot_ly(data=trend_data(), x=~trend_axis,  y = ~get(input$var_plot_trend),
