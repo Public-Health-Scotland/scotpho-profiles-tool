@@ -723,7 +723,8 @@ function(input, output, session) {
   
   # Downloading chart  
   output$download_summaryplot <- downloadHandler(
-    filename = 'summary.html',
+    filename = case_when(input$chart_summary != "Spine" ~ 'summary.html',
+                         input$chart_summary == "Spine"~ 'spine.png'),
     content = function(file){
       if (input$chart_summary == "Snapshot") {
 
@@ -765,6 +766,11 @@ function(input, output, session) {
                          }
                  ),
                device = "png", scale=4, limitsize=FALSE)
+      } else if (input$chart_summary == "Spine") {
+        ggsave(file, plot = plot_spine()+
+               ggtitle(label=paste(names(profile_list[unname(profile_list) == input$profile_summary])," profile: ", input$topic_spine,sep=""),
+                        subtitle =paste(input$geoname_summary," (",input$geotype_summary,") compared against ",input$geocomp_spine,sep="")),
+               device = "png", scale = 4, limitsize=FALSE)
       }
     })
   
