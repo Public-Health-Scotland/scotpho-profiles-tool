@@ -1354,7 +1354,7 @@ function(input, output, session) {
     time_period <- sort(unique(optdata$trend_axis[optdata$indicator == input$indic_rank&
                                                     optdata$areatype == input$geotype_rank]))
     
-    selectInput("year_rank", "Step 3. Select time period",
+    selectInput("year_rank",shiny::HTML("<p>Step 3. Select time period <br/> <br/></p>"),
                 choices = time_period, selected = last(time_period))
   })
   
@@ -1374,9 +1374,9 @@ function(input, output, session) {
     years <- c(min(rank_data$year):max(rank_data$year))
     periods <- c(sort(paste0(unique(rank_data$trend_axis[rank_data$year>=min(rank_data$year) &
                                                            rank_data$year<=max(rank_data$year)]))))
-    
+    div(title="Use this option to change the baseline year (the black circle in chart)",
     selectInput("yearcomp_rank","Step 4b. Select comparison baseline year", choices = periods,
-                selectize=TRUE)
+                selectize=TRUE))
   })
   
   
@@ -1754,7 +1754,7 @@ function(input, output, session) {
     if(is.data.frame(poly_map()) && nrow(poly_map()) == 0) {
       h4("No map available for that geographic level.", style = "color:black")
     } else {
-      withSpinner(leafletOutput("map", width="100%",height="600px"))
+      withSpinner(leafletOutput("map", width="100%",height="550px"))
     }
   })
   
@@ -1797,6 +1797,27 @@ function(input, output, session) {
       dev.off()
     })
   
+  #rank legend text
+  output$rank_legend <- renderUI({
+    if (input$comp_rank == 1) {
+      p(tags$b("Chart Legend"), 
+        br(),
+        img(src='signif_better.png', height=12, style="padding-right: 2px; vertical-align:middle"),"Better than comparator",
+        img(src='non_signif.png', height=12, style="padding-right: 2px; vertical-align:middle"), "Not different to comparator", 
+        br(),
+        img(src='signif_worse.png', height=12, style="padding-right: 2px; vertical-align:middle"), "Worse than comparator", 
+        img(src='signif_nocalc2.png', height=12, style="padding-right: 2px; vertical-align:middle"), "No differences can be calculated")
+    } else {
+      p(tags$b("Chart Legend"), br(),
+        img(src='signif_better.png', height=12, style="padding-right: 2px; vertical-align:middle"),"Better than comparator",
+        img(src='non_signif.png', height=12, style="padding-right: 2px; vertical-align:middle"), "Not different to comparator", br(),
+        img(src='signif_worse.png', height=12, style="padding-right: 2px; vertical-align:middle"), "Worse than comparator", 
+        img(src='signif_nocalc2.png', height=12, style="padding-right: 2px; vertical-align:middle"), "No differences can be calculated",br(),
+        img(src='baseline_year_color.png', height=12, style="padding-right: 2px; vertical-align:middle"), "Baseline year comparison")
+    }
+  })
+  
+      
   #####################################.      
   #### Table ----
   #####################################. 
