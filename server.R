@@ -819,13 +819,13 @@ function(input, output, session) {
 
       # Tooltip
       if (input$comp_summary == 1) {#depending if time or area comparison
-        tooltip_summary <-  c(paste0("Area: ", prof_snap_data$measure, " || ",
-                                     "Comparator: ", prof_snap_data$comp_m, "<br>",
+        tooltip_summary <-  c(paste0("Area: ", round(prof_snap_data$measure, 1), " || ",
+                                     "Comparator: ", round(prof_snap_data$comp_m), "<br>",
                                      prof_snap_data$trend_axis, "<br>", prof_snap_data$type_definition))
       } else if (input$comp_summary == 2) {
         tooltip_summary <-  c(paste0(prof_snap_data$trend_axis, ": ",
-                                     prof_snap_data$measure, "  ||  ",
-                                     "Baseline: ", prof_snap_data$comp_m, "<br>",
+                                     round(prof_snap_data$measure), "  ||  ",
+                                     "Baseline: ", round(prof_snap_data$comp_m), "<br>",
                                      prof_snap_data$type_definition))
       }
 
@@ -939,7 +939,7 @@ function(input, output, session) {
     
     #Tooltip
     heat_tooltip <- paste0(heat$indicator, "<br>", heat$def_period, "<br>",
-                           heat$type_definition, "<br>", heat$measure)
+                           heat$type_definition, "<br>", round(heat$measure, 1))
     
     # Plotting data
     heat_p <- ggplot(heat, aes(x = year, y = indicator, fill = color, text = heat_tooltip)) +
