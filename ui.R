@@ -363,9 +363,8 @@ tabPanel("Rank", icon = icon("signal"), value = "rank",
                   div(title="Use this option to change the time period presented in the chart and map",
                       uiOutput("year_ui_rank"))), 
            column(width = 3,
-                  #div(tags$b("Step 4. Select to compare by:")),
                   div(title="This option will change whether the chart compares areas to another area (e.g. the Scotland average) or against a different time period (e.g. figures for the year 2017 compared to the year 2010).",
-                      awesomeRadio("comp_rank", label =shiny::HTML("<p>Step 4. Select to compare by:<br/><br/></p>"),
+                      awesomeRadio("comp_rank", label =shiny::HTML("<p>Step 4. Select to compare by:<br/><br/></p>"), #br required to try and keep alignment across columns
                                    choices = list("Area or"= 1, "Time" = 2), 
                                    selected = 1, inline=TRUE, checkbox=TRUE)),
                   conditionalPanel(condition = "input.comp_rank == 1 ",  
@@ -389,25 +388,19 @@ tabPanel("Rank", icon = icon("signal"), value = "rank",
                   data.intro =(p(h5("Throughout the tool look out for options in each window that provide"),
                               tags$li("indicator defintions or help to interpret a visualisation,",style="color: #007ba7"),
                              tags$li("data download data options for individual charts,",style="color: #007ba7"),
-                            tags$li("image downloads for individual charts.",style="color: #007ba7")
-                               ))))
-           # column(width = 2,
-           #       p("test")
-                  #actionButton("rank_help",label="Help", icon= icon('question-circle'), class ="down"),
-                  #savechart_button('download_rankplot', 'Save chart', class = "down")
-                  
+                            tags$li("image downloads for individual charts.",style="color: #007ba7")))))
            ), #well pannel bracket
          mainPanel(width = 12, #Main panel
-                   shiny::hr(),
                    bsModal("mod_defs_rank", "Definitions", "defs_rank", htmlOutput('defs_text_rank')),
+                   uiOutput("rank_summary"), #description of the charts
+                   shiny::hr(), #header row
                    column(width = 7, #rank bar
                           h4(textOutput("rank_title"), style="color: black; text-align: left"),  
                           h5(textOutput("rank_subtitle"), style="color: black; text-align: left"),  
                           withSpinner(plotlyOutput("rank_plot"))),
                    column(width = 5, #map
                           uiOutput("rank_legend"),
-                          uiOutput("map_ui")
-                   )
+                          uiOutput("map_ui"))
          ) #main panel bracket
 ), #Tab panel bracket
 ###############################################.
