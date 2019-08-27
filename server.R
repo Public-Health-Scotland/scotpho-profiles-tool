@@ -510,21 +510,20 @@ function(input, output, session) {
     # Preparing a brief explanation for each visualisation 
     if (input$chart_summary == "Snapshot") {
       p("This visualisation shows all the indicators of the profile you
-        have chosen. The latest data available for each one of them is
-        compared against the selected comparator. The color of the boxes reflects if
+        have chosen. The latest data available for each of them is
+        compared against the selected comparator. The colour of the boxes reflects if
         the differences are significant or not. Hover over the boxes to see the
         values for each indicator.")
     } else if (input$chart_summary == "Trend") {
       p("This visualisation shows all the indicators of the profile you
-        have chosen. The latest data available for each one of them is
-        compared against the selected comparator. The color of the boxes reflects if
+        have chosen. The coloured boxes show comparisons of indicator values for your selected area against the comparator for over time. The colour of the boxes reflects if
         the differences are significant or not. Hover over the boxes to see the
         values for each indicator.")
     } else if (input$chart_summary == "Spine") {
       p("This visualisation shows all the indicators of the domain you
-        have chosen. The latest data available for each one of them is
+        have chosen. The latest data available for each of them is
         compared against the selected comparator. Each bar represents a different area.
-        The color of the square to the left of the bars reflects if
+        The colour of the square to the left of the bars reflects if
         the differences are significant or not.")
     }
   })
