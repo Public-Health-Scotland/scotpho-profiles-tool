@@ -115,7 +115,7 @@ lp_about_box <- function(title_box, image_name, button_name, description) {
       div(class = "landing-page-about-icon", style= paste0("background-image: url(", image_name, ".png);
           background-size: auto 80%; background-position: center; background-repeat: no-repeat; ")),
           (actionButton(button_name, NULL,
-                   class="landing-page-button-about",
+                   class="landing-page-button",
                    icon = icon("arrow-circle-right", "icon-lp"),title=description)))
 }
 
