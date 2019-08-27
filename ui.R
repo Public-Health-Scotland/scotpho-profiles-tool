@@ -216,32 +216,36 @@ tabPanel(
 ###############################################.
 tabPanel("Summary", icon = icon("list-ul"), value = "summary",
          wellPanel( #Filter options
-           column(4,
+           column(3,
+                  div(title="Select a geography level first, then select the are you want from the list. You can click in the box, hit backspace and start to type if you want to start searching.",
                   p(tags$b("Step 1. Select a geography level and then an area of interest.")),
                   selectInput("geotype_summary", label = NULL, choices=areatype_list,
                               selected = "Health board"),
                   conditionalPanel(#Conditional panel for extra dropdown for localities & IZ
                     condition = "input.geotype_summary== 'HSC locality' | input.geotype_summary == 'Intermediate zone' ",
+                    div(title="This option restricts the HSC locality or IZ options below to only areas within a parent geography",                      
                     selectInput("loc_iz_summary", label = "Partnership for localities/intermediate zones",
-                                choices = partnership_name)
+                                choices = partnership_name))
                   ),
-                  uiOutput("geoname_ui_summary")
+                  uiOutput("geoname_ui_summary"))
            ),
            column(3,
+                  div(title="Select the profile you are interested in. Not all profiles are available for all geographies",
                   p(tags$b("Step 2. Select a profile ")),
                   div(id= "summary_div", uiOutput("profile_ui_summary")),
                   # domain if spine selected
                   conditionalPanel(condition = 'input.chart_summary == "Spine"',
-                                   uiOutput("topic_ui_spine"))
+                                   uiOutput("topic_ui_spine")))
            ),
            column(3,
+                  div(title="Compare against another area (e.g. Scotland) or against a previous period to see the evolution of the area",
                   p(tags$b("Step 3. Select a comparator ")),
                   awesomeRadio("comp_summary", label = "Compare against",
                                choices = list("Area" = 1, "Time" = 2), 
                                selected = 1, inline=TRUE, checkbox = TRUE),
-                  uiOutput("comp_ui_summary") # comparator options
+                  uiOutput("comp_ui_summary")) # comparator options
            ),
-           column(2,
+           column(3,
                   actionButton("help_summary",label="Help", icon= icon('question-circle'), class ="down"),
                   actionButton("defs_summary",label="Definitions", icon= icon('info'), class ="down"),
                   downloadButton('download_summary', 'Download data', class = "down"),
