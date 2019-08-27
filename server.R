@@ -321,7 +321,7 @@ function(input, output, session) {
         Combining the information from the area and time comparisons suggests that whilst both indicators are reducing for this area the reductions in admissions for heart disease in this area are not keeping pace with the reductions seen in Scotland as a whole."),
       p(img(src="help_heatmap4.png")),  
       
-      size = "l", easyClose = TRUE, fade=FALSE,footer = modalButton("Close (Esc)")
+      size = "l", easyClose = TRUE, fade=FALSE, footer = modalButton("Close (Esc)")
       ))
     } else if (input$chart_summary == "Snapshot") {
       showModal(modalDialog(
@@ -329,11 +329,13 @@ function(input, output, session) {
         p(column(6,"Select 'Area' to compare one geographical area against another area, or select 'Time' to compare
                  against a baseline year for the same area."),
           column(6, img(src="help_heatmap1.png"))),
+        p(column(6,
         p("Hover over each box to see indicator values and time periods."),
         p("Colours are used to indicate if the value for an indicator is significantly different to the comparator, 
           statistical confidence intervals are used to decide if differences are 'significant'."),
-        p("The different comparison types (area or time) can be used to provide different insights about the indicators."),
-        size = "l", easyClose = TRUE, fade=FALSE,footer = modalButton("Close (Esc)")
+        p("The different comparison types (area or time) can be used to provide different insights about the indicators.")),
+        column(6, img(src="help_snapshot1.png"))),
+        size = "l", easyClose = TRUE, fade=FALSE, footer = modalButton("Close (Esc)")
         ))
     }
   })
