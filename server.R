@@ -419,7 +419,7 @@ function(input, output, session) {
                       selectize=TRUE, selected = "Scotland")
       } else if (input$comp_summary == 2) {
         
-        years <- 2002:2018 #####. NEEDS TO BE UPDATED EVERY YEAR ######.
+        years <- min(optdata$year):max(optdata$year) 
         
           selectizeInput("yearcomp_summary", "Baseline year", choices = years)
       }
