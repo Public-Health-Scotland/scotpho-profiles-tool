@@ -5,7 +5,7 @@
 ############################.
 ##Filepaths ----
 ############################.
-if (sessionInfo()$platform == "x86_64-redhat-linux-gnu (64-bit)") {
+if (sessionInfo()$platform %in% c("x86_64-redhat-linux-gnu (64-bit)", "x86_64-pc-linux-gnu (64-bit)")) {  
   lookups <- "/PHI_conf/ScotPHO/Profiles/Data/Lookups/"
   basefiles <- "/conf/phip/Projects/Profiles/Data/Scotland Localities/"
   shapefiles <- "/PHI_conf/ScotPHO/Profiles/Data/Shapefiles/"
@@ -184,8 +184,7 @@ ind_lookup<- read_csv(paste0(lookups, "indicator_lookup.csv")) %>%
            type_id, type_definition, profile_domain1, profile_domain2, 
            # This ones can be deleted once release 2.0 comes out
            domain1, domain2, domain3)) %>% 
-  mutate_if(is.character, factor) %>%  # converting variables into factors
-  mutate(ind_id = as.factor(ind_id))
+  mutate_if(is.character, factor)  # converting variables into factors
 
 ###############################################.
 ## Indicator data ----
@@ -233,9 +232,9 @@ optdata <- bind_rows(optdata, data_spss) %>%
 
 # Adding update date for all indicators based on technical document
 update_table <- techdoc %>% rename(ind_id = indicator_number, update_date = last_updated) %>% 
-  select(ind_id, update_date) %>% 
+  select(ind_id, update_date) %>% filter(ind_id != "no_id") %>% 
   mutate(update_date = as.yearmon(update_date, "%b-%Y"),
-         ind_id = as.integer(ind_id))
+         ind_id = as.integer(paste0(ind_id)))
 
 optdata <- left_join(x=optdata, y=update_table, by=c("ind_id"))
 
