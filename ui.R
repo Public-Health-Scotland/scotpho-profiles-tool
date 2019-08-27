@@ -216,7 +216,7 @@ tabPanel(
 ###############################################.
 tabPanel("Summary", icon = icon("list-ul"), value = "summary",
          wellPanel( #Filter options
-           column(3,
+           column(4,
                   p(tags$b("Step 1. Select a geography level and then an area of interest.")),
                   selectInput("geotype_summary", label = NULL, choices=areatype_list,
                               selected = "Health board"),
@@ -227,7 +227,7 @@ tabPanel("Summary", icon = icon("list-ul"), value = "summary",
                   ),
                   uiOutput("geoname_ui_summary")
            ),
-           column(2,
+           column(3,
                   p(tags$b("Step 2. Select a profile ")),
                   div(id= "summary_div", uiOutput("profile_ui_summary")),
                   # domain if spine selected
@@ -241,20 +241,23 @@ tabPanel("Summary", icon = icon("list-ul"), value = "summary",
                                selected = 1, inline=TRUE, checkbox = TRUE),
                   uiOutput("comp_ui_summary") # comparator options
            ),
-           column(4,
-             p(tags$b("Step 4. Select what type of summary you want to see:"), 
-               " snapshot is a comparison with the latest data available, 
-               trend will show how things are changing over time, and 
-               spine compares indicators with the rest of areas of the same level."),
-             radioGroupButtons("chart_summary", status = "primary", justified = TRUE,
-                             choices = c("Snapshot", "Trend", "Spine"), label=NULL  ))
+           column(2,
+                  actionButton("help_summary",label="Help", icon= icon('question-circle'), class ="down"),
+                  actionButton("defs_summary",label="Definitions", icon= icon('info'), class ="down"),
+                  downloadButton('download_summary', 'Download data', class = "down"),
+                  uiOutput("save_chart_ui"))
          ), #well panel bracket
-         wellPanel( style = "margin-left: 15%;",
-           actionButton("help_summary",label="Help", icon= icon('question-circle'), class ="down"),
-           actionButton("defs_summary",label="Definitions", icon= icon('info'), class ="down"),
-           downloadButton('download_summary', 'Download data', class = "down"),
-           uiOutput("save_chart_ui")
-                   ),
+         column(12,
+                column(3),#empty column to replicate offset and center content
+                column(6,
+                p(tags$b("Step 4. Select what type of summary you want to see:"), 
+                  " snapshot is a comparison with the latest data available, 
+                  trend will show how things are changing over time, and 
+                  spine compares indicators with the rest of areas of the same level."),
+                radioGroupButtons("chart_summary", status = "primary", justified = TRUE,
+                                  choices = c("Snapshot", "Trend", "Spine"), label=NULL  )),
+         column(3) #empty column to replicate offset and center content
+                   ), # column bracket
          mainPanel(width = 12,
                    bsModal("mod_defs_summary", "Definitions", "defs_summary",
                            htmlOutput('defs_text_summary')),
