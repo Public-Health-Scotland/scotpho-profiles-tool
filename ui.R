@@ -350,10 +350,15 @@ tabPanel("Rank", icon = icon("signal"), value = "rank",
          wellPanel(#Filter options
            column(width = 4,
                   div(title="Select an indicator to see comparative information. Click in this box, hit backspace and start to type if you want to quickly find an indicator.",
-                  selectInput("indic_rank", shiny::HTML("<p>Step 1. Select an indicator <span style='font-weight: 400'> <br/> (hit backspace and start typing to search for an indicator)</span></p>"), choices=indicator_list)),
-                  div(title="Use this option to change the type of geography displayed in the chart. Some indicators are not be available for all geography types.  See technical information to find out which geographies indicators are available for. ",
+                  selectInput("indic_rank", shiny::HTML("<p>Step 1. Select an indicator <span style='font-weight: 400'> <br/> 
+                                                        (hit backspace and start typing to search for an indicator)</span></p>"), 
+                              choices=indicator_list)),
+                  div(title="Use this option to change the type of geography displayed in the chart. 
+                      Some indicators are not be available for all geography types. 
+                      See the indicator definitions tab to find out which geographies indicators are available for.",
                   uiOutput("geotype_ui_rank")),
-                  div(title="There are too many hscp localities or IZs to show in the rank chart a selection must be made to limit localities or IZs to only those within a parent area",
+                  div(title="There are too many hscp localities or IZs to show in the rank chart a 
+                      selection must be made to limit localities or IZs to only those within a parent area",
                   conditionalPanel( #Conditional panel for extra dropdown for localities & IZ
                     condition = "input.geotype_rank == 'HSC locality' | input.geotype_rank == 'Intermediate zone' ",
                     selectInput("loc_iz_rank", "Step 2b. Select a region for localities or intermediate zones",
