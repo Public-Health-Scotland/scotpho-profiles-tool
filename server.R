@@ -1114,7 +1114,8 @@ function(input, output, session) {
     showModal(modalDialog(
       title = "How to use this chart",
       p("The trend chart is designed to explore how a single indicator has changed over time for one or more geograpical area."),
-      p(column(7,img(src="help_trend_chart2.png")),
+      p(column(7,
+               img(src="help_trend_chart2.png")),
         column(5,
                p("First select an indicator using the 'step 1' filter."),
                p("Then add one or more geographical area to the chart using the geography filters in 'Step 2'."),
@@ -1124,7 +1125,7 @@ function(input, output, session) {
                p("Confidences intervals (95%) can be added or removed from the chart using the options in 'step 3'. These are shown as shaded areas."),
                p("Confidence intervals give an indication of the precision of a rate or percentage. The width of a confidence interval is related to sample size, smaller geographies like intermediate zones often have wider intervals."),
                p("Display controls in 'Step 3' allow you to switch the graph from a measure (e.g. rate or percentage) to actual numbers (e.g numbers of deaths/hospitalisations)."))),
-                 size = "l", easyClose = TRUE, fade=FALSE))
+                 size = "l", easyClose = TRUE, fade=FALSE,footer = modalButton("Close (Esc)")))
     }) 
       
   #####################.
@@ -1353,7 +1354,7 @@ function(input, output, session) {
     time_period <- sort(unique(optdata$trend_axis[optdata$indicator == input$indic_rank&
                                                     optdata$areatype == input$geotype_rank]))
     
-    selectInput("year_rank", "Time period",
+    selectInput("year_rank",shiny::HTML("<p>Step 4. Select time period <br/> <br/></p>"),
                 choices = time_period, selected = last(time_period))
   })
   
@@ -1361,7 +1362,7 @@ function(input, output, session) {
   output$geotype_ui_rank <- renderUI({
     areas <- sort(unique(optdata$areatype[optdata$indicator == input$indic_rank]))
     areas <- areas [! areas %in% c("Scotland")] #taking out Scotland
-    selectInput("geotype_rank", label = "Geography level",
+    selectInput("geotype_rank", label = "Step 2. Select geography level",
                 choices = areas, selected = "Health board")
   })
   
@@ -1373,9 +1374,9 @@ function(input, output, session) {
     years <- c(min(rank_data$year):max(rank_data$year))
     periods <- c(sort(paste0(unique(rank_data$trend_axis[rank_data$year>=min(rank_data$year) &
                                                            rank_data$year<=max(rank_data$year)]))))
-    
-    selectInput("yearcomp_rank", "Baseline year", choices = periods,
-                selectize=TRUE)
+    div(title="Use this option to change the baseline year (the black circle in chart)",
+    selectInput("yearcomp_rank","Step 3b. Select comparison baseline year", choices = periods,
+                selectize=TRUE))
   })
   
   
@@ -1391,6 +1392,58 @@ function(input, output, session) {
                        defs_data_rank()$indicator_definition), collapse = "<br><br>"))
   })
   
+  
+  ##Rank modal dialog help 
+  
+  # Rank help main window call
+  observeEvent(input$rank_help, {showModal(rank_help_main_modal)})
+  #call to open rank area chart help modal window
+  observeEvent(input$rank_area_help,  {showModal(rank_byarea_modal) })
+  #call to open rank time chart help modal window
+  observeEvent(input$rank_time_help,  {showModal(rank_bytime_modal) })
+  #call from either area or time window back to main
+  observeEvent(input$rank_help_back,  {showModal(rank_help_main_modal) })
+  
+  #Initial help screen - users need to pick whether they want help on area or time comparison.
+  rank_help_main_modal <- modalDialog(
+    title = "How to use this chart",
+    p("There are two types of charts available designed to provide comparisons for a single indicator."),
+    p("The default chart shows a simple comparison of areas of a specific type e.g. NHS board"),
+    p("Use menu selections (Step 1 to Step 4) to set the indicator or geography type to be compared."),
+    p("In 'step 3' the comparator can be changed to 'Time', this changes the chart shown and adds an extra dimension to the area comparison."),
+    actionButton("rank_area_help","How to use area comparisons chart"),
+    actionButton("rank_time_help","How to use time comparisons chart"),
+    size = "l", easyClose = TRUE, fade=FALSE,
+    footer = modalButton("Close (Esc)"))
+    
+  #Help page for area comparison 
+  rank_byarea_modal <- modalDialog(
+    title = "How to use the area comparisons chart",
+    p("The area comparison chart makes it easy to see which areas have high or low values for a particular indicator."),
+    p("The red line that appears on the bar chart shows a comparator area, in the example below the Scotland average."),
+    p("The comparator area can be changed using the 'Step 3b' drop-down menu."),
+    p("The colours of the bars indicate whether an area is statistically significantly different to that comparator."),
+    p("Confidence intervals are used to determine if an indicator is significantly different to the comparator. By default confidence intervales are not shown on the chart but can be added by ticking the option '95% confidence intervals'."),
+    p(tags$a(img(src="help_rank_areachart.png"))),
+    size = "l", easyClose = TRUE, fade=FALSE,
+    footer=tagList(
+      actionButton("rank_time_help","Help for time comparison chart"),
+      actionButton("rank_help_back","Back"),
+      modalButton("Close (Esc)")))
+  
+  #Help page for time comparison
+  rank_bytime_modal <- modalDialog(
+    title = "How to use the time comparisons chart",
+    p("The time comparison chart shows how a particular indicator has changed over time across a set of geographies"),
+    p("The example below shows how alcohol-related hospital stays have changed between 2009/10 and 2017/18."),
+    p("The solid black circle show an indicator value at the baseline year, the other circle shows the latest value for that indicator. The 
+      colour of the circle indicates if there is a statistically significant difference between the two time points"),
+    p(tags$a(img(src="help_rank_lollychart.PNG"))),
+    size = "l", easyClose = TRUE, fade=FALSE,
+    footer=tagList(
+      actionButton("rank_area_help","Help for area comparison chart"),
+      actionButton("rank_help_back","Back"),
+      modalButton("Close (Esc)")))
 
 #####################.
 # Reactive data  
@@ -1478,7 +1531,14 @@ function(input, output, session) {
   output$rank_title <- renderText( paste0(input$indic_rank) )
   
   output$rank_subtitle <- renderText({ make_rank_subtitle()  })
-  
+ 
+  #visible summary of ui main panel to guide users
+  make_rank_summary <- function() {
+    case_when(input$comp_rank == 1 ~ paste0("The bar chart and map below both show how areas of the same type (e.g. NHS board) compare to each other for a particular indicator."),
+              input$comp_rank == 2 ~ paste0("The chart below is called a lollipop chart, it shows how areas compare with each other and also how each area has changed over time since the selected baseline year. The map shows a comparison for the selected year against the baseline year for each area."))
+  }
+  output$rank_summary <- renderText(make_rank_summary())
+   
   ############################.
   # Creating  plot
   plot_rank_charts <- function(){
@@ -1701,7 +1761,7 @@ function(input, output, session) {
     if(is.data.frame(poly_map()) && nrow(poly_map()) == 0) {
       h4("No map available for that geographic level.", style = "color:black")
     } else {
-      withSpinner(leafletOutput("map", width="100%",height="600px"))
+      withSpinner(leafletOutput("map", width="100%",height="550px"))
     }
   })
   
@@ -1744,6 +1804,27 @@ function(input, output, session) {
       dev.off()
     })
   
+  #rank legend text
+  output$rank_legend <- renderUI({
+    if (input$comp_rank == 1) {
+      p(tags$b("Legend"), 
+        br(),
+        img(src='signif_better.png', height=12, style="padding-right: 2px; vertical-align:middle"),"Better than comparator",
+        img(src='non_signif.png', height=12, style="padding-right: 2px; vertical-align:middle"), "Not different to comparator", 
+        br(),
+        img(src='signif_worse.png', height=12, style="padding-right: 2px; vertical-align:middle"), "Worse than comparator", 
+        img(src='signif_nocalc2.png', height=12, style="padding-right: 2px; vertical-align:middle"), "No differences can be calculated")
+    } else {
+      p(tags$b("Chart Legend"), br(),
+        img(src='signif_better.png', height=12, style="padding-right: 2px; vertical-align:middle"),"Better than comparator",
+        img(src='non_signif.png', height=12, style="padding-right: 2px; vertical-align:middle"), "Not different to comparator", br(),
+        img(src='signif_worse.png', height=12, style="padding-right: 2px; vertical-align:middle"), "Worse than comparator", 
+        img(src='signif_nocalc2.png', height=12, style="padding-right: 2px; vertical-align:middle"), "No differences can be calculated",br(),
+        img(src='baseline_year_color.png', height=12, style="padding-right: 2px; vertical-align:middle"), "Baseline year comparison")
+    }
+  })
+  
+      
   #####################################.      
   #### Table ----
   #####################################. 

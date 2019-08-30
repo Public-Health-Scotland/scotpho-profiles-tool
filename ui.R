@@ -303,7 +303,7 @@ tabPanel("Trend", icon = icon("area-chart"), value = "trend",
                       div(title="Select an indicator to see trend information. Click in this box, hit backspace and start to type if you want to quickly find an indicator.",
                           selectInput("indic_trend", shiny::HTML("<p>Step 1. Select an indicator <br/> <span style='font-weight: 400'>(hit backspace and start typing to search for an indicator)</span></p>"), choices=indicator_list)),
                       shiny::hr(),
-                      div(title="Use the options below to add geographies to the trend chart, remember some indicators may not be available for all geography types. See technical information to find out which geographies indicators are available for.",                      
+div(title="Use the options below to add geographies to the trend chart, remember some indicators may not be available for all geography types. See technical information to find out which geographies indicators are available for.",                      
                           p(tags$b("Step 2. Select areas to plot."),
                             p("(You can select multiple areas of any geography type)."))),
                       awesomeCheckbox("scotname_trend", tags$b("Scotland"), value=TRUE)),
@@ -346,62 +346,63 @@ tabPanel("Trend", icon = icon("area-chart"), value = "trend",
 tabPanel("Rank", icon = icon("signal"), value = "rank",
          wellPanel(#Filter options
            column(width = 4,
-                  selectInput("indic_rank", "Indicator", choices=indicator_list),
-                  uiOutput("geotype_ui_rank"),
+                  div(title="Select an indicator to see comparative information. Click in this box, hit backspace and start to type if you want to quickly find an indicator.",
+                  selectInput("indic_rank", shiny::HTML("<p>Step 1. Select an indicator <span style='font-weight: 400'> <br/> 
+                                                        (hit backspace and start typing to search for an indicator)</span></p>"), 
+                              choices=indicator_list)),
+                  div(title="Use this option to change the type of geography displayed in the chart. 
+                      Some indicators are not be available for all geography types. 
+                      See the indicator definitions tab to find out which geographies indicators are available for.",
+                  uiOutput("geotype_ui_rank")),
+                  div(title="There are too many hscp localities or IZs to show in the rank chart a 
+                      selection must be made to limit localities or IZs to only those within a parent area",
                   conditionalPanel( #Conditional panel for extra dropdown for localities & IZ
                     condition = "input.geotype_rank == 'HSC locality' | input.geotype_rank == 'Intermediate zone' ",
-                    selectInput("loc_iz_rank", label = "Partnership for localities/intermediate zones",
-                                choices = partnership_name))
+                    selectInput("loc_iz_rank", "Step 2b. Select a region for localities or intermediate zones",
+                              choices = partnership_name)))
            ),
            column(width = 3,
-                  uiOutput("year_ui_rank"), 
-                  awesomeRadio("comp_rank", label = "Compare against:",
-                               choices = list("Area" = 1, "Time" = 2), 
-                               selected = 1, inline=TRUE, checkbox=TRUE),
+                  div(title="This option will change whether the chart compares areas to another area (e.g. the Scotland average) or against a different time period (e.g. figures for the year 2017 compared to the year 2010).",
+                      awesomeRadio("comp_rank", label =shiny::HTML("<p>Step 3. Select to compare by:<br/><br/></p>"), #br required to try and keep alignment across columns
+                                   choices = list("Area or"= 1, "Time" = 2), 
+                                   selected = 1, inline=TRUE, checkbox=TRUE)),
                   conditionalPanel(condition = "input.comp_rank == 1 ",  
-                                   selectInput("geocomp_rank", "Comparator", choices = comparator_list,
-                                               selectize=TRUE, selected = "Scotland")
-                  ),
+                                   div(title="Use this option to change which area is the comparator (red line in barchart)",
+                                   selectInput("geocomp_rank", "Step 3b. Select comparator area", choices = comparator_list,
+                                               selectize=TRUE, selected = "Scotland")),
+                                   div(tags$b("Step 3c. Decide how to present data in the chart.")),
+                                   div(title="Show or hide the 95% confidence intervals on chart.",
+                                       awesomeCheckbox("ci_rank", label = "95% confidence intervals", value = FALSE))),
                   conditionalPanel(condition = "input.comp_rank == 2 ", 
-                                   uiOutput("yearcomp_ui_rank")
-                  )
+                                   uiOutput("yearcomp_ui_rank"))
            ),
            column(width = 3,
-                  awesomeCheckbox("ci_rank", label = "95% confidence intervals", value = FALSE),
-                  #Legend
-                  p(img(src='signif_better.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
-                    "Better than comparator", br(),
-                    img(src='non_signif.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
-                    "Not different to comparator", br(),
-                    img(src='signif_worse.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
-                    "Worse than comparator", br(),
-                    img(src='signif_nocalc2.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
-                    "No differences can be calculated", br(),
-                    img(src='baseline_year_color.png', height=12, style="padding-right: 2px; vertical-align:middle"), 
-                    "Baseline year comparison")
-           ),
+                  div(title="Use this option to change the time period presented in the chart and map",
+                      uiOutput("year_ui_rank"))), 
            column(width = 2,
                   introBox(
+                  actionButton("rank_help",label="Help", icon= icon('question-circle'), class ="down"),
                   actionButton("defs_rank", label="Definitions", icon= icon('info'), class ="down"), 
                   downloadButton('download_rank', 'Download data', class = "down"),
                   savechart_button('download_rankplot', 'Save chart', class = "down"),
                   savechart_button('download_mapplot', 'Save map', class = "down"),
                   data.step = 5,
                   data.intro =(p(h5("Throughout the tool look out for options in each window that provide"),
-                               tags$li("indicator defintions or help to interpret a visualisation,",style="color: #007ba7"),
-                               tags$li("data download data options for individual charts,",style="color: #007ba7"),
-                               tags$li("image downloads for individual charts.",style="color: #007ba7")
-                               )))
-         )), #well pannel bracket
+                              tags$li("indicator defintions or help to interpret a visualisation,",style="color: #007ba7"),
+                             tags$li("data download data options for individual charts,",style="color: #007ba7"),
+                            tags$li("image downloads for individual charts.",style="color: #007ba7")))))
+           ), #well pannel bracket
          mainPanel(width = 12, #Main panel
                    bsModal("mod_defs_rank", "Definitions", "defs_rank", htmlOutput('defs_text_rank')),
+                   uiOutput("rank_summary"), #description of the charts
+                   shiny::hr(), #header row
                    column(width = 7, #rank bar
                           h4(textOutput("rank_title"), style="color: black; text-align: left"),  
                           h5(textOutput("rank_subtitle"), style="color: black; text-align: left"),  
-                          withSpinner(plotlyOutput("rank_plot"))           ),
+                          withSpinner(plotlyOutput("rank_plot"))),
                    column(width = 5, #map
-                          uiOutput("map_ui")
-                   )
+                          uiOutput("rank_legend"),
+                          uiOutput("map_ui"))
          ) #main panel bracket
 ), #Tab panel bracket
 ###############################################.
