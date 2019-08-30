@@ -64,26 +64,22 @@ tagList( #needed for shinyjs
                           ".landing-page-box:hover, .landing-page-box-about:hover {-webkit-transform: scale(1.05); 
                           -ms-transform: scale(1.05); transform: scale(1.05); }", #hover effect on boxes
                           #landing page icons
-                          ".landing-page-icon {width:100%; height:75%; min-height:12vh; background-color: white;
-                          border: 0px ; position: absolute; object-fit: scale-down;}",
+                          ".landing-page-icon {width:100%; height:65%; min-height:12vh; background-color: white;
+                          border: 0px ; position: absolute; object-fit: scale-down; }",
                           ".landing-page-about-icon {width:100%; height:65%; min-height:5vh; background-color: white;
                           border: 0px; position: absolute; object-fit: scale-down;}",
                           #landing-page titles for boxes
                           ".landing-page-box-title {font-size: 16px; text-align:center; color: darkblue;
-                          font-weight: bold; background-color: none; width:100%; max-height: 20px; margin-top: 10px; }",
+                          font-weight: bold; background-color: none; width:100%; max-height: 20px; margin-top: 2vh;}",
                           #landing-page description text of boxes
                           ".landing-page-box-description {font-size: 12px; text-align:center; color: darkblue;
-                          background-color: none; width:100%; max-height: 20px; margin-top: 10px; }",
+                          background-color: none; width:100%; max-height: 20px; margin-top: 2vh; 
+                          padding-bottom: 3vh;}",
                           #landing page titles for ABOUT boxes
                           ".landing-page-box-about-title {font-size: 16px; text-align:center; color: darkblue;
                           font-weight: bold; background-color: none; width:100%; max-height: 20px; margin-top: 5px; }",
                           #landing page buttons
-                          ".landing-page-button {text-align:center;
-                          background-image:none; color: black; white-space: normal; border-radius: 0;border: 0px;
-                          font-size: 16px; min-height: 16vh; position: absolute; margin-bottom: 0px; margin-top: 5px; float: middle;width: 100%; opacity: 0;}",
-                          ".landing-page-button-about {text-align:center;
-                          background-image:none; color: black; white-space: normal; border-radius: 0; border:0px ;
-                          font-size: 14px; position: absolute; min-height: 7vh; margin-bottom: 0px; margin-top: 1px; float: middle; width: 100%; opacity:0;}",
+                          ".landing-page-button { position: absolute; top:0; width: 100%; height: 100%; opacity: 0;}",
                  #center image - for normal icons
                  "img.center {object-fit: scale-down; position:absolute; width:100%; height:100%; margin-left:auto; margin-right: auto; display: block; padding:20px;}",
                  #center image - for about icons
@@ -147,16 +143,17 @@ tabPanel(
             #2nd row of boxes
             fluidRow(
               br(), #spacing
-              column(8, introBox( #tour of the rank and trend tabs
-                data.step = 3,
-                data.intro = h5("The trend and rank charts allow detailed exploration of one indicator at a time."),
+              column(8, style = "padding-left: 0px; padding-right: 0px;", 
+                     introBox( #tour of the rank and trend tabs
+                        data.step = 3,
+                        data.intro = h5("The trend and rank charts allow detailed exploration of one indicator at a time."),
                 #Trend plot box
                 column(6, class="landing-page-column",
                        lp_main_box(image_name= "landing_button_time_trend", 
                                                      button_name = 'jump_to_trend', title_box = "Trend",
                                    description = 'Look at how an indicator changes over time')),
                 #Rank/map plot box
-                column(6, class="landing_button_maprank",
+                column(6, class="landing-page-column",
                        lp_main_box(image_name= "landing_button_maprank", 
                                    button_name = 'jump_to_rank', title_box = "Rank",
                                    description = 'Compare geographical variation for an indicator'))
@@ -192,7 +189,7 @@ tabPanel(
                                   div(class = "landing-page-about-icon", div(img(src="landing_button_other_profile.png",class="centerabout"))),
                                   actionButton('jump_to_efa', 'Links to ScotPHO evidence for action briefings', 
                                                onclick ="window.open('https://www.scotpho.org.uk/comparative-health/profiles/resources/evidence-for-action/', '_blank')",
-                                               class="landing-page-button-about", 
+                                               class="landing-page-button", 
                                                icon = icon("arrow-circle-right", "icon-lp")))),
                        column(4, class="landing-page-column", 
                               #Indicator updates
@@ -306,7 +303,7 @@ tabPanel("Trend", icon = icon("area-chart"), value = "trend",
                       div(title="Select an indicator to see trend information. Click in this box, hit backspace and start to type if you want to quickly find an indicator.",
                           selectInput("indic_trend", shiny::HTML("<p>Step 1. Select an indicator <br/> <span style='font-weight: 400'>(hit backspace and start typing to search for an indicator)</span></p>"), choices=indicator_list)),
                       shiny::hr(),
-                      div(title="Use options below to add geographies to the trend chart, some indicators may not be available for all geography types.  See technical information to find out which geographies indicators are available for.",                      
+div(title="Use the options below to add geographies to the trend chart, remember some indicators may not be available for all geography types. See technical information to find out which geographies indicators are available for.",                      
                           p(tags$b("Step 2. Select areas to plot."),
                             p("(You can select multiple areas of any geography type)."))),
                       awesomeCheckbox("scotname_trend", tags$b("Scotland"), value=TRUE)),
