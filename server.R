@@ -1535,7 +1535,7 @@ function(input, output, session) {
   #visible summary of ui main panel to guide users
   make_rank_summary <- function() {
     case_when(input$comp_rank == 1 ~ paste0("The bar chart and map below both show how areas of the same type (e.g. NHS board) compare to each other for a particular indicator."),
-              input$comp_rank == 2 ~ paste0("The chart below is called a lollipop chart, it shows how areas compare with each other and also how each area has changed over time. The map shows a static comparison of areas for the latest time period."))
+              input$comp_rank == 2 ~ paste0("The chart below is called a lollipop chart, it shows how areas compare with each other and also how each area has changed over time since the selected baseline year. The map shows a comparison for the selected year against the baseline year for each area."))
   }
   output$rank_summary <- renderText(make_rank_summary())
    
