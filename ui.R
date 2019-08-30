@@ -65,7 +65,7 @@ tagList( #needed for shinyjs
                           -ms-transform: scale(1.05); transform: scale(1.05); }", #hover effect on boxes
                           #landing page icons
                           ".landing-page-icon {width:100%; height:65%; min-height:12vh; background-color: white;
-                          border: 0px ; position: relative; object-fit: scale-down; }",
+                          border: 0px ; position: absolute; object-fit: scale-down; }",
                           ".landing-page-about-icon {width:100%; height:65%; min-height:5vh; background-color: white;
                           border: 0px; position: absolute; object-fit: scale-down;}",
                           #landing-page titles for boxes
@@ -79,12 +79,7 @@ tagList( #needed for shinyjs
                           ".landing-page-box-about-title {font-size: 16px; text-align:center; color: darkblue;
                           font-weight: bold; background-color: none; width:100%; max-height: 20px; margin-top: 5px; }",
                           #landing page buttons
-                          ".landing-page-button {text-align:center;
-                          background-image:none; color: black; white-space: normal; border-radius: 0;border: 0px;
-                          font-size: 16px; min-height: 16vh; position: absolute; margin-bottom: 0px; margin-top: 5px; float: middle;width: 100%; opacity: 0;}",
-                          ".landing-page-button-about {text-align:center;
-                          background-image:none; color: black; white-space: normal; border-radius: 0; border:0px ;
-                          font-size: 14px; position: absolute; min-height: 7vh; margin-bottom: 0px; margin-top: 1px; float: middle; width: 100%; opacity:0;}",
+                          ".landing-page-button { position: absolute; top:0; width: 100%; height: 100%; opacity: 0;}",
                  #center image - for normal icons
                  "img.center {object-fit: scale-down; position:absolute; width:100%; height:100%; margin-left:auto; margin-right: auto; display: block; padding:20px;}",
                  #center image - for about icons
@@ -194,7 +189,7 @@ tabPanel(
                                   div(class = "landing-page-about-icon", div(img(src="landing_button_other_profile.png",class="centerabout"))),
                                   actionButton('jump_to_efa', 'Links to ScotPHO evidence for action briefings', 
                                                onclick ="window.open('https://www.scotpho.org.uk/comparative-health/profiles/resources/evidence-for-action/', '_blank')",
-                                               class="landing-page-button-about", 
+                                               class="landing-page-button", 
                                                icon = icon("arrow-circle-right", "icon-lp")))),
                        column(4, class="landing-page-column", 
                               #Indicator updates
