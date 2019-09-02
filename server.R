@@ -326,15 +326,16 @@ function(input, output, session) {
     } else if (input$chart_summary == "Snapshot") {
       showModal(modalDialog(
         title = "How to use this chart",
-        p(column(6,"Select 'Area' to compare one geographical area against another area, or select 'Time' to compare
+        p(column(6, p("Select 'Area' to compare one geographical area against another area, or select 'Time' to compare
                  against a baseline year for the same area."),
-          column(6, img(src="help_heatmap1.png"))),
-        p(column(6,
-        p("Hover over each box to see indicator values and time periods."),
-        p("Colours are used to indicate if the value for an indicator is significantly different to the comparator, 
+                    p("Hover over each box to see indicator values and time periods."),
+                    p("Colours are used to indicate if the value for an indicator is significantly different to the comparator, 
           statistical confidence intervals are used to decide if differences are 'significant'."),
-        p("The different comparison types (area or time) can be used to provide different insights about the indicators.")),
-        column(6, img(src="help_snapshot1.png"))),
+                    p("The different comparison types (area or time) can be used to provide different insights about the indicators.")),
+        column(6, img(src="help_heatmap1.png"),
+               br(), br(),
+               img(src="help_snapshot1.png"),
+               br()), br()),
         size = "l", easyClose = TRUE, fade=FALSE, footer = modalButton("Close (Esc)")
         ))
     }
