@@ -217,7 +217,7 @@ tabPanel(
 ###############################################.
 tabPanel("Summary", icon = icon("list-ul"), value = "summary",
          introBox(
-         wellPanel( #Filter options
+           wellPanel(fluidRow( #Filter options
            column(3,
                   div(title="Select a geography level first, then select the are you want from the list. You can click in the box, hit backspace and start to type if you want to start searching.",
                   p(tags$b("Step 1. Select a geography level and then an area of interest.")),
@@ -226,7 +226,7 @@ tabPanel("Summary", icon = icon("list-ul"), value = "summary",
                   conditionalPanel(#Conditional panel for extra dropdown for localities & IZ
                     condition = "input.geotype_summary== 'HSC locality' | input.geotype_summary == 'Intermediate zone' ",
                     div(title="This option restricts the HSC locality or IZ options below to only areas within a parent geography",                      
-                    selectInput("loc_iz_summary", label = "Partnership for localities/intermediate zones",
+                    selectInput("loc_iz_summary", label = "Step 1b. Select a region for localities or intermediate zones",
                                 choices = partnership_name))
                   ),
                   uiOutput("geoname_ui_summary"))
@@ -241,9 +241,9 @@ tabPanel("Summary", icon = icon("list-ul"), value = "summary",
            ),
            column(3,
                   div(title="Compare against another area (e.g. Scotland) or against a previous period to see the evolution of the area",
-                  p(tags$b("Step 3. Select a comparator ")),
+                  p(tags$b("Step 3. Select to compare by ")),
                   awesomeRadio("comp_summary", label = "Compare against",
-                               choices = list("Area" = 1, "Time" = 2), 
+                               choices = list("Area or" = 1, "Time" = 2), 
                                selected = 1, inline=TRUE, checkbox = TRUE),
                   uiOutput("comp_ui_summary")) # comparator options
            ),
@@ -251,15 +251,8 @@ tabPanel("Summary", icon = icon("list-ul"), value = "summary",
                   actionButton("help_summary",label="Help", icon= icon('question-circle'), class ="down"),
                   actionButton("defs_summary",label="Definitions", icon= icon('info'), class ="down"),
                   downloadButton('download_summary', 'Download data', class = "down"),
-                  uiOutput("save_chart_ui"))
-         data.step = 4, 
-         data.intro =(p(h5("Throughout the tool use the dropdown menus to change which indicators or geographies are displayed in the charts."),
-                      br(),
-                      h5("While using dropdown menus mouse click within a dropdown menu and press backspace on your keyboard ('<-') then start typing a word to quickly find the options you are looking for"),
-                      img(src='introjs_how_to_select.png')))
-
-         ), #well panel bracket
-         column(12,
+                  uiOutput("save_chart_ui"))),
+         fluidRow(column(12,
                 column(3),#empty column to replicate offset and center content
                 column(6,
                 p(tags$b("Step 4. Select what type of summary you want to see:"), 
@@ -269,7 +262,15 @@ tabPanel("Summary", icon = icon("list-ul"), value = "summary",
                 radioGroupButtons("chart_summary", status = "primary", justified = TRUE,
                                   choices = c("Snapshot", "Trend", "Spine"), label=NULL  )),
          column(3) #empty column to replicate offset and center content
-                   ), # column bracket
+                   )) # column and row brackets
+         ), #well panel bracket
+         data.step = 4, 
+         data.intro =(p(h5("Throughout the tool use the dropdown menus to change which indicators or geographies are displayed in the charts."),
+                        br(),
+                        h5("While using dropdown menus mouse click within a dropdown menu and press backspace on your keyboard ('<-') then start typing a word to quickly find the options you are looking for"),
+                        img(src='introjs_how_to_select.png')))
+         
+         ), #introbox bracket
          mainPanel(width = 12,
                    shiny::hr(),
                    bsModal("mod_defs_summary", "Definitions", "defs_summary",
