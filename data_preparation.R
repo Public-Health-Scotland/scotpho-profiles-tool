@@ -10,7 +10,6 @@ if (sessionInfo()$platform %in% c("x86_64-redhat-linux-gnu (64-bit)", "x86_64-pc
   basefiles <- "/conf/phip/Projects/Profiles/Data/Scotland Localities/"
   shapefiles <- "/PHI_conf/ScotPHO/Profiles/Data/Shapefiles/"
   shiny_files <- "/PHI_conf/ScotPHO/Profiles/Data/Shiny Data/"
-  
 } else  {
   lookups <- "//stats/ScotPHO/Profiles/Data/Lookups/"
   basefiles <- "//stats/phip/Projects/Profiles/Data/Scotland Localities/"

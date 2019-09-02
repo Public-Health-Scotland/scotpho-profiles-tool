@@ -18,7 +18,9 @@ library(tibble) # rownames to column in techdoc
 library(shinyjs)
 library(shinydashboard) #for valuebox on techdoc tab
 library(sp)
-library(shinycssloaders) #for loading icons
+library(lubridate) #for automated list of dates in welcome modal
+library(shinycssloaders) #for loading icons, see line below
+library(rmarkdown)
 library(flextable) #for tech document table
 library(webshot) #to download plotly charts
 library(rintrojs) # for help intros
@@ -63,18 +65,18 @@ title_wrapper <- function(x, ...)
 }
 
 #Function to create plot when no data available
-plot_nodata <- function() {
+plot_nodata <- function(height_plot = 450) {
   text_na <- list(x = 5, y = 5, text = "No data available" , size = 20,
                   xref = "x", yref = "y",  showarrow = FALSE)
   
-  plot_ly() %>%
+  plot_ly(height = height_plot) %>%
     layout(annotations = text_na,
            #empty layout
            yaxis = list(showline = FALSE, showticklabels = FALSE, showgrid = FALSE, fixedrange=TRUE),
            xaxis = list(showline = FALSE, showticklabels = FALSE, showgrid = FALSE, fixedrange=TRUE),
            font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif')) %>% 
     config( displayModeBar = FALSE) # taking out plotly logo and collaborate button
-}
+} 
 
 #Function to create plot when no data available for ggplot visuals
 plot_nodata_gg <- function() {
@@ -86,13 +88,19 @@ plot_nodata_gg <- function() {
 }
 
 
+# UI for heatmap and snapshot plots
+sum_ui <- function(title, plot_name) {
+  tagList(
+    h5(title, style="color: black; text-align: center; font-weight: bold;"),
+    div(align = "center", withSpinner(plotlyOutput(plot_name, height = "auto")))
+  ) }
+
 # Indicator definition boxes for indicator definition tab
 ind_def_box <- function(label, text_output) {
   div(class="definitionbox",
       p(paste(label), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
       h5(textOutput(text_output)))
 }
-
 
 #Creating big boxes for main tabs in the landing page (see ui for formatting css)
 lp_main_box <- function(title_box, image_name, button_name, description) {

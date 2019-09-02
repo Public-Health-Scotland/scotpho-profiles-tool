@@ -1,0 +1,142 @@
+---
+params:
+  chart_summary: NA #used
+  snapshot_data: NA #used
+  profile_summary: NA #used
+  summary_data: NA
+  comp_summary: NA
+  geoname_summary: NA
+  geotype_summary: NA
+  geocomp_summary: NA
+# geometry:  margin=0.5cm
+output: html_vignette
+  # pdf_document:
+  #   includes:
+  #     in_header: preamble.tex
+  
+  # To do,:
+    # add column layout - still doesn't work in word. What if I create the charts in ggplot
+    # then merge each column using ggpubr putting all in line and then merge the columns
+    # will this respect the size 
+    # what about a solution exporting all charts as png within the rmd and then using the images
+    # in the report
+    # add conditions to input$chart_summary
+    # move to ggplot
+    # figure out width of plots
+    # if using html size is an issue
+    
+---
+```{r setup}
+knitr::opts_chunk$set(echo = F, cache = T)
+```
+
+
+```{r include=FALSE}
+###############################################.
+## Functions ----
+###############################################.
+
+  ###############################################.
+  # Function that creates a snapshot plot for a domain
+  plot_profile_snapshot <- function(domainchosen) {
+
+    # only selecting decided domain
+    prof_snap_data <- params$snapshot_data %>% subset(domain == domainchosen) %>%
+      droplevels() %>%
+      mutate(indicator = as.factor(indicator))
+
+    #If no data available for that period then plot message saying data is missing
+    if (is.data.frame(prof_snap_data) && nrow(prof_snap_data) == 0)
+    {
+      plot_nodata(height = 50)
+    } else {
+
+      # Tooltip
+      if (params$comp_summary == 1) {#depending if time or area comparison
+        tooltip_summary <-  c(paste0("Area: ", prof_snap_data$measure, " || ",
+                                     "Comparator: ", prof_snap_data$comp_m, "<br>",
+                                     prof_snap_data$trend_axis, "<br>", prof_snap_data$type_definition))
+      } else if (params$comp_summary == 2) {
+        tooltip_summary <-  c(paste0(prof_snap_data$trend_axis, ": ",
+                                     prof_snap_data$measure, "  ||  ",
+                                     "Baseline: ", prof_snap_data$comp_m, "<br>",
+                                     prof_snap_data$type_definition))
+      }
+
+      # eliminating both axis
+      axis_layout <- list(title = "", fixedrange=TRUE, zeroline = FALSE, showline = FALSE,
+                          showticklabels = FALSE, showgrid = FALSE)
+
+
+      # obtaining height for plot based on number of rows of indicators
+      n_ind <- prof_snap_data %>% nrow()
+      # when 0 or 1 indicators the plot needs at least that size to
+      # prevent the spinner from showing and let the tooltip work
+      height_plot <- case_when(n_ind > 1 ~ 38*n_ind+10,
+                               TRUE ~ 75)
+
+      # defining plot function
+      plot_ly(prof_snap_data, y = ~indicator,   color = ~color, height = height_plot,
+              colors=  c(blue = "#4da6ff", gray = "gray88", red = "#ffa64d", white = "#ffffff")
+      ) %>%
+        add_bars(x =1, showlegend= FALSE, width=1,
+                 hoverinfo="text", hovertext = tooltip_summary,
+                 marker = list(line= list(color="black", width = 0.5))) %>%
+        # adding indicator name at center of each bar
+        add_text(text = ~indic_multiline, x =0.5,  showlegend= FALSE,
+                 textfont = list(color='black'), hoverinfo="skip" ) %>%
+        layout(title = domainchosen,
+               yaxis = axis_layout, xaxis = axis_layout,
+               margin = list(b= 10 , t=5, l = 5, r = 0),
+               font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif')) %>% # to get hover compare mode as default
+        config(displayModeBar = FALSE, displaylogo = F, editable =F)
+    }
+  }
+
+
+```
+
+
+#### `params$profile_summary` profile: `params$geoname_summary` 
+
+```{r echo=FALSE}
+
+    if (params$chart_summary == "Snapshot") {
+      if (params$profile_summary == "HWB") {
+        tagList(#Health and Wellbeing profile
+          column(4,
+                 plot_profile_snapshot("Behaviours"),
+                 plot_profile_snapshot("Social care & housing"),
+                 plot_profile_snapshot("Environment"),
+                 plot_profile_snapshot("Life expectancy & mortality")
+          ),
+          column(4,
+                 plot_profile_snapshot("Women's & children's health"),
+                 plot_profile_snapshot("Immunisations & screening"),
+                 plot_profile_snapshot("Economy"),
+                 plot_profile_snapshot("Crime")
+          ),
+          column(4,
+                 plot_profile_snapshot("Mental health"),
+                 plot_profile_snapshot("Ill health & injury"),
+                 plot_profile_snapshot("Education")
+          )
+        ) #taglist bracket
+      } else if (params$profile_summary == "CYP") {
+        tagList(#Children and young people profile
+          column(4,
+                 plot_profile_snapshot("Active"),
+                 plot_profile_snapshot("Healthy")
+          ),
+          column(4,
+                 plot_profile_snapshot("Included"),
+                 plot_profile_snapshot("Nurtured"),
+                 plot_profile_snapshot("Safe")
+          ),
+          column(4,
+                 plot_profile_snapshot("Achieving"),
+                 plot_profile_snapshot("Responsible")
+          )
+        )# taglist bracket
+      }
+    }
