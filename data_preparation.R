@@ -67,19 +67,12 @@ geo_lookup <- readRDS(paste0(lookups, "Geography/codedictionary.rds")) %>%
                               substr(code, 1, 3) == "S99" ~ "HSC locality",
                               substr(code, 1, 3) == "S37" ~ "HSC partnership",
                               substr(code, 1, 3) == "S02" ~ "Intermediate zone"),
-         #TEMPORARY FIX. dealing with change in ca, hb and hscp codes
-         code = recode(code, "S12000015"='S12000047', "S12000024"='S12000048', 
-                       "S08000018"='S08000029', "S08000027"= 'S08000030', 
-                       "S37000014"='S37000032', "S37000023"='S37000033'),
          #Changing ands for & to reduce issues with long labels and " - " for "-"
          areaname = gsub(" and ", " & ", areaname),
          areaname = gsub(" - ", "-", areaname))
 
 #Bringing parent geography information and formatting in one column with no duplicates
 geo_parents <- readRDS(paste0(lookups, "Geography/IZtoPartnership_parent_lookup.rds")) %>% 
-  #TEMPORARY FIX. dealing with change in ca, hb and hscp codes
-  mutate(hscp_partnership = recode(hscp_partnership, "S37000014"='S37000032', 
-                                   "S37000023"='S37000033')) %>% 
   gather(geotype, code, c(intzone2011, hscp_locality)) %>% distinct() %>% 
   select(-geotype) %>% rename(parent_code = hscp_partnership)
 
@@ -153,8 +146,6 @@ geo_lookup <- geo_lookup %>%
     code == "S02002476" ~ "IZ17-West Dunbartonshire",
     code == "S02001551" ~ "IZ18-East Lothian",
     code == "S02002477" ~ "IZ18-West Dunbartonshire",
-    # THIS ONE IS A MISSPELLING - TEMPORARY UNTIL LOOKups fixed
-    code == "S02002007" ~ "Lochalsh",
     TRUE  ~  paste(areaname))) #Last line for the rest of cases
 
 geo_lookup <- geo_lookup %>% 
@@ -224,10 +215,13 @@ data_spss <- read_csv(paste0(basefiles, "All Data for Shiny.csv"),
 # Merging together spss and shiny data folder datasets
 optdata <- bind_rows(optdata, data_spss) %>% 
   mutate_if(is.character, factor) %>%  #converting characters into factors
-  #TEMPORARY FIX. dealing with change in ca, hb and hscp codes
-  mutate(code = recode(code, "S12000015"='S12000047', "S12000024"='S12000048',
-                       "S08000018"='S08000029', "S08000027"= 'S08000030',
-                       "S37000014"='S37000032', "S37000023"='S37000033'))
+  #Dealing with changes in ca, hb and hscp codes. Transforms old code versions into 2019 ones
+  mutate(code = recode(code, "S12000015"='S12000047', "S12000024"='S12000048', 
+              "S12000046"='S12000049', "S12000044"='S12000050',
+              "S08000018"='S08000029', "S08000027"= 'S08000030',
+              "S08000021"='S08000031', "S08000023"= 'S08000032', 
+              "S37000014"='S37000032', "S37000023"='S37000033',
+              "S37000015"='S37000034', "S37000021"='S37000035'))
 
 # Adding update date for all indicators based on technical document
 update_table <- techdoc %>% rename(ind_id = indicator_number, update_date = last_updated) %>% 
@@ -317,10 +311,11 @@ profile_lookup <- readRDS("data/profile_lookup.rds")
 ###############################################.
 ## Shapefiles ----
 ###############################################.
-#Reading file with council shapefiles
-#making it small 29mb to 2.5. Sometimes it fails, due to lack of memory (use memory.limits and close things).
-ca_bound_orig<-readOGR(shapefiles, "CA_2011_EoR_Scotland") %>%
-  rmapshaper::ms_simplify(keep=0.0025)
+#Reading file with council shapefiles: https://www.spatialdata.gov.scot/geonetwork/srv/eng/catalog.search;jsessionid=4B4BEB1B1E52BCA9D3C1FD531CC199F8#/metadata/1cd57ea6-8d6e-412b-a9dd-d1c89a80ad62
+#making it small 29mb to 2.5.
+ca_bound_orig <-readOGR(shapefiles, "pub_las") %>%
+  rmapshaper::ms_simplify(keep=0.0025)  %>% 
+  setNames(tolower(names(.))) #variables to lower case
 
 object.size(ca_bound_orig)
 
@@ -328,25 +323,19 @@ object.size(ca_bound_orig)
 ca_bound_orig <- spTransform(ca_bound_orig,  CRS("+ellps=WGS84 +proj=longlat +datum=WGS84 +no_defs"))
 
 #Saving the simplified shapefile to avoid the calculations.
-writeOGR(ca_bound_orig, dsn=shapefiles, "CA_simpl", driver="ESRI Shapefile", overwrite_layer=TRUE)
+writeOGR(ca_bound_orig, dsn=shapefiles, "CA_simpl_2019", driver="ESRI Shapefile", overwrite_layer=TRUE)
 
 #Saving as rds as it is much faster to read
-ca_bound<-readOGR(shapefiles, "CA_simpl") %>% 
-  setNames(tolower(names(.))) #variables to lower case
-names(ca_bound@data)[names(ca_bound@data)=="gss_cod"] <- "code"
-names(ca_bound@data)[names(ca_bound@data)=="name"] <- "area_name"
+names(ca_bound_orig@data)[names(ca_bound_orig@data)=="local_auth"] <- "area_name"
 
-#TEMPORARY FIX. dealing with change in ca, hb and hscp codes
-ca_bound$code <- recode(as.character(ca_bound$code), 
-                          "S12000015"='S12000047', "S12000024"='S12000048')
-
-saveRDS(ca_bound, "data/CA_boundary.rds")
+saveRDS(ca_bound_orig, "data/CA_boundary.rds")
 
 ##########################.
 ###Health board
 #making it small 29mb to 2.5. Sometimes it fails, due to lack of memory (use memory.limits and close things).
-hb_bound_orig<-readOGR(shapefiles,"SG_NHS_HealthBoards_2014") %>% 
-  rmapshaper::ms_simplify(keep=0.0025)
+hb_bound_orig<-readOGR(shapefiles,"SG_NHS_HealthBoards_2019") %>% 
+  rmapshaper::ms_simplify(keep=0.0025) %>% 
+  setNames(tolower(names(.))) #variables to lower case
 
 object.size(hb_bound_orig)
 
@@ -354,51 +343,34 @@ object.size(hb_bound_orig)
 hb_bound_orig <- spTransform(hb_bound_orig,  CRS("+ellps=WGS84 +proj=longlat +datum=WGS84 +no_defs"))
 
 #Saving the simplified shapefile to avoid the calculations.
-writeOGR(hb_bound_orig, dsn=shapefiles, "HB_simpl", driver="ESRI Shapefile", overwrite_layer=TRUE)
+writeOGR(hb_bound_orig, dsn=shapefiles, "HB_simpl_2019", driver="ESRI Shapefile", overwrite_layer=TRUE)
 
 #Saving as rds as it is much faster to read
-hb_bound<-readOGR(shapefiles,"HB_simpl") %>% 
-  setNames(tolower(names(.))) #variables to lower case
-names(hb_bound@data)[names(hb_bound@data)=="hbcode"] <- "code"
-names(hb_bound@data)[names(hb_bound@data)=="hbname"] <- "area_name"
+names(hb_bound_orig@data)[names(hb_bound_orig@data)=="hbcode"] <- "code"
+names(hb_bound_orig@data)[names(hb_bound_orig@data)=="hbname"] <- "area_name"
 
-#TEMPORARY FIX. dealing with change in ca, hb and hscp codes
-hb_bound$code <- recode(as.character(hb_bound$code), 
-                          "S08000018"='S08000029', "S08000027"= 'S08000030')
-
-saveRDS(hb_bound, "data/HB_boundary.rds")
+saveRDS(hb_bound_orig, "data/HB_boundary.rds")
 
 ##########################.
 ###HSC Partnership
 #making it small 29mb to 2.5. Sometimes it fails, due to lack of memory (use memory.limits and close things).
-hscp_bound_orig <- readOGR(shapefiles,"SG_NHS_IntegrationAuthority_2018") %>% 
+hscp_bound_orig <- readOGR(shapefiles,"SG_NHS_IntegrationAuthority_2019") %>% 
   rmapshaper::ms_simplify(keep=0.0025) %>% 
   setNames(tolower(names(.))) #variables to lower case
 
 object.size(hscp_bound_orig)
-
-#Substituing codes to old ones. New ones still not in use.
-hscp_bound_orig@data$hiacode <- as.factor(case_when(
-  hscp_bound_orig@data$hiacode == "S37000032"~ "S37000014", 
-  hscp_bound_orig@data$hiacode == "S37000033" ~ "S37000023",
-  TRUE ~ paste0(hscp_bound_orig@data$hiacode)))
 
 #Changing the projection to WSG84, the ones leaflet needs.
 proj4string(hscp_bound_orig) #Checking projection
 hscp_bound_orig <- spTransform(hscp_bound_orig, CRS("+ellps=WGS84 +proj=longlat +datum=WGS84 +no_defs"))
 
 #Saving the simplified shapefile.
-writeOGR(hscp_bound_orig, dsn=shapefiles, "HSCP_simpl", 
+writeOGR(hscp_bound_orig, dsn=shapefiles, "HSCP_simpl_2019", 
          driver="ESRI Shapefile", overwrite_layer=TRUE, verbose=TRUE,
          morphToESRI=TRUE)
 
-hscp_bound <- readOGR(shapefiles,"HSCP_simpl")
 names(hscp_bound@data)[names(hscp_bound@data)=="hiacode"] <- "code"
 names(hscp_bound@data)[names(hscp_bound@data)=="hianame"] <- "area_name"
-
-#TEMPORARY FIX. dealing with change in ca, hb and hscp codes
-hscp_bound$code <- recode(as.character(hscp_bound$code), 
-                          "S37000014"='S37000032', "S37000023"='S37000033')
 
 saveRDS(hscp_bound, "data/HSCP_boundary.rds")
 hscp_bound <- readRDS("data/HSCP_boundary.rds")
