@@ -660,7 +660,7 @@ function(input, output, session) {
         layout(yaxis = axis_layout, xaxis = axis_layout,
                margin = list(b= 10 , t=5, l = 5, r = 0),
                font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif')) %>% # to get hover compare mode as default
-        config(displayModeBar = FALSE, displaylogo = F, editable =F)
+        config(displayModeBar = FALSE, displaylogo = F)
     }
   }
 
@@ -774,7 +774,7 @@ function(input, output, session) {
         layout(margin = list(l = 400, t = 50, b =0),
                xaxis = list(side = 'top', fixedrange=TRUE), yaxis= list(fixedrange=TRUE),
                font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif')) %>%
-        config(displayModeBar = FALSE, displaylogo = F, editable =F) # taking out plotly logo 
+        config(displayModeBar = FALSE, displaylogo = F) # taking out plotly logo 
     }
   }
   
@@ -1276,7 +1276,7 @@ function(input, output, session) {
                font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif'),
                showlegend = TRUE,
                legend = list(orientation = 'h', x = 0, y = 1.18)) %>%  #legend on top
-        config(displayModeBar = FALSE, displaylogo = F, editable =F) # taking out plotly logo and collaborate button
+        config(displayModeBar = FALSE, displaylogo = F) # taking out plotly logo button
       
       #Adding confidence intervals depending on user input
       if (input$ci_trend == TRUE & input$var_plot_trend != "Numerator") {
@@ -1592,7 +1592,7 @@ function(input, output, session) {
                              font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif'),
                              margin=list(b = 180, t = 5), # to prevent labels getting cut out
                              hovermode = 'false') %>% # to get hover compare mode as default
-          config(displayModeBar = FALSE, displaylogo = F, editable =F)
+          config(displayModeBar = FALSE, displaylogo = F)
         
       } else if (input$comp_rank == 2) {#if time comparison selected, plot dumbbell plot
         
@@ -1617,7 +1617,7 @@ function(input, output, session) {
                               categoryarray = rev(order_areas)),
                  font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif'),
                  margin=list(l = 170, t=40)) %>%  # to prevent labels getting cut out
-          config(displayModeBar = FALSE, displaylogo = F, editable =F)
+          config(displayModeBar = FALSE, displaylogo = F)
         
       }
     } # bracket for "plot if data"
