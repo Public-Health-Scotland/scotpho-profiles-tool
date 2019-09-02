@@ -9,7 +9,6 @@ function(input, output, session) {
   ################################################################.
   #    Modal ----
   ################################################################.
-  
   ## Latest indicator updates modal window ----
   updates_modal <- modalDialog(
     fluidRow(
@@ -36,7 +35,7 @@ function(input, output, session) {
     br(),
     modalButton("Exit", icon("times-circle")),
     size = "l", align= "center",
-    easyClose = TRUE, fade=TRUE, footer = NULL
+    easyClose = TRUE, fade=TRUE, footer = modalButton("Close (Esc)")
   )
   
   observeEvent(input$btn_indicator_updates, { showModal(updates_modal) }) # Link action button click to modal launch 
@@ -1327,7 +1326,7 @@ function(input, output, session) {
   output$geotype_ui_rank <- renderUI({
     areas <- sort(unique(optdata$areatype[optdata$indicator == input$indic_rank]))
     areas <- areas [! areas %in% c("Scotland")] #taking out Scotland
-    selectInput("geotype_rank", label = "Step 2. Select geography level",
+    selectInput("geotype_rank", label = "Step 2. Select a geography level",
                 choices = areas, selected = "Health board")
   })
   
