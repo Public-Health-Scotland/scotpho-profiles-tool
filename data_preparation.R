@@ -369,10 +369,10 @@ writeOGR(hscp_bound_orig, dsn=shapefiles, "HSCP_simpl_2019",
          driver="ESRI Shapefile", overwrite_layer=TRUE, verbose=TRUE,
          morphToESRI=TRUE)
 
-names(hscp_bound@data)[names(hscp_bound@data)=="hiacode"] <- "code"
-names(hscp_bound@data)[names(hscp_bound@data)=="hianame"] <- "area_name"
+names(hscp_bound_orig@data)[names(hscp_bound_orig@data)=="hiacode"] <- "code"
+names(hscp_bound_orig@data)[names(hscp_bound_orig@data)=="hianame"] <- "area_name"
 
-saveRDS(hscp_bound, "data/HSCP_boundary.rds")
+saveRDS(hscp_bound_orig, "data/HSCP_boundary.rds")
 hscp_bound <- readRDS("data/HSCP_boundary.rds")
 
 ##########################.
