@@ -9,244 +9,44 @@ function(input, output, session) {
   ################################################################.
   #    Modal ----
   ################################################################.
-  #Welcome Modal
-  welcome_modal <- modalDialog(
-    br(),
-    p(img(src="scotpho_reduced.png", height=100)),
-    br(),
-    br(),
-    p(tags$h4("Welcome to the ScotPHO Profiles Tool"), tags$br(),tags$br(),
-      tags$div(h5("This interactive tool provides access to a range of public 
-                  health related indicators at different"),
-               h5("geographies including NHS boards, council areas and health and 
-                  social care partnerships.")),
-      style = "color:0E3E5D; font-size:20px"),
-    br(),
-    p(tags$h5("Learn more about the tool or get started")),
-    actionButton("tour","Take a tour", icon("play-circle")),
-    HTML("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"),
-    #For when we make any updates in future
-    actionButton("updates","Latest updates", icon("wrench")),
-    HTML("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"),
-    modalButton("Go to the tool", icon("times-circle")),
-    size = "l", align= "center",
-    easyClose = TRUE, fade=FALSE, footer = NULL
-      )
   
-  showModal(welcome_modal)
-  
-  #"Take a Tour" Modal - first window
-  first_modal <- modalDialog(
-    fluidRow( 
-      column(12,
-             p(tags$div(" To begin, select the visualisation you want to see", 
-                        style = "color:0E3E5D; font-size:20px; width: 90%; text-align: left;")),
-             br(), tags$h5("There are different ways to navigate around the tool.", 
-                           style = "width: 90%; text-align: left; " ), br(), br())), 
-    fluidRow(
-      column(5, offset=1,tags$h5("You can select visualisations via the tabs at 
-                                 the top of the page")),
-      column(3, br(), img(src="tabs_select.png", height=43, width=400))),
-    fluidRow(
-      column(6, br(), br(), br(), br(), 
-             tags$a(img(src="landing_select.png", height=150, width=250, align="right"))),
-      column(4, br(), br(), br(),br(),  br(), br(), br(), br(), 
-             tags$h5("Or select to view a visualisation using the option buttons 
-                     shown on the Home Page"))),
-    fluidRow(
-      column(5, offset=1,  br(), br(), br(), br(), br(), 
-             h5("To return to the profiles Home Page at any point just click on 
-                the house button at the top of the page."),
-             h5("Clicking on the ScotPHO logo will take you to the main ScotPHO website.")),
-      column(3,br(),br(), br(), br(), br(), br(), br(), 
-             img(src="home_select.png", height=50, width=300))
-      ),
-    br(),
-    br(),
-    actionButton("next1","Next", icon("play-circle")),
-    HTML("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"),
-    modalButton("Exit", icon("times-circle")),
-    size = "l", align= "center",
-    easyClose = TRUE, fade=TRUE, footer = NULL
-    )
-  
-  #call from either tour button or back button from modal 2
-  observeEvent(input$tour,  {showModal(first_modal) })
-  
-  observeEvent(input$back1,  {showModal(first_modal) })
-  
-  #"Take a Tour" Modal - second window
-  second_modal <- modalDialog(
-    fluidRow(
-      column(12,
-             p(tags$div("Next use the menus to select the data you want to see", 
-                        style = "color:0E3E5D; font-size:20px; width: 90%; text-align: left; ")),                 
-             br(),
-             br(),
-             p(tags$h5("Some of our visualisations allow you to look at a predefined 
-                       set of indicators related to a particular domain or profile 
-                       e.g. ‘health and wellbeing’ or ‘children and young people’,
-                       while others are designed to look at a single indicator in 
-                       more detail. Using menus next to a visualisation you can select 
-                       the area you are interested in and the time period.", 
-                       style = "width: 90%; text-align: left; "))),
-      column(6,
-             br(),
-             br(),
-             br(),
-             br(),
-             br(),
-             tags$h5("Use the drop-down menus to select filters of interest",  
-                     style="width:300px; "),
-             p(tags$a(img(src="select_indic_single.png", height=200, width=300))),
-             br()
-      ),
-      column(6,
-             br(),
-             br(),
-             br(),
-             p(tags$a(img(src="select_indicator.png", height=180, width=260))),
-             p(tags$h5("Some fields may allow for multiple entries and most fields 
-                       can be searched by typing into the field, as well as scrolling 
-                       down the list of options", style = "width: 350px")),
-             p(tags$a(img(src="type_select.png", height=180, width=260))),
-             br()
-             )),
-    br(),
-    p(tags$h5("For more information about geographic areas within Scotland, 
-              please refer to" , 
-              tags$a(href="http://statistics.gov.scot/home", "statistics.gov.scot.", 
-                     class="externallink"))),
-    br(),
-    actionButton("back1","Back", icon("backward")),
-    HTML("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"),
-    actionButton("next2","Next", icon("play-circle")),
-    HTML("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"),
-    modalButton("Exit", icon("times-circle")),
-    size = "l", align= "center",
-    easyClose = TRUE, fade=TRUE, footer = NULL
-      )
-  
-  #call from either next1 button or back button from modal 3
-  observeEvent(input$next1,  {showModal(second_modal) })
-  
-  observeEvent(input$back2,  {showModal(second_modal) })
-  
-  
-  #"Take a Tour" Modal - third window
-  third_modal <- modalDialog(
-    fluidRow(
-      column(12,
-             p(tags$div("Finally, save the visualisation or download data", 
-                        style = "color:0E3E5D; font-size:20px; width: 90%; text-align: left; ")),                 
-             br(),
-             br(),
-             p(tags$h5("Our tool allows you to download the visualisation 
-                       images and the data behind them.", 
-                       style = "width: 90%; text-align: left; "))),
-      column(6,
-             br(),
-             br(),
-             br(),
-             tags$h5("Charts displayed can be saved by clicking on the 
-                     ‘Save chart’ button",  style="width:300px; "),
-             p(tags$a(img(src="save_chart2.png", height=60, width=230))),
-             br()
-             ),
-      column(6,
-             br(),
-             br(),
-             br(),
-             p(tags$h5("The raw data used to draw a chart can also be downloaded 
-                       in csv format", style = "width: 350px")),
-             p(tags$a(img(src="save.png", height=60, width=230))),
-             br()
-             )),
-    br(),
-    p(tags$h5("The ", tags$b("'Table'")," tab within our tool allows users to 
-              quickly and easily download larger selections of data covering 
-              multiple area or multiple indicators.", style = "width: 750px")),
-    br(),
-    actionButton("back2","Back", icon("backward")),
-    HTML("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"),
-    actionButton("next3","Next", icon("play-circle")),
-    HTML("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"),
-    modalButton("Exit", icon("times-circle")),
-    size = "l", align= "center",
-    easyClose = TRUE, fade=TRUE, footer = NULL
-    )
-  
-  #call from either next2 button or back button from modal 4
-  observeEvent(input$next2,  {showModal(third_modal) })
-  
-  observeEvent(input$back3,  {showModal(third_modal) })
-  
-  #"See latest updates" Modal window - Activate if Update is carried out once 
-  # rolled out live to users
+  ## Latest indicator updates modal window ----
   updates_modal <- modalDialog(
     fluidRow(
       column(12,
+             # text_intro("We are continuously updating and developing our tool"),                 
              p(tags$div("We are continuously updating and developing our tool", 
-                        style = "color:0E3E5D; font-size:20px; width: 90%; text-align: left; ")),                 
+                        style = "color:0E3E5D; font-size:20px; width: 90%; text-align: left; ")),
              br(),
              br(),
-             p(tags$h5("Recent indicator updates include:", 
-                       style = "width: 90%; text-align: left; font-weight: bold; "))),
+             p(h5("Recent indicator updates include:", 
+                  style = "width: 90%; text-align: left; font-weight: bold; "))),
       column(12, 
-             tags$h5(HTML(paste(techdoc$indicator_name[techdoc$days_since_update<60], 
+             tags$h5(HTML(paste(techdoc$indicator_name[techdoc$days_since_update<60], #tells to display indicators updated within 60 days
                                 collapse='<br>')))
       )),
     br(),
-    p(tags$h5("Thanks for stopping by!")),
+    p(tags$h5("To find out when an indicator is due to be updated please refer to our ", 
+                          tags$a(href="https://docs.google.com/spreadsheets/d/e/2PACX-1vQUQMORMqe9RrMnS9WJSu51Q6ef0rubiF1M-QN3BYZIBueErtTvvbRe_kTZbWmnupiO_Uie80BoZCnK/pubhtml", "updates schedule.", class="externallink"))),
+    br(),
     p(tags$h5("For any further questions or other developments you would like to 
               suggest for our current tool, please contact us at", 
               tags$a(href="mailto:ScotPHO@nhs.net", "ScotPHO@nhs.net", class="externallink"), 
               style = "width: 700px")),
     br(),
-    actionButton("updatesreturn","Back", icon("backward")),
-    HTML("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"),
     modalButton("Exit", icon("times-circle")),
     size = "l", align= "center",
     easyClose = TRUE, fade=TRUE, footer = NULL
   )
   
-  observeEvent(input$updates, {   showModal(updates_modal)  })
-  observeEvent(input$updatesreturn, {   showModal(welcome_modal)  })
+  observeEvent(input$btn_indicator_updates, { showModal(updates_modal) }) # Link action button click to modal launch 
   
-  #"Take a Tour" Modal - last window
-  fourth_modal <- modalDialog(
-    fluidRow(
-      column(12,
-             p(tags$div("Please note", style = "color:0E3E5D; font-size:20px; 
-                        width: 90%; text-align: left; ")))),          
-    br(),
-    p(tags$h5("The profiles are intended to increase understanding of local health 
-              and social issues and to prompt further investigation, rather than 
-              to be used as a performance management tool.
-              The information needs to be interpreted within a local framework; an indicator 
-              may be higher or lower in one area compared to another, but local 
-              knowledge is needed to understand and interpret differences.", 
-              style = "width: 700px")),
-    br(),
-    br(),
-    br(),
-    p(tags$h5("If you require any further information by bespoke geographies or 
-              have any questions regarding the tool, please", 
-              tags$a(href="mailto:ScotPHO@nhs.net", "contact us.", class="externallink"), 
-              style = "width: 600px")),
-    br(),
-    br(),
-    p(tags$h5("Please also note this tool is being continuously developed and we 
-              welcome any ", tags$a(href="mailto:ScotPHO@nhs.net", "feedback", 
-                                    class="externallink"), " you may have on it.", 
-              style = "width: 600px")),
-    br(),
-    modalButton("Exit", icon("times-circle")),
-    size = "l", align= "center",
-    easyClose = TRUE, fade=TRUE, footer = NULL
-             )
+  ## IntroJS allow switching between tabs----
+  observeEvent(input$btn_landing, {
+    introjs(session,
+            events = list(onbeforechange = readCallback("switchTabs")))
+  })
   
-  observeEvent(input$next3, { showModal(fourth_modal) })
   
   ###############################################.
   ## Landing page ----
@@ -278,6 +78,12 @@ function(input, output, session) {
     updateTabsetPanel(session, "intabset", selected = "about")
   })
   
+  
+  observeEvent(input$jump_to_definitions, {
+    updateTabsetPanel(session, "intabset", selected = "definitions")
+  })
+  
+  
   observeEvent(input$jump_to_resources, {
     updateTabsetPanel(session, "intabset", selected = "resources")
   })
@@ -285,7 +91,6 @@ function(input, output, session) {
   observeEvent(input$jump_to_others, {
     updateTabsetPanel(session, "intabset", selected = "others")
   })
-  
  
   ###############################################.
   ## Summary - common objects ----
@@ -1101,7 +906,7 @@ function(input, output, session) {
   # Create barcode plot function
   plot_spine <- function(){
     
-    ind_count <- length(unique(spine_allareas()$ind_id)) #facet_wrap requires how many chart rows to render
+    ind_count <- length(unique(spine_allareas()$indicator)) #facet_wrap requires how many chart rows to render
     
     #Merging comparator and chosen area
     spine <- merge(spine_allareas(), spine_chosencomp(), by=c("indicator"))
@@ -1268,6 +1073,26 @@ function(input, output, session) {
   ###############################################.        
   #### Time trend plot ----
   ###############################################.  
+  # Trend help pop-up
+  observeEvent(input$help_trend, {
+    
+    showModal(modalDialog(
+      title = "How to use this chart",
+      p("The trend chart is designed to explore how a single indicator has changed over time for one or more geograpical area."),
+      p(column(7,
+               img(src="help_trend_chart2.png")),
+        column(5,
+               p("First select an indicator using the 'step 1' filter."),
+               p("Then add one or more geographical area to the chart using the geography filters in 'Step 2'."),
+               p("You can add more than one area or area type (e.g. NHS board or council area) to the trend chart."),
+               p("There may be some indicators where data is not available for the full time series or at a particular geography level."),
+               p("Use the mouse to hover over a data point to see detailed information on its value, time period and area."),
+               p("Confidences intervals (95%) can be added or removed from the chart using the options in 'step 3'. These are shown as shaded areas."),
+               p("Confidence intervals give an indication of the precision of a rate or percentage. The width of a confidence interval is related to sample size, smaller geographies like intermediate zones often have wider intervals."),
+               p("Display controls in 'Step 3' allow you to switch the graph from a measure (e.g. rate or percentage) to actual numbers (e.g numbers of deaths/hospitalisations)."))),
+                 size = "l", easyClose = TRUE, fade=FALSE,footer = modalButton("Close (Esc)")))
+    }) 
+      
   #####################.
   # Reactive controls
   #Controls for chart. Dynamic selection of locality and iz.
@@ -1363,7 +1188,7 @@ function(input, output, session) {
   trend_data <- reactive({ 
     
     trend <- optdata %>% 
-      subset((areaname %in% input$hbname_trend &  areatype == "Health board" |
+      subset((areaname %in% input$hbname_trend & areatype == "Health board" |
                 areaname %in% input$caname_trend & areatype == "Council area" |
                 input$scotname_trend == TRUE & areatype == "Scotland"  |
                 areaname %in% input$adpname_trend  & areatype == "Alcohol & drug partnership" |
@@ -1375,7 +1200,7 @@ function(input, output, session) {
       mutate(areaname_full = as.factor(areaname_full),
              # adjusting levels of areatype, so Scotland always plotted as black
              areatype = factor(areatype,
-                               levels = c("Scotland", "Health board ", "Council area",
+                               levels = c("Scotland", "Health board", "Council area",
                                           "Alcohol & drug partnership", "HSC partnership",
                                           "HSC locality", "Intermediate zone"))) %>% 
       arrange(year, areatype, areaname_full) #Needs to be sorted by year for Plotly
@@ -1386,6 +1211,14 @@ function(input, output, session) {
   #####################.
   # titles 
   output$title_trend <- renderText(paste0(input$indic_trend))
+  output$subtitle_trend <- renderText(paste0(trend_type()))                                     
+ 
+  trend_type <- function () {
+  # y axis title
+  yaxis_title <- case_when(input$var_plot_trend == "measure" ~ paste0(unique(trend_data()$type_definition)), 
+                           input$var_plot_trend == "numerator" ~ "Number")
+  }
+                              
   
   #####################.
   #Plot 
@@ -1425,12 +1258,9 @@ function(input, output, session) {
       
       #Text for tooltip
       tooltip_trend <- c(paste0(trend_data()$areaname, "<br>", trend_data()$trend_axis,
-                                "<br>", trend_data()$measure))
-      
-      # y axis title
-      yaxis_title <- case_when(input$var_plot_trend == "measure" ~ paste0(unique(trend_data()$type_definition)), 
-                               input$var_plot_trend == "numerator" ~ "Number")
-      
+                                "<br>", paste0(unique(trend_data()$type_definition)),": ", trend_data()$measure,
+                                "<br>", "Numerator: ", round(trend_data()$numerator, 1)))
+
       #Creating time trend plot
       trend_plot <- plot_ly(data=trend_data(), x=~trend_axis,  y = ~get(input$var_plot_trend),
                             color = ~areaname_full, colors = trend_col, 
@@ -1440,7 +1270,7 @@ function(input, output, session) {
         #Layout 
         layout(annotations = list(), #It needs this because of a buggy behaviour of Plotly
                margin = list(b = 160, t=5), #to avoid labels getting cut out
-               yaxis = list(title = yaxis_title, rangemode="tozero", fixedrange=TRUE,
+               yaxis = list(title = trend_type(), rangemode="tozero", fixedrange=TRUE,
                             size = 4, titlefont =list(size=14), tickfont =list(size=14)),
                xaxis = list(title = FALSE, tickfont =list(size=14), tickangle = 270, fixedrange=TRUE),
                font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif'),
@@ -1489,7 +1319,7 @@ function(input, output, session) {
     time_period <- sort(unique(optdata$trend_axis[optdata$indicator == input$indic_rank&
                                                     optdata$areatype == input$geotype_rank]))
     
-    selectInput("year_rank", "Time period",
+    selectInput("year_rank",shiny::HTML("<p>Step 4. Select time period <br/> <br/></p>"),
                 choices = time_period, selected = last(time_period))
   })
   
@@ -1497,7 +1327,7 @@ function(input, output, session) {
   output$geotype_ui_rank <- renderUI({
     areas <- sort(unique(optdata$areatype[optdata$indicator == input$indic_rank]))
     areas <- areas [! areas %in% c("Scotland")] #taking out Scotland
-    selectInput("geotype_rank", label = "Geography level",
+    selectInput("geotype_rank", label = "Step 2. Select geography level",
                 choices = areas, selected = "Health board")
   })
   
@@ -1509,9 +1339,9 @@ function(input, output, session) {
     years <- c(min(rank_data$year):max(rank_data$year))
     periods <- c(sort(paste0(unique(rank_data$trend_axis[rank_data$year>=min(rank_data$year) &
                                                            rank_data$year<=max(rank_data$year)]))))
-    
-    selectInput("yearcomp_rank", "Baseline year", choices = periods,
-                selectize=TRUE)
+    div(title="Use this option to change the baseline year (the black circle in chart)",
+    selectInput("yearcomp_rank","Step 3b. Select comparison baseline year", choices = periods,
+                selectize=TRUE))
   })
   
   
@@ -1527,6 +1357,58 @@ function(input, output, session) {
                        defs_data_rank()$indicator_definition), collapse = "<br><br>"))
   })
   
+  
+  ##Rank modal dialog help 
+  
+  # Rank help main window call
+  observeEvent(input$rank_help, {showModal(rank_help_main_modal)})
+  #call to open rank area chart help modal window
+  observeEvent(input$rank_area_help,  {showModal(rank_byarea_modal) })
+  #call to open rank time chart help modal window
+  observeEvent(input$rank_time_help,  {showModal(rank_bytime_modal) })
+  #call from either area or time window back to main
+  observeEvent(input$rank_help_back,  {showModal(rank_help_main_modal) })
+  
+  #Initial help screen - users need to pick whether they want help on area or time comparison.
+  rank_help_main_modal <- modalDialog(
+    title = "How to use this chart",
+    p("There are two types of charts available designed to provide comparisons for a single indicator."),
+    p("The default chart shows a simple comparison of areas of a specific type e.g. NHS board"),
+    p("Use menu selections (Step 1 to Step 4) to set the indicator or geography type to be compared."),
+    p("In 'step 3' the comparator can be changed to 'Time', this changes the chart shown and adds an extra dimension to the area comparison."),
+    actionButton("rank_area_help","How to use area comparisons chart"),
+    actionButton("rank_time_help","How to use time comparisons chart"),
+    size = "l", easyClose = TRUE, fade=FALSE,
+    footer = modalButton("Close (Esc)"))
+    
+  #Help page for area comparison 
+  rank_byarea_modal <- modalDialog(
+    title = "How to use the area comparisons chart",
+    p("The area comparison chart makes it easy to see which areas have high or low values for a particular indicator."),
+    p("The red line that appears on the bar chart shows a comparator area, in the example below the Scotland average."),
+    p("The comparator area can be changed using the 'Step 3b' drop-down menu."),
+    p("The colours of the bars indicate whether an area is statistically significantly different to that comparator."),
+    p("Confidence intervals are used to determine if an indicator is significantly different to the comparator. By default confidence intervales are not shown on the chart but can be added by ticking the option '95% confidence intervals'."),
+    p(tags$a(img(src="help_rank_areachart.png"))),
+    size = "l", easyClose = TRUE, fade=FALSE,
+    footer=tagList(
+      actionButton("rank_time_help","Help for time comparison chart"),
+      actionButton("rank_help_back","Back"),
+      modalButton("Close (Esc)")))
+  
+  #Help page for time comparison
+  rank_bytime_modal <- modalDialog(
+    title = "How to use the time comparisons chart",
+    p("The time comparison chart shows how a particular indicator has changed over time across a set of geographies"),
+    p("The example below shows how alcohol-related hospital stays have changed between 2009/10 and 2017/18."),
+    p("The solid black circle show an indicator value at the baseline year, the other circle shows the latest value for that indicator. The 
+      colour of the circle indicates if there is a statistically significant difference between the two time points"),
+    p(tags$a(img(src="help_rank_lollychart.PNG"))),
+    size = "l", easyClose = TRUE, fade=FALSE,
+    footer=tagList(
+      actionButton("rank_area_help","Help for area comparison chart"),
+      actionButton("rank_help_back","Back"),
+      modalButton("Close (Esc)")))
 
 #####################.
 # Reactive data  
@@ -1614,7 +1496,14 @@ function(input, output, session) {
   output$rank_title <- renderText( paste0(input$indic_rank) )
   
   output$rank_subtitle <- renderText({ make_rank_subtitle()  })
-  
+ 
+  #visible summary of ui main panel to guide users
+  make_rank_summary <- function() {
+    case_when(input$comp_rank == 1 ~ paste0("The bar chart and map below both show how areas of the same type (e.g. NHS board) compare to each other for a particular indicator."),
+              input$comp_rank == 2 ~ paste0("The chart below is called a lollipop chart, it shows how areas compare with each other and also how each area has changed over time since the selected baseline year. The map shows a comparison for the selected year against the baseline year for each area."))
+  }
+  output$rank_summary <- renderText(make_rank_summary())
+   
   ############################.
   # Creating  plot
   plot_rank_charts <- function(){
@@ -1837,7 +1726,7 @@ function(input, output, session) {
     if(is.data.frame(poly_map()) && nrow(poly_map()) == 0) {
       h4("No map available for that geographic level.", style = "color:black")
     } else {
-      withSpinner(leafletOutput("map", width="100%",height="600px"))
+      withSpinner(leafletOutput("map", width="100%",height="550px"))
     }
   })
 
@@ -1880,6 +1769,27 @@ function(input, output, session) {
       dev.off()
     })
   
+  #rank legend text
+  output$rank_legend <- renderUI({
+    if (input$comp_rank == 1) {
+      p(tags$b("Legend"), 
+        br(),
+        img(src='signif_better.png', height=12, style="padding-right: 2px; vertical-align:middle"),"Better than comparator",
+        img(src='non_signif.png', height=12, style="padding-right: 2px; vertical-align:middle"), "Not different to comparator", 
+        br(),
+        img(src='signif_worse.png', height=12, style="padding-right: 2px; vertical-align:middle"), "Worse than comparator", 
+        img(src='signif_nocalc2.png', height=12, style="padding-right: 2px; vertical-align:middle"), "No differences can be calculated")
+    } else {
+      p(tags$b("Chart Legend"), br(),
+        img(src='signif_better.png', height=12, style="padding-right: 2px; vertical-align:middle"),"Better than comparator",
+        img(src='non_signif.png', height=12, style="padding-right: 2px; vertical-align:middle"), "Not different to comparator", br(),
+        img(src='signif_worse.png', height=12, style="padding-right: 2px; vertical-align:middle"), "Worse than comparator", 
+        img(src='signif_nocalc2.png', height=12, style="padding-right: 2px; vertical-align:middle"), "No differences can be calculated",br(),
+        img(src='baseline_year_color.png', height=12, style="padding-right: 2px; vertical-align:middle"), "Baseline year comparison")
+    }
+  })
+  
+      
   #####################################.      
   #### Table ----
   #####################################. 
@@ -2151,8 +2061,8 @@ function(input, output, session) {
         if (input$all_data == TRUE) {
           filtered_geos <- optdata %>%  
             filter(year>=input$date_from[1] & year<=input$date_from[2] &
-                     (domain1 %in% input$topic_filter|domain2 %in% input$topic_filter|
-                        domain3 %in% input$topic_filter))
+          (substr(profile_domain1, 5, nchar(as.vector(profile_domain1))) %in%  input$topic_filter |
+          substr(profile_domain2, 5, nchar(as.vector(profile_domain2))) %in%  input$topic_filter))
           
         } else {
           
@@ -2165,15 +2075,15 @@ function(input, output, session) {
                      (areaname %in% input$hscp_true & areatype == "HSC partnership")|
                      code %in% input$code) %>% 
             filter(year>=input$date_from[1] & year<=input$date_from[2] & 
-                     (domain1 %in% input$topic_filter|domain2 %in% input$topic_filter|
-                        domain3 %in% input$topic_filter))
+                     (substr(profile_domain1, 5, nchar(as.vector(profile_domain1))) == input$topic_filter |
+                        substr(profile_domain2, 5, nchar(as.vector(profile_domain2))) == input$topic_filter))
           
           filtered_geo2 <- if (input$scotland == TRUE) {
             optdata %>% 
               filter(areaname == "Scotland" & 
                        year>=input$date_from[1] & year<=input$date_from[2] & 
-                       (domain1 %in% input$topic_filter|domain2 %in% input$topic_filter|
-                          domain3 %in% input$topic_filter))
+                       (substr(profile_domain1, 5, nchar(as.vector(profile_domain1))) %in%  input$topic_filter |
+                          substr(profile_domain2, 5, nchar(as.vector(profile_domain2))) %in%  input$topic_filter))
           }  
           
           # Merging together Scotland and other areas selected
@@ -2282,52 +2192,175 @@ function(input, output, session) {
   #################################################.
   ##  Technical Doc Page ----
   #################################################.
-  # Reactive data
-  indicator_selected <- reactive({ filter(techdoc,techdoc$indicator_name==input$indicator_defined)})
   
-  ###############################################.
-  # Reactive filter
-  #Filter indicator list by  profile or by domain 
-  output$indicator_chosen <- renderUI ({
+  #### Techdoc for summary of indicators.
+  
+  ## Reactive filter of available geography types based on which profile is selected.
+  output$tecdoc_geographies <- renderUI ({
     
-    if (input$profile_defined != "Show all"){
-      indic_selection <- sort(unique(c(as.character(optdata$indicator[grep(input$profile_defined,optdata$profile_domain1)]),
-                                       as.character(optdata$indicator[grep(input$profile_defined,optdata$profile_domain2)] ))))
-    } else if (input$topic_defined != "Show all"){
-      indic_selection <- sort(unique(optdata$indicator[optdata$domain1==input$topic_defined|
-                                                         optdata$domain2==input$topic_defined|
-                                                         optdata$domain3==input$topic_defined]))
-    } else { 
-      indic_selection <- indicator_list
-    }
+    if (input$profile_picked != "Show all"){
+      geo_selection <- sort(unique(c(as.character(optdata$areatype[grep(input$profile_picked,optdata$profile_domain1)]),
+                                     as.character(optdata$areatype[grep(input$profile_picked,optdata$profile_domain2)] ))))
+    } else {geo_selection <- areatype_list }
     
-    selectizeInput("indicator_defined", label = "Select indicator to see technical information for",
-                   width = "510px", choices = indic_selection, 
-                   selected = character(0), multiple=TRUE, 
-                   options = list(placeholder = "Select your indicator of interest", maxItems = 1)) 
+    selectizeInput("techdoc_geotype", label = "Step 3. Select a geography type (optional)",
+                   width = "100%", choices = c("Show all", geo_selection), 
+                   selected = "Show all", multiple=TRUE, 
+                   options = list(placeholder = "Select....", maxItems = 1)) 
   }) 
   
+  ## Reactive dataset filtered for flextable - four possible combinations of data
+  techdoc_indicator_data <- reactive({  
+    if (input$profile_picked != "Show all"){ # if a single profile selected
+      if(input$techdoc_geotype != "Show all"){ #further filter if user selects a geography type
+        techdoc %>%
+          subset(grepl(input$techdoc_geotype,available_geographies)) %>%
+          subset(grepl(names(profile_list[unname(profile_list) == input$profile_picked]),profile))} 
+      else { # dataset if user wants a single profile but all geography types 
+        techdoc %>%
+          subset(grepl(names(profile_list[unname(profile_list) == input$profile_picked]),profile))}}
+    else if (input$profile_picked == "Show all"){ #subset applied if user selects all profiles
+      if(input$techdoc_geotype == "Show all"){  # user selects all geography types
+        techdoc}
+      else { # user selects a single geography type
+        techdoc %>%
+          subset(grepl(input$techdoc_geotype,available_geographies))}}
+  })
+  
+  ## Function to manipulate filtered data - easier for data download if manipulations done after filters
+  formatted_techdoc_data <- function(){
+    if (input$profile_picked != "Show all"){
+      techdoc_indicator_data() %>%
+        mutate(prof_start=regexpr((names(profile_list[unname(profile_list) == input$profile_picked])), domain), #find start position of profile name in domain column
+               prof_name_text=substr(domain,prof_start, nchar(domain)),  #generate column that starts with filtered profile
+               findcomma=regexpr(",",prof_name_text), #find position of comma (where domain description ends
+               findhyp=regexpr("-",prof_name_text), #find position of hyphen (where domain description starts)
+               domain1= case_when(findcomma<0 ~ substr(prof_name_text,findhyp+1,nchar(prof_name_text)),
+                                  findcomma>0 ~ substr(prof_name_text,findhyp+1,findcomma-1),
+                                  TRUE ~ "")) %>% # extract domain string linked to seletec profile
+        mutate (profilename=input$profile_picked) %>%  #sort on profile name since some indicators in multiple profiles
+        arrange(profilename, domain1, indicator_name) %>%
+        rownames_to_column(var="ind_index")} 
+    else{
+      techdoc_indicator_data()}}
+  
+  ## Function to construct flextable displaying techdoc info
+  plot_techdoc <- function(){
+    
+    if (input$profile_picked != "Show all"){ # table for a single profile selection
+      formatted_techdoc_data() %>%
+        select(domain1, ind_index,indicator_name, indicator_definition,available_geographies,aggregation) %>%
+        flextable() %>%
+        add_header_lines(paste0((names(profile_list[unname(profile_list) == input$profile_picked]))," profile")) %>%
+        set_header_labels (domain1="Domain",ind_index= "",indicator_name="Indicator",indicator_definition="Indicator Definition",
+                           available_geographies="Available geographies", aggregation="Level of aggregation") %>%
+        theme_box() %>%
+        merge_v(j = ~ domain1) %>%
+        align_text_col(align = "left") %>%
+        color(i = 1, color = "white", part = "header") %>% # format text colour of header to identify profile 
+        bg(i=1,bg="#007ba7",part="header") %>%  # format background colour of header to identify profile
+        autofit() %>%
+        htmltools_value()
+      } else { #table all indicators (ie "show all") profiles selected - additional column for profile(s)
+      formatted_techdoc_data() %>%
+        arrange(profile, domain) %>%
+        rownames_to_column(var="ind_index") %>%
+        select (profile, domain,ind_index,indicator_name, indicator_definition,available_geographies, aggregation) %>%
+        flextable() %>%
+        set_header_labels (profile="Profile(s)",domain="Domain(s)",ind_index="",indicator_name="Indicator",indicator_definition="Indicator Definition",
+                           available_geographies="Available geographies", aggregation="Level of aggregation") %>%
+        theme_box() %>%
+        merge_v(j = ~ profile) %>%
+        merge_v(j = ~ domain) %>%
+        align_text_col(align = "left") %>%
+        autofit() %>%
+        htmltools_value()}
+  }
+
+  ## RenderUI for which version flextable to display on techdoc page
+  #render techincal info depending on whether selected to see summary of 
+  # available indictors or single indicator definition
+  output$techdoc_display <- renderUI({  
+    # Preparing a brief explanation for each visualisation 
+    if (input$techdoc_selection == "List of available indicators") {
+      plot_techdoc()
+    } else if (input$techdoc_selection == "Detailed information about single indicator")
+      p("loading..")}  #shows 'loading' as there can be a small delay while switching back between views
+  )
+
+ ## Function to format data for csv according to whether showing single profile or all profiles
+ techdoc_csv <- function() {
+   if (input$profile_picked != "Show all"){
+     formatted_techdoc_data() %>%
+       rename(profile_selection=profilename, all_profiles=profile, domain_selection=domain1) %>%  
+       select(c(profile_selection, domain_selection,ind_index,indicator_name, indicator_number, indicator_definition, all_profiles, domain,inclusion_rationale, data_source,
+                diagnostic_code_position, numerator, denominator, measure, disclosure_control, rounding, age_group, sex, year_type,
+                trends_from, aggregation, update_frequency, available_geographies, confidence_interval_method, notes_caveats, 
+                related_publications, supporting_information, last_updated, next_update))}
+   else { #table all indicators (ie "show all") profiles selected - additional column for profile(s)
+     formatted_techdoc_data() %>%
+       arrange(indicator_name) %>%
+       select(c(indicator_name, indicator_number, indicator_definition,profile, domain, inclusion_rationale, data_source,
+                diagnostic_code_position, numerator, denominator, measure, disclosure_control, rounding, age_group, sex, year_type,
+                trends_from, aggregation, update_frequency, available_geographies, confidence_interval_method, notes_caveats, 
+                related_publications, supporting_information, last_updated, next_update))}
+ }
+ 
+ ## Download techdoc data from conditional panel (flextable)
+ output$download_techdoc1_csv <- downloadHandler(
+   filename ="indicator_definitions.csv",
+   content = function(file) {
+     write.csv(techdoc_csv(),
+               file, row.names=FALSE) } 
+ )
+ 
+  #################################################.  
+  #### Techdoc for individual indicator.
+  
+ ## Reactive filters for technical details document - filter for indicator dependent on profile/topic selected
+ output$indicator_choices <- renderUI ({
+   
+   if (input$profile_picked != "Show all"){
+     indic_selection <- sort(unique(c(as.character(optdata$indicator[grep(input$profile_picked,optdata$profile_domain1)]),
+                                      as.character(optdata$indicator[grep(input$profile_picked,optdata$profile_domain2)] ))))
+   } else if (input$topic_defined != "Show all"){
+     indic_selection <- sort(unique(
+       optdata$indicator[substr(optdata$profile_domain1, 5, nchar(as.vector(optdata$profile_domain1)))
+                         == input$topic_defined |
+                           substr(optdata$profile_domain2, 5, nchar(as.vector(optdata$profile_domain2)))
+                         == input$topic_defined]))
+   } else {indic_selection <- indicator_list}
+   
+   selectizeInput("indicator_selection", label = "Step 4. Select an indicator for detailed technical information",
+                  width = "510px", choices = indic_selection, 
+                  selected = character(0), multiple=TRUE, 
+                  options = list(placeholder = "Make a selection to see information", maxItems = 1)) 
+ }) 
+  
   #To keep it simple, when you change profile, reset topic and vice versa.
-  observeEvent(input$profile_defined, { 
-    if (input$topic_defined != "Show all" && input$profile_defined != "Show all"){ 
+  observeEvent(input$profile_picked, { 
+    if (input$topic_defined != "Show all" && input$profile_picked != "Show all"){ 
       updateSelectizeInput(session,"topic_defined", label = "Or by domain",
-                           choices = topic_list_filter, selected = "Show all")
-    }
+                           choices = topic_list_filter, selected = "Show all")}
   })
   
   observeEvent(input$topic_defined, { 
-    if (input$profile_defined != "Show all" && input$topic_defined != "Show all"){ 
-      updateSelectizeInput(session,"profile_defined", label = "Filter by profile",
-                           choices = profile_list_filter, selected = "Show all")
-    }
+    if (input$profile_picked != "Show all" && input$topic_defined != "Show all"){ 
+      updateSelectizeInput(session,"profile_picked", label = "Filter by profile",
+                           choices = profile_list_filter, selected = "Show all")}
   })
   
   ###############################################.
-  # Creating text and titles for info
-  # Title box
+  # Creating text and titles for info to display
+ 
+  #reactive selection for single indicator
+  indicator_selected <- reactive({ 
+    filter(techdoc, techdoc$indicator_name==input$indicator_selection)
+    })
+  
+  #Text for title of indicator selected
   output$indicator <- renderValueBox({
-    
-    valueBox(tags$p(indicator_selected()$indicator_name, style="color: white; font-size: 30px; font-weight: bold;"), 
+        valueBox(tags$p(indicator_selected()$indicator_name, style="color: white; font-size: 30px; font-weight: bold;"), 
              HTML(paste("<b>","Profile:","</b>",indicator_selected()$profile,br(),
                         "<b>","Domain:","</b>",indicator_selected()$domain)), icon = icon ("book"),color = "blue")
   })
@@ -2358,20 +2391,28 @@ function(input, output, session) {
   output$next_update <- renderText ({indicator_selected()$next_update})
   
   
-  ###############################################.
-  #Download definitions table for selected indicator
-  indicator_definitions <- reactive({ techdoc %>% filter(indicator_name == input$indicator_defined)})
+  ## Download techdoc data from 2nd conditional panel (detailed indicator)
+  #Download definitions table for selected indicator - not
+
+  indicator_csv <- reactive({ format_definitions_csv(indicator_selected()) })
   
-  indicator_csv <- reactive({ format_definitions_csv(indicator_definitions()) })
+  allindicator_csv <- reactive({ format_definitions_csv(techdoc) })
   
-  output$definitions_by_indicator <- downloadHandler(
+  output$download_detailtechdoc_csv <- downloadHandler(
     filename ="indicator_definitions.csv",
     content = function(file) {
       write.csv(indicator_csv(),
                 file, row.names=FALSE) } 
   )
   
+  output$download_alltechdoc_csv <- downloadHandler(
+    filename ="indicator_definitions.csv",
+    content = function(file) {
+      write.csv(allindicator_csv(),
+                file, row.names=FALSE) } 
+  )
+  
+
 } #server closing bracket
 
 #########################  END ----
-
