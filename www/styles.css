@@ -1,0 +1,128 @@
+/* CSS styles used in the shiny app */
+
+
+/* to avoid red text error messages in the whole app, take out for testing*/
+.shiny-output-error { visibility: hidden; }
+.shiny-output-error:before { visibility: hidden; }
+
+/*for introjs sizing */
+.newClass {min-width: 50px;max-width: 50px;} 
+
+/* Style sidebars/well panels */
+.well {background-color:#ffffff; border: 0 solid #336699;
+       padding: 5px; box-shadow: none; }
+       
+/* Background colour of header navBar */                        
+.navbar-brand {background-color: white}
+
+.navbar {font-size: 14px; border: 0} /* font size and border*/
+
+.dropdown-menu { font-size: 14px;} /* dropdown menu within navBar*/
+
+.container-fluid {padding-right: 0}
+                          
+/*Text size and line height. Padding needed for footer */
+body { font-size: 14px; line-height: 1.1; padding-bottom:30px}
+
+.checkbox label, .radio label, .checkbox-bs label, .radio-bs label
+                          { line-height: 1.6 }
+                          
+.radio-inline {line-height: 2}
+                          
+/* Padding and margins of filters and labels*/
+.form-group {margin: 3px}
+
+.li-custom {margin-bottom: 10px;} /* bullet point list items */
+
+.shiny-options-group { margin-top: 3px; }
+
+.selectize-control { margin-bottom: 3px}
+
+.selectize-input {padding: 3px 3px; min-height: 10px; line-height: 18px;}
+
+.selectize-dropdown {line-height: 18px; }
+
+.control-label { margin-bottom: 1px}
+                          
+/* Padding of columns*/
+.col-xs-1, .col-sm-1, .col-md-1, .col-lg-1, .col-xs-2, .col-sm-2, .col-md-2, 
+      .col-lg-2, .col-xs-3, .col-sm-3, .col-md-3, .col-lg-3, .col-xs-4, .col-sm-4, 
+      .col-md-4, .col-lg-4, .col-xs-5, .col-sm-5, .col-md-5, .col-lg-5, .col-xs-6, 
+      .col-sm-6, .col-md-6, .col-lg-6, .col-xs-7, .col-sm-7, .col-md-7, .col-lg-7, 
+      .col-xs-8, .col-sm-8, .col-md-8, .col-lg-8, .col-xs-9, .col-sm-9, .col-md-9, 
+      .col-lg-9, .col-xs-10, .col-sm-10, .col-md-10, .col-lg-10, .col-xs-11, .col-sm-11, 
+       .col-md-11, .col-lg-11, .col-xs-12, .col-sm-12, .col-md-12, .col-lg-12 
+           {padding-left: 5px; padding-right: 5px;}
+                          
+/*Style for download buttons */
+.down{ background-color:#4da6ff; color: white; background-image:none; 
+       min-width: 23vh;  font-size: 14px; padding: 5px 10px; 
+       margin-top: 5px; margin-left: 3px}
+                          
+/* landing page boxes*/
+.landing-page-box { width:100%; height:100%; min-height:23vh; background-color:white;
+                    border: 1px solid #AAAAAA; margin-bottom: 5px; float: left; 
+                    transition: 0.5s ease; position: relative; object-fit: scale-down;}
+                    
+.landing-page-box-about {width:100%; height:100%; min-height:11vh; background-color:white;
+                          border: 1px solid #AAAAAA; margin-bottom: 5px; float: left; 
+                          position: relative; object-fit: scale-down;}
+                          
+.landing-page-box:hover, .landing-page-box-about:hover {-webkit-transform: scale(1.05); 
+                          -ms-transform: scale(1.05); transform: scale(1.05); } /* hover effect on boxes*/ 
+                          
+/*landing page icons */
+.landing-page-icon {width:100%; height:65%; min-height:12vh; background-color: white;
+                     border: 0 ; position: absolute; object-fit: scale-down; }
+
+.landing-page-about-icon {width:100%; height:65%; min-height:5vh; background-color: white;
+                          border: 0; position: absolute; object-fit: scale-down;}
+                          
+/* landing-page titles for boxes*/
+.landing-page-box-title {font-size: 16px; text-align:center; color: darkblue;
+                          font-weight: bold; background-color: none; width:100%; 
+                          max-height: 20px; margin-top: 2vh;}
+                          
+/* landing-page description text of boxes*/
+.landing-page-box-description {font-size: 12px; text-align:center; color: darkblue;
+                          background-color: none; width:100%; max-height: 20px; 
+                          margin-top: 2vh; padding-bottom: 3vh;}
+                          
+/*landing page titles for ABOUT boxes */
+.landing-page-box-about-title { font-size: 16px; text-align:center; color: darkblue;
+                                font-weight: bold; background-color: none; 
+                                width:100%; max-height: 20px; margin-top: 5px; }
+                          
+/* landing page buttons*/
+.landing-page-button { position: absolute; top:0; width: 100%; 
+                        height: 100%; opacity: 0;}
+                          
+/*center image - for normal icons */
+img.center {object-fit: scale-down; position:absolute; width:100%; height:100%; 
+              margin-left:auto; margin-right: auto; display: block; padding:20px;}
+                 
+/* center image - for about icons*/
+img.centerabout {object-fit: scale-down; position:absolute; width:100%; 
+                  height:100%; margin-left:auto; margin-right: auto; 
+                  display: block; padding:8px;}
+                 
+/*landing-page column  */
+.landing-page-column {padding-right:3vh}
+               
+/* landing-page icons*/
+.icon-lp{font-size: 1.3em; padding-right: 4px;}
+               
+/* flextable wrapping text*/
+.tabwid table {white-space: normal;}
+               
+/*External links underlined an open a new tab */
+.externallink{text-decoration: underline;} 
+
+/* Box layout for the indicator definitions tab */
+.definitionbox {width:100%; height:100%; text-align:left ;background-color:white;
+                  border: 2px solid #2FA4E7; padding: 10px; margin-top: 0; 
+                  margin-bottom: 5px; float: left; transition: 0.5s ease; 
+                  position: relative; object-fit: scale-down;}
+        
+        /* END */
+        
