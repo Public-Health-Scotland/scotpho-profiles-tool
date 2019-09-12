@@ -646,9 +646,9 @@ tabPanel("Other profiles", value = "others",
            br()
            ) # mainPanel bracket
            ) #tabPanel bracket
-)# NavbarMenu bracket
-  ), #Bracket  navbarPage
-
+  )# NavbarMenu bracket
+), #Bracket  navbarPage
+div(style = "margin-bottom: 30px;"), # this adds breathing space between content and footer
 ###############################################.             
 ##############Footer----    
 ###############################################.
