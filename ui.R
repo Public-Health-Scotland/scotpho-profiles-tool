@@ -240,7 +240,8 @@ tabPanel("Trend", icon = icon("area-chart"), value = "trend",
                       column(12,
                       shiny::hr(),
                       div(title="Select an indicator to see trend information. Click in this box, hit backspace and start to type if you want to quickly find an indicator.",
-                          selectInput("indic_trend", shiny::HTML("<p>Step 1. Select an indicator <br/> <span style='font-weight: 400'>(hit backspace and start typing to search for an indicator)</span></p>"), choices=indicator_list)),
+                          selectInput("indic_trend", shiny::HTML("<p>Step 1. Select an indicator <br/> <span style='font-weight: 400'>(hit backspace and start typing to search for an indicator)</span></p>"), 
+                                      choices=indicator_list, selected = "Alcohol-related hospital stays")),
                       shiny::hr(),
 div(title="Use the options below to add geographies to the trend chart, remember some indicators may not be available for all geography types. See technical information to find out which geographies indicators are available for.",                      
                           p(tags$b("Step 2. Select areas to plot."),
@@ -288,7 +289,7 @@ tabPanel("Rank", icon = icon("signal"), value = "rank",
                   div(title="Select an indicator to see comparative information. Click in this box, hit backspace and start to type if you want to quickly find an indicator.",
                   selectInput("indic_rank", shiny::HTML("<p>Step 1. Select an indicator <span style='font-weight: 400'> <br/> 
                                                         (hit backspace and start typing to search for an indicator)</span></p>"), 
-                              choices=indicator_list)),
+                              choices=indicator_list, selected = "Alcohol-related hospital stays")),
                   div(title="Use this option to change the type of geography displayed in the chart. 
                       Some indicators are not be available for all geography types. 
                       See the indicator definitions tab to find out which geographies indicators are available for.",

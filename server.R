@@ -1114,8 +1114,8 @@ function(input, output, session) {
   
   
   ###############################################.
-  # disabling controls if no data available for a type of geography
-  
+  # disabling controls if no data available for a type of geography and
+  # changing labels to indicate no data is available
   observeEvent(input$indic_trend, {
     
     trend <- optdata %>% subset(indicator == input$indic_trend) %>% 
@@ -1123,9 +1123,23 @@ function(input, output, session) {
     
     toggleState ("adpname_trend", condition= 
                    "Alcohol & drug partnership" %in%   unique(trend$areatype) )
+    if (!("Alcohol & drug partnership" %in% unique(trend$areatype) ) ) {
+      updateSelectizeInput(session, "adpname_trend", 
+                           label = "Alcohol & drug partnership (no available)")
+    } else {
+      updateSelectizeInput(session, "adpname_trend", 
+                           label = "Alcohol & drug partnership")
+    }
     
     toggleState ("partname_trend", condition= 
                    "HSC partnership" %in%  unique(trend$areatype))
+    if (!("HSC partnership" %in% unique(trend$areatype) ) ) {
+      updateSelectizeInput(session, "partname_trend", 
+                           label = "HSC partnership (no available)")
+    } else {
+      updateSelectizeInput(session, "partname_trend", 
+                           label = "HSC partnership")
+    }
     
     toggleState ("loc_iz_trend", 
                  condition = "Intermediate zone" %in%  unique(trend$areatype) |
@@ -1133,15 +1147,43 @@ function(input, output, session) {
     
     toggleState ("locname_trend", condition= 
                    "HSC locality" %in%  unique(trend$areatype))
+    if (!("HSC locality" %in% unique(trend$areatype) ) ) {
+      updateSelectizeInput(session, "locname_trend", 
+                           label = "HSC locality (no available)")
+    } else {
+      updateSelectizeInput(session, "locname_trend", 
+                           label = "HSC locality")
+    }
     
     toggleState ("izname_trend", condition= 
                    "Intermediate zone" %in%  unique(trend$areatype)) 
+    if (!("Intermediate zone" %in% unique(trend$areatype) ) ) {
+      updateSelectizeInput(session, "izname_trend", 
+                           label = "Intermediate zone (no available)")
+    } else {
+      updateSelectizeInput(session, "izname_trend", 
+                           label = "Intermediate zone")
+    }
     
     toggleState("caname_trend",
                 condition = ("Council area" %in%  unique(trend$areatype)))
+    if (!("Council area" %in% unique(trend$areatype) ) ) {
+      updateSelectizeInput(session, "caname_trend", 
+                           label = "Council area (no available)")
+    } else {
+      updateSelectizeInput(session, "caname_trend", 
+                           label = "Council area")
+    }
     
     toggleState("hbname_trend",
                 condition = ("Health board" %in%  unique(trend$areatype)))
+    if (!("Health board" %in% unique(trend$areatype) ) ) {
+      updateSelectizeInput(session, "hbname_trend", 
+                           label = "Health board (no available)")
+    } else {
+      updateSelectizeInput(session, "hbname_trend", 
+                           label = "Health board")
+    }
     
     # Disabling numerator/rate radio buttons if no numerator available
     toggleState("var_plot_trend",
@@ -1313,6 +1355,15 @@ function(input, output, session) {
   ###############################################.   
   #####################.
   # Reactive controls - used for the map as well.
+  ## Remember the selected samples
+  # creates reactive values to remember user selection of the geography level
+  # so it only changes when the user changes it on purpose
+  georank_chosen <- reactiveValues(value_geo = "Health board")
+  observeEvent(input$geotype_rank, 
+               isolate({ georank_chosen$value_geo <- input$geotype_rank})
+  )
+  
+  
   #Dropdown for time period based on indicator selection  
   output$year_ui_rank <- renderUI({
     time_period <- sort(unique(optdata$trend_axis[optdata$indicator == input$indic_rank&
@@ -1327,7 +1378,7 @@ function(input, output, session) {
     areas <- sort(unique(optdata$areatype[optdata$indicator == input$indic_rank]))
     areas <- areas [! areas %in% c("Scotland")] #taking out Scotland
     selectInput("geotype_rank", label = "Step 2. Select a geography level",
-                choices = areas, selected = "Health board")
+                choices = areas, selected = georank_chosen$value_geo)
   })
   
   # Years to compare with depending on what data is available
