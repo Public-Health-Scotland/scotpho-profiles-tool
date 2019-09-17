@@ -493,8 +493,9 @@ navbarMenu("Info", icon = icon("info-circle"),
            tabPanel("Indicator definitions", value = "definitions",
                     #Sidepanel for filtering data
                     fluidRow(style = "width:60%; margin-left: 2%; min-width: 350px",
-                             h3("Indicator definitions and technical information"),
-                             h5("ScotPHO Profiles are made up of a collection of indicators related to a specific theme 
+                             h4("Indicator definitions and technical information", style = "color:black;"),
+                             h5(style = "color:black", 
+                                "ScotPHO Profiles are made up of a collection of indicators related to a specific theme 
                                 e.g. 'Alcohol' or 'Drugs'. Profiles are further divided into topic areas to group similar indicators together. 
                                  This page allows users to see available indicators and geographies as well as finding detailed technical information 
                                   about how incidators are created."),
