@@ -487,9 +487,9 @@ navbarMenu("Info", icon = icon("info-circle"),
                                 "and we will be happy to help.")),
                     br()
            ),#Tab panel
-           # ###############################################.
-           # ## Definitions navbar ----
-           # ###############################################.
+###############################################.
+## Definitions navbar ----
+###############################################.
            tabPanel("Indicator definitions", value = "definitions",
                     #Sidepanel for filtering data
                     fluidRow(style = "width:60%; margin-left: 2%; min-width: 350px",

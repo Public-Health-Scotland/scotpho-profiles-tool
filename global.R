@@ -99,7 +99,7 @@ sum_ui <- function(title, plot_name) {
 ind_def_box <- function(label, text_output) {
   div(class="definitionbox",
       p(paste(label), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-      h5(textOutput(text_output)))
+      h5(style = "color: black", textOutput(text_output)))
 }
 
 #Creating big boxes for main tabs in the landing page (see ui for formatting css)

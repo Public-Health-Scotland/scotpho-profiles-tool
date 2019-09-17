@@ -21,8 +21,7 @@ function(input, output, session) {
              p(h5("Recent indicator updates include:", 
                   style = "width: 90%; text-align: left; font-weight: bold; "))),
       column(12, #tells to display indicators updated within 60 days
-             tags$h5(HTML(paste(indicators_updated, 
-                                collapse='<br>')))
+             tags$h5(HTML(paste(indicators_updated, collapse='<br>')))
       )),
     br(),
     p(tags$h5("To find out when an indicator is due to be updated please refer to our ", 
@@ -33,7 +32,6 @@ function(input, output, session) {
               tags$a(href="mailto:ScotPHO@nhs.net", "ScotPHO@nhs.net", class="externallink"), 
               style = "width: 700px")),
     br(),
-    modalButton("Exit", icon("times-circle")),
     size = "l", align= "center",
     easyClose = TRUE, fade=TRUE, footer = modalButton("Close (Esc)")
   )
@@ -2268,6 +2266,7 @@ function(input, output, session) {
         align_text_col(align = "left") %>%
         color(i = 1, color = "white", part = "header") %>% # format text colour of header to identify profile 
         bg(i=1,bg="#007ba7",part="header") %>%  # format background colour of header to identify profile
+        fontsize(size = 14, part = "all") %>% 
         autofit() %>%
         htmltools_value()
       } else { #table all indicators (ie "show all") profiles selected - additional column for profile(s)
@@ -2282,6 +2281,7 @@ function(input, output, session) {
         merge_v(j = ~ profile) %>%
         merge_v(j = ~ domain) %>%
         align_text_col(align = "left") %>%
+        fontsize(size = 14, part = "all") %>% 
         autofit() %>%
         htmltools_value()}
   }
