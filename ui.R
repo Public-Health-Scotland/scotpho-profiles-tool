@@ -167,7 +167,7 @@ tabPanel("Summary", icon = icon("list-ul"), value = "summary",
            column(3,
                   div(title="Compare against another area (e.g. Scotland) or against a previous period to see the evolution of the area",
                   p(tags$b("Step 3. Select to compare by ")),
-                  awesomeRadio("comp_summary", label = "Compare against",
+                  awesomeRadio("comp_summary", label = NULL,
                                choices = list("Area or" = 1, "Time" = 2), 
                                selected = 1, inline=TRUE, checkbox = TRUE),
                   uiOutput("comp_ui_summary")) # comparator options

@@ -173,6 +173,7 @@ areatype_noscot_list <- c("Alcohol & drug partnership", "Council area", "Health 
 #Indicator names
 indicator_list <- sort(unique(optdata$indicator))
 indicator_map_list <- sort(unique(optdata$indicator[optdata$interpret != 'O']))
+indicators_updated <- techdoc %>% filter(days_since_update<60) %>% pull(indicator_name)
 
 #Profile names
 topic_list_filter <- as.factor(c("Show all",unique(sort(c(

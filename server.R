@@ -20,8 +20,8 @@ function(input, output, session) {
              br(),
              p(h5("Recent indicator updates include:", 
                   style = "width: 90%; text-align: left; font-weight: bold; "))),
-      column(12, 
-             tags$h5(HTML(paste(techdoc$indicator_name[techdoc$days_since_update<60], #tells to display indicators updated within 60 days
+      column(12, #tells to display indicators updated within 60 days
+             tags$h5(HTML(paste(indicators_updated, 
                                 collapse='<br>')))
       )),
     br(),
@@ -114,10 +114,10 @@ function(input, output, session) {
         column(6, img(src="help_heatmap1.png"))),
       p(column(6, "Hover over each tile to see indicator definitions and time periods."),
         column(6, img(src="help_heatmap2.png"))), 
-      p("Colours are used to indicate if the value for an indicator is significantly different to the comparator, statistical confidence intervals are used to decide if differences are 'significant'."),
+      p("Colours are used to indicate if the value for an indicator is statistically significantly different to the comparator, statistical confidence intervals are used to decide if differences are 'significant'."),
       h5("Area comparison example:  e.g. comparing 'Area X' against Scotland", style = "font-weight: bold; color: black; margin-bottom: 0px;"),
-      p("In the example below the first row shows an indicator significantly worse than Scotland up to the year 2010 but from 2013 onwards is significantly better than Scotland.
-        The second row is an example of an indicator not significantly different to Scotland for the 4 years up to 2006 but from 2007 significantly worse than Scotland."),
+      p("In the example below the first row shows an indicator statistically significantly worse than Scotland up to the year 2010 but from 2013 onwards is statistically significantly better than Scotland.
+        The second row is an example of an indicator not statistically significantly different to Scotland for the 4 years up to 2006 but from 2007 significantly worse than Scotland."),
       p(img(src="help_heatmap3.png")),      
       h5("Time comparison example: e.g. yearly comparisons of 'Area X' against the value for year 2003", style = "font-weight: bold; color: black; margin-bottom: 0px;"),
       p("Changing the comparison type to a time based comparison can provide differing insights.
@@ -133,7 +133,7 @@ function(input, output, session) {
         p(column(6, p("Select 'Area' to compare one geographical area against another area, or select 'Time' to compare
                  against a baseline year for the same area."),
                     p("Hover over each box to see indicator values and time periods."),
-                    p("Colours are used to indicate if the value for an indicator is significantly different to the comparator, 
+                    p("Colours are used to indicate if the value for an indicator is statistically significantly different to the comparator, 
           statistical confidence intervals are used to decide if differences are 'significant'."),
                     p("The different comparison types (area or time) can be used to provide different insights about the indicators.")),
         column(6, img(src="help_heatmap1.png"),
@@ -319,19 +319,19 @@ function(input, output, session) {
       p("This visualisation shows all the indicators of the profile you
         have chosen. The latest data available for each of them is
         compared against the selected comparator. The colour of the boxes reflects if
-        the differences are significant or not. Hover over the boxes to see the
+        the differences are statistically significant or not. Hover over the boxes to see the
         values for each indicator.")
     } else if (input$chart_summary == "Trend") {
       p("This visualisation shows all the indicators of the profile you
         have chosen. The coloured boxes show comparisons of indicator values for your selected area against the chosen comparator over time. The colour of the boxes reflects if
-        the differences are significant or not. Hover over the boxes to see the
+        the differences are statistically significant or not. Hover over the boxes to see the
         values for each indicator.")
     } else if (input$chart_summary == "Spine") {
       p("This visualisation shows all the indicators of the domain you
         have chosen. The latest data available for each of them is
         compared against the selected comparator. Each bar represents a different area.
         The colour of the square to the left of the bars reflects if
-        the differences are significant or not.")
+        the differences are statistically significant or not.")
     }
   })
    
@@ -577,7 +577,7 @@ function(input, output, session) {
         ggsave(file, plot = plot_spine()+
                ggtitle(label=paste(names(profile_list[unname(profile_list) == input$profile_summary])," profile: ", input$topic_spine,sep=""),
                         subtitle =paste(input$geoname_summary," (",input$geotype_summary,") compared against ",input$geocomp_spine,sep="")),
-               device = "png", scale = 4, limitsize=FALSE)
+               device = "png", width=15, limitsize=FALSE)
       }
     })
   
@@ -1016,17 +1016,27 @@ function(input, output, session) {
   #Create text output for responsive plot legend
   #legend - selected area - green
   output$ui_spine_legend_selected <- renderUI({
-    img(src='spine_legend_selected.jpg', height=18, style="padding-right: 2px; vertical-align:middle",paste(input$geoname_summary,sep = ""))
+    img(src='spine_legend_selected.jpg', height=18, 
+        style="padding-right: 2px; vertical-align:middle",
+        paste0(input$geoname_summary))
   }) 
   
   #legend - comparator - pink
   output$ui_spine_legend_comparator <- renderUI({
-    img(src='spine_legend_comparator.jpg', height=18, style="padding-right: 2px; vertical-align:middle",paste(input$geocomp_spine))
+    img(src='spine_legend_comparator.jpg', height=18, 
+        style="padding-right: 2px; vertical-align:middle",
+        paste(input$geocomp_spine))
   })
   
   #legend - area type - grey bars
   output$ui_spine_legend_areatype <- renderUI({
-    img(src='bar_legend_areatype.jpg', height=18, style="padding-right: 2px; vertical-align:middle",paste(input$geotype_summary))
+    
+    # So it reads ok when user selects Scotland level
+    text_legend <- case_when(input$geotype_summary == "Scotland" ~ "Scotland",
+                             TRUE ~ paste0("Other ", tolower(input$geotype_summary), "s"))
+    
+    img(src='bar_legend_areatype.jpg', height=18, 
+        style="padding-right: 2px; vertical-align:middle", text_legend)
   }) 
 
   #####################.
