@@ -2228,7 +2228,7 @@ function(input, output, session) {
       label_filter <- "Step 2. Select a profile to see indicators included on it (optional)"
       div_title <- "Filter table selecting only indicators available for a specific profile"
     } else if (input$techdoc_selection == "Detailed information about single indicator") {
-      label_filter <- "Step 3. Filter indicator list selecting a single profile (optional)"
+      label_filter <- "Step 3a. Filter indicator list selecting a single profile (optional)"
       div_title <- "Filter indicator list from step 2 selecting only indicators from a specific profile"
     }
     
