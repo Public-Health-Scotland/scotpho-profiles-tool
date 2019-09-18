@@ -2199,9 +2199,7 @@ function(input, output, session) {
   #################################################.
   ##  Technical Doc Page ----
   #################################################.
-  
   #### Techdoc for summary of indicators.
-  
   ## Reactive filter of available geography types based on which profile is selected.
   output$tecdoc_geographies <- renderUI ({
     
@@ -2210,13 +2208,39 @@ function(input, output, session) {
                                      as.character(optdata$areatype[grep(input$profile_picked,optdata$profile_domain2)] ))))
     } else {geo_selection <- areatype_list }
     
-    selectizeInput("techdoc_geotype", label = "Step 3. Select a geography type (optional)",
+    
+    div(title="Filter table selecting only indicators available for a specific geography type", 
+        selectizeInput("techdoc_geotype", 
+                   label = "Step 3. Select a geography type to see indicators available at that level (optional)",
                    width = "100%", choices = c("Show all", geo_selection), 
                    selected = "Show all", multiple=TRUE, 
-                   options = list(placeholder = "Select....", maxItems = 1)) 
+                   options = list(placeholder = "Select....", maxItems = 1))) 
   }) 
   
-  ## Reactive dataset filtered for flextable - four possible combinations of data
+  # observeEvent(input$profile_picked, { 
+  #   if (input$topic_defined != "Show all" && input$profile_picked != "Show all"){ 
+  #     updateSelectizeInput(session,"topic_defined", label = "Or by domain",
+  #                          choices = topic_list_filter, selected = "Show all")}
+  # })
+  
+  output$profile_picked_ui <- renderUI({
+    
+    if (input$techdoc_selection == "List of available indicators") {
+      label_filter <- "Step 2. Select a profile to see indicators included on it (optional)"
+      div_title <- "Filter table selecting only indicators available for a specific profile"
+    } else if (input$techdoc_selection == "Detailed information about single indicator") {
+      label_filter <- "Step 3. Filter indicator list selecting a single profile (optional)"
+      div_title <- "Filter indicator list from step 2 selecting only indicators from a specific profile"
+    }
+    
+    div(title= div_title, 
+        selectizeInput("profile_picked", label = label_filter,
+                       width = "100%",choices = profile_list_filter, 
+                       selected = "Show all", multiple=FALSE))
+  })
+  
+  ###############################################.
+  # Reactive dataset filtered for flextable - four possible combinations of data
   techdoc_indicator_data <- reactive({  
     if (input$profile_picked != "Show all"){ # if a single profile selected
       if(input$techdoc_geotype != "Show all"){ #further filter if user selects a geography type
@@ -2340,7 +2364,8 @@ function(input, output, session) {
                          == input$topic_defined]))
    } else {indic_selection <- indicator_list}
    
-   selectizeInput("indicator_selection", label = "Step 4. Select an indicator for detailed technical information",
+   selectizeInput("indicator_selection", 
+                  label =shiny::HTML("<p>Step 2. Select an indicator for detailed technical information <br/> <span style='font-weight: 400'>(hit backspace and start typing to search for an indicator)</span></p>"),
                   width = "510px", choices = indic_selection, 
                   selected = character(0), multiple=TRUE, 
                   options = list(placeholder = "Make a selection to see information", maxItems = 1)) 

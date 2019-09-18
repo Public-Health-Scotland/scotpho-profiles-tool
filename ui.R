@@ -488,7 +488,7 @@ navbarMenu("Info", icon = icon("info-circle"),
                     br()
            ),#Tab panel
 ###############################################.
-## Definitions navbar ----
+## Indicator definitions ----
 ###############################################.
            tabPanel("Indicator definitions", value = "definitions",
                     #Sidepanel for filtering data
@@ -500,23 +500,28 @@ navbarMenu("Info", icon = icon("info-circle"),
                                  This page allows users to see available indicators and geographies as well as finding detailed technical information 
                                   about how incidators are created."),
                              br(),
-                             radioGroupButtons("techdoc_selection", status = "primary",
-                                               choices = c("List of available indicators", "Detailed information about single indicator"), label= "Step 1. Select what you want to see:" ),
+                             div(title="Choose if you want to see a list of all available indicators or all the details for an specific one",
+                                 radioGroupButtons("techdoc_selection", status = "primary",
+                                               choices = c("List of available indicators", "Detailed information about single indicator"), 
+                                               label= "Step 1. Select what you want to see:" )),
                              br(),
-                             selectizeInput("profile_picked", label = "Step 2. Select a single profile e.g. Health & wellbeing (optional)",
-                                            width = "100%",choices = profile_list_filter, selected = "Show all", multiple=FALSE),
+                             conditionalPanel(condition = 'input.techdoc_selection == "Detailed information about single indicator"',
+                                              uiOutput("indicator_choices"),
+                                              br()
+                             ),
+                             uiOutput("profile_picked_ui"),
                              br(),
                              #conditional panel for profile summary
                              conditionalPanel(condition = 'input.techdoc_selection == "List of available indicators"',
                                               uiOutput("tecdoc_geographies"),
-                                              downloadButton("download_techdoc1_csv",'Download Indicator summary (.csv)', class = "down")),
+                                              downloadButton("download_techdoc1_csv",'Download indicator summary (.csv)', class = "down")),
                              #conditional panel for single indicator
                              conditionalPanel(condition = 'input.techdoc_selection == "Detailed information about single indicator"',
                                               div(style="display:inline-block", 
-                                                  selectizeInput("topic_defined", label = "Step 3. Select a topic within a particular profile (optional)",
+                                                  title="Filter indicator list from step 2 selecting only indicators from a specific domain", 
+                                                  selectizeInput("topic_defined", label = "Step 4. Filter indicator list selecting a domain within a particular profile (optional)",
                                                                  width = "100%", choices = topic_list_filter, 
                                                                  selected = "Show all", multiple=FALSE)),
-                                              uiOutput("indicator_choices"),
                                               downloadButton("download_detailtechdoc_csv",'Download selected definition', class = "down"),
                                               downloadButton("download_alltechdoc_csv",'Download all indicator definitions', class = "down")
                              )),
@@ -618,10 +623,6 @@ tabPanel("Other profiles", value = "others",
            p("There are a number of organisations that provide local information relating to the wider determinants of health in Scotland.
              Below are links to some of alternative profiling products."),
            tags$ul( 
-             #Link to old tool
-             tags$li(class= "li-custom", tags$a(href="https://scotpho.nhsnss.scot.nhs.uk/scotpho/homeAction.do", 
-                                                "Historic ScotPHO profiles",  class="externallink"), 
-                     " - The old style ScotPHO profiles are currently still accessible via our old profile platform"),
              #Link to GCPH
              tags$li(class= "li-custom", tags$a(href="http://www.nssdiscovery.scot.nhs.uk/",
                                                 "NSS Discovery",  class="externallink")), 
