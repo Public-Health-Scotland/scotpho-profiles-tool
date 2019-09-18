@@ -169,20 +169,12 @@ geo_lookup <- readRDS("data/geo_lookup.rds")
 
 ###############################################.
 ## Indicator lookup table 
-ind_lookup_old <- read_csv(paste0(lookups, "indicator_lookup.csv")) %>% 
-  setNames(tolower(names(.))) %>% #variables to lower case
-  select(c(ind_id, indicator, interpret, supression, supress_less_than, 
-           type_id, type_definition, profile_domain1, profile_domain2)) %>% 
-  mutate_if(is.character, factor)  # converting variables into factors
-
-
 #Can't use read_csv as it's not the first tab of the spreadsheet.
 ind_lookup <- gsheet2tbl("docs.google.com/spreadsheets/d/1JOr1_MSnKdQfg4o8qEiqX-EKDsbXUjejnAV4NzbSg78#gid=2036303524") %>% 
   setNames(tolower(names(.))) %>% #variables to lower case
+  select(-label_ineq) %>% 
   mutate_if(is.character, factor)  # converting variables into factors
 
-unique(ind_lookup_old$interpret)
-unique(ind_lookup$interpret)
 ###############################################.
 ## Indicator data ----
 ###############################################.   
