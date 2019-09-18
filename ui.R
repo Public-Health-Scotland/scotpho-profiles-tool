@@ -355,7 +355,7 @@ tabPanel("Data", icon = icon("table"), value = "table",
            fluidRow(
              p("Download the data used in the tool", 
                style = "font-weight: bold; color: black;"),
-             p("Select appropriate conditions to filter data. ",
+             p("Use the filters below to select the data you want to download. ",
                "To delete choices use backspace or select item and delete"),
              br()
            ),
