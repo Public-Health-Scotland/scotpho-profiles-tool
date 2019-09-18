@@ -501,7 +501,7 @@ navbarMenu("Info", icon = icon("info-circle"),
                                  This page allows users to see available indicators and geographies as well as finding detailed technical information 
                                   about how incidators are created."),
                              br(),
-                             div(title="Choose if you want to see a list of all available indicators or all the details for an specific one",
+                             div(title="Choose if you want to see a list of all available indicators or all the details for a specific indicator",
                                  radioGroupButtons("techdoc_selection", status = "primary",
                                                choices = c("List of available indicators", "Detailed information about single indicator"), 
                                                label= "Step 1. Select what you want to see:" )),
