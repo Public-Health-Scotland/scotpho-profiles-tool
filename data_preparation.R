@@ -29,7 +29,8 @@ library(data.table) #reading data
 library(zoo) # dealing with dates
 library(lubridate) #for automated list of dates in welcome modal
 library(janitor) #cleaning names
-library (rgdal) #for reading shapefiles
+library(gsheet) #for reading google sheets
+library(rgdal) #for reading shapefiles
 library(rgeos) #for reducing size of shapefiles
 library(rmapshaper) #for reducing size of shapefiles
 
@@ -168,12 +169,10 @@ geo_lookup <- readRDS("data/geo_lookup.rds")
 
 ###############################################.
 ## Indicator lookup table 
-ind_lookup<- read_csv(paste0(lookups, "indicator_lookup.csv")) %>% 
+#Can't use read_csv as it's not the first tab of the spreadsheet.
+ind_lookup <- gsheet2tbl("docs.google.com/spreadsheets/d/1JOr1_MSnKdQfg4o8qEiqX-EKDsbXUjejnAV4NzbSg78#gid=2036303524") %>% 
   setNames(tolower(names(.))) %>% #variables to lower case
-  select(c(ind_id, indicator, interpret, supression, supress_less_than, 
-           type_id, type_definition, profile_domain1, profile_domain2, 
-           # This ones can be deleted once release 2.0 comes out
-           domain1, domain2, domain3)) %>% 
+  select(-label_ineq) %>% 
   mutate_if(is.character, factor)  # converting variables into factors
 
 ###############################################.
