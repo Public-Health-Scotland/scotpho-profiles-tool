@@ -1125,7 +1125,7 @@ function(input, output, session) {
                    "Alcohol & drug partnership" %in%   unique(trend$areatype) )
     if (!("Alcohol & drug partnership" %in% unique(trend$areatype) ) ) {
       updateSelectizeInput(session, "adpname_trend", 
-                           label = "Alcohol & drug partnership (no available)")
+                           label = "Alcohol & drug partnership (not available)")
     } else {
       updateSelectizeInput(session, "adpname_trend", 
                            label = "Alcohol & drug partnership")
@@ -1135,7 +1135,7 @@ function(input, output, session) {
                    "HSC partnership" %in%  unique(trend$areatype))
     if (!("HSC partnership" %in% unique(trend$areatype) ) ) {
       updateSelectizeInput(session, "partname_trend", 
-                           label = "HSC partnership (no available)")
+                           label = "HSC partnership (not available)")
     } else {
       updateSelectizeInput(session, "partname_trend", 
                            label = "HSC partnership")
@@ -1149,7 +1149,7 @@ function(input, output, session) {
                    "HSC locality" %in%  unique(trend$areatype))
     if (!("HSC locality" %in% unique(trend$areatype) ) ) {
       updateSelectizeInput(session, "locname_trend", 
-                           label = "HSC locality (no available)")
+                           label = "HSC locality (not available)")
     } else {
       updateSelectizeInput(session, "locname_trend", 
                            label = "HSC locality")
@@ -1159,7 +1159,7 @@ function(input, output, session) {
                    "Intermediate zone" %in%  unique(trend$areatype)) 
     if (!("Intermediate zone" %in% unique(trend$areatype) ) ) {
       updateSelectizeInput(session, "izname_trend", 
-                           label = "Intermediate zone (no available)")
+                           label = "Intermediate zone (not available)")
     } else {
       updateSelectizeInput(session, "izname_trend", 
                            label = "Intermediate zone")
@@ -1179,7 +1179,7 @@ function(input, output, session) {
                 condition = ("Health board" %in%  unique(trend$areatype)))
     if (!("Health board" %in% unique(trend$areatype) ) ) {
       updateSelectizeInput(session, "hbname_trend", 
-                           label = "Health board (no available)")
+                           label = "Health board (not available)")
     } else {
       updateSelectizeInput(session, "hbname_trend", 
                            label = "Health board")
