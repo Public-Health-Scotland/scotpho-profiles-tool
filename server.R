@@ -2216,12 +2216,6 @@ function(input, output, session) {
                    options = list(placeholder = "Select....", maxItems = 1))) 
   }) 
   
-  # observeEvent(input$profile_picked, { 
-  #   if (input$topic_defined != "Show all" && input$profile_picked != "Show all"){ 
-  #     updateSelectizeInput(session,"topic_defined", label = "Or by domain",
-  #                          choices = topic_list_filter, selected = "Show all")}
-  # })
-  
   output$profile_picked_ui <- renderUI({
     
     if (input$techdoc_selection == "List of available indicators") {
