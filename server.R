@@ -14,20 +14,20 @@ function(input, output, session) {
     fluidRow(
       column(12,
              # text_intro("We are continuously updating and developing our tool"),                 
-             p(tags$div("We are continuously updating and developing our tool", 
+             p(div("We are continuously updating and developing our tool", 
                         style = "color:0E3E5D; font-size:20px; width: 90%; text-align: left; ")),
              br(),
              br(),
              p(h5("Recent indicator updates include:", 
                   style = "width: 90%; text-align: left; font-weight: bold; "))),
       column(12, #tells to display indicators updated within 60 days
-             tags$h5(HTML(paste(indicators_updated, collapse='<br>')))
+             h5(HTML(paste(indicators_updated, collapse='<br>')))
       )),
     br(),
-    p(tags$h5("To find out when an indicator is due to be updated please refer to our ", 
+    p(h5("To find out when an indicator is due to be updated please refer to our ", 
                           tags$a(href="https://docs.google.com/spreadsheets/d/e/2PACX-1vQUQMORMqe9RrMnS9WJSu51Q6ef0rubiF1M-QN3BYZIBueErtTvvbRe_kTZbWmnupiO_Uie80BoZCnK/pubhtml", "updates schedule.", class="externallink"))),
     br(),
-    p(tags$h5("For any further questions or other developments you would like to 
+    p(h5("For any further questions or other developments you would like to 
               suggest for our current tool, please contact us at", 
               tags$a(href="mailto:ScotPHO@nhs.net", "ScotPHO@nhs.net", class="externallink"), 
               style = "width: 700px")),
@@ -1787,7 +1787,7 @@ function(input, output, session) {
         img(src='signif_worse.png', height=12, style="padding-right: 2px; vertical-align:middle"), "Worse than comparator", 
         img(src='signif_nocalc2.png', height=12, style="padding-right: 2px; vertical-align:middle"), "No differences can be calculated")
     } else {
-      p(tags$b("Chart Legend"), br(),
+      p(tags$b("Chart legend"), br(),
         img(src='signif_better.png', height=12, style="padding-right: 2px; vertical-align:middle"),"Better than comparator",
         img(src='non_signif.png', height=12, style="padding-right: 2px; vertical-align:middle"), "Not different to comparator", br(),
         img(src='signif_worse.png', height=12, style="padding-right: 2px; vertical-align:middle"), "Worse than comparator", 
@@ -1822,9 +1822,9 @@ function(input, output, session) {
       choices_selected <- interzone_filtered()
     }
     
-    selectizeInput("iz_true", label = NULL, width = "229px", choices = choices_selected, 
-                   selected = NULL, multiple=TRUE, options = list(maxOptions = 1300, 
-                                                                  placeholder = "Select or type specific intermediate zone"))
+    selectizeInput("iz_true", label = NULL, choices = choices_selected, 
+                   selected = NULL, multiple=TRUE, 
+                   options = list(maxOptions = 1300, placeholder = "Select or type specific intermediate zone"))
   }) 
   
   #Filter HSCL's by parent area
@@ -1834,8 +1834,7 @@ function(input, output, session) {
     } else {  # if a partnership selected reduce the list of localities shown
       choices_selected <- hsclocality_filtered()
     }
-    selectizeInput(
-      "hscl_true", label = NULL, width = "229px", choices = choices_selected, 
+    selectizeInput("hscl_true", label = NULL, choices = choices_selected, 
       selected = NULL, multiple=TRUE, options = 
         list(placeholder = "Select or type specific HSC locality"))
   }) 
@@ -1873,7 +1872,7 @@ function(input, output, session) {
     
     if (input$iz_parent == "Show all"){ 
       selectizeInput(
-        "iz_true", label = NULL, width = "229px", 
+        "iz_true", label = NULL, 
         choices = intzone_name, selected = NULL, multiple=TRUE, options = 
           list(maxOptions = 1300, placeholder = "Select or type specific intermediate zone")) 
     } else {
@@ -1915,7 +1914,7 @@ function(input, output, session) {
     
     if (input$hscl_parent == "Show all"){ 
       selectizeInput(
-        "hscl_true", label = NULL, width = "229px", choices = locality_name, 
+        "hscl_true", label = NULL, choices = locality_name, 
         selected = NULL, multiple=TRUE, options = 
           list(maxOptions = 1300, placeholder = "Select or type specific HSC locality")) 
     } else {
@@ -2365,7 +2364,7 @@ function(input, output, session) {
    } else {indic_selection <- indicator_list}
    
    selectizeInput("indicator_selection", 
-                  label =shiny::HTML("<p>Step 2. Select an indicator for detailed technical information <br/> <span style='font-weight: 400'>(hit backspace and start typing to search for an indicator)</span></p>"),
+                  label = shiny::HTML("<p>Step 2. Select an indicator for detailed technical information <br/> <span style='font-weight: 400'>(hit backspace and start typing to search for an indicator)</span></p>"),
                   width = "510px", choices = indic_selection, 
                   selected = character(0), multiple=TRUE, 
                   options = list(placeholder = "Make a selection to see information", maxItems = 1)) 
@@ -2394,7 +2393,7 @@ function(input, output, session) {
   
   #Text for title of indicator selected
   output$indicator <- renderValueBox({
-        valueBox(tags$p(indicator_selected()$indicator_name, style="color: white; font-size: 30px; font-weight: bold;"), 
+        valueBox(p(indicator_selected()$indicator_name, style="color: white; font-size: 30px; font-weight: bold;"), 
              HTML(paste("<b>","Profile:","</b>",indicator_selected()$profile,br(),
                         "<b>","Domain:","</b>",indicator_selected()$domain)), icon = icon ("book"),color = "blue")
   })

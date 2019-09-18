@@ -353,16 +353,17 @@ tabPanel("Data", icon = icon("table"), value = "table",
            width = 12, style="margin-left:0.5%; margin-right:0.5%",
            #Row 1 for intro  
            fluidRow(
-             p("Filter ScotPHO data by", style = "font-weight: bold; color: black;"),
-             tags$div("Select appropriate conditions to filter data. ",
-                      "To delete choices use RETURN or select item and DELETE"),
+             p("Download the data used in the tool", 
+               style = "font-weight: bold; color: black;"),
+             p("Select appropriate conditions to filter data. ",
+               "To delete choices use backspace or select item and delete"),
              br()
            ),
            #Row 2 for selections
            fluidRow(
              column(3,
-                    p("Profile product", style = "font-weight: bold; color: black;"),  
-                    tags$div("All available indicators will be displayed for
+                    p("Select what data you want", style = "font-weight: bold; color: black;"),  
+                    div("All available indicators will be displayed for
                              selected geography if none specified"),
                     awesomeRadio("product_filter", label=NULL, choices = c("Indicator", "Domain", "Profile"), selected = NULL, inline = FALSE,
                                  status = "primary", checkbox = TRUE),
@@ -384,7 +385,7 @@ tabPanel("Data", icon = icon("table"), value = "table",
                     )
                     ),# column bracket
              column(3,
-                    p("Geography", style = "font-weight: bold; color: black;"),
+                    p("Select what areas you want", style = "font-weight: bold; color: black;"),
                     # Scotland selections
                     awesomeCheckbox("scotland",label = "Scotland", value = FALSE),
                     # Panel for health board selections
@@ -442,17 +443,17 @@ tabPanel("Data", icon = icon("table"), value = "table",
                                    options = list(placeholder = 'Or search by area code'), 
                                    multiple=TRUE, selected = "")
              ), #column bracket
-             column(3,
-                    p("Time period", style = "font-weight: bold; color: black;"),
-                    sliderInput("date_from",label = NULL, min = min_year, max = max_year, value = c(min_year,max_year), 
-                                step = 1, sep="", round = TRUE, ticks = TRUE, dragRange = FALSE),
+             column(3, style = "width:20%",
+                    p("Select the time period", style = "font-weight: bold; color: black;"),
+                    sliderInput("date_from",label = NULL, min = min_year, 
+                                max = max_year, value = c(min_year,max_year), 
+                                step = 1, sep="", round = TRUE, 
+                                ticks = TRUE, dragRange = FALSE),
                     br(),
                     actionButton("clear", label = "Clear all filters",  icon ("eraser"), class = "down"),
-                    downloadButton("download_table_csv", 'Download data', class = "down"),
-                    actionButton("btn2","Guide me around this page")
-             ) #column bracket
+                    downloadButton("download_table_csv", 'Download data', class = "down")             
+                    ) #column bracket
          ), #filters fluid row bracket
-         
          #Row 3- Table
          fluidRow(  
            column(12, div(DT::dataTableOutput("table_filtered"), 
