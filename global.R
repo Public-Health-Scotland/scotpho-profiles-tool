@@ -99,7 +99,7 @@ sum_ui <- function(title, plot_name) {
 ind_def_box <- function(label, text_output) {
   div(class="definitionbox",
       p(paste(label), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-      h5(textOutput(text_output)))
+      h5(style = "color: black", textOutput(text_output)))
 }
 
 #Creating big boxes for main tabs in the landing page (see ui for formatting css)
@@ -173,6 +173,7 @@ areatype_noscot_list <- c("Alcohol & drug partnership", "Council area", "Health 
 #Indicator names
 indicator_list <- sort(unique(optdata$indicator))
 indicator_map_list <- sort(unique(optdata$indicator[optdata$interpret != 'O']))
+indicators_updated <- techdoc %>% filter(days_since_update<60) %>% pull(indicator_name)
 
 #Profile names
 topic_list_filter <- as.factor(c("Show all",unique(sort(c(
