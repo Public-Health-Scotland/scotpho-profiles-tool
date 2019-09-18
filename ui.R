@@ -573,8 +573,8 @@ navbarMenu("Info", icon = icon("info-circle"),
                         carry out similar analysis to ours"),
                       tags$ul( 
                         #Link to user guide
-                        tags$li(class= "li-custom", tags$a(href="https://www.scotpho.org.uk/media/1691/scotpho-profiles-quick-reference-guide-sep2018.docx", 
-                                                           "User guide",  class="externallink"), 
+                        tags$li(class= "li-custom", tags$a(href="https://www.scotpho.org.uk/media/1880/scotpho-profiles-quick-reference-guide-sep2019.docx", 
+                                                           "User quick reference guide",  class="externallink"), 
                                 " - Learn how to use and get the most out of the tool"),
                         #Link to overview reports
                         tags$li(class= "li-custom", tags$a(href="http://www.scotpho.org.uk/comparative-health/profiles/resources/",
