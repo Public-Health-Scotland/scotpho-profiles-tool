@@ -173,6 +173,7 @@ geo_lookup <- readRDS("data/geo_lookup.rds")
 ind_lookup <- gsheet2tbl("docs.google.com/spreadsheets/d/1JOr1_MSnKdQfg4o8qEiqX-EKDsbXUjejnAV4NzbSg78#gid=2036303524") %>% 
   setNames(tolower(names(.))) %>% #variables to lower case
   select(-label_ineq) %>% 
+  mutate(ind_id =as.numeric(ind_id)) %>% 
   mutate_if(is.character, factor)  # converting variables into factors
 
 ###############################################.
