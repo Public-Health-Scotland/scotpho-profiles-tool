@@ -39,11 +39,10 @@ function(input, output, session) {
   observeEvent(input$btn_indicator_updates, { showModal(updates_modal) }) # Link action button click to modal launch 
   
   ## IntroJS allow switching between tabs----
-  observeEvent(input$btn_landing, {
-    introjs(session,
-            events = list(onbeforechange = readCallback("switchTabs")))
-  })
-  
+  # observeEvent(input$btn_landing, {
+  #   introjs(session,
+  #           events = list(onbeforechange = readCallback("switchTabs")))
+  # })
   
   ###############################################.
   ## Landing page ----
@@ -87,6 +86,11 @@ function(input, output, session) {
   
   observeEvent(input$jump_to_others, {
     updateTabsetPanel(session, "intabset", selected = "others")
+  })
+  
+  # Temporary until rintroJS fixed
+  observeEvent(input$btn_landing, {
+    updateTabsetPanel(session, "intabset", selected = "tour")
   })
  
   ###############################################.

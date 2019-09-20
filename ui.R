@@ -40,7 +40,7 @@ tabPanel(
                               social care partnerships."),
                              br(),
                              h5("There are different ways to navigate around the tool."),
-                             h5("Different visualisation can be opened using the menu bar ('the blue strip') at the top of the screen"),
+                             h5("Different visualisations can be opened using the menu bar ('the blue strip') at the top of the screen."),
                              img(src='introjs_tabset_panel.PNG',width=300),
                              br(),
                              h5("The 'Home' option in the menu bar will return to the profiles tool home page."),
@@ -615,6 +615,65 @@ navbarMenu("Info", icon = icon("info-circle"),
 ###############################################. 
 tabPanel(a("Evidence for action", href="https://www.scotpho.org.uk/comparative-health/profiles/resources/evidence-for-action/", target="_blank")
 ), #tabPanel bracket
+###############################################.             
+############## Tour of the tool----    
+###############################################.
+tabPanel("Tour of the tool", value = "tour",
+         mainPanel(width=11,
+                   fluidRow(p(h4("Welcome to the ScotPHO Profiles Tool"),
+                     h5("This interactive tool provides access to a range of public
+              health related indicators at different geographies including NHS boards, council areas and health and
+              social care partnerships."),
+                     h5("There are different ways to navigate around the tool."),
+                     h5("Different visualisations can be opened using the menu bar ('the blue strip') at the top of the screen."),
+                     img(src='introjs_tabset_panel.PNG',width=300),
+                     br(),
+                     h5("The 'Home' option in the menu bar will return to the profiles tool home page."),
+                     style = "font-size:20px")),
+                   hr(),
+                   fluidRow(column(6,
+                          h5("The profile summary allows you to look at multiple indicators within an area at the same time.",
+                             style = "color:black;")),
+                   column(6, img(src='tour_summary1.PNG'))),
+                   hr(),
+                   fluidRow(column(3,
+                          h5("The trend and rank charts allow detailed exploration of one indicator at a time.",
+                             style = "color:black;")),
+                   column(9, img(src='tour_trendrank1.PNG'))),
+                   hr(),
+                   fluidRow(p(h5("Throughout the tool use the dropdown menus to change which indicators or geographies are displayed in the charts."),
+                     img(src='tour_summary2.png', style = "vertical-align: middle; border-style: solid; border-color: black; border-width: 1px"),
+                     column(6, h5("While using dropdown menus mouse click within a dropdown menu and press backspace on your keyboard ('<-') then start typing a word to quickly find the options you are looking for",
+                                  style = "color:black;")),
+                     column(6, img(src='introjs_how_to_select.png')))),
+                   hr(),
+                   br(),
+                   fluidRow(column(8,
+                          p(h5("Throughout the tool look out for options in each window that provide",
+                               style = "color:black;"),
+                            tags$ul( tags$li("indicator defintions or help to interpret a visualisation,"),
+                            tags$li("data download data options for individual charts,"),
+                            tags$li("image downloads for individual charts.")))),
+                   column(4, img(src='tour_rankmap2.PNG'))),
+                   hr(),
+                   br(),
+                   fluidRow(column(6,
+                          h5("The 'Data' window can be used to filter and download profiles data.",
+                             style = "color:black;")),
+                   column(6, img(src='tour_data1.PNG'))),
+                   hr(),
+                   br(),
+                   fluidRow(column(6,
+                          h5("The inequalities module allows exploration of deprivation affects a selection of indicators from the main profiles tool.",
+                             style = "color:black;")),
+                   column(6, img(src='tour_ineq1.png'))),
+                   hr(),
+                   br(),
+                   fluidRow(h5("There are also options to find out information such as detailed descriptions of the profile indicators, indicator update schedules and links to evidence for action briefings.",
+                               style = "color:black;"),
+                   img(src='tour_about1.PNG', width="100%"))
+         )#main panel bracket
+), #tab panel bracket
 ###############################################.             
 ##############Other profiles----    
 ###############################################.
