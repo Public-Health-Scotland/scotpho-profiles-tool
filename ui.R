@@ -619,7 +619,8 @@ tabPanel(a("Evidence for action", href="https://www.scotpho.org.uk/comparative-h
 ############## Tour of the tool----    
 ###############################################.
 tabPanel("Tour of the tool", value = "tour",
-         mainPanel(width=11,
+         sidebarPanel(width=1),
+         mainPanel(width=10,
                    fluidRow(p(h4("Welcome to the ScotPHO Profiles Tool"),
                      h5("This interactive tool provides access to a range of public
               health related indicators at different geographies including NHS boards, council areas and health and
