@@ -328,6 +328,7 @@ writeOGR(ca_bound_orig, dsn=shapefiles, "CA_simpl_2019", driver="ESRI Shapefile"
 #Saving as rds as it is much faster to read
 names(ca_bound_orig@data)[names(ca_bound_orig@data)=="local_auth"] <- "area_name"
 
+saveRDS(ca_bound_orig, paste0(shapefiles, "CA_boundary.rds"))
 saveRDS(ca_bound_orig, "data/CA_boundary.rds")
 
 ##########################.
@@ -349,6 +350,7 @@ writeOGR(hb_bound_orig, dsn=shapefiles, "HB_simpl_2019", driver="ESRI Shapefile"
 names(hb_bound_orig@data)[names(hb_bound_orig@data)=="hbcode"] <- "code"
 names(hb_bound_orig@data)[names(hb_bound_orig@data)=="hbname"] <- "area_name"
 
+saveRDS(hb_bound_orig, paste0(shapefiles, "HB_boundary.rds"))
 saveRDS(hb_bound_orig, "data/HB_boundary.rds")
 
 ##########################.
@@ -372,6 +374,7 @@ writeOGR(hscp_bound_orig, dsn=shapefiles, "HSCP_simpl_2019",
 names(hscp_bound_orig@data)[names(hscp_bound_orig@data)=="hiacode"] <- "code"
 names(hscp_bound_orig@data)[names(hscp_bound_orig@data)=="hianame"] <- "area_name"
 
+saveRDS(hscp_bound_orig, paste0(shapefiles, "HSCP_boundary.rds"))
 saveRDS(hscp_bound_orig, "data/HSCP_boundary.rds")
 hscp_bound <- readRDS("data/HSCP_boundary.rds")
 
@@ -386,6 +389,7 @@ iz_bound_orig$council <- gsub(" and ", " & ", iz_bound_orig$council)
 iz_bound_orig$council <- gsub("Edinburgh", "City of Edinburgh", iz_bound_orig$council)
 iz_bound_orig$council <- gsub("Eilean Siar", "Na h-Eileanan Siar", iz_bound_orig$council)
 
+saveRDS(iz_bound_orig, paste0(shapefiles, "IZ_boundary.rds"))
 saveRDS(iz_bound_orig, "data/IZ_boundary.rds")
 iz_bound <- readRDS("data/IZ_boundary.rds")
 
