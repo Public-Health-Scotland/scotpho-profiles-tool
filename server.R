@@ -5,6 +5,11 @@
 
 ## Define a server for the Shiny app
 function(input, output, session) {
+  ###############################################.
+  ## Deprivation ----
+  ###############################################.
+  # Sourcing file with server code
+  source(file.path("server_ineq.R"),  local = TRUE)$value
  
   ################################################################.
   #    Modal ----
@@ -62,10 +67,10 @@ function(input, output, session) {
     updateTabsetPanel(session, "intabset", selected = "rank")
   })
   
-  # observeEvent(input$jump_to_simd, {
-  #   updateTabsetPanel(session, "intabset", selected = "simd")
-  # })
-  # 
+  observeEvent(input$jump_to_ineq, {
+    updateTabsetPanel(session, "intabset", selected = "ineq")
+  })
+
   observeEvent(input$jump_to_table, {
     updateTabsetPanel(session, "intabset", selected = "table")
   })
