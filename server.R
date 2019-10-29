@@ -660,7 +660,7 @@ function(input, output, session) {
                  textfont = list(color='black'), hoverinfo="skip" ) %>%
         layout(yaxis = axis_layout, xaxis = axis_layout,
                margin = list(b= 10 , t=5, l = 5, r = 0),
-               font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif')) %>% # to get hover compare mode as default
+               font = font_plots) %>% # to get hover compare mode as default
         config(displayModeBar = FALSE, displaylogo = F)
     }
   }
@@ -774,7 +774,7 @@ function(input, output, session) {
         # margins needed as long labels don't work well with Plotly
         layout(margin = list(l = 400, t = 50, b =0),
                xaxis = list(side = 'top', fixedrange=TRUE), yaxis= list(fixedrange=TRUE),
-               font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif')) %>%
+               font = font_plots) %>%
         config(displayModeBar = FALSE, displaylogo = F) # taking out plotly logo 
     }
   }
@@ -1326,7 +1326,7 @@ function(input, output, session) {
                yaxis = list(title = trend_type(), rangemode="tozero", fixedrange=TRUE,
                             size = 4, titlefont =list(size=14), tickfont =list(size=14)),
                xaxis = list(title = FALSE, tickfont =list(size=14), tickangle = 270, fixedrange=TRUE),
-               font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif'),
+               font = font_plots,
                showlegend = TRUE,
                legend = list(orientation = 'h', x = 0, y = 1.18)) %>%  #legend on top
         config(displayModeBar = FALSE, displaylogo = F) # taking out plotly logo button
@@ -1651,7 +1651,7 @@ function(input, output, session) {
                                           tickfont =list(size=13), #axis parameters
                                           categoryorder="array", #order of plotting
                                           categoryarray = order_areas),
-                             font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif'),
+                             font = font_plots,
                              margin=list(b = 180, t = 5), # to prevent labels getting cut out
                              hovermode = 'false') %>% # to get hover compare mode as default
           config(displayModeBar = FALSE, displaylogo = F)
@@ -1677,7 +1677,7 @@ function(input, output, session) {
                               tickfont =list(size=13), #axis parameters
                               categoryorder="array", #order of plotting
                               categoryarray = rev(order_areas)),
-                 font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif'),
+                 font = font_plots,
                  margin=list(l = 170, t=40)) %>%  # to prevent labels getting cut out
           config(displayModeBar = FALSE, displaylogo = F)
         
