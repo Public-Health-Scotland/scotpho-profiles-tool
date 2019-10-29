@@ -35,6 +35,50 @@ library(rgeos) #for reducing size of shapefiles
 library(rmapshaper) #for reducing size of shapefiles
 
 ###############################################.
+## Functions ----
+###############################################.
+
+# If indicator is presented as standardised rate and suppression required
+# then suppress numerator where count is less than specified value.
+# standardised rates do not require suppression of rates or CI.
+# If indicator is presented as crude rate or percentage and suppression required
+# then suppress numerator where count is less than specified value.
+# crude rate and percentages DO require suppression of rates and CI as well as numerator.
+apply_supressions <- function(dataset) {
+  dataset <- dataset %>%
+    mutate(numerator = case_when(#std rate case
+      supression=="Y" & substr(type_id,1,2)=='sr' & numerator<supress_less_than ~ NA_real_,
+      # crude rate and percentage cases
+      supression =="Y" & (substr(type_id,1,2)=='cr' | (substr(type_id,1,1))=='%') &
+        numerator<supress_less_than ~ NA_real_, TRUE ~ numerator ), #if not keep numerator
+      measure = case_when(# crude rate and percentage cases
+        supression =="Y" & (substr(type_id,1,2)=='cr' | (substr(type_id,1,1))=='%') &
+          numerator<supress_less_than ~ NA_real_, TRUE ~ measure ),
+      lowci =case_when(# crude rate and percentage cases
+        supression =="Y" & (substr(type_id,1,2)=='cr' | (substr(type_id,1,1))=='%') &
+          numerator<supress_less_than ~ NA_real_, TRUE ~ lowci ),
+      upci =case_when(# crude rate and percentage cases
+        supression =="Y" & (substr(type_id,1,2)=='cr' | (substr(type_id,1,1))=='%') &
+          numerator<supress_less_than ~ NA_real_, TRUE ~ upci )
+    )
+}
+
+# This functions reads Andy's HSC inequality data and formats it the way we need to be joined
+# with the rest of the deprivation data
+prepare_andyp_data <- function(filename, indic_id) {
+  overall_data <- read_csv(paste0("data/", filename, ".csv")) %>% 
+    mutate(code = paste0(substr(code, 1, 3), "0", substr(code, 5, 9)),
+           quintile = recode(as.character(quintile), "0" = "Total"),
+           quint_type = case_when(substr(code, 1, 3) == "S08" ~ "hb_quin",
+                                  substr(code, 1, 3) == "S12" ~ "ca_quin",
+                                  substr(code, 1, 3) == "S00" ~ "sc_quin"),
+           ind_id=indic_id) %>%
+    rename(measure = rate) %>% 
+    select (-code2)
+  
+}
+
+###############################################.
 ## Technical document ----
 ###############################################.
 #This code updates the Technical Document table based on an online Google Drive version of the table
@@ -249,28 +293,7 @@ optdata <- left_join(x=optdata, y=ind_lookup, by="ind_id")
 optdata <- left_join(x=optdata, y=geo_lookup, by="code") 
 
 #Apply supressions.
-# If indicator is presented as standardised rate and suppression required
-# then suppress numerator where count is less than specified value.
-# standardised rates do not require suppression of rates or CI.
-# If indicator is presented as crude rate or percentage and suppression required
-# then suppress numerator where count is less than specified value.
-# crude rate and percentages DO require suppression of rates and CI as well as numerator.
-optdata <- optdata %>%
-  mutate(numerator = case_when(#std rate case
-    supression=="Y" & substr(type_id,1,2)=='sr' & numerator<supress_less_than ~ NA_real_,
-    # crude rate and percentage cases
-    supression =="Y" & (substr(type_id,1,2)=='cr' | (substr(type_id,1,1))=='%') &
-      numerator<supress_less_than ~ NA_real_, TRUE ~ numerator ), #if not keep numerator
-    measure = case_when(# crude rate and percentage cases
-      supression =="Y" & (substr(type_id,1,2)=='cr' | (substr(type_id,1,1))=='%') &
-        numerator<supress_less_than ~ NA_real_, TRUE ~ measure ),
-    lowci =case_when(# crude rate and percentage cases
-      supression =="Y" & (substr(type_id,1,2)=='cr' | (substr(type_id,1,1))=='%') &
-        numerator<supress_less_than ~ NA_real_, TRUE ~ lowci ),
-    upci =case_when(# crude rate and percentage cases
-      supression =="Y" & (substr(type_id,1,2)=='cr' | (substr(type_id,1,1))=='%') &
-        numerator<supress_less_than ~ NA_real_, TRUE ~ upci )
-  )
+optdata <- optdata %>% apply_supressions()
 
 # Scaling measures (0 to 1) in groups by year, area type and indicator.
 optdata <- optdata %>% group_by(ind_id, year, areatype) %>%
@@ -312,20 +335,6 @@ profile_lookup <- readRDS("data/profile_lookup.rds")
 ###############################################.
 ###############################################.
 ## Preparing Andy's indicators data
-.# This functions reads Andy's data and formats it the way we need to be joined
-# with the rest of the data
-prepare_andyp_data <- function(filename, indic_id) {
-  overall_data <- read_csv(paste0("data/", filename, ".csv")) %>% 
-    mutate(code = paste0(substr(code, 1, 3), "0", substr(code, 5, 9)),
-           quintile = recode(as.character(quintile), "0" = "Total"),
-           quint_type = case_when(substr(code, 1, 3) == "S08" ~ "hb_quin",
-                                  substr(code, 1, 3) == "S12" ~ "ca_quin",
-                                  substr(code, 1, 3) == "S00" ~ "sc_quin"),
-           ind_id=indic_id) %>%
-    rename(measure = rate) %>% 
-    select (-code2)
-  
-}
 
 andyp_data <- rbind( # merging together all indicators
   prepare_andyp_data("04_prev_hosp_sii_rii_opt", 4),
@@ -364,21 +373,7 @@ data_depr <- left_join(x=data_depr, y=geo_lookup, by="code") %>%
                            "5" = "5 - least deprived")) %>% 
   droplevels()
 
-#Apply supressions. 
-# If indicator is presented as standardised rate and suppression required then suppress numerator where count is less than specified value.
-# standardised rates do not require suppression of rates or CI.
-# If indicator is presented as crude rate or percentage and suppression required then suppress numerator where count is less than specified value.
-# crude rate and percentages DO require suppression of rates and CI as well as numerator.
-data_depr <- data_depr %>% 
-  mutate(numerator = case_when(supression == "Y" & numerator < supress_less_than ~ NA_real_,
-                               TRUE  ~ numerator),
-         measure = case_when(supression == "Y" & (substr(type_id,1,2)=='cr' | (substr(type_id,1,1))=='%') &
-                               numerator<supress_less_than ~ NA_real_, TRUE  ~ measure),
-         lowci = case_when(supression == "Y" & (substr(type_id,1,2)=='cr' | (substr(type_id,1,1))=='%') &
-                             numerator<supress_less_than ~ NA_real_, TRUE  ~ lowci),
-         upci = case_when(supression == "Y" & (substr(type_id,1,2)=='cr' | (substr(type_id,1,1))=='%') &
-                            numerator<supress_less_than ~ NA_real_, TRUE  ~ upci)) %>% 
-  select(-supression, -supress_less_than, -type_id)
+data_depr <- data_depr %>% apply_supressions() #Apply supressions. 
 
 #selecting out indicators where higher is better as app doesn't work with them
 data_depr <- data_depr %>% 
