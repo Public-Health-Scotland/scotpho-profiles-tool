@@ -1308,6 +1308,10 @@ function(input, output, session) {
       trend_scale <- c(setNames(trend_palette, unique(trend_data()$areaname_full)[1:trend_length]))
       trend_col <- trend_scale[1:trend_length]
       
+      #Modifying standard layout
+      yaxis_plots[["title"]] <- trend_type()
+      
+      
       # Same approach for symbols
       symbols_palette <-  c('circle', 'diamond', 'circle', 'diamond', 'circle', 'diamond',
                             'square','triangle-up', 'square','triangle-up', 'square','triangle-up')
@@ -1328,10 +1332,7 @@ function(input, output, session) {
         #Layout 
         layout(annotations = list(), #It needs this because of a buggy behaviour of Plotly
                margin = list(b = 160, t=5), #to avoid labels getting cut out
-               yaxis = list(title = trend_type(), rangemode="tozero", fixedrange=TRUE,
-                            size = 4, titlefont =list(size=14), tickfont =list(size=14)),
-               xaxis = list(title = FALSE, tickfont =list(size=14), tickangle = 270, fixedrange=TRUE),
-               font = font_plots,
+               yaxis = yaxis_plots, xaxis = xaxis_plots, font = font_plots,
                showlegend = TRUE,
                legend = list(orientation = 'h', x = 0, y = 1.18)) %>%  #legend on top
         config(displayModeBar = FALSE, displaylogo = F) # taking out plotly logo button
