@@ -5,7 +5,7 @@
 
 ## Define a server for the Shiny app
 function(input, output, session) {
- 
+
   ################################################################.
   #    Modal ----
   ################################################################.
@@ -1587,24 +1587,17 @@ function(input, output, session) {
         no_ind <- length(unique(rank_bar_data()$areaname))
         height_plot <- no_ind * 25 + 70
       }
-      
+       
       #Coloring based on if signicantly different from comparator
-      color_pal <- case_when(
-        rank_bar_data()$interpret == "O" ~ '#999966',
-        is.na(rank_bar_data()$lowci) | is.na(rank_bar_data()$upci) | 
-          is.na(rank_bar_data()$comp_value) | is.na(rank_bar_data()$measure) |
-          rank_bar_data()$measure == 0 ~ '#999966',
-        rank_bar_data()$lowci <= rank_bar_data()$comp_value & 
-          rank_bar_data()$upci >= rank_bar_data()$comp_value ~'#cccccc',
-        rank_bar_data()$lowci > rank_bar_data()$comp_value & 
-          rank_bar_data()$interpret == "H" ~ '#4da6ff',
-        rank_bar_data()$lowci > rank_bar_data()$comp_value & 
-          rank_bar_data()$interpret == "L" ~ '#ffa64d',
-        rank_bar_data()$upci < rank_bar_data()$comp_value & 
-          rank_bar_data()$interpret == "L" ~ '#4da6ff',
-        rank_bar_data()$upci < rank_bar_data()$comp_value & 
-          rank_bar_data()$interpret == "H" ~ '#ffa64d', 
-        TRUE ~ '#ccccff')
+      rank_bar_data <- rank_bar_data() %>% 
+        mutate(color_pal = case_when(interpret == "O" ~ '#999966',
+        is.na(lowci) | is.na(upci) | is.na(comp_value) | is.na(measure) |measure == 0 ~ '#999966',
+        lowci <= comp_value & upci >= comp_value ~'#cccccc',
+        lowci > comp_value & interpret == "H" ~ '#4da6ff',
+        lowci > comp_value & interpret == "L" ~ '#ffa64d',
+        upci < comp_value & interpret == "L" ~ '#4da6ff',
+        upci < comp_value & interpret == "H" ~ '#ffa64d', 
+        TRUE ~ '#ccccff'))
       
       # Text for tooltip - one for each type of chart
       tooltip_bar <-c(paste0(rank_bar_data()$areaname, ": ", rank_bar_data()$measure, "<br>",
@@ -1620,7 +1613,7 @@ function(input, output, session) {
       ###############################################.
       # Starting the plot 
       # General plot and layout, bars with or without error bars will be added after user input
-      rank_plot <- plot_ly(data = rank_bar_data(), height = height_plot) 
+      rank_plot <- plot_ly(data = rank_bar_data, height = height_plot) 
       
       if (input$comp_rank == 1) {
         #Comparator line
@@ -1632,13 +1625,13 @@ function(input, output, session) {
         if (input$ci_rank == FALSE) {  
           #adding bar layer without confidence intervals
           rank_plot <- rank_plot %>% add_bars(x = ~areaname, y = ~ measure, text=tooltip_bar, hoverinfo="text",
-                                              marker = list(color = color_pal))
+                                              marker = list(color = ~color_pal))
           
         }
         else { 
           #adding bar layer with error bars
           rank_plot <- rank_plot %>% add_bars(x = ~areaname,y = ~ measure, text=tooltip_bar, hoverinfo="text",
-                                              marker = list(color = color_pal), 
+                                              marker = list(color = ~color_pal), 
                                               error_y = list(type = "data",color='#000000',
                                                              symmetric = FALSE, array = ~upci_diff, arrayminus = ~lowci_diff)) 
         }
@@ -1666,8 +1659,8 @@ function(input, output, session) {
                     type = 'scatter', mode = 'markers', showlegend = FALSE, 
                     marker = list(color = 'black', size = 10), text=tooltip_dumbbell, hoverinfo="text") %>% 
           # value of the area in the selected period
-          add_trace(y = ~areaname, x = ~measure, name = ~unique(areaname), type = 'scatter', mode = 'markers',
-                    marker = list(color = color_pal, size = 10,
+          add_trace(y = ~areaname, x = ~measure, type = 'scatter', mode = 'markers',
+                    marker = list(color = ~color_pal, size = 10,
                                   line = list(color = 'gray', width = 2)), 
                     showlegend = FALSE, text=tooltip_dumbbell, hoverinfo="text") %>% 
           # Adding layout
