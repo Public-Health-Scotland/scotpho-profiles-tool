@@ -35,15 +35,15 @@ if (is.null(suppressMessages(webshot:::find_phantom()))) {
 ###############################################.  
 # Selects the variables of interest and renames them so csv downloads are 
 # more user friendly
-format_csv <- function(reactive_dataset) {
+format_csv <- function(reactive_dataset, extra_vars = NULL ) {
   
   techdoc <- techdoc %>%
     select(indicator_name, data_source)
-  
+ 
   left_join(reactive_dataset, techdoc, by = c("indicator" = "indicator_name")) %>%
-    select(c(indicator, areaname, code, areatype, year, def_period, numerator, measure, 
-             lowci, upci, type_definition, data_source)) %>% 
-    rename(lower_confidence_interval=lowci, upper_confidence_interval=upci, 
+    select_at(c("indicator", "areaname", "code", "areatype", "year", "def_period", "numerator", "measure",
+                "lowci", "upci", extra_vars, "type_definition", "data_source")) %>%
+    rename(lower_confidence_interval=lowci, upper_confidence_interval=upci,
            period = def_period, definition = type_definition, area_code=code, area_name=areaname,area_type=areatype)
 }
 
