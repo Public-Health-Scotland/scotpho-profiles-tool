@@ -7,12 +7,10 @@
 ############################.
 if (sessionInfo()$platform %in% c("x86_64-redhat-linux-gnu (64-bit)", "x86_64-pc-linux-gnu (64-bit)")) {  
   lookups <- "/PHI_conf/ScotPHO/Profiles/Data/Lookups/"
-  basefiles <- "/conf/phip/Projects/Profiles/Data/Scotland Localities/"
   shapefiles <- "/PHI_conf/ScotPHO/Profiles/Data/Shapefiles/"
   shiny_files <- "/PHI_conf/ScotPHO/Profiles/Data/Shiny Data/"
 } else  {
   lookups <- "//stats/ScotPHO/Profiles/Data/Lookups/"
-  basefiles <- "//stats/phip/Projects/Profiles/Data/Scotland Localities/"
   shapefiles <- "//stats/ScotPHO/Profiles/Data/Shapefiles/"
   shiny_files <- "//stats/ScotPHO/Profiles/Data/Shiny Data/"
 }
@@ -204,7 +202,7 @@ optdata %>% select(ind_id, file_name) %>% unique %>% group_by(ind_id) %>%
   add_tally() %>% filter(n >1) %>% View()
 
 # Bringing data created by SPSS code extracting from database
-data_spss <- read_csv(paste0(basefiles, "All Data for Shiny.csv"),
+data_spss <- read_csv(paste0(shiny_files, "All Data for Shiny.csv"),
                       col_types = cols(NUMERATOR = col_number())) %>%
   setNames(tolower(names(.)))%>% #names to lower case
   rename(ind_id = indicator_id, code = geography_code) %>% 
