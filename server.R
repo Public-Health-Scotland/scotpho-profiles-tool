@@ -518,7 +518,9 @@ observeEvent(input$browser, browser())
   # Downloading data
   summary_csv <- reactive({ 
     if (input$chart_summary == "Snapshot") {
-      format_csv(snapshot_data())
+      format_csv(snapshot_data(), extra_vars = "comp_m") %>%
+        mutate(comparator_name = case_when(input$comp_summary == 1 ~ paste0(input$geocomp_summary),
+                                           input$comp_summary == 2 ~ paste0(input$yearcomp_summary)))
     } else if (input$chart_summary == "Trend") {
       format_csv(summary_data(), extra_vars = "comp_m") %>% 
         mutate(comparator_name = case_when(input$comp_summary == 1 ~ paste0(input$geocomp_summary),
