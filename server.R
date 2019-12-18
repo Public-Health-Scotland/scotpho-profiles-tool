@@ -5,7 +5,6 @@
 
 ## Define a server for the Shiny app
 function(input, output, session) {
-observeEvent(input$browser, browser())
   ################################################################.
   #    Modal ----
   ################################################################.
