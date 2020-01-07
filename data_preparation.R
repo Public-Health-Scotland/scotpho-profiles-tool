@@ -337,7 +337,10 @@ profile_lookup <- readRDS("data/profile_lookup.rds")
 ## Preparing Andy's indicators data
 
 andyp_data <- rbind( # merging together all indicators
+  prepare_andyp_data("01_pc_access_sii_rii_opt", 1),
   prepare_andyp_data("04_prev_hosp_sii_rii_opt", 4),
+  prepare_andyp_data("05_rep_hosp_sii_rii_opt", 5),
+  prepare_andyp_data("06_dying_hosp_sii_rii_opt", 6),
   prepare_andyp_data("07_hc_amenable_mort_3-year aggregate_sii_rii_opt", 7),
   prepare_andyp_data("08_prem_mort_3-year aggregate_sii_rii_opt", 8)
 )
@@ -382,7 +385,7 @@ data_depr <- data_depr %>%
                             "Healthy birth weight",
                             "Bowel screening uptake",
                             "Single adult dwellings",
-                            "Immunisation uptake at 24 months - 5 in 1",
+                            "Immunisation uptake at 24 months - 6 in 1",
                             "Immunisation uptake at 24 months - MMR",
                             "Teenage pregnancies"))) %>% droplevels()
 
