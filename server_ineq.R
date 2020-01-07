@@ -99,14 +99,16 @@
   #Disabling quintile option for those created for HSC report
   # better approach will be list of these indicators with no scquintile
   # disable but also update so selection is local.!("sc_quin" %in% simd_quint_data()$quint_type)
+  # Patients GP are only calculated for Scotland quintiles
   observeEvent(input$indic_simd, {
-    if (input$indic_simd %in% c("Preventable emergency hospitalisation for a chronic condition",
-                                "Repeat emergency hospitalisation in the same year",
-                                "Mortality amenable to health care",                            
-                                "All-cause premature mortality")) {
+    if (input$indic_simd %in% ind_hsc_list) {
       disable("quint_type" )
       
       updateSelectizeInput(session, "quint_type", selected = "Local")
+    } else if(input$indic_simd == "Patients per general practitioner") {
+      disable("quint_type" )
+      
+      updateSelectizeInput(session, "quint_type", selected = "Scotland")
     } else if (input$geotype_simd == "Scotland") {
       disable("quint_type" )
     } else {
@@ -115,14 +117,14 @@
   })
   
   observeEvent(input$geotype_simd, {
-    if (input$indic_simd %in% c("Preventable emergency hospitalisation for a chronic condition",
-                                "Repeat emergency hospitalisation in the same year",
-                                "Mortality amenable to health care",                            
-                                "All-cause premature mortality")) {
+    if (input$indic_simd %in% ind_hsc_list) {
       disable("quint_type" )
       
       updateSelectizeInput(session, "quint_type", selected = "Local")
+    } else if(input$indic_simd == "Patients per general practitioner") {
+      disable("quint_type" )
       
+      updateSelectizeInput(session, "quint_type", selected = "Scotland")
     } else if (input$geotype_simd == "Scotland") {
       disable("quint_type" )
     } else {

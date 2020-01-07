@@ -178,6 +178,12 @@ indicator_list <- sort(unique(optdata$indicator))
 indicator_map_list <- sort(unique(optdata$indicator[optdata$interpret != 'O']))
 indicators_updated <- techdoc %>% filter(days_since_update<60) %>% pull(indicator_name)
 ind_depr_list <- sort(unique(depr_data$indicator)) #list of indicators
+# Hsc deprivation indicators
+ind_hsc_list <- c("Preventable emergency hospitalisation for a chronic condition",
+                  "Repeat emergency hospitalisation in the same year",
+                  "Mortality amenable to health care",                            
+                  "All-cause premature mortality",
+                  "Dying in hospital", "Mortality amenable to health care")
 
 #Profile names
 topic_list_filter <- as.factor(c("Show all",unique(sort(c(
