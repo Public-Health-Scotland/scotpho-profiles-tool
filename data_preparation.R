@@ -231,6 +231,8 @@ saveRDS(optdata, "/PHI_conf/ScotPHO/Profiles/Data/shiny_tool_backup_data.rds")
 
 #Finds all the csv files in the shiny folder
 files <-  list.files(path = shiny_files, pattern = "*.csv", full.names = TRUE)
+# taking out spss/old opt data
+files <- files[files != "/PHI_conf/ScotPHO/Profiles/Data/Shiny Data//All Data for Shiny.csv"] 
 # To check dates of update of each file and who did it
 View(file.info(files,  extra_cols = TRUE))
 
@@ -342,8 +344,10 @@ andyp_data <- rbind( # merging together all indicators
   prepare_andyp_data("05_rep_hosp_sii_rii_opt", 5),
   prepare_andyp_data("06_dying_hosp_sii_rii_opt", 6),
   prepare_andyp_data("07_hc_amenable_mort_3-year aggregate_sii_rii_opt", 7),
-  prepare_andyp_data("08_prem_mort_3-year aggregate_sii_rii_opt", 8)
-)
+  prepare_andyp_data("08_prem_mort_3-year aggregate_sii_rii_opt", 8)) %>% 
+  # patients by gp is all scotland simd
+  mutate(quint_type = case_when(ind_id ==1  ~ "sc_quin", 
+                                TRUE ~ quint_type))
 
 ###############################################.
 ## Rest of the data
