@@ -5,7 +5,6 @@
 
 ## Define a server for the Shiny app
 function(input, output, session) {
-
   ################################################################.
   #    Modal ----
   ################################################################.
@@ -303,10 +302,10 @@ function(input, output, session) {
   })
   
   output$summary_subtitle <- renderText({
-    if(input$comp_summary == 1){
+    if(input$comp_summary == 1){ #if areacomparator selected
       paste0(input$geoname_summary," (",input$geotype_summary,") compared against ",
              input$geocomp_summary)
-    } else if(input$comp_summary==2){
+    } else if(input$comp_summary==2){#if time comparison selected
       paste0("Changes within ",input$geoname_summary,": latest data available",
              " compared to ", input$yearcomp_summary)
     }
@@ -518,9 +517,15 @@ function(input, output, session) {
   # Downloading data
   summary_csv <- reactive({ 
     if (input$chart_summary == "Snapshot") {
-      format_csv(snapshot_data())
+      format_csv(snapshot_data(), extra_vars = "comp_m") %>%
+        mutate(comparator_name = case_when(input$comp_summary == 1 ~ paste0(input$geocomp_summary),
+                                           input$comp_summary == 2 ~ paste0(input$yearcomp_summary))) %>%
+        rename("comparator_value" = "comp_m")
     } else if (input$chart_summary == "Trend") {
-      format_csv(summary_data())
+      format_csv(summary_data(), extra_vars = "comp_m") %>% 
+        mutate(comparator_name = case_when(input$comp_summary == 1 ~ paste0(input$geocomp_summary),
+                                           input$comp_summary == 2 ~ paste0(input$yearcomp_summary))) %>% 
+        rename("comparator_value" = "comp_m")
     } else if (input$chart_summary == "Spine") {
       spine_csv()
     }
@@ -1683,7 +1688,8 @@ function(input, output, session) {
   
   ###############################################.
   #Downloading data
-  rank_csv <- reactive({ format_csv(rank_bar_data()) })
+  rank_csv <- reactive({ format_csv(rank_bar_data(), extra_vars = c("comp_value", "comp_name")) %>%
+      rename("comparator_value" = "comp_value", "comparator_name" = "comp_name") })
   
   output$download_rank <- downloadHandler(filename =  'rank_data.csv',
                                           content = function(file) {write.csv(rank_csv(), file, row.names=FALSE) })
