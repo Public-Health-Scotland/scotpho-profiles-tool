@@ -5,12 +5,13 @@
 
 ## Define a server for the Shiny app
 function(input, output, session) {
+
   ###############################################.
   ## Deprivation ----
   ###############################################.
   # Sourcing file with server code
   source(file.path("server_ineq.R"),  local = TRUE)$value
- 
+
   ################################################################.
   #    Modal ----
   ################################################################.
@@ -308,10 +309,10 @@ function(input, output, session) {
   })
   
   output$summary_subtitle <- renderText({
-    if(input$comp_summary == 1){
+    if(input$comp_summary == 1){ #if areacomparator selected
       paste0(input$geoname_summary," (",input$geotype_summary,") compared against ",
              input$geocomp_summary)
-    } else if(input$comp_summary==2){
+    } else if(input$comp_summary==2){#if time comparison selected
       paste0("Changes within ",input$geoname_summary,": latest data available",
              " compared to ", input$yearcomp_summary)
     }
@@ -523,9 +524,15 @@ function(input, output, session) {
   # Downloading data
   summary_csv <- reactive({ 
     if (input$chart_summary == "Snapshot") {
-      format_csv(snapshot_data())
+      format_csv(snapshot_data(), extra_vars = "comp_m") %>%
+        mutate(comparator_name = case_when(input$comp_summary == 1 ~ paste0(input$geocomp_summary),
+                                           input$comp_summary == 2 ~ paste0(input$yearcomp_summary))) %>%
+        rename("comparator_value" = "comp_m")
     } else if (input$chart_summary == "Trend") {
-      format_csv(summary_data())
+      format_csv(summary_data(), extra_vars = "comp_m") %>% 
+        mutate(comparator_name = case_when(input$comp_summary == 1 ~ paste0(input$geocomp_summary),
+                                           input$comp_summary == 2 ~ paste0(input$yearcomp_summary))) %>% 
+        rename("comparator_value" = "comp_m")
     } else if (input$chart_summary == "Spine") {
       spine_csv()
     }
@@ -1593,24 +1600,17 @@ function(input, output, session) {
         no_ind <- length(unique(rank_bar_data()$areaname))
         height_plot <- no_ind * 25 + 70
       }
-      
+       
       #Coloring based on if signicantly different from comparator
-      color_pal <- case_when(
-        rank_bar_data()$interpret == "O" ~ '#999966',
-        is.na(rank_bar_data()$lowci) | is.na(rank_bar_data()$upci) | 
-          is.na(rank_bar_data()$comp_value) | is.na(rank_bar_data()$measure) |
-          rank_bar_data()$measure == 0 ~ '#999966',
-        rank_bar_data()$lowci <= rank_bar_data()$comp_value & 
-          rank_bar_data()$upci >= rank_bar_data()$comp_value ~'#cccccc',
-        rank_bar_data()$lowci > rank_bar_data()$comp_value & 
-          rank_bar_data()$interpret == "H" ~ '#4da6ff',
-        rank_bar_data()$lowci > rank_bar_data()$comp_value & 
-          rank_bar_data()$interpret == "L" ~ '#ffa64d',
-        rank_bar_data()$upci < rank_bar_data()$comp_value & 
-          rank_bar_data()$interpret == "L" ~ '#4da6ff',
-        rank_bar_data()$upci < rank_bar_data()$comp_value & 
-          rank_bar_data()$interpret == "H" ~ '#ffa64d', 
-        TRUE ~ '#ccccff')
+      rank_bar_data <- rank_bar_data() %>% 
+        mutate(color_pal = case_when(interpret == "O" ~ '#999966',
+        is.na(lowci) | is.na(upci) | is.na(comp_value) | is.na(measure) |measure == 0 ~ '#999966',
+        lowci <= comp_value & upci >= comp_value ~'#cccccc',
+        lowci > comp_value & interpret == "H" ~ '#4da6ff',
+        lowci > comp_value & interpret == "L" ~ '#ffa64d',
+        upci < comp_value & interpret == "L" ~ '#4da6ff',
+        upci < comp_value & interpret == "H" ~ '#ffa64d', 
+        TRUE ~ '#ccccff'))
       
       # Text for tooltip - one for each type of chart
       tooltip_bar <-c(paste0(rank_bar_data()$areaname, ": ", rank_bar_data()$measure, "<br>",
@@ -1626,7 +1626,7 @@ function(input, output, session) {
       ###############################################.
       # Starting the plot 
       # General plot and layout, bars with or without error bars will be added after user input
-      rank_plot <- plot_ly(data = rank_bar_data(), height = height_plot) 
+      rank_plot <- plot_ly(data = rank_bar_data, height = height_plot) 
       
       if (input$comp_rank == 1) {
         #Comparator line
@@ -1638,13 +1638,13 @@ function(input, output, session) {
         if (input$ci_rank == FALSE) {  
           #adding bar layer without confidence intervals
           rank_plot <- rank_plot %>% add_bars(x = ~areaname, y = ~ measure, text=tooltip_bar, hoverinfo="text",
-                                              marker = list(color = color_pal))
+                                              marker = list(color = ~color_pal))
           
         }
         else { 
           #adding bar layer with error bars
           rank_plot <- rank_plot %>% add_bars(x = ~areaname,y = ~ measure, text=tooltip_bar, hoverinfo="text",
-                                              marker = list(color = color_pal), 
+                                              marker = list(color = ~color_pal), 
                                               error_y = list(type = "data",color='#000000',
                                                              symmetric = FALSE, array = ~upci_diff, arrayminus = ~lowci_diff)) 
         }
@@ -1672,8 +1672,8 @@ function(input, output, session) {
                     type = 'scatter', mode = 'markers', showlegend = FALSE, 
                     marker = list(color = 'black', size = 10), text=tooltip_dumbbell, hoverinfo="text") %>% 
           # value of the area in the selected period
-          add_trace(y = ~areaname, x = ~measure, name = ~unique(areaname), type = 'scatter', mode = 'markers',
-                    marker = list(color = color_pal, size = 10,
+          add_trace(y = ~areaname, x = ~measure, type = 'scatter', mode = 'markers',
+                    marker = list(color = ~color_pal, size = 10,
                                   line = list(color = 'gray', width = 2)), 
                     showlegend = FALSE, text=tooltip_dumbbell, hoverinfo="text") %>% 
           # Adding layout
@@ -1696,7 +1696,8 @@ function(input, output, session) {
   
   ###############################################.
   #Downloading data
-  rank_csv <- reactive({ format_csv(rank_bar_data()) })
+  rank_csv <- reactive({ format_csv(rank_bar_data(), extra_vars = c("comp_value", "comp_name")) %>%
+      rename("comparator_value" = "comp_value", "comparator_name" = "comp_name") })
   
   output$download_rank <- downloadHandler(filename =  'rank_data.csv',
                                           content = function(file) {write.csv(rank_csv(), file, row.names=FALSE) })
