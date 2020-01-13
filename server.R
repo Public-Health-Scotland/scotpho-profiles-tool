@@ -1739,6 +1739,9 @@ function(input, output, session) {
       map_pol <- sp::merge(hb_bound, rank_bar_data(), by='code')
     } else if(input$geotype_rank == "HSC partnership"){
       map_pol <- sp::merge(hscp_bound, rank_bar_data(), by='code')
+    } else if(input$geotype_rank == "HSC locality"){
+      map_pol <- sp::merge(hscloc_bound, rank_bar_data(), by='code')
+      map_pol <- map_pol %>% subset(parent_area == input$loc_iz_rank)
     } else if(input$geotype_rank == "Intermediate zone"){
       map_pol <- sp::merge(iz_bound, rank_bar_data(), by='code')
       map_pol <- map_pol %>% subset(parent_area == input$loc_iz_rank)

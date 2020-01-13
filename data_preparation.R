@@ -33,6 +33,7 @@ library(gsheet) #for reading google sheets
 library(rgdal) #for reading shapefiles
 library(rgeos) #for reducing size of shapefiles
 library(rmapshaper) #for reducing size of shapefiles
+library(maptools) #for dissolving dzs shp into localities
 
 ###############################################.
 ## Functions ----
@@ -475,6 +476,46 @@ names(hscp_bound_orig@data)[names(hscp_bound_orig@data)=="hianame"] <- "area_nam
 saveRDS(hscp_bound_orig, paste0(shapefiles, "HSCP_boundary.rds"))
 saveRDS(hscp_bound_orig, "data/HSCP_boundary.rds")
 hscp_bound <- readRDS("data/HSCP_boundary.rds")
+
+###############################################.
+# HSC locality
+# Based on datazones 2011, so for some partnerships it might not fit their 'official'
+# boundaries. Boundaries can be found in the SG website too
+dz11_shp <-readOGR('/conf/linkage/output/lookups/Unicode/Geography/Shapefiles/Data Zones 2011/', 
+                   "SG_DataZone_Bdry_2011") %>% 
+  setNames(tolower(names(.))) #variables to lower case
+
+# Transforming projection
+dz11_shp <- spTransform(dz11_shp,  CRS("+ellps=WGS84 +proj=longlat +datum=WGS84 +no_defs"))
+
+# Bringing lookup dz to locality
+loc_look <- readRDS(paste0(lookups, 'Geography/DataZone11_HSCLocality_Lookup.rds'))
+
+#merge with locality look up
+dz11_shp@data <- left_join(dz11_shp@data, loc_look, by=c("datazone" = "datazone2011"))
+
+#Dissolve datazone boundaries to crate locality boundaries
+locality_shp <- unionSpatialPolygons(dz11_shp, dz11_shp$hscplocality)
+
+# Adding a data slot to the shp with names and code.
+loc_look <- loc_look %>% select(-datazone2011) %>% unique() %>%  #one row per locality
+  rename(area_name = hscplocality, code = hscp_locality)
+rownames(loc_look)  <- loc_look$area_name #need this to match with the shp
+
+#Merging data with shapefile
+locality_shp <- SpatialPolygonsDataFrame(locality_shp, loc_look)
+
+# Simplifying shp to make it small
+locality_shp <- locality_shp %>% rmapshaper::ms_simplify(keep=0.0050, keep_shapes = T)
+
+#Saving the simplified shapefile.
+writeOGR(locality_shp, dsn=shapefiles, "HSC_locality_simpl_2019", 
+         driver="ESRI Shapefile", overwrite_layer=TRUE, verbose=TRUE,
+         morphToESRI=TRUE)
+
+saveRDS(locality_shp, paste0(shapefiles, "HSC_locality_boundary.rds"))
+saveRDS(locality_shp, "data/HSC_locality_boundary.rds")
+hscloc_bound <- readRDS("data/HSC_locality_boundary.rds")
 
 ##########################.
 ###Intermediate zone

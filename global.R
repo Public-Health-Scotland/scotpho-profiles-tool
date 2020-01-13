@@ -141,6 +141,7 @@ profile_lookup <- readRDS("data/profile_lookup.rds") #profile lookup
 ca_bound<-readRDS("data/CA_boundary.rds") #Council area 
 hb_bound<-readRDS("data/HB_boundary.rds") #Health board
 hscp_bound <- readRDS("data/HSCP_boundary.rds") #HSC Partnerships
+hscloc_bound <- readRDS("data/HSC_locality_boundary.rds") #HSC localities
 iz_bound <- readRDS("data/IZ_boundary.rds") #Intermediate zone
 
 ###############################################.
