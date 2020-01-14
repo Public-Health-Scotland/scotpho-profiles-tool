@@ -95,7 +95,7 @@ definition_table <- definition_table %>%
 saveRDS(definition_table,"data/techdoc.rds") #for opt
 techdoc <- readRDS("data/techdoc.rds")
 #backup copy in case issues with google drive
-write_csv(definition_table,"/PHI_conf/ScotPHO/Profiles/Shiny Tool/techdoc_backup.csv")
+write_csv(definition_table, paste0("/PHI_conf/ScotPHO/Profiles/Data/Backups/techdoc_backup_", today() ,".csv"))
 
 ###############################################.
 ## Lookups ---- 
@@ -213,6 +213,7 @@ geo_lookup <- readRDS("data/geo_lookup.rds")
 ###############################################.
 ## Indicator lookup table 
 #Can't use read_csv as it's not the first tab of the spreadsheet.
+# For some reason, it's important that the raw tab is alphabetically sorted for this to work properly
 ind_lookup <- gsheet2tbl("docs.google.com/spreadsheets/d/1JOr1_MSnKdQfg4o8qEiqX-EKDsbXUjejnAV4NzbSg78#gid=2036303524") %>% 
   setNames(tolower(names(.))) %>% #variables to lower case
   mutate(ind_id =as.numeric(ind_id)) %>% 
@@ -226,7 +227,7 @@ ind_lookup <- gsheet2tbl("docs.google.com/spreadsheets/d/1JOr1_MSnKdQfg4o8qEiqX-
 
 #Start creating a backup of the old file 
 optdata <- readRDS("data/optdata.rds")
-saveRDS(optdata, "/PHI_conf/ScotPHO/Profiles/Data/shiny_tool_backup_data.rds")
+saveRDS(optdata, paste0("/PHI_conf/ScotPHO/Profiles/Data/Backups/shiny_tool_backup_data_", today() ,".rds"))
 
 #Finds all the csv files in the shiny folder
 files <-  list.files(path = shiny_files, pattern = "*.csv", full.names = TRUE)
@@ -291,6 +292,9 @@ optdata <- optdata %>% filter(!(ind_id %in% c("20205", "20403", "20204", "20402"
 
 #Merging with indicator and geography information
 optdata <- left_join(x=optdata, y=ind_lookup, by="ind_id") 
+# if for some reason some indicators haven't matched with the lookup this will show them
+View(optdata %>% filter(is.na(indicator)))
+
 optdata <- left_join(x=optdata, y=geo_lookup, by="code") 
 
 #Apply supressions.
