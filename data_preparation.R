@@ -65,7 +65,7 @@ apply_supressions <- function(dataset) {
 # This functions reads Andy's HSC inequality data and formats it the way we need to be joined
 # with the rest of the deprivation data
 prepare_andyp_data <- function(filename, indic_id) {
-  overall_data <- read_csv(paste0("data/", filename, ".csv")) %>% 
+  overall_data <- read_csv(paste0(shiny_files, "Inequalities HSC Data/", filename, ".csv")) %>% 
     mutate(code = paste0(substr(code, 1, 3), "0", substr(code, 5, 9)),
            quintile = recode(as.character(quintile), "0" = "Total"),
            quint_type = case_when(substr(code, 1, 3) == "S08" ~ "hb_quin",
