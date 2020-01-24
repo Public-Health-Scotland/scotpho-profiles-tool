@@ -358,9 +358,8 @@ tabPanel("Inequalities", icon = icon("balance-scale"), value = "ineq",
                           style = "margin-top: 10px; margin-bottom: 20px;", 
                           radioGroupButtons("measure_simd", 
                                             label= "Step 4 - Select what aspect of inequality you want to explore.", 
-                                            choices = measure_types, status = "primary",
-                                            justified = TRUE#, 
-                                            # checkIcon = list(yes = icon("ok", lib = "glyphicon"))
+                                            choices = depr_measure_types, status = "primary",
+                                            justified = TRUE
                           )),
                       awesomeCheckbox("ci_simd", label = "Show/hide 95% confidence intervals", value = F),
                       tags$div(title="Select if you want to use local or national quintiles", # tooltip

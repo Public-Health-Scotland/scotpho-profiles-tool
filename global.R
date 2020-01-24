@@ -195,7 +195,7 @@ topic_list_filter <- as.factor(c("Show all",unique(sort(c(
   substr(optdata$profile_domain1, 5, nchar(as.vector(optdata$profile_domain1))), 
   substr(optdata$profile_domain2, 5, nchar(as.vector(optdata$profile_domain2)))))))) 
 
-measure_types <- c("Trend", "Gap", "Risk") #list of measure types
+depr_measure_types <- c("Trend", "Gap", "Risk") #list of measure types
 
 topic_list <- topic_list_filter[-1] #taking out show all from list
 
