@@ -7,7 +7,7 @@
 function(input, output, session) {
 
   ###############################################.
-  ## Deprivation ----
+  ## Health Inequalities (deprivation tab) ----
   ###############################################.
   # Sourcing file with server code
   source(file.path("server_ineq.R"),  local = TRUE)$value
