@@ -5,6 +5,13 @@
 
 ## Define a server for the Shiny app
 function(input, output, session) {
+
+  ###############################################.
+  ## Health Inequalities (deprivation tab) ----
+  ###############################################.
+  # Sourcing file with server code
+  source(file.path("server_ineq.R"),  local = TRUE)$value
+
   ################################################################.
   #    Modal ----
   ################################################################.
@@ -61,10 +68,10 @@ function(input, output, session) {
     updateTabsetPanel(session, "intabset", selected = "rank")
   })
   
-  # observeEvent(input$jump_to_simd, {
-  #   updateTabsetPanel(session, "intabset", selected = "simd")
-  # })
-  # 
+  observeEvent(input$jump_to_ineq, {
+    updateTabsetPanel(session, "intabset", selected = "ineq")
+  })
+
   observeEvent(input$jump_to_table, {
     updateTabsetPanel(session, "intabset", selected = "table")
   })
@@ -665,7 +672,7 @@ function(input, output, session) {
                  textfont = list(color='black'), hoverinfo="skip" ) %>%
         layout(yaxis = axis_layout, xaxis = axis_layout,
                margin = list(b= 10 , t=5, l = 5, r = 0),
-               font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif')) %>% # to get hover compare mode as default
+               font = font_plots) %>% # to get hover compare mode as default
         config(displayModeBar = FALSE, displaylogo = F)
     }
   }
@@ -779,7 +786,7 @@ function(input, output, session) {
         # margins needed as long labels don't work well with Plotly
         layout(margin = list(l = 400, t = 50, b =0),
                xaxis = list(side = 'top', fixedrange=TRUE), yaxis= list(fixedrange=TRUE),
-               font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif')) %>%
+               font = font_plots) %>%
         config(displayModeBar = FALSE, displaylogo = F) # taking out plotly logo 
     }
   }
@@ -1308,6 +1315,10 @@ function(input, output, session) {
       trend_scale <- c(setNames(trend_palette, unique(trend_data()$areaname_full)[1:trend_length]))
       trend_col <- trend_scale[1:trend_length]
       
+      #Modifying standard layout
+      yaxis_plots[["title"]] <- trend_type()
+      
+      
       # Same approach for symbols
       symbols_palette <-  c('circle', 'diamond', 'circle', 'diamond', 'circle', 'diamond',
                             'square','triangle-up', 'square','triangle-up', 'square','triangle-up')
@@ -1328,10 +1339,7 @@ function(input, output, session) {
         #Layout 
         layout(annotations = list(), #It needs this because of a buggy behaviour of Plotly
                margin = list(b = 160, t=5), #to avoid labels getting cut out
-               yaxis = list(title = trend_type(), rangemode="tozero", fixedrange=TRUE,
-                            size = 4, titlefont =list(size=14), tickfont =list(size=14)),
-               xaxis = list(title = FALSE, tickfont =list(size=14), tickangle = 270, fixedrange=TRUE),
-               font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif'),
+               yaxis = yaxis_plots, xaxis = xaxis_plots, font = font_plots,
                showlegend = TRUE,
                legend = list(orientation = 'h', x = 0, y = 1.18)) %>%  #legend on top
         config(displayModeBar = FALSE, displaylogo = F) # taking out plotly logo button
@@ -1649,7 +1657,7 @@ function(input, output, session) {
                                           tickfont =list(size=13), #axis parameters
                                           categoryorder="array", #order of plotting
                                           categoryarray = order_areas),
-                             font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif'),
+                             font = font_plots,
                              margin=list(b = 180, t = 5), # to prevent labels getting cut out
                              hovermode = 'false') %>% # to get hover compare mode as default
           config(displayModeBar = FALSE, displaylogo = F)
@@ -1675,7 +1683,7 @@ function(input, output, session) {
                               tickfont =list(size=13), #axis parameters
                               categoryorder="array", #order of plotting
                               categoryarray = rev(order_areas)),
-                 font = list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif'),
+                 font = font_plots,
                  margin=list(l = 170, t=40)) %>%  # to prevent labels getting cut out
           config(displayModeBar = FALSE, displaylogo = F)
         
@@ -1732,6 +1740,9 @@ function(input, output, session) {
       map_pol <- sp::merge(hb_bound, rank_bar_data(), by='code')
     } else if(input$geotype_rank == "HSC partnership"){
       map_pol <- sp::merge(hscp_bound, rank_bar_data(), by='code')
+    } else if(input$geotype_rank == "HSC locality"){
+      map_pol <- sp::merge(hscloc_bound, rank_bar_data(), by='code')
+      map_pol <- map_pol %>% subset(parent_area == input$loc_iz_rank)
     } else if(input$geotype_rank == "Intermediate zone"){
       map_pol <- sp::merge(iz_bound, rank_bar_data(), by='code')
       map_pol <- map_pol %>% subset(parent_area == input$loc_iz_rank)

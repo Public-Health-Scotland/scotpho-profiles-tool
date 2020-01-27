@@ -15,6 +15,7 @@ library(leaflet) #javascript maps
 library(plotly) #interactive graphs
 library(shinyWidgets) # for extra widgets
 library(tibble) # rownames to column in techdoc
+library(shinyBS) #modals
 library(shinyjs)
 library(shinydashboard) #for valuebox on techdoc tab
 library(sp)
@@ -134,6 +135,7 @@ lp_about_box <- function(title_box, image_name, button_name, description) {
 ## Data ----
 ###############################################.    
 optdata <- readRDS("data/optdata.rds") #main dataset
+depr_data <- readRDS("data/deprivation_data.rds") #deprivation/inequalities dataset
 techdoc <- readRDS("data/techdoc.rds") #technical documents data including definitions
 
 geo_lookup <- readRDS("data/geo_lookup.rds") #geography lookup
@@ -143,6 +145,7 @@ profile_lookup <- readRDS("data/profile_lookup.rds") #profile lookup
 ca_bound<-readRDS("data/CA_boundary.rds") #Council area 
 hb_bound<-readRDS("data/HB_boundary.rds") #Health board
 hscp_bound <- readRDS("data/HSCP_boundary.rds") #HSC Partnerships
+hscloc_bound <- readRDS("data/HSC_locality_boundary.rds") #HSC localities
 iz_bound <- readRDS("data/IZ_boundary.rds") #Intermediate zone
 
 ###############################################.
@@ -173,16 +176,26 @@ areatype_list <- c("Alcohol & drug partnership", "Council area", "Health board",
                    "HSC locality", "HSC partnership",  "Intermediate zone", "Scotland")
 areatype_noscot_list <- c("Alcohol & drug partnership", "Council area", "Health board",  
                           "HSC locality", "HSC partnership",  "Intermediate zone")
+areatype_depr_list <- c("Scotland", "Health board", "Council area") #for deprivation tab
 
 #Indicator names
 indicator_list <- sort(unique(optdata$indicator))
 indicator_map_list <- sort(unique(optdata$indicator[optdata$interpret != 'O']))
 indicators_updated <- techdoc %>% filter(days_since_update<60) %>% pull(indicator_name)
+ind_depr_list <- sort(unique(depr_data$indicator)) #list of indicators
+# Hsc deprivation indicators
+ind_hsc_list <- c("Preventable emergency hospitalisation for a chronic condition",
+                  "Repeat emergency hospitalisation in the same year",
+                  "Mortality amenable to health care",                            
+                  "All-cause premature mortality",
+                  "Dying in hospital", "Mortality amenable to health care")
 
 #Profile names
 topic_list_filter <- as.factor(c("Show all",unique(sort(c(
   substr(optdata$profile_domain1, 5, nchar(as.vector(optdata$profile_domain1))), 
   substr(optdata$profile_domain2, 5, nchar(as.vector(optdata$profile_domain2)))))))) 
+
+depr_measure_types <- c("Trend", "Gap", "Risk") #list of measure types
 
 topic_list <- topic_list_filter[-1] #taking out show all from list
 
@@ -245,6 +258,19 @@ cookie_box <- div(class="alert alert-info", style = "margin-bottom: 0",
       tags$a(href='https://www.scotpho.org.uk/about-us/scotpho-website-policies-and-statements/privacy-and-cookies',
   " Privacy and Cookies"), "statement.",
       HTML('<a href="#" class="close" data-dismiss="alert" aria-label="close">&check;</a>'))
+
+###############################################.
+## Plot parameters ----
+###############################################.
+
+#Common parameters for plots
+xaxis_plots <- list(title = FALSE, tickfont = list(size=14), titlefont = list(size=14), 
+                    showline = TRUE, tickangle = 270, fixedrange=TRUE)
+
+yaxis_plots <- list(title = FALSE, rangemode="tozero", fixedrange=TRUE, size = 4, 
+                    tickfont = list(size=14), titlefont = list(size=14)) 
+
+font_plots <- list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif')
 
 # Identify which geographies have data for each indicator
 # indic <- unique(optdata$indicator[!is.na(optdata$measure)])
