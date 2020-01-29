@@ -90,7 +90,9 @@ definition_table <- read_csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vT
 new_date <- fast_strptime(paste("01",definition_table$last_updated,sep="-"),"%d-%b-%Y")
 
 definition_table <- definition_table %>% 
-  mutate(days_since_update=day(as.period(new_date %--% today(), unit="days")))
+  mutate(days_since_update=day(as.period(new_date %--% today(), unit="days"))) %>% 
+  #filtering out non-active indicators
+  filter(active == "A")
 
 saveRDS(definition_table,"data/techdoc.rds") #for opt
 techdoc <- readRDS("data/techdoc.rds")
@@ -338,6 +340,10 @@ profile_lookup <- readRDS("data/profile_lookup.rds")
 ###############################################.
 ## Inequalities data ----
 ###############################################.
+data_depr <- readRDS("data/deprivation_data.rds") #deprivation/inequalities dataset
+
+saveRDS(optdata, paste0("/PHI_conf/ScotPHO/Profiles/Data/Backups/deprivation_data_", today() ,".rds"))
+
 ###############################################.
 ## Preparing Andy's indicators data
 
@@ -355,9 +361,9 @@ andyp_data <- rbind( # merging together all indicators
 ###############################################.
 ## Rest of the data
 #Finds all the rds for inequalities in the data folder reads them and combine them.
-files <-  list.files(path = shiny_files, pattern = "*_ineq.rds", full.names = TRUE)
-View(gsub(paste0(shiny_files, "/"), "", files))
-data_depr <- do.call(rbind, lapply(files, readRDS)) %>% 
+files_depr <-  list.files(path = shiny_files, pattern = "*_ineq.rds", full.names = TRUE)
+View(gsub(paste0(shiny_files, "/"), "", files_depr))
+data_depr <- do.call(rbind, lapply(files_depr, readRDS)) %>% 
   rename(measure = rate) 
 
 # Merging with Andy's data and then formatting
