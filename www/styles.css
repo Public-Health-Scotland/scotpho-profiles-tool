@@ -123,6 +123,14 @@ img.centerabout {object-fit: scale-down; position:absolute; width:100%;
                   border: 2px solid #2FA4E7; padding: 10px; margin-top: 0; 
                   margin-bottom: 5px; float: left; transition: 0.5s ease; 
                   position: relative; object-fit: scale-down;}
+                  
+/* Deprivation boxes text */
+.depr-text-box {width:100%; height:100%; background-color:white;
+    margin-bottom: 20px; box-shadow: 0 2px 5px 0 rgba(0,0,0,.26);
+    transition: 0.5s ease; }             
+.depr-text-box .title{background-color: #4da6ff; color: white;   font-weight:bold;
+    font-size: 20px; display:block; line-height:20px; padding: 5px; padding-left: 20px; }
+.depr-text-box .content{ color: black; overflow: hidden; padding: 10px; min-height: 0px;}
         
         /* END */
         
