@@ -318,8 +318,8 @@ optdata <- optdata %>% #taking out some variables
   droplevels() %>%  #to get rid of factor levels not present in data set.
   #Making the numerator the measure for a few indicators, so it plots correctly
   mutate(measure = ifelse(indicator %in% c('Mid-year population estimate - all ages',
-                                           'S2 pupils - SALSUS', 'S4 pupils - SALSUS',
-                                           "Quit attempts"), numerator, measure))
+                                           'S2 pupils who smoke (SALSUS)', 'S4 pupils who smoke (SALSUS)',
+                                           "Smoking quit attempts"), numerator, measure))
 
 saveRDS(optdata, "data/optdata.rds")
 optdata <- readRDS("data/optdata.rds")
