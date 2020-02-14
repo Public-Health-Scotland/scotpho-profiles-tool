@@ -342,7 +342,7 @@ profile_lookup <- readRDS("data/profile_lookup.rds")
 ###############################################.
 data_depr <- readRDS("data/deprivation_data.rds") #deprivation/inequalities dataset
 
-saveRDS(optdata, paste0("/PHI_conf/ScotPHO/Profiles/Data/Backups/deprivation_data_", today() ,".rds"))
+saveRDS(data_depr, paste0("/PHI_conf/ScotPHO/Profiles/Data/Backups/deprivation_data_", today() ,".rds"))
 
 ###############################################.
 ## Preparing Andy's indicators data
@@ -404,14 +404,7 @@ data_depr <- data_depr %>%
 
 # Temporary until we decide to add new indicators
 data_depr <- data_depr %>% 
-  filter(!(indicator %in% c("Alcohol-related mortality", 
-                            "Alcohol-related hospital stays",
-                            "New cancer registrations",
-                            "Drug-related hospital stays",
-                            "Population prescribed drugs for anxiety/depression/psychosis",
-                            "Deaths from suicide",
-                            "People living in 15% most 'access deprived' areas",
-                            "Women smoking during pregnancy"))) %>% droplevels()
+  filter(!(indicator %in% c("Deaths from suicide"))) %>% droplevels()
 
 saveRDS(data_depr, "data/deprivation_data.rds")
 
