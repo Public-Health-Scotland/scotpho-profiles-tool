@@ -525,14 +525,14 @@ function(input, output, session) {
   summary_csv <- reactive({ 
     if (input$chart_summary == "Snapshot") {
       format_csv(snapshot_data(), extra_vars = "comp_m") %>%
-        mutate(comparator_name = case_when(input$comp_summary == 1 ~ paste0(input$geocomp_summary),
-                                           input$comp_summary == 2 ~ paste0(input$yearcomp_summary))) %>%
-        rename("comparator_value" = "comp_m")
+        mutate(comparator_name = ifelse(input$comp_summary == 1, input$geocomp_summary,
+                                        paste0(input$yearcomp_summary))) %>% 
+        rename(comparator_value = comp_m)
     } else if (input$chart_summary == "Trend") {
       format_csv(summary_data(), extra_vars = "comp_m") %>% 
-        mutate(comparator_name = case_when(input$comp_summary == 1 ~ paste0(input$geocomp_summary),
-                                           input$comp_summary == 2 ~ paste0(input$yearcomp_summary))) %>% 
-        rename("comparator_value" = "comp_m")
+        mutate(comparator_name = ifelse(input$comp_summary == 1, input$geocomp_summary,
+                                        paste0(input$yearcomp_summary))) %>% 
+        rename(comparator_value = comp_m)
     } else if (input$chart_summary == "Spine") {
       spine_csv()
     }
