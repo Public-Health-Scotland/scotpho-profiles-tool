@@ -570,7 +570,7 @@ navbarMenu("Info", icon = icon("info-circle"),
                                 "ScotPHO Profiles are made up of a collection of indicators related to a specific theme 
                                 e.g. 'Alcohol' or 'Drugs'. Profiles are further divided into topic areas to group similar indicators together. 
                                  This page allows users to see available indicators and geographies as well as finding detailed technical information 
-                                  about how incidators are created."),
+                                  about how indicators are created."),
                              br(),
                              div(title="Choose if you want to see a list of all available indicators or all the details for a specific indicator",
                                  radioGroupButtons("techdoc_selection", status = "primary",
