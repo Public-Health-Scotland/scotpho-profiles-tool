@@ -21,6 +21,8 @@ library(shinydashboard) #for valuebox on techdoc tab
 library(sp)
 library(lubridate) #for automated list of dates in welcome modal
 library(shinycssloaders) #for loading icons, see line below
+# it uses github version devtools::install_github("andrewsali/shinycssloaders")
+# This is to avoid issues with loading symbols behind charts and perhaps with bouncing of app
 library(rmarkdown)
 library(flextable) #for tech document table
 library(webshot) #to download plotly charts
