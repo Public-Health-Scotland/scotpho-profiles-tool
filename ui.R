@@ -553,6 +553,16 @@ navbarMenu("Info", icon = icon("info-circle"),
                                 management tool. The information needs to be interpreted within a local 
                                 framework; an indicator may be higher or lower in one area compared to another, 
                                 but local knowledge is needed to understand and interpret differences."),
+                              p("The Scottish Public Health Observatory (ScotPHO) collaboration is led 
+                                by Public Health Scotland, and includes  Glasgow Centre for Population Health, National Records of Scotland, 
+                                the MRC/CSO Social and Public Health Sciences Unit and the Scottish Learning Disabilities Observatory."),
+                              p("We aim to provide a clear picture of the health of the Scottish population and the factors 
+                                that affect it. We contribute to improved collection and use of routine data on health, 
+                                risk factors, behaviours and wider health determinants. We take a lead in determining 
+                                Scotland's future public health information needs, develop innovations in public health 
+                                information and provide a focus for new routine public health information development 
+                                where gaps exist."),
+                              img(src='phs-logo.png', width=40),
                               p("If you have any trouble accessing any information on this site or have
                                 any further questions or feedback relating to the data or the tool, then please contact us at: ",
                                 tags$b(tags$a(href="mailto:ScotPHO@nhs.net", "ScotPHO@nhs.net", class="externallink")),
