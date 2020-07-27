@@ -5,7 +5,7 @@
 ############################.
 ##Filepaths ----
 ############################.
-if (sessionInfo()$platform %in% c("x86_64-redhat-linux-gnu (64-bit)", "x86_64-pc-linux-gnu (64-bit)")) {  
+if (sessionInfo()$platform %in% c("x86_64-redhat-linux-gnu (64-bit)", "x86_64-pc-linux-gnu (64-bit)")) {
   lookups <- "/PHI_conf/ScotPHO/Profiles/Data/Lookups/"
   shapefiles <- "/PHI_conf/ScotPHO/Profiles/Data/Shapefiles/"
   shiny_files <- "/PHI_conf/ScotPHO/Profiles/Data/Shiny Data/"
@@ -18,9 +18,10 @@ if (sessionInfo()$platform %in% c("x86_64-redhat-linux-gnu (64-bit)", "x86_64-pc
 ############################.
 ##Packages ----
 ############################.
-library(dplyr) 
+library(dplyr)
 library(tidyr)
 library(readr)
+library(magrittr)
 library(scales) #rescaling variables
 library(haven) #for SPPS file reading
 library(data.table) #reading data
@@ -44,7 +45,7 @@ library(maptools) #for dissolving dzs shp into localities
 # then suppress numerator where count is less than specified value.
 # crude rate and percentages DO require suppression of rates and CI as well as numerator.
 apply_supressions <- function(dataset) {
-  dataset <- dataset %>%
+  dataset %<>%
     mutate(numerator = case_when(#std rate case
       supression=="Y" & substr(type_id,1,2)=='sr' & numerator<supress_less_than ~ NA_real_,
       # crude rate and percentage cases
@@ -65,16 +66,16 @@ apply_supressions <- function(dataset) {
 # This functions reads Andy's HSC inequality data and formats it the way we need to be joined
 # with the rest of the deprivation data
 prepare_andyp_data <- function(filename, indic_id) {
-  overall_data <- read_csv(paste0(shiny_files, "Inequalities HSC Data/", filename, ".csv")) %>% 
+  read_csv(paste0(shiny_files, "Inequalities HSC Data/", filename, ".csv")) %>%
     mutate(code = paste0(substr(code, 1, 3), "0", substr(code, 5, 9)),
            quintile = recode(as.character(quintile), "0" = "Total"),
            quint_type = case_when(substr(code, 1, 3) == "S08" ~ "hb_quin",
                                   substr(code, 1, 3) == "S12" ~ "ca_quin",
                                   substr(code, 1, 3) == "S00" ~ "sc_quin"),
            ind_id=indic_id) %>%
-    rename(measure = rate) %>% 
+    rename(measure = rate) %>%
     select (-code2)
-  
+
 }
 
 ###############################################.
@@ -84,13 +85,13 @@ prepare_andyp_data <- function(filename, indic_id) {
 #Run every time you want to refresh the data in the local copy to represent what's in the online copy
 #This file is where indicator names and definitions are stored and are loaded into the shiny tool.
 definition_table <- read_csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vTzrwAG7IFBjLvxuxUO0vJ7mn2AgilWVA1ZJQ9oVaLOSG4mgkquMKWga8MY5g2OFkFn-3awM_GYaHjL/pub?gid=94312583&single=true&output=csv") %>%
-  as.data.frame() %>% mutate(indicator_number = as.factor(indicator_number)) 
+  as.data.frame() %>% mutate(indicator_number = as.factor(indicator_number))
 
 #automating dates
 new_date <- fast_strptime(paste("01",definition_table$last_updated,sep="-"),"%d-%b-%Y")
 
-definition_table <- definition_table %>% 
-  mutate(days_since_update=day(as.period(new_date %--% today(), unit="days"))) %>% 
+definition_table %<>%
+  mutate(days_since_update=day(as.period(new_date %--% today(), unit="days"))) %>%
   #filtering out non-active indicators
   filter(active == "A")
 
@@ -100,13 +101,13 @@ techdoc <- readRDS("data/techdoc.rds")
 write_csv(definition_table, paste0("/PHI_conf/ScotPHO/Profiles/Data/Backups/techdoc_backup_", today() ,".csv"))
 
 ###############################################.
-## Lookups ---- 
+## Lookups ----
 ###############################################.
 # Lookup with all geography codes information. This file is created in the lookup repo
-geo_lookup <- readRDS(paste0(lookups, "Geography/codedictionary.rds")) %>% 
+geo_lookup <- readRDS(paste0(lookups, "Geography/codedictionary.rds")) %>%
   mutate_all(factor) %>% # converting variables into factors
   #Creating geography type variable
-  mutate(areatype = case_when(substr(code, 1, 3) == "S00" ~ "Scotland", 
+  mutate(areatype = case_when(substr(code, 1, 3) == "S00" ~ "Scotland",
                               substr(code, 1, 3) == "S08" ~ "Health board",
                               substr(code, 1, 3) == "S12" ~ "Council area",
                               substr(code, 1, 3) == "S11" ~ "Alcohol & drug partnership",
@@ -118,21 +119,21 @@ geo_lookup <- readRDS(paste0(lookups, "Geography/codedictionary.rds")) %>%
          areaname = gsub(" - ", "-", areaname))
 
 #Bringing parent geography information and formatting in one column with no duplicates
-geo_parents <- readRDS(paste0(lookups, "Geography/IZtoPartnership_parent_lookup.rds")) %>% 
-  gather(geotype, code, c(intzone2011, hscp_locality)) %>% distinct() %>% 
+geo_parents <- readRDS(paste0(lookups, "Geography/IZtoPartnership_parent_lookup.rds")) %>%
+  gather(geotype, code, c(intzone2011, hscp_locality)) %>% distinct() %>%
   select(-geotype) %>% rename(parent_code = hscp_partnership)
 
 # Merging to geo_lookup to obtain parent area name
-geo_parents <- left_join(x=geo_parents, y=geo_lookup, by=c("parent_code" = "code")) %>% 
+geo_parents <- left_join(x=geo_parents, y=geo_lookup, by=c("parent_code" = "code")) %>%
   select(-c(areatype)) %>% rename(parent_area = areaname)
 
 #Merging parents to geo_lookup
-geo_lookup <- left_join(x=geo_lookup, y=geo_parents, by="code", all.x = TRUE) 
+geo_lookup <- left_join(x=geo_lookup, y=geo_parents, by="code", all.x = TRUE)
 
 ##No IZ seem to be assigned to more than one partnership in this file.
 
 ###There are a number of IZ's with the same name, recoding.
-geo_lookup <- geo_lookup %>% 
+geo_lookup %<>%
   mutate(areaname = case_when(
     code == "S02001938" ~ "Woodside-Glasgow City",
     code == "S02001267" ~ "Woodside-Abeerdeen City",
@@ -194,85 +195,85 @@ geo_lookup <- geo_lookup %>%
     code == "S02002477" ~ "IZ18-West Dunbartonshire",
     TRUE  ~  paste(areaname))) #Last line for the rest of cases
 
-geo_lookup <- geo_lookup %>% 
+geo_lookup %<>%
   #Creating variable that includeas area name and type for trend plotting
-  mutate(areaname_full = paste(areaname, "-", areatype)) %>% 
+  mutate(areaname_full = paste(areaname, "-", areatype)) %>%
   mutate_if(is.character, factor) %>% #transforming into factors
-  select(-c(parent_code)) %>% 
+  select(-c(parent_code)) %>%
 #Reducing length of the area type descriptor
   mutate(areaname_full = ifelse(areaname == "Scotland", "Scotland",
                                 paste(areaname_full)),
-         areaname_full = gsub("Health board", "HB", areaname_full), 
-         areaname_full = gsub("Council area", "CA", areaname_full), 
-         areaname_full = gsub("Alcohol & drug partnership", "ADP", areaname_full), 
-         areaname_full = gsub("HSC partnership", "HSCP", areaname_full), 
-         areaname_full = gsub("HSC locality", "HSCL", areaname_full), 
+         areaname_full = gsub("Health board", "HB", areaname_full),
+         areaname_full = gsub("Council area", "CA", areaname_full),
+         areaname_full = gsub("Alcohol & drug partnership", "ADP", areaname_full),
+         areaname_full = gsub("HSC partnership", "HSCP", areaname_full),
+         areaname_full = gsub("HSC locality", "HSCL", areaname_full),
          areaname_full = gsub("Intermediate zone", "IZ", areaname_full))
 
 saveRDS(geo_lookup, "data/geo_lookup.rds")
-geo_lookup <- readRDS("data/geo_lookup.rds") 
+geo_lookup <- readRDS("data/geo_lookup.rds")
 
 ###############################################.
-## Indicator lookup table 
+## Indicator lookup table
 #Can't use read_csv as it's not the first tab of the spreadsheet.
 # For some reason, it's important that the raw tab is alphabetically sorted for this to work properly
-ind_lookup <- gsheet2tbl("docs.google.com/spreadsheets/d/1JOr1_MSnKdQfg4o8qEiqX-EKDsbXUjejnAV4NzbSg78#gid=2036303524") %>% 
+ind_lookup <- gsheet2tbl("docs.google.com/spreadsheets/d/1JOr1_MSnKdQfg4o8qEiqX-EKDsbXUjejnAV4NzbSg78#gid=2036303524") %>%
   setNames(tolower(names(.))) %>% #variables to lower case
-  mutate(ind_id =as.numeric(ind_id)) %>% 
+  mutate(ind_id =as.numeric(ind_id)) %>%
   mutate_if(is.character, factor)  # converting variables into factors
 
 ###############################################.
 ## Indicator data ----
-###############################################.   
+###############################################.
 # Brings data prepared by spss and then delete all the one already present in shiny files
 # Eventually the spss data will be deleted.
 
-#Start creating a backup of the old file 
+#Start creating a backup of the old file
 optdata <- readRDS("data/optdata.rds")
 saveRDS(optdata, paste0("/PHI_conf/ScotPHO/Profiles/Data/Backups/shiny_tool_backup_data_", today() ,".rds"))
 
 #Finds all the csv files in the shiny folder
 files <-  list.files(path = shiny_files, pattern = "*.csv", full.names = TRUE)
 # taking out spss/old opt data
-files <- files[files != "/PHI_conf/ScotPHO/Profiles/Data/Shiny Data//All Data for Shiny.csv"] 
+files <- files[files != "/PHI_conf/ScotPHO/Profiles/Data/Shiny Data//All Data for Shiny.csv"]
 # To check dates of update of each file and who did it
 View(file.info(files,  extra_cols = TRUE))
 
 # reads the data and combines it, variables to lower case and variable with filename
-optdata <- do.call(rbind, lapply(files, function(x){ 
-  fread(x)[,file_name:= x] %>% clean_names() })) %>% 
-  mutate(file_name = gsub("/PHI_conf/ScotPHO/Profiles/Data/Shiny Data//", "", file_name)) %>% 
-  rename(measure = rate) %>% 
-  mutate_at(c("numerator", "measure", "lowci", "upci"), as.numeric) %>% 
+optdata <- do.call(rbind, lapply(files, function(x){
+  fread(x)[,file_name:= x] %>% clean_names() })) %>%
+  mutate(file_name = gsub("/PHI_conf/ScotPHO/Profiles/Data/Shiny Data//", "", file_name)) %>%
+  rename(measure = rate) %>%
+  mutate_at(c("numerator", "measure", "lowci", "upci"), as.numeric) %>%
   mutate(ind_id = as.integer(ind_id))
 
 # to check if there is more then one file for the same indicator. This should be empty
-optdata %>% select(ind_id, file_name) %>% unique %>% group_by(ind_id) %>% 
+optdata %>% select(ind_id, file_name) %>% unique %>% group_by(ind_id) %>%
   add_tally() %>% filter(n >1) %>% View()
 
 # Bringing data created by SPSS code extracting from database
 data_spss <- read_csv(paste0(shiny_files, "All Data for Shiny.csv"),
                       col_types = cols(NUMERATOR = col_number())) %>%
   setNames(tolower(names(.)))%>% #names to lower case
-  rename(ind_id = indicator_id, code = geography_code) %>% 
-  select(-update_date) %>% 
+  rename(ind_id = indicator_id, code = geography_code) %>%
+  select(-update_date) %>%
   # excluding indicators already present in shiny folder data files
-  filter(!(ind_id %in% unique(optdata$ind_id))) %>% droplevels() 
+  filter(!(ind_id %in% unique(optdata$ind_id))) %>% droplevels()
 
 # Merging together spss and shiny data folder datasets
-optdata <- bind_rows(optdata, data_spss) %>% 
+optdata <- bind_rows(optdata, data_spss) %>%
   mutate_if(is.character, factor) %>%  #converting characters into factors
   #Dealing with changes in ca, hb and hscp codes. Transforms old code versions into 2019 ones
-  mutate(code = recode(code, "S12000015"='S12000047', "S12000024"='S12000048', 
+  mutate(code = recode(code, "S12000015"='S12000047', "S12000024"='S12000048',
               "S12000046"='S12000049', "S12000044"='S12000050',
               "S08000018"='S08000029', "S08000027"= 'S08000030',
-              "S08000021"='S08000031', "S08000023"= 'S08000032', 
+              "S08000021"='S08000031', "S08000023"= 'S08000032',
               "S37000014"='S37000032', "S37000023"='S37000033',
               "S37000015"='S37000034', "S37000021"='S37000035'))
 
 # Adding update date for all indicators based on technical document
-update_table <- techdoc %>% rename(ind_id = indicator_number, update_date = last_updated) %>% 
-  select(ind_id, update_date) %>% filter(ind_id != "no_id") %>% 
+update_table <- techdoc %>% rename(ind_id = indicator_number, update_date = last_updated) %>%
+  select(ind_id, update_date) %>% filter(ind_id != "no_id") %>%
   mutate(update_date = as.yearmon(update_date, "%b-%Y"),
          ind_id = as.integer(paste0(ind_id)))
 
@@ -288,30 +289,33 @@ optdata <- left_join(x=optdata, y=update_table, by=c("ind_id"))
 # teenage pregnancies - 21001
 # mothers smoking during pregnancy - 21002
 # drug-related hospital stays - 20205.
-optdata <- optdata %>% filter(!(ind_id %in% c("20205", "20403", "20204", "20402",
-                                              "20301", "20401", "21001", "21002") & 
+optdata %<>% filter(!(ind_id %in% c("20205", "20403", "20204", "20402",
+                                              "20301", "20401", "21001", "21002") &
                                   substr(code, 1, 3) == "S02"))
 
+# TEMPORARY - take out localities data for children low income as it's not updated yet
+optdata %<>% filter(!(ind_id == "20705" & substr(code, 1, 3) == "S99"))
+
 #Merging with indicator and geography information
-optdata <- left_join(x=optdata, y=ind_lookup, by="ind_id") 
+optdata <- left_join(x=optdata, y=ind_lookup, by="ind_id")
 # if for some reason some indicators haven't matched with the lookup this will show them
 View(optdata %>% filter(is.na(indicator)))
 
-optdata <- left_join(x=optdata, y=geo_lookup, by="code") 
+optdata <- left_join(x=optdata, y=geo_lookup, by="code")
 
 #Apply supressions.
-optdata <- optdata %>% apply_supressions()
+optdata %<>% apply_supressions()
 
 # Scaling measures (0 to 1) in groups by year, area type and indicator.
-optdata <- optdata %>% group_by(ind_id, year, areatype) %>%
+optdata %<>% group_by(ind_id, year, areatype) %>%
   mutate(measure_sc = case_when(interpret=="H"~ as.vector(scales::rescale(measure, to=c(1,0))),
                                 interpret=="L" ~ as.vector(scales::rescale(measure, to=c(0,1))),
                                 TRUE ~ 0))  %>% ungroup()
 
 # Tidying up the format
-optdata <- optdata %>% #taking out some variables
+optdata %<>% #taking out some variables
   # we will be able to exclude ind_id here once release2.0 comes out
-  select(-c(supression, supress_less_than, type_id, file_name, label_ineq)) %>%  
+  select(-c(supression, supress_less_than, type_id, file_name, label_ineq)) %>%
   #rounding variables
   mutate(numerator = round(numerator, 2), measure = round(measure, 2),
          lowci = round(lowci, 2), upci = round(upci, 2)) %>%
@@ -353,9 +357,9 @@ andyp_data <- rbind( # merging together all indicators
   prepare_andyp_data("05_rep_hosp_sii_rii_opt", 5),
   prepare_andyp_data("06_dying_hosp_sii_rii_opt", 6),
   prepare_andyp_data("07_hc_amenable_mort_3-year aggregate_sii_rii_opt", 7),
-  prepare_andyp_data("08_prem_mort_3-year aggregate_sii_rii_opt", 8)) %>% 
+  prepare_andyp_data("08_prem_mort_3-year aggregate_sii_rii_opt", 8)) %>%
   # patients by gp is all scotland simd
-  mutate(quint_type = case_when(ind_id ==1  ~ "sc_quin", 
+  mutate(quint_type = case_when(ind_id ==1  ~ "sc_quin",
                                 TRUE ~ quint_type))
 
 ###############################################.
@@ -363,37 +367,37 @@ andyp_data <- rbind( # merging together all indicators
 #Finds all the rds for inequalities in the data folder reads them and combine them.
 files_depr <-  list.files(path = shiny_files, pattern = "*_ineq.rds", full.names = TRUE)
 View(gsub(paste0(shiny_files, "/"), "", files_depr))
-data_depr <- do.call(rbind, lapply(files_depr, readRDS)) %>% 
-  rename(measure = rate) 
+data_depr <- do.call(rbind, lapply(files_depr, readRDS)) %>%
+  rename(measure = rate)
 
 # Merging with Andy's data and then formatting
-data_depr <- bind_rows(data_depr, andyp_data) %>% 
+data_depr <- bind_rows(data_depr, andyp_data) %>%
   mutate_if(is.character,factor) %>% #converting characters into factors
   mutate_at(c("numerator", "measure", "lowci", "upci", "rii", "upci_rii",
-              "lowci_rii", "sii", "lowci_sii", "upci_sii", "par", "abs_range", 
+              "lowci_rii", "sii", "lowci_sii", "upci_sii", "par", "abs_range",
               "rel_range", "rii_int", "lowci_rii_int", "upci_rii_int"),
-            round, 1) %>% 
+            round, 1) %>%
   #Dealing with changes in ca, hb and hscp codes. Transforms old code versions into 2019 ones
-  mutate(code = recode(code, "S12000015"='S12000047', "S12000024"='S12000048', 
+  mutate(code = recode(code, "S12000015"='S12000047', "S12000024"='S12000048',
                        "S12000046"='S12000049', "S12000044"='S12000050',
                        "S08000018"='S08000029', "S08000027"= 'S08000030',
-                       "S08000021"='S08000031', "S08000023"= 'S08000032', 
+                       "S08000021"='S08000031', "S08000023"= 'S08000032',
                        "S37000014"='S37000032', "S37000023"='S37000033',
                        "S37000015"='S37000034', "S37000021"='S37000035'))
 
 #Merging with indicator and geography information
-data_depr <- left_join(x=data_depr, y=ind_lookup, by="ind_id") 
-data_depr <- left_join(x=data_depr, y=geo_lookup, by="code") %>% 
-  select(-profile_domain1, -profile_domain2, -areaname_full, -parent_area) %>% 
-  mutate(quintile = recode(quintile, "1" = "1 - most deprived", 
-                           "5" = "5 - least deprived")) %>% 
+data_depr <- left_join(x=data_depr, y=ind_lookup, by="ind_id")
+data_depr <- left_join(x=data_depr, y=geo_lookup, by="code") %>%
+  select(-profile_domain1, -profile_domain2, -areaname_full, -parent_area) %>%
+  mutate(quintile = recode(quintile, "1" = "1 - most deprived",
+                           "5" = "5 - least deprived")) %>%
   droplevels()
 
-data_depr <- data_depr %>% apply_supressions() #Apply supressions. 
+data_depr <- data_depr %>% apply_supressions() #Apply supressions.
 
 #selecting out indicators where higher is better as app doesn't work with them
-data_depr <- data_depr %>% 
-  filter(!(indicator %in% c("Child dental health in primary 1", 
+data_depr <- data_depr %>%
+  filter(!(indicator %in% c("Child dental health in primary 1",
                             "Child dental health in primary 7",
                             "Healthy birth weight",
                             "Bowel screening uptake",
@@ -403,7 +407,7 @@ data_depr <- data_depr %>%
                             "Teenage pregnancies"))) %>% droplevels()
 
 # Temporary until we decide to add new indicators
-data_depr <- data_depr %>% 
+data_depr <- data_depr %>%
   filter(!(indicator %in% c("Deaths from suicide"))) %>% droplevels()
 
 saveRDS(data_depr, "data/deprivation_data.rds")
@@ -414,7 +418,7 @@ saveRDS(data_depr, "data/deprivation_data.rds")
 #Reading file with council shapefiles: https://www.spatialdata.gov.scot/geonetwork/srv/eng/catalog.search;jsessionid=4B4BEB1B1E52BCA9D3C1FD531CC199F8#/metadata/1cd57ea6-8d6e-412b-a9dd-d1c89a80ad62
 #making it small 29mb to 2.5.
 ca_bound_orig <-readOGR(shapefiles, "pub_las") %>%
-  rmapshaper::ms_simplify(keep=0.0025)  %>% 
+  rmapshaper::ms_simplify(keep=0.0025)  %>%
   setNames(tolower(names(.))) #variables to lower case
 
 object.size(ca_bound_orig)
@@ -434,8 +438,8 @@ saveRDS(ca_bound_orig, "data/CA_boundary.rds")
 ##########################.
 ###Health board
 #making it small 29mb to 2.5. Sometimes it fails, due to lack of memory (use memory.limits and close things).
-hb_bound_orig<-readOGR(shapefiles,"SG_NHS_HealthBoards_2019") %>% 
-  rmapshaper::ms_simplify(keep=0.0025) %>% 
+hb_bound_orig<-readOGR(shapefiles,"SG_NHS_HealthBoards_2019") %>%
+  rmapshaper::ms_simplify(keep=0.0025) %>%
   setNames(tolower(names(.))) #variables to lower case
 
 object.size(hb_bound_orig)
@@ -456,8 +460,8 @@ saveRDS(hb_bound_orig, "data/HB_boundary.rds")
 ##########################.
 ###HSC Partnership
 #making it small 29mb to 2.5. Sometimes it fails, due to lack of memory (use memory.limits and close things).
-hscp_bound_orig <- readOGR(shapefiles,"SG_NHS_IntegrationAuthority_2019") %>% 
-  rmapshaper::ms_simplify(keep=0.0025) %>% 
+hscp_bound_orig <- readOGR(shapefiles,"SG_NHS_IntegrationAuthority_2019") %>%
+  rmapshaper::ms_simplify(keep=0.0025) %>%
   setNames(tolower(names(.))) #variables to lower case
 
 object.size(hscp_bound_orig)
@@ -467,7 +471,7 @@ proj4string(hscp_bound_orig) #Checking projection
 hscp_bound_orig <- spTransform(hscp_bound_orig, CRS("+ellps=WGS84 +proj=longlat +datum=WGS84 +no_defs"))
 
 #Saving the simplified shapefile.
-writeOGR(hscp_bound_orig, dsn=shapefiles, "HSCP_simpl_2019", 
+writeOGR(hscp_bound_orig, dsn=shapefiles, "HSCP_simpl_2019",
          driver="ESRI Shapefile", overwrite_layer=TRUE, verbose=TRUE,
          morphToESRI=TRUE)
 
@@ -482,8 +486,8 @@ hscp_bound <- readRDS("data/HSCP_boundary.rds")
 # HSC locality
 # Based on datazones 2011, so for some partnerships it might not fit their 'official'
 # boundaries. Boundaries can be found in the SG website too
-dz11_shp <-readOGR('/conf/linkage/output/lookups/Unicode/Geography/Shapefiles/Data Zones 2011/', 
-                   "SG_DataZone_Bdry_2011") %>% 
+dz11_shp <-readOGR('/conf/linkage/output/lookups/Unicode/Geography/Shapefiles/Data Zones 2011/',
+                   "SG_DataZone_Bdry_2011") %>%
   setNames(tolower(names(.))) #variables to lower case
 
 # Transforming projection
@@ -495,13 +499,13 @@ loc_look <- readRDS(paste0(lookups, 'Geography/DataZone11_HSCLocality_Lookup.rds
 #merge with locality look up
 dz11_shp@data <- left_join(dz11_shp@data, loc_look, by=c("datazone" = "datazone2011"))
 
-#Dissolve datazone boundaries to crate locality boundaries
-locality_shp <- unionSpatialPolygons(dz11_shp, dz11_shp$hscplocality)
+#Dissolve datazone boundaries to create locality boundaries
+locality_shp <- unionSpatialPolygons(dz11_shp, dz11_shp$hscp_locality)
 
 # Adding a data slot to the shp with names and code.
-loc_look <- loc_look %>% select(-datazone2011) %>% unique() %>%  #one row per locality
-  rename(area_name = hscplocality, code = hscp_locality)
-rownames(loc_look)  <- loc_look$area_name #need this to match with the shp
+loc_look %<>% select(-datazone2011) %>% unique() %>%  #one row per locality
+  rename(area_name = loc_name, code = hscp_locality)
+rownames(loc_look)  <- loc_look$code #need this to match with the shp
 
 #Merging data with shapefile
 locality_shp <- SpatialPolygonsDataFrame(locality_shp, loc_look)
@@ -510,7 +514,7 @@ locality_shp <- SpatialPolygonsDataFrame(locality_shp, loc_look)
 locality_shp <- locality_shp %>% rmapshaper::ms_simplify(keep=0.0050, keep_shapes = T)
 
 #Saving the simplified shapefile.
-writeOGR(locality_shp, dsn=shapefiles, "HSC_locality_simpl_2019", 
+writeOGR(locality_shp, dsn=shapefiles, "HSC_locality_simpl_2019",
          driver="ESRI Shapefile", overwrite_layer=TRUE, verbose=TRUE,
          morphToESRI=TRUE)
 
@@ -521,7 +525,7 @@ hscloc_bound <- readRDS("data/HSC_locality_boundary.rds")
 ##########################.
 ###Intermediate zone
 # It comes from Improvement Service
-iz_bound_orig <- readRDS(paste0(shapefiles, "IZshapes.rds")) %>% #IZ 
+iz_bound_orig <- readRDS(paste0(shapefiles, "IZshapes.rds")) %>% #IZ
   setNames(tolower(names(.))) #variables to lower case
 names(iz_bound_orig@data)[names(iz_bound_orig@data)=="interzone"] <- "code"
 names(iz_bound_orig@data)[names(iz_bound_orig@data)=="name"] <- "area_name"
