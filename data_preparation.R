@@ -30,9 +30,6 @@ library(lubridate) #for automated list of dates in welcome modal
 library(janitor) #cleaning names
 library(gsheet) #for reading google sheets
 library(rgdal) #for reading shapefiles
-library(rgeos) #for reducing size of shapefiles
-library(rmapshaper) #for reducing size of shapefiles
-library(maptools) #for dissolving dzs shp into localities
 
 ###############################################.
 ## Functions ----
@@ -104,114 +101,8 @@ write_csv(definition_table, paste0("/PHI_conf/ScotPHO/Profiles/Data/Backups/tech
 ## Lookups ----
 ###############################################.
 # Lookup with all geography codes information. This file is created in the lookup repo
-geo_lookup <- readRDS(paste0(lookups, "Geography/codedictionary.rds")) %>%
-  mutate_all(factor) %>% # converting variables into factors
-  #Creating geography type variable
-  mutate(areatype = case_when(substr(code, 1, 3) == "S00" ~ "Scotland",
-                              substr(code, 1, 3) == "S08" ~ "Health board",
-                              substr(code, 1, 3) == "S12" ~ "Council area",
-                              substr(code, 1, 3) == "S11" ~ "Alcohol & drug partnership",
-                              substr(code, 1, 3) == "S99" ~ "HSC locality",
-                              substr(code, 1, 3) == "S37" ~ "HSC partnership",
-                              substr(code, 1, 3) == "S02" ~ "Intermediate zone"),
-         #Changing ands for & to reduce issues with long labels and " - " for "-"
-         areaname = gsub(" and ", " & ", areaname),
-         areaname = gsub(" - ", "-", areaname))
-
-#Bringing parent geography information and formatting in one column with no duplicates
-geo_parents <- readRDS(paste0(lookups, "Geography/IZtoPartnership_parent_lookup.rds")) %>%
-  gather(geotype, code, c(intzone2011, hscp_locality)) %>% distinct() %>%
-  select(-geotype) %>% rename(parent_code = hscp_partnership)
-
-# Merging to geo_lookup to obtain parent area name
-geo_parents <- left_join(x=geo_parents, y=geo_lookup, by=c("parent_code" = "code")) %>%
-  select(-c(areatype)) %>% rename(parent_area = areaname)
-
-#Merging parents to geo_lookup
-geo_lookup <- left_join(x=geo_lookup, y=geo_parents, by="code", all.x = TRUE)
-
-##No IZ seem to be assigned to more than one partnership in this file.
-
-###There are a number of IZ's with the same name, recoding.
-geo_lookup %<>%
-  mutate(areaname = case_when(
-    code == "S02001938" ~ "Woodside-Glasgow City",
-    code == "S02001267" ~ "Woodside-Abeerdeen City",
-    code == "S02002233" ~ "Western Edge-Perth & Kinross",
-    code == "S02001475" ~ "Western Edge-Dundee City",
-    code == "S02001620" ~ "Tollcross-City of Edinburgh",
-    code == "S02001911" ~ "Tollcross-Glasgow City",
-    code == "S02001671" ~ "Muirhouse-City of Edinburgh",
-    code == "S02002137" ~ "Muirhouse-North Lanarkshire",
-    code == "S02002358" ~ "Law-South Lanarkshire",
-    code == "S02001469" ~ "Law-Dundee City",
-    code == "S02002490" ~ "Ladywell-West Lothian",
-    code == "S02002156" ~ "Ladywell-North Lanarkshire",
-    code == "S02001528" ~ "Hillhead-East Dunbartonshire",
-    code == "S02001953" ~ "Hillhead-Glasgow City",
-    code == "S02001249" ~ "City Centre West-Aberdeen City",
-    code == "S02001933" ~ "City Centre West-Glasgow City",
-    code == "S02001250" ~ "City Centre East-Aberdeen City",
-    code == "S02001932" ~ "City Centre East-Glasgow City",
-    code == "S02001448" ~ "City Centre-Dundee City",
-    code == "S02002449" ~ "City Centre-Stirling",
-    code == "S02001307" ~ "Blackburn-Aberdeenshire",
-    code == "S02002496" ~ "Blackburn-West Lothian",
-    code == "S02001534" ~ "IZ01-East Lothian",
-    code == "S02002460" ~ "IZ01-West Dunbartonshire",
-    code == "S02001535" ~ "IZ02-East Lothian",
-    code == "S02002461" ~ "IZ02-West Dunbartonshire",
-    code == "S02001536" ~ "IZ03-East Lothian",
-    code == "S02002462" ~ "IZ03-West Dunbartonshire",
-    code == "S02001537" ~ "IZ04-East Lothian",
-    code == "S02002463" ~ "IZ04-West Dunbartonshire",
-    code == "S02001538" ~ "IZ05-East Lothian",
-    code == "S02002464" ~ "IZ05-West Dunbartonshire",
-    code == "S02001539" ~ "IZ06-East Lothian",
-    code == "S02002465" ~ "IZ06-West Dunbartonshire",
-    code == "S02001540" ~ "IZ07-East Lothian",
-    code == "S02002466" ~ "IZ07-West Dunbartonshire",
-    code == "S02001541" ~ "IZ08-East Lothian",
-    code == "S02002467" ~ "IZ08-West Dunbartonshire",
-    code == "S02001542" ~ "IZ09-East Lothian",
-    code == "S02002468" ~ "IZ09-West Dunbartonshire",
-    code == "S02001543" ~ "IZ10-East Lothian",
-    code == "S02002469" ~ "IZ10-West Dunbartonshire",
-    code == "S02001544" ~ "IZ11-East Lothian",
-    code == "S02002470" ~ "IZ11-West Dunbartonshire",
-    code == "S02001545" ~ "IZ12-East Lothian",
-    code == "S02002471" ~ "IZ12-West Dunbartonshire",
-    code == "S02001546" ~ "IZ13-East Lothian",
-    code == "S02002472" ~ "IZ13-West Dunbartonshire",
-    code == "S02001547" ~ "IZ14-East Lothian",
-    code == "S02002473" ~ "IZ14-West Dunbartonshire",
-    code == "S02001548" ~ "IZ15-East Lothian",
-    code == "S02002474" ~ "IZ15-West Dunbartonshire",
-    code == "S02001549" ~ "IZ16-East Lothian",
-    code == "S02002475" ~ "IZ16-West Dunbartonshire",
-    code == "S02001550" ~ "IZ17-East Lothian",
-    code == "S02002476" ~ "IZ17-West Dunbartonshire",
-    code == "S02001551" ~ "IZ18-East Lothian",
-    code == "S02002477" ~ "IZ18-West Dunbartonshire",
-    TRUE  ~  paste(areaname))) #Last line for the rest of cases
-
-geo_lookup %<>%
-  #Creating variable that includeas area name and type for trend plotting
-  mutate(areaname_full = paste(areaname, "-", areatype)) %>%
-  mutate_if(is.character, factor) %>% #transforming into factors
-  select(-c(parent_code)) %>%
-#Reducing length of the area type descriptor
-  mutate(areaname_full = ifelse(areaname == "Scotland", "Scotland",
-                                paste(areaname_full)),
-         areaname_full = gsub("Health board", "HB", areaname_full),
-         areaname_full = gsub("Council area", "CA", areaname_full),
-         areaname_full = gsub("Alcohol & drug partnership", "ADP", areaname_full),
-         areaname_full = gsub("HSC partnership", "HSCP", areaname_full),
-         areaname_full = gsub("HSC locality", "HSCL", areaname_full),
-         areaname_full = gsub("Intermediate zone", "IZ", areaname_full))
-
+geo_lookup <- readRDS(paste0(geo_lookup, "geo_lookup.rds"))
 saveRDS(geo_lookup, "shiny_app/data/geo_lookup.rds")
-geo_lookup <- readRDS("shiny_app/data/geo_lookup.rds")
 
 ###############################################.
 ## Indicator lookup table
@@ -415,126 +306,25 @@ saveRDS(data_depr, "shiny_app/data/deprivation_data.rds")
 ###############################################.
 ## Shapefiles ----
 ###############################################.
-#Reading file with council shapefiles: https://www.spatialdata.gov.scot/geonetwork/srv/eng/catalog.search;jsessionid=4B4BEB1B1E52BCA9D3C1FD531CC199F8#/metadata/1cd57ea6-8d6e-412b-a9dd-d1c89a80ad62
-#making it small 29mb to 2.5.
-ca_bound_orig <-readOGR(shapefiles, "pub_las") %>%
-  rmapshaper::ms_simplify(keep=0.0025)  %>%
-  setNames(tolower(names(.))) #variables to lower case
-
-object.size(ca_bound_orig)
-
-#Transforming coordinate system to the one leaflet needs
-ca_bound_orig <- spTransform(ca_bound_orig,  CRS("+ellps=WGS84 +proj=longlat +datum=WGS84 +no_defs"))
-
-#Saving the simplified shapefile to avoid the calculations.
-writeOGR(ca_bound_orig, dsn=shapefiles, "CA_simpl_2019", driver="ESRI Shapefile", overwrite_layer=TRUE)
-
-#Saving as rds as it is much faster to read
-names(ca_bound_orig@data)[names(ca_bound_orig@data)=="local_auth"] <- "area_name"
-
-saveRDS(ca_bound_orig, paste0(shapefiles, "CA_boundary.rds"))
+##########################.
+### Council area
+ca_bound_orig <- readRDS(paste0(shapefiles, "CA_boundary.rds"))
 saveRDS(ca_bound_orig, "shiny_app/data/CA_boundary.rds")
-
 ##########################.
 ###Health board
-#making it small 29mb to 2.5. Sometimes it fails, due to lack of memory (use memory.limits and close things).
-hb_bound_orig<-readOGR(shapefiles,"SG_NHS_HealthBoards_2019") %>%
-  rmapshaper::ms_simplify(keep=0.0025) %>%
-  setNames(tolower(names(.))) #variables to lower case
-
-object.size(hb_bound_orig)
-
-#Transforming coordinate system to the one leaflet needs
-hb_bound_orig <- spTransform(hb_bound_orig,  CRS("+ellps=WGS84 +proj=longlat +datum=WGS84 +no_defs"))
-
-#Saving the simplified shapefile to avoid the calculations.
-writeOGR(hb_bound_orig, dsn=shapefiles, "HB_simpl_2019", driver="ESRI Shapefile", overwrite_layer=TRUE)
-
-#Saving as rds as it is much faster to read
-names(hb_bound_orig@data)[names(hb_bound_orig@data)=="hbcode"] <- "code"
-names(hb_bound_orig@data)[names(hb_bound_orig@data)=="hbname"] <- "area_name"
-
-saveRDS(hb_bound_orig, paste0(shapefiles, "HB_boundary.rds"))
+hb_bound_orig <- readRDS(paste0(shapefiles, "HB_boundary.rds"))
 saveRDS(hb_bound_orig, "shiny_app/data/HB_boundary.rds")
-
 ##########################.
 ###HSC Partnership
-#making it small 29mb to 2.5. Sometimes it fails, due to lack of memory (use memory.limits and close things).
-hscp_bound_orig <- readOGR(shapefiles,"SG_NHS_IntegrationAuthority_2019") %>%
-  rmapshaper::ms_simplify(keep=0.0025) %>%
-  setNames(tolower(names(.))) #variables to lower case
-
-object.size(hscp_bound_orig)
-
-#Changing the projection to WSG84, the ones leaflet needs.
-proj4string(hscp_bound_orig) #Checking projection
-hscp_bound_orig <- spTransform(hscp_bound_orig, CRS("+ellps=WGS84 +proj=longlat +datum=WGS84 +no_defs"))
-
-#Saving the simplified shapefile.
-writeOGR(hscp_bound_orig, dsn=shapefiles, "HSCP_simpl_2019",
-         driver="ESRI Shapefile", overwrite_layer=TRUE, verbose=TRUE,
-         morphToESRI=TRUE)
-
-names(hscp_bound_orig@data)[names(hscp_bound_orig@data)=="hiacode"] <- "code"
-names(hscp_bound_orig@data)[names(hscp_bound_orig@data)=="hianame"] <- "area_name"
-
-saveRDS(hscp_bound_orig, paste0(shapefiles, "HSCP_boundary.rds"))
+hscp_bound_orig <- readRDS(paste0(shapefiles, "HSCP_boundary.rds"))
 saveRDS(hscp_bound_orig, "shiny_app/data/HSCP_boundary.rds")
-hscp_bound <- readRDS("shiny_app/data/HSCP_boundary.rds")
-
 ###############################################.
 # HSC locality
-# Based on datazones 2011, so for some partnerships it might not fit their 'official'
-# boundaries. Boundaries can be found in the SG website too
-dz11_shp <-readOGR('/conf/linkage/output/lookups/Unicode/Geography/Shapefiles/Data Zones 2011/',
-                   "SG_DataZone_Bdry_2011") %>%
-  setNames(tolower(names(.))) #variables to lower case
-
-# Transforming projection
-dz11_shp <- spTransform(dz11_shp,  CRS("+ellps=WGS84 +proj=longlat +datum=WGS84 +no_defs"))
-
-# Bringing lookup dz to locality
-loc_look <- readRDS(paste0(lookups, 'Geography/DataZone11_HSCLocality_Lookup.rds'))
-
-#merge with locality look up
-dz11_shp@data <- left_join(dz11_shp@data, loc_look, by=c("datazone" = "datazone2011"))
-
-#Dissolve datazone boundaries to create locality boundaries
-locality_shp <- unionSpatialPolygons(dz11_shp, dz11_shp$hscp_locality)
-
-# Adding a data slot to the shp with names and code.
-loc_look %<>% select(-datazone2011) %>% unique() %>%  #one row per locality
-  rename(area_name = loc_name, code = hscp_locality)
-rownames(loc_look)  <- loc_look$code #need this to match with the shp
-
-#Merging data with shapefile
-locality_shp <- SpatialPolygonsDataFrame(locality_shp, loc_look)
-
-# Simplifying shp to make it small
-locality_shp <- locality_shp %>% rmapshaper::ms_simplify(keep=0.0050, keep_shapes = T)
-
-#Saving the simplified shapefile.
-writeOGR(locality_shp, dsn=shapefiles, "HSC_locality_simpl_2019",
-         driver="ESRI Shapefile", overwrite_layer=TRUE, verbose=TRUE,
-         morphToESRI=TRUE)
-
-saveRDS(locality_shp, paste0(shapefiles, "HSC_locality_boundary.rds"))
+locality_shp <- readRDS(paste0(shapefiles, "HSC_locality_boundary.rds"))
 saveRDS(locality_shp, "shiny_app/data/HSC_locality_boundary.rds")
-hscloc_bound <- readRDS("shiny_app/data/HSC_locality_boundary.rds")
-
 ##########################.
 ###Intermediate zone
-# It comes from Improvement Service
-iz_bound_orig <- readRDS(paste0(shapefiles, "IZshapes.rds")) %>% #IZ
-  setNames(tolower(names(.))) #variables to lower case
-names(iz_bound_orig@data)[names(iz_bound_orig@data)=="interzone"] <- "code"
-names(iz_bound_orig@data)[names(iz_bound_orig@data)=="name"] <- "area_name"
-iz_bound_orig$council <- gsub(" and ", " & ", iz_bound_orig$council)
-iz_bound_orig$council <- gsub("Edinburgh", "City of Edinburgh", iz_bound_orig$council)
-iz_bound_orig$council <- gsub("Eilean Siar", "Na h-Eileanan Siar", iz_bound_orig$council)
-
-saveRDS(iz_bound_orig, paste0(shapefiles, "IZ_boundary.rds"))
+iz_bound <- readRDS(paste0(shapefiles, "IZ_boundary.rds"))
 saveRDS(iz_bound_orig, "shiny_app/data/IZ_boundary.rds")
-iz_bound <- readRDS("shiny_app/data/IZ_boundary.rds")
 
 ##END
