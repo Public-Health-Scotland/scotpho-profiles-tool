@@ -95,8 +95,8 @@ definition_table %<>%
   #filtering out non-active indicators
   filter(active == "A")
 
-saveRDS(definition_table,"data/techdoc.rds") #for opt
-techdoc <- readRDS("data/techdoc.rds")
+saveRDS(definition_table,"shiny_app/data/techdoc.rds") #for opt
+techdoc <- readRDS("shiny_app/data/techdoc.rds")
 #backup copy in case issues with google drive
 write_csv(definition_table, paste0("/PHI_conf/ScotPHO/Profiles/Data/Backups/techdoc_backup_", today() ,".csv"))
 
@@ -210,8 +210,8 @@ geo_lookup %<>%
          areaname_full = gsub("HSC locality", "HSCL", areaname_full),
          areaname_full = gsub("Intermediate zone", "IZ", areaname_full))
 
-saveRDS(geo_lookup, "data/geo_lookup.rds")
-geo_lookup <- readRDS("data/geo_lookup.rds")
+saveRDS(geo_lookup, "shiny_app/data/geo_lookup.rds")
+geo_lookup <- readRDS("shiny_app/data/geo_lookup.rds")
 
 ###############################################.
 ## Indicator lookup table
@@ -229,7 +229,7 @@ ind_lookup <- gsheet2tbl("docs.google.com/spreadsheets/d/1JOr1_MSnKdQfg4o8qEiqX-
 # Eventually the spss data will be deleted.
 
 #Start creating a backup of the old file
-optdata <- readRDS("data/optdata.rds")
+optdata <- readRDS("shiny_app/data/optdata.rds")
 saveRDS(optdata, paste0("/PHI_conf/ScotPHO/Profiles/Data/Backups/shiny_tool_backup_data_", today() ,".rds"))
 
 #Finds all the csv files in the shiny folder
@@ -325,8 +325,8 @@ optdata %<>% #taking out some variables
                                            'S2 pupils who smoke (SALSUS)', 'S4 pupils who smoke (SALSUS)',
                                            "Smoking quit attempts"), numerator, measure))
 
-saveRDS(optdata, "data/optdata.rds")
-optdata <- readRDS("data/optdata.rds")
+saveRDS(optdata, "shiny_app/data/optdata.rds")
+optdata <- readRDS("shiny_app/data/optdata.rds")
 
 ###############################################.
 ## Profile lookup ----
@@ -338,13 +338,13 @@ profile_lookup <- data.frame(profile_domain = c(paste(unique(optdata$profile_dom
          domain = substr(profile_domain, 5, nchar(as.vector(profile_domain)))) %>%
   select(-profile_domain)
 
-saveRDS(profile_lookup, "data/profile_lookup.rds")
-profile_lookup <- readRDS("data/profile_lookup.rds")
+saveRDS(profile_lookup, "shiny_app/data/profile_lookup.rds")
+profile_lookup <- readRDS("shiny_app/data/profile_lookup.rds")
 
 ###############################################.
 ## Inequalities data ----
 ###############################################.
-data_depr <- readRDS("data/deprivation_data.rds") #deprivation/inequalities dataset
+data_depr <- readRDS("shiny_app/data/deprivation_data.rds") #deprivation/inequalities dataset
 
 saveRDS(data_depr, paste0("/PHI_conf/ScotPHO/Profiles/Data/Backups/deprivation_data_", today() ,".rds"))
 
@@ -410,7 +410,7 @@ data_depr <- data_depr %>%
 data_depr <- data_depr %>%
   filter(!(indicator %in% c("Deaths from suicide"))) %>% droplevels()
 
-saveRDS(data_depr, "data/deprivation_data.rds")
+saveRDS(data_depr, "shiny_app/data/deprivation_data.rds")
 
 ###############################################.
 ## Shapefiles ----
@@ -433,7 +433,7 @@ writeOGR(ca_bound_orig, dsn=shapefiles, "CA_simpl_2019", driver="ESRI Shapefile"
 names(ca_bound_orig@data)[names(ca_bound_orig@data)=="local_auth"] <- "area_name"
 
 saveRDS(ca_bound_orig, paste0(shapefiles, "CA_boundary.rds"))
-saveRDS(ca_bound_orig, "data/CA_boundary.rds")
+saveRDS(ca_bound_orig, "shiny_app/data/CA_boundary.rds")
 
 ##########################.
 ###Health board
@@ -455,7 +455,7 @@ names(hb_bound_orig@data)[names(hb_bound_orig@data)=="hbcode"] <- "code"
 names(hb_bound_orig@data)[names(hb_bound_orig@data)=="hbname"] <- "area_name"
 
 saveRDS(hb_bound_orig, paste0(shapefiles, "HB_boundary.rds"))
-saveRDS(hb_bound_orig, "data/HB_boundary.rds")
+saveRDS(hb_bound_orig, "shiny_app/data/HB_boundary.rds")
 
 ##########################.
 ###HSC Partnership
@@ -479,8 +479,8 @@ names(hscp_bound_orig@data)[names(hscp_bound_orig@data)=="hiacode"] <- "code"
 names(hscp_bound_orig@data)[names(hscp_bound_orig@data)=="hianame"] <- "area_name"
 
 saveRDS(hscp_bound_orig, paste0(shapefiles, "HSCP_boundary.rds"))
-saveRDS(hscp_bound_orig, "data/HSCP_boundary.rds")
-hscp_bound <- readRDS("data/HSCP_boundary.rds")
+saveRDS(hscp_bound_orig, "shiny_app/data/HSCP_boundary.rds")
+hscp_bound <- readRDS("shiny_app/data/HSCP_boundary.rds")
 
 ###############################################.
 # HSC locality
@@ -519,8 +519,8 @@ writeOGR(locality_shp, dsn=shapefiles, "HSC_locality_simpl_2019",
          morphToESRI=TRUE)
 
 saveRDS(locality_shp, paste0(shapefiles, "HSC_locality_boundary.rds"))
-saveRDS(locality_shp, "data/HSC_locality_boundary.rds")
-hscloc_bound <- readRDS("data/HSC_locality_boundary.rds")
+saveRDS(locality_shp, "shiny_app/data/HSC_locality_boundary.rds")
+hscloc_bound <- readRDS("shiny_app/data/HSC_locality_boundary.rds")
 
 ##########################.
 ###Intermediate zone
@@ -534,7 +534,7 @@ iz_bound_orig$council <- gsub("Edinburgh", "City of Edinburgh", iz_bound_orig$co
 iz_bound_orig$council <- gsub("Eilean Siar", "Na h-Eileanan Siar", iz_bound_orig$council)
 
 saveRDS(iz_bound_orig, paste0(shapefiles, "IZ_boundary.rds"))
-saveRDS(iz_bound_orig, "data/IZ_boundary.rds")
-iz_bound <- readRDS("data/IZ_boundary.rds")
+saveRDS(iz_bound_orig, "shiny_app/data/IZ_boundary.rds")
+iz_bound <- readRDS("shiny_app/data/IZ_boundary.rds")
 
 ##END
