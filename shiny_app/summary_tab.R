@@ -991,3 +991,5 @@ output$download_spineplot <- downloadHandler(
                     subtitle =paste(input$geoname_summary," (",input$geotype_summary,") compared against ",input$geocomp_spine,sep="")),
            device = "png",width=15, limitsize=FALSE)
   })
+
+##END

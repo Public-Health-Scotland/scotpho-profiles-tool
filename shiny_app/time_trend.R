@@ -1,7 +1,7 @@
-
+#Code for trend chart tab
 
 ###############################################.        
-#### Time trend plot ----
+#### Modal  ----
 ###############################################.  
 # Trend help pop-up
 observeEvent(input$help_trend, {
@@ -23,8 +23,9 @@ observeEvent(input$help_trend, {
     size = "l", easyClose = TRUE, fade=FALSE,footer = modalButton("Close (Esc)")))
 }) 
 
-#####################.
-# Reactive controls
+###############################################.
+## Reactive controls ----
+###############################################.
 #Controls for chart. Dynamic selection of locality and iz.
 output$loc_ui_trend <- renderUI({
   selectizeInput("locname_trend", "HSC locality", 
@@ -143,7 +144,8 @@ observeEvent({
   })
 
 ###############################################.
-# Indicator definitions
+## Indicator efinitions ----
+###############################################.
 #Subsetting by domain and profile. Profile is fiddly as vector uses abbreviations 
 # so needs to be converted to the names to match techdoc.
 defs_data_trend <- reactive({techdoc %>% subset(input$indic_trend == indicator_name)})
@@ -154,8 +156,9 @@ output$defs_text_trend <- renderUI({
                      defs_data_trend()$indicator_definition), collapse = "<br><br>"))
 })
 
-#####################.
-# Reactive data 
+###############################################.
+## Reactive data ----
+###############################################.
 #Time trend data. Filtering based on user input values.
 trend_data <- reactive({ 
   
@@ -179,7 +182,7 @@ trend_data <- reactive({
 })
 
 #####################.
-# Creating plot
+# Creating plot ----
 #####################.
 # titles 
 output$title_trend <- renderText(paste0(input$indic_trend))
@@ -265,8 +268,9 @@ plot_trend_chart <- function() {
 # Creating plot for ui side
 output$trend_plot <- renderPlotly({ plot_trend_chart()  }) 
 
-#####################.
-# Downloading data and plot
+###############################################.
+## Downloads ----
+###############################################.
 #Downloading data
 trend_csv <- reactive({ format_csv(trend_data()) })
 
@@ -281,3 +285,5 @@ output$download_trendplot <- downloadHandler(
              layout(title = paste0(input$indic_trend), margin = list(t = 140)), 
            file = file, zoom = 3)
   })
+
+##END

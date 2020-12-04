@@ -1,6 +1,6 @@
-
+# Code for data tab
 #####################################.      
-#### Table ----
+#### Reactive data ----
 #####################################. 
 # Reactive data for IZ and locality filters
 #Filter iz_list and hscl list by parent area selection
@@ -13,7 +13,8 @@ hsclocality_filtered <- reactive({
 })
 
 ###############################################.
-# Reactive filters 
+## Reactive filters ----
+###############################################.
 #Filter IZ's by Parent area
 
 output$iz_filtered <- renderUI ({ 
@@ -225,7 +226,8 @@ observeEvent(input$clear, {
 })
 
 ###############################################.
-# Preparing reactive data for table output
+## Reactive data ----
+###############################################.
 filter_table <- reactive ({
   if (is.null(input$indicator_filter) & is.null(input$topic_filter) & 
       is.null(input$profile_filter)) {
@@ -371,6 +373,10 @@ filter_table <- reactive ({
   
 })
 
+###############################################.
+## Table ----
+###############################################.
+
 #display table based on selection made by user on indicator tab
 output$table_filtered <- DT::renderDataTable({
   
@@ -386,6 +392,8 @@ output$table_filtered <- DT::renderDataTable({
 })
 
 ###############################################.
+## Downloads ----
+###############################################.
 # Downloading data in csv format
 table_csv <- reactive({ format_csv(filter_table()) })
 
@@ -396,3 +404,5 @@ output$download_table_csv <- downloadHandler(
     write.csv(table_csv(),
               file, row.names=FALSE) } 
 )
+
+##END

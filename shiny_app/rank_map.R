@@ -1,7 +1,11 @@
+#Code for rank and map tab
+
 ###############################################.       
 #### Rank plot ----
 ###############################################.   
-#####################.
+###############################################.
+## Reactive controls ----
+###############################################.
 # Reactive controls - used for the map as well.
 ## Remember the selected samples
 # creates reactive values to remember user selection of the geography level
@@ -108,8 +112,9 @@ rank_bytime_modal <- modalDialog(
     actionButton("rank_help_back","Back"),
     modalButton("Close (Esc)")))
 
-#####################.
-# Reactive data  
+###############################################.
+## Reactive data ----
+###############################################.
 # Comparator data rank plot. 
 rank_compar <- reactive({
   
@@ -182,6 +187,9 @@ rank_bar_data <- reactive({
   }
 })
 
+###############################################.
+## Plots ----
+###############################################.
 ############################.
 #Title of plot
 make_rank_subtitle <- function() {
@@ -317,6 +325,8 @@ plot_rank_charts <- function(){
 # Calling the renderPlotly object
 output$rank_plot <- renderPlotly({plot_rank_charts()  }) 
 
+###############################################.
+## Downloads ----
 ###############################################.
 #Downloading data
 rank_csv <- reactive({ format_csv(rank_bar_data(), extra_vars = c("comp_value", "comp_name")) %>%

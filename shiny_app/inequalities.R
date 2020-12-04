@@ -1,10 +1,7 @@
-#Code to create ScotPHO's Shiny inequalities platform
-#In this script include all the server side functions: plots, reactive objects, etc.
+#Code to inequalities tab
 
-###############################################.
-## Define a server for the Shiny app
   ###############################################.        
-  #### Deprivation ----
+  #### Modal ----
   ###############################################.   
   # Inequality help pop-up
   #links to SIMD, deprivation and inequality scotpho and measuring inequalities report
@@ -65,7 +62,8 @@
   }) 
   
   ###############################################.
-  # Indicator definitions
+  ## Indicator definitions ----
+  ###############################################.
   #Subsetting by domain and profile. Profile is fiddly as vector uses abbreviations 
   # so needs to be converted to the names to match techdoc.
   output$defs_text_simd <- renderUI({
