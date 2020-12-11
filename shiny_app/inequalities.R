@@ -1,10 +1,7 @@
-#Code to create ScotPHO's Shiny inequalities platform
-#In this script include all the server side functions: plots, reactive objects, etc.
+#Code to inequalities tab
 
-###############################################.
-## Define a server for the Shiny app
   ###############################################.        
-  #### Deprivation ----
+  #### Modal ----
   ###############################################.   
   # Inequality help pop-up
   #links to SIMD, deprivation and inequality scotpho and measuring inequalities report
@@ -38,9 +35,10 @@
         in the overall value of an indicator, if the value of the least deprived 
         group were experienced across the whole population. We use the Population 
         Attributable Risk (PAR) to calculate this. "),
-      # p("You can read more about the measures used and presented",         
-      #   tags$a(href="", #to change
-      #          "here (link not ready)",  class="externallink"), "."),
+      p("You can read more about the measures used and presented in the",
+        tags$a(href="https://www.scotpho.org.uk/comparative-health/measuring-inequalities/", #to change
+               "Measuring inequalities section",  class="externallink"), 
+                "of the ScotPHO website."),
       #simd explanation
       p("To prepare the data shown in this tab we have divided the Scotland population 
         into five groups (quintiles) based on their deprivation level. This has been done using the ",
@@ -64,7 +62,8 @@
   }) 
   
   ###############################################.
-  # Indicator definitions
+  ## Indicator definitions ----
+  ###############################################.
   #Subsetting by domain and profile. Profile is fiddly as vector uses abbreviations 
   # so needs to be converted to the names to match techdoc.
   output$defs_text_simd <- renderUI({
