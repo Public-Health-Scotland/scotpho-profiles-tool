@@ -101,7 +101,7 @@ write_csv(definition_table, paste0("/PHI_conf/ScotPHO/Profiles/Data/Backups/tech
 ## Lookups ----
 ###############################################.
 # Lookup with all geography codes information. This file is created in the lookup repo
-geo_lookup <- readRDS(paste0(geo_lookup, "geo_lookup.rds"))
+geo_lookup <- readRDS(paste0(lookups, "Geography/opt_geo_lookup.rds"))
 saveRDS(geo_lookup, "shiny_app/data/geo_lookup.rds")
 
 ###############################################.
