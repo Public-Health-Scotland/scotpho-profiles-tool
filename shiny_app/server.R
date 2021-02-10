@@ -40,7 +40,7 @@ function(input, output, session) {
     br(),
     p(h5("For any further questions or other developments you would like to 
               suggest for our current tool, please contact us at", 
-              tags$a(href="mailto:ScotPHO@nhs.net", "ScotPHO@nhs.net", class="externallink"), 
+              tags$a(href="mailto:phs.scotpho@phs.scot", "phs.scotpho@phs.scot", class="externallink"), 
               style = "width: 700px")),
     br(),
     size = "l", align= "center",

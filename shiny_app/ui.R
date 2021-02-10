@@ -564,7 +564,7 @@ navbarMenu("Info", icon = icon("info-circle"),
                                 where gaps exist."),
                               p("If you have any trouble accessing any information on this site or have
                                 any further questions or feedback relating to the data or the tool, then please contact us at: ",
-                                tags$b(tags$a(href="mailto:ScotPHO@nhs.net", "ScotPHO@nhs.net", class="externallink")),
+                                tags$b(tags$a(href="mailto:phs.scotpho@phs.scot", "phs.scotpho@phs.scot", class="externallink")),
                                 "and we will be happy to help.")),
                     br()
            ),#Tab panel
@@ -800,7 +800,7 @@ div(style = "margin-bottom: 30px;"), # this adds breathing space between content
 ###############################################.
 #Copyright warning
 tags$footer(column(6, "© Scottish Public Health Observatory v2.0 2018"), 
-            column(2, tags$a(href="mailto:ScotPHO@nhs.net", tags$b("Contact us!"), 
+            column(2, tags$a(href="mailto:phs.scotpho@phs.scot", tags$b("Contact us!"), 
                               class="externallink", style = "color: white; text-decoration: none")), 
             column(3, tags$a(href="https://www.scotpho.org.uk/about-us/scotpho-website-policies-and-statements/privacy-and-cookies", tags$b("Privacy & cookies"), 
                              class="externallink", style = "color: white; text-decoration: none")), 
