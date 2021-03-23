@@ -325,6 +325,6 @@ saveRDS(locality_shp, "shiny_app/data/HSC_locality_boundary.rds")
 ##########################.
 ###Intermediate zone
 iz_bound <- readRDS(paste0(shapefiles, "IZ_boundary.rds"))
-saveRDS(iz_bound_orig, "shiny_app/data/IZ_boundary.rds")
+saveRDS(iz_bound, "shiny_app/data/IZ_boundary.rds")
 
 ##END
