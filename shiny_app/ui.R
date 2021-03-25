@@ -266,7 +266,7 @@ div(title="Use the options below to add geographies to the trend chart, remember
                       div(title="Show or hide the 95% confidence intervals for the data selected.", # tooltip
                           awesomeCheckbox("ci_trend", label = "95% confidence intervals", value = FALSE)),
                       downloadButton('download_trend', 'Download data', class = "down"),
-                      savechart_button('download_trendplot', 'Save chart',  class = "down"))),
+                      savechart_button('download_trendplot', 'Save chart',  class = "down", disabled=TRUE))),
          mainPanel(width = 8, #Main panel
                    bsModal("mod_defs_trend", "Definitions", "defs_trend", htmlOutput('defs_text_trend')),
                    h4(textOutput("title_trend"), style="color: black; text-align: left"),
@@ -318,7 +318,7 @@ tabPanel("Rank", icon = icon("signal"), value = "rank",
                   actionButton("rank_help",label="Help", icon= icon('question-circle'), class ="down"),
                   actionButton("defs_rank", label="Definitions", icon= icon('info'), class ="down"), 
                   downloadButton('download_rank', 'Download data', class = "down"),
-                  savechart_button('download_rankplot', 'Save chart', class = "down"),
+                  savechart_button('download_rankplot', 'Save chart', class = "down", disabled=TRUE),
                   savechart_button('download_mapplot', 'Save map', class = "down"),
                   data.step = 5,
                   data.intro =(p(h5("Throughout the tool look out for options in each window that provide"),
