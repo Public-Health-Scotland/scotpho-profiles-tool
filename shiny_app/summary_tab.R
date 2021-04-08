@@ -97,9 +97,7 @@ output$profile_ui_summary <- renderUI({
 # Temporary fix for lack of saving charts functionality for snapshot and trend
 output$save_chart_ui <- renderUI({
   if (input$chart_summary %in% c("Trend", "Snapshot") ){
-    actionButton('download_summaryplot_no', 
-                 'Save chart (coming soon)',  
-                 class = "down")
+    savechart_button('download_summaryplot_no', 'Save chart',  class = "down", disabled=TRUE)
   } else if (input$chart_summary == "Spine") {
     savechart_button('download_summaryplot', 'Save chart',  class = "down")
   }

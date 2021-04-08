@@ -366,8 +366,8 @@ tabPanel("Inequalities", icon = icon("balance-scale"), value = "ineq",
                                awesomeRadio("quint_type", label= "Local/Scotland quintiles",
                                             choices = c("Local", "Scotland"),  inline=TRUE, checkbox = TRUE)),
                       downloadButton(outputId = 'download_simd',
-                                     "Download data", class = "down")#,
-                      # savechart_button('report_simd', 'Save charts', class = "down")
+                                     "Download data", class = "down"),
+                      savechart_button('report_simd', 'Save charts', class = "down", disabled=TRUE)
          ),
          mainPanel(width = 9, #Main panel
                    bsModal("mod_defs_simd", "Definitions", "defs_simd", htmlOutput('defs_text_simd')),
