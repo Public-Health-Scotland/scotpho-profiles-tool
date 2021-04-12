@@ -53,11 +53,15 @@ body { font-size: 14px; line-height: 1.1; padding-bottom:30px}
       .col-lg-9, .col-xs-10, .col-sm-10, .col-md-10, .col-lg-10, .col-xs-11, .col-sm-11, 
        .col-md-11, .col-lg-11, .col-xs-12, .col-sm-12, .col-md-12, .col-lg-12 
            {padding-left: 5px; padding-right: 5px;}
-                          
+
 /*Style for download buttons */
 .down{ background-color:#4da6ff; color: white; background-image:none; 
        min-width: 23vh;  font-size: 14px; padding: 5px 10px; 
        margin-top: 5px; margin-left: 3px}
+       
+ /*Colour for disabled download buttons 
+ (This must come after .down so it will override background-color) */
+.down_disabled{ background-color:#a6a6a6}
                           
 /* landing page boxes*/
 .landing-page-box { width:100%; height:100%; min-height:23vh; background-color:white;
