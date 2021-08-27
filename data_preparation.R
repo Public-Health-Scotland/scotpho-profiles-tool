@@ -139,8 +139,10 @@ optdata <- do.call(rbind, lapply(files, function(x){
   mutate(ind_id = as.integer(ind_id))
 
 # to check if there is more then one file for the same indicator. This should be empty
-optdata %>% select(ind_id, file_name) %>% unique %>% group_by(ind_id) %>%
-  add_tally() %>% filter(n >1) %>% View()
+duplicate_file_check = 
+  optdata %>% select(ind_id, file_name) %>% unique %>% group_by(ind_id) %>%
+  add_tally() %>% filter(n >1)
+View(duplicate_file_check)
 
 # Bringing data created by SPSS code extracting from database
 data_spss <- read_csv(paste0(shiny_files, "All Data for Shiny.csv"),
