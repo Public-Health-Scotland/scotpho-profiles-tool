@@ -15,7 +15,6 @@ library(leaflet) #javascript maps
 library(plotly) #interactive graphs
 library(shinyWidgets) # for extra widgets
 library(tibble) # rownames to column in techdoc
-library(shinyBS) #modals
 library(shinyjs)
 library(shinydashboard) #for valuebox on techdoc tab
 library(sp)
