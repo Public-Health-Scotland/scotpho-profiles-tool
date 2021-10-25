@@ -1,6 +1,7 @@
 # they include API keys
 cookie-control.js
 deploying_app.R
+deploy.R
 
 #Not needed
 rsconnect
