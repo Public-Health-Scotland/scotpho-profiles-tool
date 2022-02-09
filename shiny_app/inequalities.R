@@ -361,6 +361,7 @@
       
       #Modifying standard layout
       yaxis_plots[["title"]] <- unique(simd_bar_data()$type_definition)
+      xaxis_plots[["tickangle"]] <- -45
       
       #Creating plot    
       p <- plot_ly(data=simd_bar_data(), x=~quintile,
@@ -440,10 +441,15 @@
           trend_simd_plot <- trend_simd_plot
         }
         
+
         #Modifying standard layout
         yaxis_plots[["title"]] <- unique(simd_bar_data()$type_definition)
-        xaxis_plots[["autotick"]] <- F
-        xaxis_plots[["dtick"]] <- 2
+        xaxis_plots[["tickangle"]] <- ifelse(max(nchar(as.character(simd_trend_data()$trend_axis)))>7, -45, 0)
+        xaxis_plots[["dtick"]] <- ifelse(length(unique(simd_trend_data()$trend_axis)) >=10, 3, 1)
+        
+        
+        
+        
         
         #Layout
         trend_simd_plot %>%           
@@ -495,6 +501,7 @@
     yaxis_plots[["title"]] <- ~type_definition
     xaxis_plots[["autotick"]] <- F
     xaxis_plots[["dtick"]] <- 2
+    xaxis_plots[["tickangle"]] <- -45
     
     #Create plot SII
     sii_plot <- plot_ly(data=simd_index, x=~trend_axis,
@@ -556,7 +563,10 @@
       #Modifying standard layout
       yaxis_plots[["title"]] <- "Percentage more/less than average"
       xaxis_plots[["autotick"]] <- F
-      xaxis_plots[["dtick"]] <- 2
+      xaxis_plots[["tickangle"]] <- ifelse(max(nchar(as.character(simd_index$trend_axis)))>7, -45, 0)
+      xaxis_plots[["dtick"]] <- ifelse(length(unique(simd_index$trend_axis)) >=10, 3, 1)
+      
+
       
       #Create plot RII
       rii_plot <- plot_ly(data=simd_index, x=~trend_axis,
@@ -620,6 +630,8 @@
     
     #Modifying standard layout
     yaxis_plots[["title"]] <- ~type_definition
+    xaxis_plots[["tickangle"]] <- -45
+    
     
     par_bar_plot <- plot_ly(data = simd_parbar_data, x = ~quintile, 
                             text=tooltip_parbar, hoverinfo="text") %>%
@@ -663,9 +675,14 @@
                                  simd_partrend_data$par, "%")
       
     #Modifying standard layout
+ 
     yaxis_plots[["title"]] <- "Percentage attributable to deprivation"
-    xaxis_plots[["autotick"]] <- F
-    xaxis_plots[["dtick"]] <- 2
+    xaxis_plots[["dtick"]] <- ifelse(length(unique(simd_partrend_data$trend_axis)) >=10, 3, 1)
+    xaxis_plots[["tickangle"]] <- ifelse(max(nchar(as.character(simd_partrend_data$trend_axis)))>7, -45, 0)
+    
+    
+   
+    
     
     par_trend_plot <- plot_ly(data=simd_partrend_data, x=~trend_axis,
                               text=tooltip_partrend, hoverinfo="text") %>%

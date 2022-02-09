@@ -284,7 +284,7 @@ plot_rank_charts <- function(){
       rank_plot %>% layout(annotations = list(), #It needs this because of a buggy behaviour
                            yaxis = list(title = ~type_definition, titlefont =list(size=14), 
                                         tickfont =list(size=14), fixedrange=TRUE),
-                           xaxis = list(title = "", tickangle = 270, fixedrange=TRUE,
+                           xaxis = list(title = "", tickangle = -45, fixedrange=TRUE,
                                         tickfont =list(size=13), #axis parameters
                                         categoryorder="array", #order of plotting
                                         categoryarray = order_areas),
