@@ -909,7 +909,7 @@ plot_spine <- function(){
                scales="fixed",                          # fix scale so can compare % diff down column
                labeller = label_wrap_gen(multi_line = TRUE), # allow labels to wrap 
                strip.position="left")+                    # swap strip text to appear on left
-    theme(strip.text.y = element_text(size=14,colour ='#555555', angle = 180, hjust = 0), #adjust font & rotation
+    theme(strip.text.y.left = element_text(size=14,colour ='#555555', angle = 0, hjust = 0), #adjust font & rotation
           strip.switch.pad.wrap = unit(-1, "cm"), # reducing white space between strip panel & chart
           strip.placement = "outside",  # formatting again to try and limit white space
           strip.background = element_rect(fill="grey95"))           # change colour of facet wrap background
