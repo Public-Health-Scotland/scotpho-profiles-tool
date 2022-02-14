@@ -364,7 +364,7 @@
       
       #Creating plot    
       p <- plot_ly(data=simd_bar_data(), x=~quintile,
-              text=tooltip_simd, hoverinfo="text") %>%
+              text=tooltip_simd,textposition="none", hoverinfo="text") %>%
         #Comparator line
         add_trace(y = ~average, name = "Average", type = 'scatter', mode = 'lines',
                   line = list(color = '#FF0000'), hoverinfo="skip") %>% 
@@ -426,7 +426,7 @@
         
         #Creating plot
         trend_simd_plot <- plot_ly(data=simd_trend_data(), x=~trend_axis, 
-                                   text=tooltip_simd, hoverinfo="text") %>%
+                                   text=tooltip_simd, textposition="none", hoverinfo="text") %>%
           add_lines(y = ~measure, name = "", type = 'scatter', 
                     mode = 'lines', color = ~quintile, colors = pal_simd_trend) 
         
@@ -622,7 +622,7 @@
     yaxis_plots[["title"]] <- ~type_definition
     
     par_bar_plot <- plot_ly(data = simd_parbar_data, x = ~quintile, 
-                            text=tooltip_parbar, hoverinfo="text") %>%
+                            text=tooltip_parbar,textposition="none", hoverinfo="text") %>%
       add_bars(y = ~baseline, name= "", marker = list(color = "#4da6ff"), showlegend = FALSE) %>%   
       add_bars(y = ~diff_baseline, name = "Attributable to deprivation", 
                marker = list(color = "#ffa64d"), showlegend = FALSE) %>% 
@@ -668,7 +668,7 @@
     xaxis_plots[["dtick"]] <- 2
     
     par_trend_plot <- plot_ly(data=simd_partrend_data, x=~trend_axis,
-                              text=tooltip_partrend, hoverinfo="text") %>%
+                              text=tooltip_partrend, textposition="none",hoverinfo="text") %>%
       add_lines(y = ~par, type = 'scatter', mode = 'lines', line = list(color = "#4575b4")) %>%
       layout(yaxis = yaxis_plots, xaxis = xaxis_plots, font = font_plots,
              margin = list(b = 140)) %>% #to avoid labels getting cut out

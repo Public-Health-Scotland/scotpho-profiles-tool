@@ -268,13 +268,13 @@ plot_rank_charts <- function(){
       #Respond to user input regarding confidence intervals
       if (input$ci_rank == FALSE) {  
         #adding bar layer without confidence intervals
-        rank_plot <- rank_plot %>% add_bars(x = ~areaname, y = ~ measure, text=tooltip_bar, hoverinfo="text",
+        rank_plot <- rank_plot %>% add_bars(x = ~areaname, y = ~ measure, text=tooltip_bar, textposition="none",hoverinfo="text",
                                             marker = list(color = ~color_pal))
         
       }
       else { 
         #adding bar layer with error bars
-        rank_plot <- rank_plot %>% add_bars(x = ~areaname,y = ~ measure, text=tooltip_bar, hoverinfo="text",
+        rank_plot <- rank_plot %>% add_bars(x = ~areaname,y = ~ measure, text=tooltip_bar, textposition="none",hoverinfo="text",
                                             marker = list(color = ~color_pal), 
                                             error_y = list(type = "data",color='#000000',
                                                            symmetric = FALSE, array = ~upci_diff, arrayminus = ~lowci_diff)) 
