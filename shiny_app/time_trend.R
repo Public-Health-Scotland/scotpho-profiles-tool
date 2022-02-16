@@ -228,6 +228,9 @@ plot_trend_chart <- function() {
     #Modifying standard layout
     yaxis_plots[["title"]] <- trend_type()
     
+    xaxis_plots[["tickangle"]] <- ifelse(max(nchar(as.character(trend_data()$trend_axis)))>7, -45, 0)
+    xaxis_plots[["dtick"]] <- ifelse(length(unique(trend_data()$trend_axis)) >=10, 2, 1)
+   
     
     # Same approach for symbols
     symbols_palette <-  c('circle', 'diamond', 'circle', 'diamond', 'circle', 'diamond',
