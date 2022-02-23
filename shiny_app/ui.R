@@ -562,6 +562,10 @@ navbarMenu("Info", icon = icon("info-circle"),
                                 Scotland's future public health information needs, develop innovations in public health 
                                 information and provide a focus for new routine public health information development 
                                 where gaps exist."),
+                              p("Organisations may cite material included within the ScotPHO profiles tool subject to the following conditions:",
+                                tags$li("Quote the source as “Scottish Public Health Observatory”"),
+                                tags$li("Include the following URL -", 
+                                        tags$a(href ="https://scotland.shinyapps.io/ScotPHO_profiles_tool/", "https://scotland.shinyapps.io/ScotPHO_profiles_tool/", class = "externallink"))),
                               p("If you have any trouble accessing any information on this site or have
                                 any further questions or feedback relating to the data or the tool, then please contact us at: ",
                                 tags$b(tags$a(href="mailto:phs.scotpho@phs.scot", "phs.scotpho@phs.scot", class="externallink")),
