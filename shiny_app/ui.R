@@ -13,17 +13,13 @@ tagList( #needed for shinyjs
            windowTitle = "ScotPHO profiles", #title for browser tab
            theme = shinytheme("cerulean"), #Theme of the app (blue navbar)
            collapsible = TRUE, #tab panels collapse into menu in small screens
-           header =         
-             tags$head( #CSS styles
-               cookie_box, ##Cookie box
-               tags$link(rel="shortcut icon", href="favicon_scotpho.ico"), #Icon for browser tab
-               #Including Google analytics and Cookie control
-               includeScript("google-analytics.js"),
-               # HTML('<script src="https://cc.cdn.civiccomputing.com/8/cookieControl-8.x.min.js"></script>'),
-               # includeScript("cookie-control.js"),
-               includeCSS("www/styles.css"),
-               HTML("<base target='_blank'>") # to make external links open a new tab
-             ),
+           header = tags$head(includeCSS("www/styles.css"), # CSS styles
+                              HTML("<html lang='en'>"),
+                              tags$link(rel="shortcut icon", href="favicon_scotpho.ico"), #Icon for browser tab
+                              #Including Google analytics
+                              #includeScript("google-analytics.js"),
+                              HTML("<base target='_blank'>"),
+                              cookie_box),
 ###############################################.
 ## Landing page ----
 ###############################################.
