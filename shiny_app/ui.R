@@ -221,7 +221,7 @@ tabPanel("Summary", icon = icon("list-ul"), value = "summary",
 ###############################################.
 ## Time trend ----
 ###############################################.
-tabPanel("Trend", icon = icon("area-chart"), value = "trend",
+tabPanel("Trend", icon = icon("chart-area"), value = "trend",
          sidebarPanel(width=4,
                       column(6,
                              actionButton("help_trend",label="Help", icon= icon('question-circle'), class ="down")),
