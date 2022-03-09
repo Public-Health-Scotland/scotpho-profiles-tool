@@ -151,7 +151,10 @@ data_spss <- read_csv(paste0(shiny_files, "All Data for Shiny.csv"),
   rename(ind_id = indicator_id, code = geography_code) %>%
   select(-update_date) %>%
   # excluding indicators already present in shiny folder data files
-  filter(!(ind_id %in% unique(optdata$ind_id))) %>% droplevels()
+  filter(!(ind_id %in% unique(optdata$ind_id))) %>%
+  # exclude non-active indicators from old profiles tool dataset (drugs funded by crime)
+  filter(ind_id != "4131") %>%
+  droplevels()
 
 # Merging together spss and shiny data folder datasets
 optdata <- bind_rows(optdata, data_spss) %>%
