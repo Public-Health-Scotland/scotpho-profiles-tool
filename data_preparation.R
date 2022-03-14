@@ -266,8 +266,13 @@ View(gsub(paste0(shiny_files, "/"), "", files_depr))
 data_depr <- do.call(rbind, lapply(files_depr, readRDS)) %>%
   rename(measure = rate)
 
+##add life expectancy data
+le_inequalities_m <- readRDS("/PHI_conf/ScotPHO/Profiles/Data/Data to be checked/life_expectancy_male_ineq.rds")
+le_inequalities_f <- readRDS("/PHI_conf/ScotPHO/Profiles/Data/Data to be checked/life_expectancy_female_ineq.rds")
+
+
 # Merging with Andy's data and then formatting
-data_depr <- bind_rows(data_depr, andyp_data) %>%
+data_depr <- bind_rows(data_depr, andyp_data,le_inequalities_m,le_inequalities_f) %>%
   mutate_if(is.character,factor) %>% #converting characters into factors
   mutate_at(c("numerator", "measure", "lowci", "upci", "rii", "upci_rii",
               "lowci_rii", "sii", "lowci_sii", "upci_sii", "par", "abs_range",
