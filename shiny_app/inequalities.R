@@ -293,30 +293,18 @@
   
   
   #####################.
-  # Downloading report
+  # Downloading charts
   output$report_simd <- downloadHandler(
-    # For PDF output, change this to "report.pdf"
-    filename = "report.html",
-    content = function(file) {
-      # Copy the report file to a temporary directory before processing it, in
-      # case we don't have write permissions to the current working dir (which
-      # can happen when deployed).
-      tempReport <- file.path(tempdir(), "simd_report.Rmd")
-      file.copy("simd_report.Rmd", tempReport, overwrite = TRUE)
-      
-      simd_bar_data <- simd_bar_data()
-      
-      # Set up parameters to pass to Rmd document
-      params <- list(area_name = input$geoname_simd,
-                     simd_bar_data = simd_bar_data)
-      
-      # Knit the document, passing in the `params` list, and eval it in a
-      # child of the global environment (this isolates the code in the document
-      # from the code in this app).
-      rmarkdown::render(tempReport, output_file = file,
-                        params = params,
-                        envir = new.env(parent = globalenv())
-      )
+    # file name
+    filename <- 'plot.png',
+    # content
+    content = function(file){
+      #select plots to download, depending on measure type selected
+      export(p = if(input$measure_simd == "Trend"){combined_trend()}
+             else if(input$measure_simd == "Gap"){combined_gap()}
+             else if(input$measure_simd == "Risk"){combined_risk()}, file = 'tempPlot.png')
+      # hand over the file
+      file.copy('tempPlot.png',file)
     }
   )
   
@@ -330,8 +318,10 @@
                     " between deprivation groups for ", input$year_simd)))
   })
   
-  #First plot on the right hand side, the rate
-  output$simd_bar_plot <- renderPlotly({
+  # Chart 1. barplot ----
+  chart_1 <- reactive({
+    
+    
     #If no data available for that period then plot message saying data is missing
     if (is.data.frame(simd_bar_data()) && nrow(simd_bar_data()) == 0)
     {
@@ -342,14 +332,14 @@
       #Text for tooltip
       if (input$ci_simd == FALSE) {  
         tooltip_simd <- paste0("Quintile ", simd_bar_data()$quintile, "<br>",
-                                simd_bar_data()$trend_axis, ": ", simd_bar_data()$measure,
+                               simd_bar_data()$trend_axis, ": ", simd_bar_data()$measure,
                                "<br>", simd_bar_data()$type_definition)
       } else { 
         tooltip_simd <- paste0("Quintile ", simd_bar_data()$quintile, "<br>",
-                                 simd_bar_data()$trend_axis, ": ", 
-                                 simd_bar_data()$measure, "<br>",
-                                 "95% confidence interval: ", simd_bar_data()$lowci, "-", simd_bar_data()$upci, 
-                                 "<br>", simd_bar_data()$type_definition)
+                               simd_bar_data()$trend_axis, ": ", 
+                               simd_bar_data()$measure, "<br>",
+                               "95% confidence interval: ", simd_bar_data()$lowci, "-", simd_bar_data()$upci, 
+                               "<br>", simd_bar_data()$type_definition)
       }
       
       #Palette for plot 
@@ -365,101 +355,162 @@
       
       #Creating plot    
       p <- plot_ly(data=simd_bar_data(), x=~quintile,
-              text=tooltip_simd,textposition="none", hoverinfo="text") %>%
+                   text=tooltip_simd, hoverinfo="text") %>%
         #Comparator line
         add_trace(y = ~average, name = "Average", type = 'scatter', mode = 'lines',
                   line = list(color = '#FF0000'), hoverinfo="skip") %>% 
         layout(bargap = 0.1, margin=list(b = 140), #to avoid labels getting cut out
-               showlegend = FALSE,
+               #showlegend = FALSE,
                font = font_plots, yaxis = yaxis_plots, xaxis = xaxis_plots) %>%
         config(displayModeBar = F, displaylogo = F, editable =F) # taking out toolbar
     }
-
+    
     if (input$ci_simd == FALSE) {  
       #adding bar layer without confidence intervals
-      p %>% add_bars(y = ~measure, color = ~ quintile, marker = list(color = pal_simd_bar))
+      p %>% add_bars(y = ~measure, color = ~ quintile, marker = list(color = pal_simd_bar), showlegend = TRUE)
     } else { 
       #adding bar layer with error bars
-      p %>% add_bars(y = ~measure, color = ~ quintile, marker = list(color = pal_simd_bar),
+      p %>% add_bars(y = ~measure, color = ~ quintile, marker = list(color = pal_simd_bar), showlegend = TRUE,
                      error_y = list(type = "data",color='#000000',
                                     symmetric = FALSE, array = ~upci_diff, arrayminus = ~lowci_diff)) 
     }
-  
+    
   })
   
-###############################################.
-# Trend plot of trend tab 
-  
-  #Title
-  output$simd_trendplot_title <- renderUI({
-    p(tags$b(paste0("Changes over time by deprivation group")))
+  # Chart 1 - bar plot (version to display on dashboard)
+  output$simd_bar_plot <- renderPlotly({
+    
+    chart_1() %>%
+      layout(showlegend = F)
+    
   })
-
-  #Plotting
-  output$simd_trend_plot <- renderPlotly({
+  
+  
+  
+  # Chart 2 - trend plot ----
+  chart_2 <- reactive({
+    
+    
+    
     #If no data available for that period then plot message saying data is missing
     if (is.data.frame(simd_trend_data()) && nrow(simd_trend_data()) == 0)
     {
       plot_nodata()
     } else { #If there is data plot it
-        #Text for tooltip
-       
-        if (input$ci_simd == FALSE) {  
-          tooltip_simd <- paste0(simd_trend_data()$quintile, "<br>",
-                                   simd_trend_data()$trend_axis, ": ", simd_trend_data()$measure,
-                                   "<br>", simd_trend_data()$type_definition)
-        } else { 
-          tooltip_simd <- paste0(simd_trend_data()$quintile, "<br>",
-                                   simd_trend_data()$trend_axis, ": ", 
-                                   simd_trend_data()$measure, "<br>",
-                                   "95% confidence interval: ",
-                                   simd_trend_data()$lowci, "-", simd_trend_data()$upci,
-                                   "<br>", simd_trend_data()$type_definition)
-        }
-        
-        #Palette for plot 
-        pal_simd_trend <- case_when(simd_trend_data()$quintile == "1 - most deprived" ~ '#022031', 
+      #Text for tooltip
+      
+      if (input$ci_simd == FALSE) {  
+        tooltip_simd <- paste0(simd_trend_data()$quintile, "<br>",
+                               simd_trend_data()$trend_axis, ": ", simd_trend_data()$measure,
+                               "<br>", simd_trend_data()$type_definition)
+      } else { 
+        tooltip_simd <- paste0(simd_trend_data()$quintile, "<br>",
+                               simd_trend_data()$trend_axis, ": ", 
+                               simd_trend_data()$measure, "<br>",
+                               "95% confidence interval: ",
+                               simd_trend_data()$lowci, "-", simd_trend_data()$upci,
+                               "<br>", simd_trend_data()$type_definition)
+      }
+      
+      #Palette for plot 
+      pal_simd_trend <- case_when(simd_trend_data()$quintile == "1 - most deprived" ~ '#022031', 
                                   simd_trend_data()$quintile == "2" ~ '#313695', 
                                   simd_trend_data()$quintile == "3" ~ '#4575b4', 
                                   simd_trend_data()$quintile == "4" ~ '#74add1', 
                                   simd_trend_data()$quintile == "5 - least deprived" ~ '#abd9e9',
                                   simd_trend_data()$quintile == "Total" ~ '#FF0000')
+      
+      #Creating plot
+      trend_simd_plot <- plot_ly(data=simd_trend_data(), x=~trend_axis, 
+                                 text=tooltip_simd, hoverinfo="text") %>%
+        add_lines(y = ~measure, name = "", type = 'scatter', 
+                  mode = 'lines', color = ~quintile, colors = pal_simd_trend, showlegend = FALSE) 
+      
+      #Adding confidence intervals depending on user input
+      if (input$ci_simd == TRUE) {
+        trend_simd_plot <- trend_simd_plot %>% 
+          add_ribbons(data = simd_trend_data(), ymin = ~lowci, ymax = ~upci, showlegend = FALSE,
+                      opacity = 0.2, color = ~quintile) 
         
-        #Creating plot
-        trend_simd_plot <- plot_ly(data=simd_trend_data(), x=~trend_axis, 
-                                   text=tooltip_simd, textposition="none", hoverinfo="text") %>%
-          add_lines(y = ~measure, name = "", type = 'scatter', 
-                    mode = 'lines', color = ~quintile, colors = pal_simd_trend) 
-        
-        #Adding confidence intervals depending on user input
-        if (input$ci_simd == TRUE) {
-          trend_simd_plot <- trend_simd_plot %>% 
-            add_ribbons(data = simd_trend_data(), ymin = ~lowci, ymax = ~upci, showlegend = F,
-                        opacity = 0.2, color = ~quintile) 
-          
-        } else if (input$ci_simd == FALSE) {
-          trend_simd_plot <- trend_simd_plot
-        }
-        
-
-        #Modifying standard layout
-        yaxis_plots[["title"]] <- unique(simd_bar_data()$type_definition)
-        xaxis_plots[["tickangle"]] <- ifelse(max(nchar(as.character(simd_trend_data()$trend_axis)))>7, -45, 0)
-        xaxis_plots[["dtick"]] <- ifelse(length(unique(simd_trend_data()$trend_axis)) >=10, 3, 1)
-        
-        
-        
-        
-        
-        #Layout
-        trend_simd_plot %>%           
-          layout(margin = list(b = 140), #to avoid labels getting cut out
-                 yaxis = yaxis_plots, xaxis = xaxis_plots, font = font_plots,
-                 showlegend = F) %>%
-
-          config(displayModeBar = FALSE, displaylogo = F, editable =F) # taking out toolbar
+      } else if (input$ci_simd == FALSE) {
+        trend_simd_plot <- trend_simd_plot
       }
+      
+      #Modifying standard layout
+      yaxis_plots[["title"]] <- unique(simd_bar_data()$type_definition)
+      xaxis_plots[["tickangle"]] <- ifelse(max(nchar(as.character(simd_trend_data()$trend_axis)))>7, -45, 0)
+      xaxis_plots[["dtick"]] <- ifelse(length(unique(simd_trend_data()$trend_axis)) >=10, 3, 1)
+      
+      #Layout
+      trend_simd_plot %>%           
+        layout(margin = list(b = 140), #to avoid labels getting cut out
+               yaxis = yaxis_plots, xaxis = xaxis_plots, font = font_plots) %>%
+        
+        config(displayModeBar = FALSE, displaylogo = F, editable =F) # taking out toolbar
+    }
   })
+  
+  
+  
+  #Title
+  output$simd_trendplot_title <- renderUI({
+    p(tags$b(paste0("Changes over time by deprivation group")))
+  })
+  
+  #chart 2 - trend plot (for displaying on the dashboard)
+  output$simd_trend_plot <- renderPlotly({
+    
+    chart_2() 
+    
+  })
+  
+  
+  # 2 charts within 'trend' measure
+  # combined into a subplot for the purpose of exporting together with legend and titles
+  
+  combined_trend <- reactive({
+    
+    chart_1 <-  chart_1 () %>%
+      layout(annotations = list(
+        xanchor = "left",
+        yanchor = "top",
+        x = 0 ,
+        y = 1.05, 
+        text = paste0("Differences in ", first(simd_bar_data()$indicator), "\nbetween deprivation groups for ", first(simd_bar_data()$trend_axis)), 
+        showarrow = F, 
+        align = "left",
+        font=list(size=13,face="bold"),
+        xref='paper', 
+        yref='paper'),
+        yaxis = list(title = first(simd_trend_data()$type_definition)))
+    
+    
+    chart_2 <- chart_2() %>%
+      layout(annotations = list(
+        xanchor = "left",
+        yanchor = "top",
+        align = "left",
+        x = 0 ,
+        y = 1.05, 
+        text = "Changes over time by deprivation group", 
+        font=list(size=13,face="bold"),
+        showarrow = F, 
+        xref='paper', 
+        yref='paper'),
+        yaxis = list(title = first(simd_trend_data()$type_definition)))
+    
+    
+    final <- subplot(chart_1, chart_2, margin = 0.07, titleY = TRUE) %>%
+      layout(width = 1200, height = 600,
+        legend = list(orientation = "h",
+                      xanchor = "center", 
+                      x = 0.5,
+                      y = -0.3))
+    
+  })
+  
+  
+  
   
 ###############################################.
 ## Plots for RII/SII ----
@@ -471,10 +522,11 @@
         p(paste0("Absolute differences between most and least deprived areas, 
                  expressed as ", tolower(unique(simd_trend_data()$type_definition)), ".")))
   })
+  
 
-  #SII plot
-  output$simd_sii_plot <- renderPlotly({
-      
+  #SII plot 
+  chart_3 <- reactive({
+    
     simd_index <- simd_trend_data() %>% filter((quintile == "Total"))
     
     #If no SII for that period then plot message saying data is missing
@@ -527,6 +579,18 @@
     }
   })
   
+  
+  # ssi plot (chart 3) to display on dashboard
+  output$simd_sii_plot <- renderPlotly({
+    
+    chart_3() 
+    
+  })
+  
+  
+  
+  
+  
   #RII plot
   
   #text for title rii
@@ -537,7 +601,11 @@
             and the overall average for the area.")))
   })
   
-  output$simd_rii_plot <- renderPlotly({
+  
+  
+  # rri plot
+  chart_4 <- reactive({
+
     
     simd_index <- simd_trend_data() %>% filter((quintile == "Total"))
     
@@ -591,7 +659,70 @@
 
     }
   })
+  
+  
+  # rri plot (to display on dashboard)
+  output$simd_rii_plot <- renderPlotly({
+    
+    
+    chart_4() 
+    
+  })
+  
+  
+  
+  
+  # 2 charts within 'trend' measure
+  # combined into a subplot for the purpose of exporting together with legend and titles
+  combined_gap <- reactive({
+    
+    
+    chart_3 <-  chart_3 () %>%
+      layout(annotations = list(
+        xanchor = "left",
+        yanchor = "top",
+        x = 0 ,
+        y = 1.05, 
+        text = paste0("Inequality gap over time\nAbsolute differences between the most and least deprived areas\nexpressed as ", tolower(unique(simd_trend_data()$type_definition))),
+        showarrow = F, 
+        align = "left",
+        xref='paper', 
+        yref='paper',
+        font=list(size=13,face="bold")),
+        xaxis = list(autorange = TRUE),
+        yaxis = list(autorange = TRUE))
+    
+    
+    
+    chart_4 <-  chart_4 () %>%
+      layout(showlegend = T,
+             annotations = list(
+               xanchor = "left",
+               yanchor = "top",
+               align = "left",
+               x = 0 ,
+               y = 1.05, 
+               text = "How the most deprived area compares with the average for Scotland\nRelative differences between the least deprived area\nand the overall average for the area.",
+               showarrow = F, 
+               xref='paper', 
+               yref='paper',
+               font=list(size=13,face="bold")),
+             xaxis = list(autorange = TRUE),
+             yaxis = list(autorange = TRUE),
+             yaxis = list(title = "% more/less than average"))
+    
+    
+    
+    final <- subplot(chart_3, chart_4, margin = 0.07, titleY = TRUE) %>%
+      layout(legend = list(orientation = "h",
+                           xanchor = "center", 
+                           x = 0.5,
+                           y = -0.2),
+             width = 1200, height = 600)
+  })
+  
 
+  
   ###############################################.
   ## Plots for PAR ----
   ###############################################.
@@ -609,7 +740,11 @@
           of the least deprived area were experienced across the whole population."))
   })
   
-  output$simd_par_barplot <- renderPlotly({
+  
+  
+  
+  #Bar plot for PAR
+  chart_5 <- reactive({
     
     #If no PAR for that period then plot message saying data is missing
     if (is.na(simd_bar_data()$par))
@@ -635,9 +770,9 @@
     
     par_bar_plot <- plot_ly(data = simd_parbar_data, x = ~quintile, 
                             text=tooltip_parbar,textposition="none", hoverinfo="text") %>%
-      add_bars(y = ~baseline, name= "", marker = list(color = "#4da6ff"), showlegend = FALSE) %>%   
+      add_bars(y = ~baseline, name= "baseline", marker = list(color = "#4da6ff"), showlegend = TRUE) %>%   
       add_bars(y = ~diff_baseline, name = "Attributable to deprivation", 
-               marker = list(color = "#ffa64d"), showlegend = FALSE) %>% 
+               marker = list(color = "#ffa64d"), showlegend = TRUE) %>% 
       layout(bargap = 0.1, barmode = 'stack', showlegend = T, 
              legend = list(x = 0.9, y = 0.9),
              margin = list(b = 140), #to avoid labels getting cut out
@@ -646,6 +781,17 @@
     
     }
   })
+  
+  
+  # bar plot for PAR (for displaying on the dashboard)
+  output$simd_par_barplot <- renderPlotly({
+    
+    chart_5()  %>%
+      layout(showlegend = F)
+    
+  })
+  
+  
   
   #Line plot for PAR
   
@@ -656,7 +802,7 @@
 
   })
   
-  output$simd_par_trendplot <- renderPlotly({
+  chart_6 <- reactive({ 
     
     #preparing data needed
     simd_partrend_data <- simd_quint_data() %>%
@@ -686,7 +832,7 @@
     
     par_trend_plot <- plot_ly(data=simd_partrend_data, x=~trend_axis,
                               text=tooltip_partrend, textposition="none",hoverinfo="text") %>%
-      add_lines(y = ~par, type = 'scatter', mode = 'lines', line = list(color = "#4575b4")) %>%
+      add_lines(y = ~par, type = 'scatter', mode = 'lines', line = list(color = "#4575b4"), name = "% attributable to deprivation") %>%
       layout(yaxis = yaxis_plots, xaxis = xaxis_plots, font = font_plots,
              margin = list(b = 140)) %>% #to avoid labels getting cut out
       config(displayModeBar = FALSE, displaylogo = F, editable =F) # taking out toolbar
@@ -694,5 +840,58 @@
     }
   })
   
-
+  
+  # line plot PAR (to display on dashboard)
+  output$simd_par_trendplot <- renderPlotly({
+    
+    chart_6() 
+    
+  })
+  
+  
+  #d. Combine into a subplot for the purpose of downloading
+  
+  combined_risk <- reactive({
+    
+    
+    chart_5 <-  chart_5() %>%
+      layout(annotations = list(
+        xanchor = "left",
+        yanchor = "top",
+        x = 0.07 ,
+        y = 1.05, 
+        align = "left",
+        font=list(size=13,face="bold"),
+        text = paste0("Attributable to inequality, ",first(simd_bar_data()$trend_axis), "\nWhat part of ", first(simd_bar_data()$indicator), "\ncan be attributed to socioeconomic inequalities"),
+        yref='paper'),
+        xaxis = list(autorange = TRUE),
+        yaxis = list(autorange = TRUE))
+    
+    
+    
+    chart_6 <-  chart_6() %>%
+      layout(annotations = list(
+        xanchor = "left",
+        yanchor = "top",
+        x = 0.07 ,
+        y = 1.05, 
+        align = "left",
+        font=list(size=13,face="bold"),
+        text = paste0("Potential for improvement.\nHow much ",first(simd_bar_data()$indicator)," could be reduced if the \nlevels of the least deprived area were experienced across\n the whole population."),
+        yref='paper'),
+        xaxis = list(autorange = TRUE),
+        yaxis = list(autorange = TRUE))
+    
+      
+      
+      final <- subplot(chart_5, chart_6, margin = 0.07, titleY = TRUE) %>%
+      layout(width = 1200, height = 600,
+            legend = list(orientation = "h",
+                           xanchor = "center", 
+                           x = 0.5,
+                           y = -0.3),
+             margin = list(l = 50, r = 50, b = 100, t = 100, pad = 4))
+  })
+  
+  
 ##END
