@@ -341,7 +341,8 @@ output$download_rankplot <- downloadHandler(
   content = function(file){
     export(p = plot_rank_charts() %>% 
              layout(title = paste0(input$indic_rank, "<br>", make_rank_subtitle()),
-                    margin = list(t = 180)),
+                    margin = list(t = 180),
+                    width = 1000, height = 800),
            file = file)
   })
 

@@ -3,6 +3,8 @@ cookie-control.js
 deploying_app.R
 deploy.R
 
+tempPlot.png
+
 #Not needed
 rsconnect
 .Rproj.user
