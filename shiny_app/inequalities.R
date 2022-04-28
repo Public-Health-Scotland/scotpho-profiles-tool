@@ -355,7 +355,7 @@
       
       #Creating plot    
       p <- plot_ly(data=simd_bar_data(), x=~quintile,
-                   text=tooltip_simd, hoverinfo="text") %>%
+                   text=tooltip_simd, textposition="none",hoverinfo="text") %>%
         #Comparator line
         add_trace(y = ~average, name = "Average", type = 'scatter', mode = 'lines',
                   line = list(color = '#FF0000'), hoverinfo="skip") %>% 
