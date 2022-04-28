@@ -266,9 +266,13 @@ View(gsub(paste0(shiny_files, "/"), "", files_depr))
 data_depr <- do.call(rbind, lapply(files_depr, readRDS)) %>%
   rename(measure = rate)
 
+
+############TEMPORARY SCRIPT UNTIL LE DATA READY FOR INCLUSION
 ##add life expectancy data
-le_inequalities_m <- readRDS("/PHI_conf/ScotPHO/Profiles/Data/Data to be checked/life_expectancy_male_ineq.rds")
-le_inequalities_f <- readRDS("/PHI_conf/ScotPHO/Profiles/Data/Data to be checked/life_expectancy_female_ineq.rds")
+le_inequalities_m <- readRDS("/PHI_conf/ScotPHO/Profiles/Data/Data to be checked/life_expectancy_male_ineq.rds") %>%
+mutate(quint_type=case_when(code=="S00000001" ~ "sc_quin", TRUE ~ quint_type))  
+le_inequalities_f <- readRDS("/PHI_conf/ScotPHO/Profiles/Data/Data to be checked/life_expectancy_female_ineq.rds") %>%
+  mutate(quint_type=case_when(code=="S00000001" ~ "sc_quin", TRUE ~ quint_type))  
 
 
 # Merging with Andy's data and then formatting
@@ -297,19 +301,19 @@ data_depr <- left_join(x=data_depr, y=geo_lookup, by="code") %>%
 data_depr <- data_depr %>% apply_supressions() #Apply supressions.
 
 #selecting out indicators where higher is better as app doesn't work with them
-data_depr <- data_depr %>%
-  filter(!(indicator %in% c("Child dental health in primary 1",
-                            "Child dental health in primary 7",
-                            "Healthy birth weight",
-                            "Bowel screening uptake",
-                            "Single adult dwellings",
-                            "Immunisation uptake at 24 months - 6 in 1",
-                            "Immunisation uptake at 24 months - MMR",
-                            "Teenage pregnancies"))) %>% droplevels()
+# data_depr <- data_depr %>%
+#   filter(!(indicator %in% c("Child dental health in primary 1",
+#                             "Child dental health in primary 7",
+#                             "Healthy birth weight",
+#                             "Bowel screening uptake",
+#                             "Single adult dwellings",
+#                             "Immunisation uptake at 24 months - 6 in 1",
+#                             "Immunisation uptake at 24 months - MMR",
+#                             "Teenage pregnancies"))) %>% droplevels()
 
-# Temporary until we decide to add new indicators
-data_depr <- data_depr %>%
-  filter(!(indicator %in% c("Deaths from suicide"))) %>% droplevels()
+# # Temporary until we decide to add new indicators
+# data_depr <- data_depr %>%
+#   filter(!(indicator %in% c("Deaths from suicide"))) %>% droplevels()
 
 saveRDS(data_depr, "shiny_app/data/deprivation_data.rds")
 
