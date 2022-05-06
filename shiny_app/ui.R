@@ -391,11 +391,14 @@ tabPanel("Inequalities", icon = icon("balance-scale"), value = "ineq",
                    ),#trend minitab bracket
                    #Absolute and realtive inequality
                    conditionalPanel("input.measure_simd == 'Gap'",
-                                    column(6, htmlOutput("title_sii"), br(),
-                                           withSpinner(plotlyOutput("simd_sii_plot"))), 
+                                    column(5, htmlOutput("title_sii"), br(),
+                                           withSpinner(plotlyOutput("simd_sii_plot"))),
+                                    column(1,p("increasing inequalities")),
                                     column(6, 
                                            htmlOutput("title_rii"),
-                                           withSpinner(plotlyOutput("simd_rii_plot"))) 
+                                           withSpinner(plotlyOutput("simd_rii_plot"))),
+                                    column(12,
+                                           p("test "))
                    ),
                    #Population attributable risk
                    conditionalPanel("input.measure_simd == 'Risk'",
@@ -408,6 +411,12 @@ tabPanel("Inequalities", icon = icon("balance-scale"), value = "ineq",
                                     column(6,
                                            htmlOutput("simd_par_trendplot_title"),
                                            withSpinner(plotlyOutput("simd_par_trendplot")))
+                   ),
+                   #Which measure to look at
+                   conditionalPanel("input.measure_simd == '?'",
+                                    column(6,
+                                           p("There are a number of different ways to measure inequalities...."))
+
                    )
          )
 ), #Tab panel bracket

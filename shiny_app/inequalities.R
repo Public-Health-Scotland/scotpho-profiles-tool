@@ -1,4 +1,9 @@
-#Code to inequalities tab
+##to do
+
+#paf chart needs to cope with indicators like bowel screening where rates highest in least deprived - should we allow neagtive perecntages
+
+
+#Code for inequalities tab
 
   ###############################################.        
   #### Modal ----
@@ -182,14 +187,21 @@
     
     #Data used to translate measure into numerator 
     simd_text_data <- simd_trend_data() %>%
-      filter(quintile == "Total" & trend_axis == input$year_simd) %>%
+      filter(quintile == "Total") %>%
+      mutate(sii_start=sii[which.min(year)],
+             sii_end=sii[which.max(year)]) %>%      
+      filter(trend_axis == input$year_simd) %>%
+      mutate(sii_change=case_when(sii_start>sii_end ~"narrowed.",
+                                  sii_start<sii_end ~"widened.",
+                                  sii_start==sii_end~"remained unchanged.", TRUE ~"other"))
+
     # OUT FOR THE MOMENT Until we clarify message/method
       # mutate(stand_rate = case_when(
       #   type_definition == "Age-sex standardised rate per 100,000" ~ sii * (denominator/100000),
       #   type_definition == "Crude rate per 1,000" ~ sii * (denominator/1000),
       #   type_definition == "Percentage" ~ sii/100 * denominator
       # )) %>% 
-      droplevels()
+      #droplevels()
 
     #To have dynamic text depending on if rii is positive or negative
     more_less <- case_when(
@@ -227,10 +239,12 @@
         #                  tolower(unique(simd_bar_data()$label_ineq)), " each year."))),
         # conditionalPanel("!(is.na(simd_bar_data()$rii_int)",
         tags$li(class= "li-custom",  
+                p(paste0(unique(simd_bar_data()$qmax_statement)," have the highest ",tolower(input$indic_simd))),
                 p(paste0("The most deprived areas have ", abs(round(unique(simd_text_data$rii_int), 0)),
                          "% ", more_less, tolower(unique(simd_text_data$label_ineq)), than_as, 
-                         " the overall average." )))
-                )
+                         " the overall average." )),
+                p(simd_text_data$sii_change))
+      )
       
     } else { #if the data is available print the following messages
       tags$ul( 
@@ -240,15 +254,20 @@
         #                  format(round(simd_text_data$stand_rate, 0), big.mark=","), " ",
         #                  tolower(unique(simd_bar_data()$label_ineq)), " each year."))),
         # conditionalPanel("!(is.na(simd_bar_data()$rii_int)",
-        tags$li(class= "li-custom",  
+        tags$li(class= "li-custom",
+                p(paste0(unique(simd_bar_data()$qmax_statement)," have the highest ",tolower(input$indic_simd)))),
+        tags$li(class= "li-custom",
                 p(paste0("The most deprived areas have ", abs(round(unique(simd_bar_data()$rii_int), 0)),
                          "% ", more_less, tolower(unique(simd_bar_data()$label_ineq)), than_as, 
                          " the overall average." ))),
-                tags$li(class= "li-custom",
-                        p(paste0(input$indic_simd, " would be ",
-                                 abs(round(unique(simd_bar_data()$par), 0)),"% ", par_more_less, "if the levels of the 
+        tags$li(class= "li-custom",
+                p(paste0("Over time the gap between the least and most deprived areas has ",
+                         simd_text_data$sii_change))),
+        tags$li(class= "li-custom",
+                p(paste0(input$indic_simd, " would be ",
+                         abs(round(unique(simd_bar_data()$par), 0)),"% ", par_more_less, "if the levels of the 
                                  least deprived area were experienced across the whole population.")))
-                        )
+      )
     }
   })
   
@@ -464,14 +483,16 @@
 ###############################################.
 ## Plots for RII/SII ----
 ###############################################.
-
+  
   #text for title sii
   output$title_sii <- renderUI({
-    div(p(tags$b("Inequality gap over time")),
-        p(paste0("Absolute differences between most and least deprived areas, 
-                 expressed as ", tolower(unique(simd_trend_data()$type_definition)), ".")))
+    div(p(tags$b("Inequalities over time:",br(),"absolute differences")),
+        p(paste0("The chart below shows the difference between most and least deprived areas 
+                 (expressed as ", tolower(unique(simd_trend_data()$type_definition)), ")")),
+        br(),
+        p("An increasing trend suggests the gap between the most and least deprived areas is growing."))
   })
-
+  
   #SII plot
   output$simd_sii_plot <- renderPlotly({
       
@@ -485,9 +506,10 @@
     
     # #Text for tooltips
       if (input$ci_simd == FALSE) {  
-        tooltip_sii <- paste0(simd_index$trend_axis, ": ", simd_index$sii, "<br>", 
-                               simd_index$type_definition, "<br>", 
-                               "Also known as Slope Index of Inequality")
+        tooltip_sii <- paste0("Absolute difference between most and least deprived areas,","<br>",
+                              "also known as Slope Index of Inequality (SII)", "<br>",
+          simd_index$trend_axis, ": ", simd_index$sii, "<br>", 
+                               simd_index$type_definition)
       } else { 
         tooltip_sii <- paste0(simd_index$trend_axis, ": ", simd_index$sii, "<br>",
                                 "95% confidence interval: ",
@@ -498,16 +520,27 @@
 
     
     #Modifying standard layout
-    yaxis_plots[["title"]] <- ~type_definition
+    yaxis_plots[["title"]] <- paste0(unique(simd_index$type_definition))
     xaxis_plots[["autotick"]] <- F
-    xaxis_plots[["dtick"]] <- 2
-    xaxis_plots[["tickangle"]] <- -45
+    xaxis_plots[["tickangle"]] <- ifelse(max(nchar(as.character(simd_index$trend_axis)))>7, -45, 0)
+    xaxis_plots[["dtick"]] <- ifelse(length(unique(simd_index$trend_axis)) >=10, 3, 1)
+    
     
     #Create plot SII
     sii_plot <- plot_ly(data=simd_index, x=~trend_axis,
-                        text=tooltip_sii, hoverinfo="text") %>%
+                        text=tooltip_sii, hoverinfo="text",height = 500) %>%
       add_lines(y = ~sii, name = "Absolute inequality (SII)", type = 'scatter', mode = 'lines',
-                line = list(color = '#74add1'))  %>% 
+                line = list(color = '#74add1'))  %>%
+      #add annotation
+      add_annotations(
+        x= -1,
+        y= 1,
+        textangle= -90,
+       # xref = "paper",
+        yref = "paper",
+        text = "Increasing inequalities ⇒",
+        showarrow = F
+      ) %>%
       #Layout
       layout(yaxis= yaxis_plots, showlegend = FALSE,
              margin = list(b = 140), #to avoid labels getting cut out
@@ -529,12 +562,20 @@
   
   #RII plot
   
-  #text for title rii
+  # old text for title rii - can remove this chunk if happy with revised wording
+  # output$title_rii <- renderUI({
+  #   div(p(tags$b(paste0("How the most deprived area compares with the average for ",
+  #                       input$geoname_simd)),
+  #         p("Relative differences between the least deprived area 
+  #           and the overall average for the area.")))
+  # })
+  
   output$title_rii <- renderUI({
-    div(p(tags$b(paste0("How the most deprived area compares with the average for ",
-                        input$geoname_simd)),
-          p("Relative differences between the least deprived area 
-            and the overall average for the area.")))
+    div(p(tags$b("Inequalities over time:",br(),"relative differences")),
+        p(paste0("The chart below shows the differences between the least deprived area
+            and the overall average for ",input$geoname_simd," (expressed as a percentage).")),
+        br(),
+        p("An increasing trend suggests that the gap between the least deprived areas and the average is growing."))
   })
   
   output$simd_rii_plot <- renderPlotly({
@@ -566,11 +607,9 @@
       xaxis_plots[["tickangle"]] <- ifelse(max(nchar(as.character(simd_index$trend_axis)))>7, -45, 0)
       xaxis_plots[["dtick"]] <- ifelse(length(unique(simd_index$trend_axis)) >=10, 3, 1)
       
-
-      
       #Create plot RII
       rii_plot <- plot_ly(data=simd_index, x=~trend_axis,
-                          text=tooltip_rii, hoverinfo="text") %>%
+                          text=tooltip_rii, hoverinfo="text",height = 500) %>%
         add_lines(y = ~rii_int, name = "Relative gap", type = 'scatter', mode = 'lines',
                   line = list(color = '#313695')) %>% 
         #Layout
@@ -592,6 +631,11 @@
     }
   })
 
+  
+  output$sii_rii_subplot <- renderPlotly({
+    
+  })
+  
   ###############################################.
   ## Plots for PAR ----
   ###############################################.

@@ -300,6 +300,30 @@ data_depr <- left_join(x=data_depr, y=geo_lookup, by="code") %>%
 
 data_depr <- data_depr %>% apply_supressions() #Apply supressions.
 
+# convert sii value to absolute values (remove negative values as)
+data_depr <- data_depr %>%
+  mutate(across(sii:upci_rii_int,abs))
+
+# flag quintile where measure highest & check for linear trends
+data_depr <- data_depr %>%
+group_by(ind_id, year,quint_type,code) %>%
+  arrange(ind_id, year, quint_type,code, desc(measure)) %>%
+ # mutate(qmax=quintile[measure==max(measure)]) %>%
+  mutate(qmax=quintile[which.max(measure)],
+         qmax_statement=case_when(qmax=="1 - most deprived" ~ "The most deprived areas",
+                                  qmax=="5 - least deprived" ~ "The least deprived areas",
+                                  qmax=="2" ~ "More deprived areas",
+                                  qmax=="4" ~ "Less deprived areas",
+                                  qmax=="3" ~ "No particular areas of deprivation",TRUE ~ " ")) %>%
+  ungroup() %>%
+  arrange(ind_id, year, code, quint_type, quintile)
+
+#indicators i'm not sure make sense to include
+ data_depr <- data_depr %>%
+   filter(!(indicator %in% c("People living in 15% most 'access deprived' areas",
+                             "Healthy birth weight"))) %>% #check healty weight as seems like reverse of what i'd expect
+   droplevels()
+
 #selecting out indicators where higher is better as app doesn't work with them
 # data_depr <- data_depr %>%
 #   filter(!(indicator %in% c("Child dental health in primary 1",
