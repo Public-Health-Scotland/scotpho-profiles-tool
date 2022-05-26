@@ -391,14 +391,19 @@ tabPanel("Inequalities", icon = icon("balance-scale"), value = "ineq",
                    ),#trend minitab bracket
                    #Absolute and realtive inequality
                    conditionalPanel("input.measure_simd == 'Gap'",
-                                    column(5, htmlOutput("title_sii"), br(),
+                                    column(6, htmlOutput("title_sii"),
+                                           br(),
+                                           actionButton("help_sii", label="Info", 
+                                                        icon= icon('question-circle'), class ="down"), 
+                                           br(),
                                            withSpinner(plotlyOutput("simd_sii_plot"))),
-                                    column(1,p("increasing inequalities")),
                                     column(6, 
                                            htmlOutput("title_rii"),
-                                           withSpinner(plotlyOutput("simd_rii_plot"))),
-                                    column(12,
-                                           p("test "))
+                                           br(),
+                                           actionButton("help_rii", label="Info", 
+                                                        icon= icon('question-circle'), class ="down"), 
+                                           br(),
+                                           withSpinner(plotlyOutput("simd_rii_plot")))
                    ),
                    #Population attributable risk
                    conditionalPanel("input.measure_simd == 'Risk'",
@@ -414,8 +419,21 @@ tabPanel("Inequalities", icon = icon("balance-scale"), value = "ineq",
                    ),
                    #Which measure to look at
                    conditionalPanel("input.measure_simd == '?'",
-                                    column(6,
-                                           p("There are a number of different ways to measure inequalities...."))
+                                    column(12,
+                                           p("There are a variety of ways to measure health inequalities, often to understand trends in inequality requires consideration of more than one measure."),
+                                           p("Indicators within the inequality module of the profiles tool show rates split by the ",
+                                             tags$a(href="http://www.healthscotland.scot/health-inequalities", "Scottish Indicies of Multiple Deprivation (SIMD)", 
+                                                    class="externallink"),
+                                             " quintile where individuals live."),
+                                           p("This tool presents some commonly used measures of inequality which summarise both absolute and relative inequality."),
+                                           p("Futher background information about ",
+                                             tags$a(href="http://www.healthscotland.scot/health-inequalities", "health inequalities", 
+                                                    class="externallink"),
+                                             " and ",
+                                             tags$a(href="https://www.scotpho.org.uk/comparative-health/measuring-inequalities/", "measuring health inequalities", 
+                                                    class="externallink"),
+                                             " in Scotland.")
+                                    ) # close column
 
                    )
          )
