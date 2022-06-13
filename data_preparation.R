@@ -300,16 +300,13 @@ data_depr <- left_join(x=data_depr, y=geo_lookup, by="code") %>%
 
 data_depr <- data_depr %>% apply_supressions() #Apply supressions.
 
-# # convert sii value to absolute values (remove negative values as)
-# data_depr <- data_depr %>%
-#   mutate(across(sii:upci_rii_int,abs))
 
 # flag quintile where measure highest & check for linear trends
 data_depr <- data_depr %>%
 group_by(ind_id, year,quint_type,code) %>%
   arrange(ind_id, year, quint_type,code, desc(measure)) %>%
   mutate(rii_gradient = case_when(rii>0 ~ "positive", sii<0 ~ "negative", sii==0 ~ "zero",TRUE ~ "zero")) %>%
-  mutate(across(sii:upci_rii_int,abs)) %>% # convert sii/rii value to absolute values (remove negative values as)
+  mutate(across(sii:abs_range,abs)) %>% # convert sii/rii value to absolute values (remove negative values as)
   mutate(qmax=quintile[which.max(measure)], # which quintile contains highest value
          qmax_statement=case_when(qmax=="1 - most deprived" ~ "The most deprived areas",
                                   qmax=="5 - least deprived" ~ "The least deprived areas",
