@@ -65,10 +65,8 @@
       size = "l", easyClose = TRUE, fade=FALSE, footer = modalButton("Close (Esc)")
     ))
   }) 
-  
-  
+
 ## Help on SII
-  
   observeEvent(input$help_sii, {
     showModal(modalDialog(
       title = "Absolute inequality and the Slope Index of Inequality (SII)",
@@ -97,8 +95,7 @@
   }) 
   
   ## Help on RII
-  
-  observeEvent(input$help_rii, {
+    observeEvent(input$help_rii, {
     showModal(modalDialog(
       title = "Relative inequality and the Relative Index of Inequality (RII)",
       p("The chart below shows how relative inequalty (the gap between the least disadvantaged group and the average of all groups) has changed over time."),
@@ -122,9 +119,6 @@
       size = "l", easyClose = TRUE, fade=FALSE, footer = modalButton("Close (Esc)")
     ))
   }) 
-  
-  
-  
   
   
   ###############################################.
@@ -424,13 +418,13 @@
       
       #Text for tooltip
       if (input$ci_simd == FALSE) {  
-        tooltip_simd <- paste0("Quintile ", simd_bar_data()$quintile, "<br>",
-                                simd_bar_data()$trend_axis, ": ", simd_bar_data()$measure,
-                               "<br>", simd_bar_data()$type_definition)
+        tooltip_simd <- paste0("Population living within SIMD quintile ", simd_bar_data()$quintile, "<br>",
+                               simd_bar_data()$measure,"<br>",
+                               simd_bar_data()$type_definition, "<br>",
+                               simd_bar_data()$trend_axis)
       } else { 
-        tooltip_simd <- paste0("Quintile ", simd_bar_data()$quintile, "<br>",
-                                 simd_bar_data()$trend_axis, ": ", 
-                                 simd_bar_data()$measure, "<br>",
+        tooltip_simd <- paste0("Population living within SIMD quintile ", simd_bar_data()$quintile, "<br>",
+                                 simd_bar_data()$trend_axis, ": ", simd_bar_data()$measure, "<br>",
                                  "95% confidence interval: ", simd_bar_data()$lowci, "-", simd_bar_data()$upci, 
                                  "<br>", simd_bar_data()$type_definition)
       }
