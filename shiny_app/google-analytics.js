@@ -8,3 +8,12 @@
   ga('create', 'UA-31372813-3', 'auto');
   ga('set', 'anonymizeIp', true);
   ga('send', 'pageview');
+
+  ////////////////////////// Event tracking /////////////////////// 
+  // Tracking clicks to the different tabs. It does track clicks to any links,
+  // if no data value assigned they will appear as unset, but this could work to
+  // look at all link click with some minor tweaks
+     $(document).on('click', 'a', function(e) {
+    ga('send', 'event', 'TabsetPanel', 'Tab Viewed', $(this).attr('data-value'));
+    
+  });
