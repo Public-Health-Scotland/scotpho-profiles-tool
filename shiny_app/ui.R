@@ -17,7 +17,7 @@ tagList( #needed for shinyjs
                               HTML("<html lang='en'>"),
                               tags$link(rel="shortcut icon", href="favicon_scotpho.ico"), #Icon for browser tab
                               #Including Google analytics
-                              #includeScript("google-analytics.js"),
+                              includeScript("google-analytics.js"),
                               HTML("<base target='_blank'>"),
                               cookie_box),
 ###############################################.
