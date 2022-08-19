@@ -251,7 +251,7 @@ andyp_data <- rbind( # merging together all indicators
   prepare_andyp_data("01_pc_access_sii_rii_opt", 1),
   prepare_andyp_data("04_prev_hosp_sii_rii_opt", 4),
   prepare_andyp_data("05_rep_hosp_sii_rii_opt", 5),
-  prepare_andyp_data("06_dying_hosp_sii_rii_opt", 6),
+  #prepare_andyp_data("06_dying_hosp_sii_rii_opt", 6),
   prepare_andyp_data("07_hc_amenable_mort_3-year aggregate_sii_rii_opt", 7),
   prepare_andyp_data("08_prem_mort_3-year aggregate_sii_rii_opt", 8)) %>%
   # patients by gp is all scotland simd
@@ -273,10 +273,16 @@ le_inequalities_m <- readRDS("/PHI_conf/ScotPHO/Profiles/Data/Data to be checked
 mutate(quint_type=case_when(code=="S00000001" ~ "sc_quin", TRUE ~ quint_type))  
 le_inequalities_f <- readRDS("/PHI_conf/ScotPHO/Profiles/Data/Data to be checked/life_expectancy_female_ineq.rds") %>%
   mutate(quint_type=case_when(code=="S00000001" ~ "sc_quin", TRUE ~ quint_type))  
+dying_in_hosp_michael <-readRDS("/PHI_conf/ScotPHO/Profiles/Data/Data to be checked/dying_in_hosp_depr_ineq.rds") %>%
+  rename(measure = rate)
+  
+    # mutate(ind_id=as.numeric(ind_id),
+    #      quintile=as.factor(quintile))
 
+#example_ineq <-readRDS("/PHI_conf/ScotPHO/Profiles/Data/Data to be checked/alcohol_stays_depr_ineq.rds")
 
 # Merging with Andy's data and then formatting
-data_depr <- bind_rows(data_depr, andyp_data,le_inequalities_m,le_inequalities_f) %>%
+data_depr <- bind_rows(data_depr, andyp_data,le_inequalities_m,le_inequalities_f,dying_in_hosp_michael) %>%
   mutate_if(is.character,factor) %>% #converting characters into factors
   mutate_at(c("numerator", "measure", "lowci", "upci", "rii", "upci_rii",
               "lowci_rii", "sii", "lowci_sii", "upci_sii", "par", "abs_range",
