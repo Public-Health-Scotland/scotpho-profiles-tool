@@ -120,7 +120,64 @@
     ))
   }) 
   
+  ###############################################.
+  ## Explanatory Text ----
+  ###############################################.
   
+    
+    output$which_measure_help <- renderUI({
+      tagList(
+        h5("Which option should I look at?",style = "font-weight: bold; color: black; margin-bottom: 0px;"),
+        p("There several different measures of health inequality. Understanding patterns in inequalities often requires looking at more than one measures. The options 'Trend','Gap' and 'Risk' present different measures to help users understand how inequaliries are changing over time."),
+        
+        #trend explanation
+        h5("Trend", style = "font-weight: bold; color: black; margin-bottom: 0px;"),
+        p("The ", tags$b("'Trend'"), " charts show indicator values for the population split by deprivation, they can be used to illustrate how rates in the most and least deprived areas compare."),
+        
+        #gap explanation
+        h5("Gap", style = "font-weight: bold; color: black; margin-bottom: 0px;"),
+        p("The ", tags$b("'Gap'"), " charts show two common measures of inequality - 
+          the Slope Index of Inequality (SII), which represents the absolute 
+          inequality gap using a regression model and the Relative Index of Inequality (RII), 
+          which quantifies the difference between the most deprived group 
+          and the overall average value. 
+          It is possible for absolute inequalities to reduce, while relative inequalities increase (or vice-versa) which is why it is valuable to look at both SII and RII."),
+        
+        #risk explanation
+        h5("Risk", style = "font-weight: bold; color: black; margin-bottom: 0px;"),
+        p("The ", tags$b("'Risk'"), " charts explore the potential for improvement in the overall value of an indicator.  
+        The metric shown is a theoretical value known as the Population Attributable Risk (PAR). 
+        This represents the potential reduction that would be possible if the popoulation as a whole experienced the same rate as that of the least deprived area.
+        It assumes that the least deprived areas have the most desirable rate (ie lowest or highest rate)."),
+        
+        p("You can read more about the measures used and presented in the",
+          tags$a(href="https://www.scotpho.org.uk/comparative-health/measuring-inequalities/", #to change
+                 "Measuring inequalities section",  class="externallink"), 
+          "of the ScotPHO website."),
+        
+        #Deprivation
+        h5("How does ScotPHO define deprivation? ", style = "font-weight: bold; color: black; margin-bottom: 0px;"),
+        #p("Indicators within the inequality module of the profiles tool show rates split by the ",
+        p("This tool use the ",
+          tags$a(href="http://www.healthscotland.scot/health-inequalities", "Scottish Indicies of Multiple Deprivation (SIMD)",
+                 class="externallink"),
+          " to subdivide geographic areas into groups experiencing different degrees of relative socio-economic deprivation."),
+        
+        #Further information about measuring inequality
+        h5("Further information about measuring inequality? ", style = "font-weight: bold; color: black; margin-bottom: 0px;"),
+        p("This tool presents some commonly used measures of inequality which summarise both absolute and relative inequality."),
+        p("Futher background information about ",
+          tags$a(href="http://www.healthscotland.scot/health-inequalities", "health inequalities",
+                 class="externallink"),
+          " and ",
+          tags$a(href="https://www.scotpho.org.uk/comparative-health/measuring-inequalities/", "measuring health inequalities",
+                 class="externallink"),
+          " in Scotland."))
+    })
+    
+    
+
+    
   ###############################################.
   ## Indicator definitions ----
   ###############################################.

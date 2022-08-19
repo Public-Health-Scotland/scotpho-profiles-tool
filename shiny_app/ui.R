@@ -340,20 +340,21 @@ tabPanel("Rank", icon = icon("signal"), value = "rank",
 ###############################################.
 tabPanel("Inequalities", icon = icon("balance-scale"), value = "ineq",
          sidebarPanel(width = 3, #Filter options
-                      actionButton("help_simd", label="Help", 
-                                   icon= icon('question-circle'), class ="down"), 
-                      actionButton("defs_simd",label="Definitions", icon= icon('info'), class ="down"),
+                      # actionButton("help_simd", label="Help", 
+                      #              icon= icon('question-circle'), class ="down"), 
+                      #actionButton("defs_simd",label="Definitions", icon= icon('info'), class ="down"),
                       div(style = "margin-top: 30px",
                           selectInput("geotype_simd", label = "Step 1 - Select a geography level and an area",
                                       choices = areatype_depr_list, selected =  "Scotland")),
                       uiOutput("geoname_ui_simd"),
                       selectInput("indic_simd", label = "Step 2 - Choose an indicator (type to search)",
                                   choices = ind_depr_list),
+                      actionButton("defs_simd",label="Definitions", icon= icon('info'), class ="down"),
                       uiOutput("year_ui_simd"),
-                      div(title="Select what aspect of inequality you want to explore.", # tooltip
+                      div(title="Select what aspect of inequality you want to explore", # tooltip
                           style = "margin-top: 10px; margin-bottom: 20px;", 
                           radioGroupButtons("measure_simd", 
-                                            label= "Step 4 - Select what aspect of inequality you want to explore.", 
+                                            label= "Step 4 - Select what aspect of inequality you want to explore", 
                                             choices = depr_measure_types, status = "primary",
                                             justified = TRUE
                           )),
@@ -367,11 +368,16 @@ tabPanel("Inequalities", icon = icon("balance-scale"), value = "ineq",
          ),
          mainPanel(width = 9, #Main panel
                    bsModal("mod_defs_simd", "Definitions", "defs_simd", htmlOutput('defs_text_simd')),
+                   #testing moving the overview text to only displaying when trend is selected rather than above every graph?
                    #Overview: trend and bar chart
-                   div(class= "depr-text-box",
-                       div(class= "title", textOutput("simd_nutshell_title")),
-                       div(class= "content", htmlOutput("simd_text"))),
+                   # div(class= "depr-text-box",
+                   #     div(class= "title", textOutput("simd_nutshell_title")),
+                   #     div(class= "content", htmlOutput("simd_text"))),
                    conditionalPanel("input.measure_simd == 'Trend'",
+                                    column(9,
+                                           div(class= "depr-text-box",
+                                               div(class= "title", textOutput("simd_nutshell_title")),
+                                               div(class= "content", htmlOutput("simd_text")))),
                                     column(6,
                                            htmlOutput("simd_barplot_title"),
                                            withSpinner(plotlyOutput("simd_bar_plot"))),
@@ -418,21 +424,22 @@ tabPanel("Inequalities", icon = icon("balance-scale"), value = "ineq",
                                            withSpinner(plotlyOutput("simd_par_trendplot")))
                    ),
                    #Which measure to look at
-                   conditionalPanel("input.measure_simd == '?'",
+                   conditionalPanel("input.measure_simd == 'Help'",
                                     column(12,
-                                           p("There are a variety of ways to measure health inequalities, often to understand trends in inequality requires consideration of more than one measure."),
-                                           p("Indicators within the inequality module of the profiles tool show rates split by the ",
-                                             tags$a(href="http://www.healthscotland.scot/health-inequalities", "Scottish Indicies of Multiple Deprivation (SIMD)", 
-                                                    class="externallink"),
-                                             " quintile where individuals live."),
-                                           p("This tool presents some commonly used measures of inequality which summarise both absolute and relative inequality."),
-                                           p("Futher background information about ",
-                                             tags$a(href="http://www.healthscotland.scot/health-inequalities", "health inequalities", 
-                                                    class="externallink"),
-                                             " and ",
-                                             tags$a(href="https://www.scotpho.org.uk/comparative-health/measuring-inequalities/", "measuring health inequalities", 
-                                                    class="externallink"),
-                                             " in Scotland.")
+                                           uiOutput("which_measure_help")
+                                           # p("There are a variety of ways to measure health inequalities, often to understand trends in inequality requires consideration of more than one measure."),
+                                           # p("Indicators within the inequality module of the profiles tool show rates split by the ",
+                                           #   tags$a(href="http://www.healthscotland.scot/health-inequalities", "Scottish Indicies of Multiple Deprivation (SIMD)", 
+                                           #          class="externallink"),
+                                           #   " quintile where individuals live."),
+                                           # p("This tool presents some commonly used measures of inequality which summarise both absolute and relative inequality."),
+                                           # p("Futher background information about ",
+                                           #   tags$a(href="http://www.healthscotland.scot/health-inequalities", "health inequalities", 
+                                           #          class="externallink"),
+                                           #   " and ",
+                                           #   tags$a(href="https://www.scotpho.org.uk/comparative-health/measuring-inequalities/", "measuring health inequalities", 
+                                           #          class="externallink"),
+                                           #   " in Scotland.")
                                     ) # close column
 
                    )
