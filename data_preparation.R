@@ -251,7 +251,7 @@ andyp_data <- rbind( # merging together all indicators
   prepare_andyp_data("01_pc_access_sii_rii_opt", 1),
   prepare_andyp_data("04_prev_hosp_sii_rii_opt", 4),
   prepare_andyp_data("05_rep_hosp_sii_rii_opt", 5),
-  #prepare_andyp_data("06_dying_hosp_sii_rii_opt", 6),
+  #prepare_andyp_data("06_dying_hosp_sii_rii_opt", 6), #data recalcuated by PHS analyst micahel webster 
   prepare_andyp_data("07_hc_amenable_mort_3-year aggregate_sii_rii_opt", 7),
   prepare_andyp_data("08_prem_mort_3-year aggregate_sii_rii_opt", 8)) %>%
   # patients by gp is all scotland simd
@@ -310,15 +310,23 @@ data_depr <- data_depr %>% apply_supressions() #Apply supressions.
 # flag quintile where measure highest & check for linear trends
 data_depr <- data_depr %>%
 group_by(ind_id, year,quint_type,code) %>%
-  arrange(ind_id, year, quint_type,code, desc(measure)) %>%
-  mutate(rii_gradient = case_when(rii>0 ~ "positive", sii<0 ~ "negative", sii==0 ~ "zero",TRUE ~ "zero")) %>%
-  mutate(across(sii:abs_range,abs)) %>% # convert sii/rii value to absolute values (remove negative values as)
-  mutate(qmax=quintile[which.max(measure)], # which quintile contains highest value
+  arrange(ind_id, year, quint_type, code, desc(measure)) %>%
+  mutate(rii_gradient = case_when(rii>0 ~ "positive", rii<0 ~ "negative", rii==0 ~ "zero",TRUE ~ "zero")) %>% # determines direction of rii
+  mutate(par_gradient = case_when(par>0 ~ "positive", par<0 ~ "negative", par==0 ~ "zero",TRUE ~ "zero")) %>% # labels if par is positive or negative
+  mutate(across(sii:abs_range,abs)) %>% # convert sii/rii value to absolute values (remove negative values as) needed to make charts in gap analysis easier to read (ie no negative axis but axis text changes to reflect most desirable situation)
+  mutate(qmax=quintile[which.max(measure)], # which quintile contains highest rate/value
+         qmin=quintile[which.min(measure)], # which quintile contains lowest rate/value
+         # create field that identifies for each year which quintile have highest/lowest values (used in summary statement #1 - qmax for when high rates are less desirable/qmin for when low rates are less desirable)
          qmax_statement=case_when(qmax=="1 - most deprived" ~ "The most deprived areas",
                                   qmax=="5 - least deprived" ~ "The least deprived areas",
                                   qmax=="2" ~ "More deprived areas",
                                   qmax=="4" ~ "Less deprived areas",
-                                  qmax=="3" ~ "No particular areas of deprivation",TRUE ~ " ")) %>%
+                                  qmax=="3" ~ "No particular areas of deprivation",TRUE ~ " "),
+         qmin_statement=case_when(qmin=="1 - most deprived" ~ "The most deprived areas",
+                                  qmin=="5 - least deprived" ~ "The least deprived areas",
+                                  qmin=="2" ~ "More deprived areas",
+                                  qmin=="4" ~ "Less deprived areas",
+                                  qmin=="3" ~ "No particular areas of deprivation",TRUE ~ " ")) %>%
   ungroup() %>%
   arrange(ind_id, year, code, quint_type, quintile)
 
@@ -329,15 +337,15 @@ group_by(ind_id, year,quint_type,code) %>%
    droplevels()
 
 #selecting out indicators where higher is better as app doesn't work with them
-# data_depr <- data_depr %>%
-#   filter(!(indicator %in% c("Child dental health in primary 1",
-#                             "Child dental health in primary 7",
-#                             "Healthy birth weight",
-#                             "Bowel screening uptake",
-#                             "Single adult dwellings",
-#                             "Immunisation uptake at 24 months - 6 in 1",
-#                             "Immunisation uptake at 24 months - MMR",
-#                             "Teenage pregnancies"))) %>% droplevels()
+ data_depr <- data_depr %>%
+   filter(!(indicator %in% c("Child dental health in primary 1",
+                             "Child dental health in primary 7",
+                             "Healthy birth weight",
+                             "Bowel screening uptake",
+                             "Single adult dwellings",
+                             "Immunisation uptake at 24 months - 6 in 1",
+                             "Immunisation uptake at 24 months - MMR",
+                             "Teenage pregnancies"))) %>% droplevels()
 
 # # Temporary until we decide to add new indicators
 # data_depr <- data_depr %>%
