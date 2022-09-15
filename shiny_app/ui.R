@@ -19,6 +19,9 @@ tagList( #needed for shinyjs
                               #Including Google analytics
                               includeScript("google-analytics.js"),
                               HTML("<base target='_blank'>"),
+                              # including google analytics 4
+                              HTML('<script async src="https://www.googletagmanager.com/gtag/js?id=G-KE1C59RLNS"></script>'),
+                              includeScript("gtag.js"),
                               cookie_box),
 ###############################################.
 ## Landing page ----
@@ -773,9 +776,6 @@ tabPanel("Other profiles", value = "others",
              #Link to GCPH
              tags$li(class= "li-custom", tags$a(href="http://www.understandingglasgow.com/",
                                                 "Glasgow Centre for Population Health (GCPH)",  class="externallink")), 
-             #Link to Fife
-             tags$li(class= "li-custom", tags$a(href="https://knowfife.fife.gov.uk/",
-                                                "KnowFife Dataset",  class="externallink")), 
              #Link to IS
              tags$li(class= "li-custom", tags$a(href="http://www.improvementservice.org.uk/community-planning-outcomes-profile.html",
                                                 "Improvement Service (IS) - Community planning outcomes profile (CPOP)",  class="externallink")), 
