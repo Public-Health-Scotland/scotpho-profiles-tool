@@ -221,7 +221,7 @@ ind_hsc_list <- c("Preventable emergency hospitalisation for a chronic condition
                   "Repeat emergency hospitalisation in the same year",
                   "Mortality amenable to health care",                            
                   "All-cause premature mortality",
-                  "Dying in hospital", "Mortality amenable to health care")
+                  "Mortality amenable to health care")
 
 #Profile names
 topic_list_filter <- as.factor(c("Show all",unique(sort(c(
