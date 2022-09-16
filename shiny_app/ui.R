@@ -349,7 +349,7 @@ tabPanel("Inequalities", icon = icon("balance-scale"), value = "ineq",
                       uiOutput("geoname_ui_simd"),
                       selectInput("indic_simd", label = "Step 2 - Choose an indicator (type to search)",
                                   choices = ind_depr_list),
-                      actionButton("defs_simd",label="Definitions", icon= icon('info'), class ="down"),
+                      actionButton("defs_simd",label="Indicator definitions", icon= icon('info'), class ="down"),
                       uiOutput("year_ui_simd"),
                       div(title="Select what aspect of inequality you want to explore", # tooltip
                           style = "margin-top: 10px; margin-bottom: 20px;", 
@@ -369,15 +369,16 @@ tabPanel("Inequalities", icon = icon("balance-scale"), value = "ineq",
          mainPanel(width = 9, #Main panel
                    bsModal("mod_defs_simd", "Definitions", "defs_simd", htmlOutput('defs_text_simd')),
                    #testing moving the overview text to only displaying when trend is selected rather than above every graph?
-                   #Overview: trend and bar chart
-                   # div(class= "depr-text-box",
-                   #     div(class= "title", textOutput("simd_nutshell_title")),
-                   #     div(class= "content", htmlOutput("simd_text"))),
+                   #Summary text
+                    div(class= "depr-text-box",
+                        div(class= "title", textOutput("simd_nutshell_title")),
+                        div(class= "content", htmlOutput("simd_text"))),
+                   #Bar chart and trend
                    conditionalPanel("input.measure_simd == 'Trend'",
-                                    column(9,
-                                           div(class= "depr-text-box",
-                                               div(class= "title", textOutput("simd_nutshell_title")),
-                                               div(class= "content", htmlOutput("simd_text")))),
+                                    # column(12,
+                                    #        div(class= "depr-text-box",
+                                    #            div(class= "title", textOutput("simd_nutshell_title")),
+                                    #            div(class= "content", htmlOutput("simd_text")))),
                                     column(6,
                                            htmlOutput("simd_barplot_title"),
                                            withSpinner(plotlyOutput("simd_bar_plot"))),
@@ -397,16 +398,19 @@ tabPanel("Inequalities", icon = icon("balance-scale"), value = "ineq",
                    ),#trend minitab bracket
                    #Absolute and realtive inequality
                    conditionalPanel("input.measure_simd == 'Gap'",
-                                    column(6, htmlOutput("title_sii"),
+                                    column(6, 
+                                           br(),br(),#improve alignment with selection menu
+                                           htmlOutput("title_sii"),
                                            br(),
-                                           actionButton("help_sii", label="Info", 
+                                           actionButton("help_sii", label="What does this chart show?", 
                                                         icon= icon('question-circle'), class ="down"), 
                                            br(),
                                            withSpinner(plotlyOutput("simd_sii_plot"))),
                                     column(6, 
+                                           br(),br(), #improve alignment with selection menu
                                            htmlOutput("title_rii"),
                                            br(),
-                                           actionButton("help_rii", label="Info", 
+                                           actionButton("help_rii", label="Chart info", 
                                                         icon= icon('question-circle'), class ="down"), 
                                            br(),
                                            withSpinner(plotlyOutput("simd_rii_plot")))
@@ -414,13 +418,20 @@ tabPanel("Inequalities", icon = icon("balance-scale"), value = "ineq",
                    #Population attributable risk
                    conditionalPanel("input.measure_simd == 'Risk'",
                                     column(6,
+                                           br(),br(),#improve alignment with selection menu
                                            htmlOutput("simd_par_barplot_title"),
+                                           actionButton("help_paf", label="What does this chart show?", 
+                                                        icon= icon('question-circle'), class ="down"),
                                            withSpinner(plotlyOutput("simd_par_barplot")),
                                            p(img(src= "signif_worse.png", height = "16px"),
-                                             "Attributable to inequality", 
-                                             style= "text-align: center; padding-bottom: 40px")),
+                                             "Attributable to inequality",
+                                             style= "text-align: center; padding-bottom: 40px")
+                                    ),
                                     column(6,
+                                           br(),br(),#improve alignment with selection menu
                                            htmlOutput("simd_par_trendplot_title"),
+                                           actionButton("help_paf2", label="What does this chart show?", 
+                                                        icon= icon('question-circle'), class ="down"),
                                            withSpinner(plotlyOutput("simd_par_trendplot")))
                    ),
                    #Which measure to look at
