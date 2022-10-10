@@ -228,7 +228,8 @@ topic_list_filter <- as.factor(c("Show all",unique(sort(c(
   substr(optdata$profile_domain1, 5, nchar(as.vector(optdata$profile_domain1))), 
   substr(optdata$profile_domain2, 5, nchar(as.vector(optdata$profile_domain2)))))))) 
 
-depr_measure_types <- c("Trend", "Gap", "Risk","Help") #list of measure types
+#depr_measure_types <- c("Trend", "Gap", "Risk","Help") #list of options to change which metric is displayed in inequalities module (original options but may switch wording)
+depr_measure_options <- c("Patterns of inequality", "Inequality gap", "Potential for impact","About these options?") #list of options to change which metric is displayed in inequalities module
 
 topic_list <- topic_list_filter[-1] #taking out show all from list
 
