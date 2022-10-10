@@ -337,12 +337,10 @@ tabPanel("Rank", icon = icon("signal"), value = "rank",
 ), #Tab panel bracket
 ###############################################.
 ## Health inequalities ---- 
+# depr_measure_options <- c("Patterns of inequality", "Inequality gap", "Potential for impact","Help me understand these options")
 ###############################################.
 tabPanel("Inequalities", icon = icon("balance-scale"), value = "ineq",
          sidebarPanel(width = 3, #Filter options
-                      # actionButton("help_simd", label="Help", 
-                      #              icon= icon('question-circle'), class ="down"), 
-                      #actionButton("defs_simd",label="Definitions", icon= icon('info'), class ="down"),
                       div(style = "margin-top: 30px",
                           selectInput("geotype_simd", label = "Step 1 - Select a geography level and an area",
                                       choices = areatype_depr_list, selected =  "Scotland")),
@@ -355,7 +353,7 @@ tabPanel("Inequalities", icon = icon("balance-scale"), value = "ineq",
                           style = "margin-top: 10px; margin-bottom: 20px;", 
                           radioGroupButtons("measure_simd", 
                                             label= "Step 4 - Select what aspect of inequality you want to explore", 
-                                            choices = depr_measure_types, status = "primary",
+                                            choices = depr_measure_options, status = "primary", direction = "vertical",
                                             justified = TRUE
                           )),
                       awesomeCheckbox("ci_simd", label = "Show/hide 95% confidence intervals", value = F),
@@ -374,7 +372,7 @@ tabPanel("Inequalities", icon = icon("balance-scale"), value = "ineq",
                         div(class= "title", textOutput("simd_nutshell_title")),
                         div(class= "content", htmlOutput("simd_text"))),
                    #Bar chart and trend
-                   conditionalPanel("input.measure_simd == 'Trend'",
+                   conditionalPanel("input.measure_simd == 'Patterns of inequality'",
                                     # column(12,
                                     #        div(class= "depr-text-box",
                                     #            div(class= "title", textOutput("simd_nutshell_title")),
@@ -397,7 +395,7 @@ tabPanel("Inequalities", icon = icon("balance-scale"), value = "ineq",
                                              column(1)))
                    ),#trend minitab bracket
                    #Absolute and realtive inequality
-                   conditionalPanel("input.measure_simd == 'Gap'",
+                   conditionalPanel("input.measure_simd == 'Inequality gap'",
                                     column(6, 
                                            br(),br(),#improve alignment with selection menu
                                            htmlOutput("title_sii"),
@@ -410,13 +408,13 @@ tabPanel("Inequalities", icon = icon("balance-scale"), value = "ineq",
                                            br(),br(), #improve alignment with selection menu
                                            htmlOutput("title_rii"),
                                            br(),
-                                           actionButton("help_rii", label="Chart info", 
+                                           actionButton("help_rii", label="What does this chart show?", 
                                                         icon= icon('question-circle'), class ="down"), 
                                            br(),
                                            withSpinner(plotlyOutput("simd_rii_plot")))
                    ),
                    #Population attributable risk
-                   conditionalPanel("input.measure_simd == 'Risk'",
+                   conditionalPanel("input.measure_simd == 'Potential for impact'",
                                     column(6,
                                            br(),br(),#improve alignment with selection menu
                                            htmlOutput("simd_par_barplot_title"),
@@ -435,22 +433,9 @@ tabPanel("Inequalities", icon = icon("balance-scale"), value = "ineq",
                                            withSpinner(plotlyOutput("simd_par_trendplot")))
                    ),
                    #Which measure to look at
-                   conditionalPanel("input.measure_simd == 'Help'",
+                   conditionalPanel("input.measure_simd == 'About these options?'",
                                     column(12,
-                                           uiOutput("which_measure_help")
-                                           # p("There are a variety of ways to measure health inequalities, often to understand trends in inequality requires consideration of more than one measure."),
-                                           # p("Indicators within the inequality module of the profiles tool show rates split by the ",
-                                           #   tags$a(href="http://www.healthscotland.scot/health-inequalities", "Scottish Indicies of Multiple Deprivation (SIMD)", 
-                                           #          class="externallink"),
-                                           #   " quintile where individuals live."),
-                                           # p("This tool presents some commonly used measures of inequality which summarise both absolute and relative inequality."),
-                                           # p("Futher background information about ",
-                                           #   tags$a(href="http://www.healthscotland.scot/health-inequalities", "health inequalities", 
-                                           #          class="externallink"),
-                                           #   " and ",
-                                           #   tags$a(href="https://www.scotpho.org.uk/comparative-health/measuring-inequalities/", "measuring health inequalities", 
-                                           #          class="externallink"),
-                                           #   " in Scotland.")
+                                           uiOutput("inequality_options_help") # text displayed generated in inequalities server script
                                     ) # close column
 
                    )
@@ -844,7 +829,7 @@ div(style = "margin-bottom: 30px;"), # this adds breathing space between content
 ##############Footer----    
 ###############################################.
 #Copyright warning
-tags$footer(column(6, "© Scottish Public Health Observatory v2.0 2018"), 
+tags$footer(column(6, "© Scottish Public Health Observatory v2.1 2022"), 
             column(2, tags$a(href="mailto:phs.scotpho@phs.scot", tags$b("Contact us!"), 
                               class="externallink", style = "color: white; text-decoration: none")), 
             column(3, tags$a(href="https://www.scotpho.org.uk/about-us/scotpho-website-policies-and-statements/privacy-and-cookies", tags$b("Privacy & cookies"), 
