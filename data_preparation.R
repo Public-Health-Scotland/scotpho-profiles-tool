@@ -251,7 +251,6 @@ andyp_data <- rbind( # merging together all indicators
   prepare_andyp_data("01_pc_access_sii_rii_opt", 1),
   prepare_andyp_data("04_prev_hosp_sii_rii_opt", 4),
   prepare_andyp_data("05_rep_hosp_sii_rii_opt", 5),
-  #prepare_andyp_data("06_dying_hosp_sii_rii_opt", 6), #data recalcuated by PHS analyst micahel webster 
   prepare_andyp_data("07_hc_amenable_mort_3-year aggregate_sii_rii_opt", 7),
   prepare_andyp_data("08_prem_mort_3-year aggregate_sii_rii_opt", 8)) %>%
   # patients by gp is all scotland simd
@@ -267,22 +266,21 @@ data_depr <- do.call(rbind, lapply(files_depr, readRDS)) %>%
   rename(measure = rate)
 
 
-############TEMPORARY SCRIPT UNTIL LE DATA READY FOR INCLUSION
-##add life expectancy data
+############TEMPORARY SCRIPT UNTIL LE DATA READY FOR INCLUSION 
+## don't want to put new indicators in shiny data folder until we are ready incase loading them breaks live tool
+##life expectancy data
 le_inequalities_m <- readRDS("/PHI_conf/ScotPHO/Profiles/Data/Data to be checked/life_expectancy_male_ineq.rds") %>%
 mutate(quint_type=case_when(code=="S00000001" ~ "sc_quin", TRUE ~ quint_type))  
 le_inequalities_f <- readRDS("/PHI_conf/ScotPHO/Profiles/Data/Data to be checked/life_expectancy_female_ineq.rds") %>%
   mutate(quint_type=case_when(code=="S00000001" ~ "sc_quin", TRUE ~ quint_type))  
+##new dying in hospital data
 dying_in_hosp_michael <-readRDS("/PHI_conf/ScotPHO/Profiles/Data/Data to be checked/dying_in_hosp_depr_ineq.rds") %>%
   rename(measure = rate)
+##end of temp chunk ( need to adjust line 283 too when removing this)
   
-    # mutate(ind_id=as.numeric(ind_id),
-    #      quintile=as.factor(quintile))
-
-#example_ineq <-readRDS("/PHI_conf/ScotPHO/Profiles/Data/Data to be checked/alcohol_stays_depr_ineq.rds")
 
 # Merging with Andy's data and then formatting
-data_depr <- bind_rows(data_depr, andyp_data,le_inequalities_m,le_inequalities_f,dying_in_hosp_michael) %>%
+data_depr <- bind_rows(data_depr, andyp_data,le_inequalities_m,le_inequalities_f,dying_in_hosp_michael) %>% ##adjust this line when removing temp chunk
   mutate_if(is.character,factor) %>% #converting characters into factors
   mutate_at(c("numerator", "measure", "lowci", "upci", "rii", "upci_rii",
               "lowci_rii", "sii", "lowci_sii", "upci_sii", "par", "abs_range",
@@ -306,46 +304,35 @@ data_depr <- left_join(x=data_depr, y=geo_lookup, by="code") %>%
 
 data_depr <- data_depr %>% apply_supressions() #Apply supressions.
 
-
 # flag quintile where measure highest & check for linear trends
 data_depr <- data_depr %>%
-group_by(ind_id, year,quint_type,code) %>%
+group_by(ind_id, year, quint_type, code) %>%
   arrange(ind_id, year, quint_type, code, desc(measure)) %>%
-  mutate(rii_gradient = case_when(rii>0 ~ "positive", rii<0 ~ "negative", rii==0 ~ "zero",TRUE ~ "zero")) %>% # determines direction of rii
-  mutate(par_gradient = case_when(par>0 ~ "positive", par<0 ~ "negative", par==0 ~ "zero",TRUE ~ "zero")) %>% # labels if par is positive or negative
-  mutate(across(sii:abs_range,abs)) %>% # convert sii/rii value to absolute values (remove negative values as) needed to make charts in gap analysis easier to read (ie no negative axis but axis text changes to reflect most desirable situation)
-  mutate(qmax=quintile[which.max(measure)], # which quintile contains highest rate/value
-         qmin=quintile[which.min(measure)], # which quintile contains lowest rate/value
+  mutate(sii_gradient = case_when(sii>0 ~ "positive", sii<0 ~ "negative", sii==0 ~ "zero")) %>% 
+  mutate(rii_gradient = case_when(rii>0 ~ "positive", rii<0 ~ "negative", rii==0 ~ "zero")) %>% # label if rii positive or negative (helps with health inequality dynamic summary text)
+  mutate(par_gradient = case_when(par>0 ~ "positive", par<0 ~ "negative", par==0 ~ "zero")) %>% # label if par positive or negative (helps with health inequality dynamic summary text)
+  mutate(qmax=quintile[which.max(measure)], # which quintile contains highest rate/value - quicker to add into dataset rather than do calculation in app?
+         qmin=quintile[which.min(measure)]) %>% # which quintile contains lowest rate/value - quicker to add into dataset rather than do calculation in app?
          # create field that identifies for each year which quintile have highest/lowest values (used in summary statement #1 - qmax for when high rates are less desirable/qmin for when low rates are less desirable)
-         qmax_statement=case_when(qmax=="1 - most deprived" ~ "The most deprived areas",
-                                  qmax=="5 - least deprived" ~ "The least deprived areas",
-                                  qmax=="2" ~ "More deprived areas",
-                                  qmax=="4" ~ "Less deprived areas",
-                                  qmax=="3" ~ "No particular areas of deprivation",TRUE ~ " "),
-         qmin_statement=case_when(qmin=="1 - most deprived" ~ "The most deprived areas",
-                                  qmin=="5 - least deprived" ~ "The least deprived areas",
-                                  qmin=="2" ~ "More deprived areas",
-                                  qmin=="4" ~ "Less deprived areas",
-                                  qmin=="3" ~ "No particular areas of deprivation",TRUE ~ " ")) %>%
   ungroup() %>%
-  arrange(ind_id, year, code, quint_type, quintile)
+  arrange(ind_id, year, code, quint_type, quintile) 
 
-#indicators i'm not sure make sense to include
+# Exclude any indicators we aren't ready to release or that do not sense to include
  data_depr <- data_depr %>%
    filter(!(indicator %in% c("People living in 15% most 'access deprived' areas",
                              "Healthy birth weight"))) %>% #check healty weight as seems like reverse of what i'd expect
    droplevels()
 
-#selecting out indicators where higher is better as app doesn't work with them
- data_depr <- data_depr %>%
-   filter(!(indicator %in% c("Child dental health in primary 1",
-                             "Child dental health in primary 7",
-                             "Healthy birth weight",
-                             "Bowel screening uptake",
-                             "Single adult dwellings",
-                             "Immunisation uptake at 24 months - 6 in 1",
-                             "Immunisation uptake at 24 months - MMR",
-                             "Teenage pregnancies"))) %>% droplevels()
+# #selecting out indicators where higher is better as app doesn't work with them
+#  data_depr <- data_depr %>%
+#    filter(!(indicator %in% c("Child dental health in primary 1",
+#                              "Child dental health in primary 7",
+#                              "Healthy birth weight",
+#                              "Bowel screening uptake",
+#                              "Single adult dwellings",
+#                              "Immunisation uptake at 24 months - 6 in 1",
+#                              "Immunisation uptake at 24 months - MMR",
+#                              "Teenage pregnancies"))) %>% droplevels()
 
 # # Temporary until we decide to add new indicators
 # data_depr <- data_depr %>%
