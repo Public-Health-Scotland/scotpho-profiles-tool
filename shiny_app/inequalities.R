@@ -487,33 +487,40 @@
   
   
   #####################.
-  # Downloading charts
+  # Downloading charts image----
   output$report_simd <- downloadHandler(
     # file name
     filename <- 'plot.png',
     # content
     content = function(file){
       #select plots to download, depending on measure type selected
-      export(p = if(input$measure_simd == "Trend"){combined_trend()}
-             else if(input$measure_simd == "Gap"){combined_gap()}
-             else if(input$measure_simd == "Risk"){combined_risk()}, file = 'tempPlot.png')
+      export(p = if(input$measure_simd == "Patterns of inequality"){combined_trend()}
+             else if(input$measure_simd == "Inequality gap"){combined_gap()}
+             else if(input$measure_simd == "Potential for impact"){combined_risk()}, file = 'tempPlot.png')
       # hand over the file
       file.copy('tempPlot.png',file)
     }
   )
   
   ###############################################.
-  ## Trend charts  ----
+  ## Plots logic----
+  ## Plots in inequalities tab are set up as reactive elements which are then rendered in separate command
+  ## Pressing 'Save chart' option within dashboard will trigger formation of a subplot containing both 2 charts on dashboard into one image
+  ## Combined into a subplot also allows exporting of charts together with legend and titles
+  ###############################################.
+
+  ###############################################.
+  ## Plots: Trend ----
   ###############################################.
   
-  #Title for barplot from trend
+  # Title for barplot from trend (appears within dashboard)
   output$simd_barplot_title <- renderUI({
-    p(tags$b(paste0(input$indic_simd,
-                    " by deprivation group for ", input$year_simd)))
+    p(tags$b(paste0(input$indic_simd," by deprivation group for ", input$year_simd)))
   })
   
   # Chart 1. barplot ----
-  chart_1 <- reactive({
+ 
+   chart_1 <- reactive({
 
     #If no data available for that period then plot message saying data is missing
     if (is.data.frame(simd_bar_data()) && nrow(simd_bar_data()) == 0)
@@ -579,16 +586,15 @@
     
   })
   
-  
 
-  #Title
+  # Chart 2. trend plot ----
+  
+  # Title (as appears on dashboard panel)
   output$simd_trendplot_title <- renderUI({
-    p(tags$b(paste0(input$indic_simd,
-                    " over time by deprivation group")))
+    p(tags$b(paste0(input$indic_simd," over time by deprivation group")))
   })
 
-  
-  # Chart 2 - trend plot ----
+
   chart_2 <- reactive({
 
     #If no data available for that period then plot message saying data is missing
@@ -650,23 +656,16 @@
   })
   
   
-  
-  #Title
-  output$simd_trendplot_title <- renderUI({
-    p(tags$b(paste0("Changes over time by deprivation group")))
-  })
-  
-  #chart 2 - trend plot (for displaying on the dashboard)
+  # Chart 2 - trend plot (command to displaying on the dashboard)
   output$simd_trend_plot <- renderPlotly({
     
     chart_2() 
     
   })
   
-  
-  # 2 charts within 'trend' measure
-  # combined into a subplot for the purpose of exporting together with legend and titles
-  
+
+  # Combined trend charts ----
+
   combined_trend <- reactive({
     
     chart_1 <-  chart_1 () %>%
@@ -675,7 +674,7 @@
         yanchor = "top",
         x = 0 ,
         y = 1.05, 
-        text = paste0("Differences in ", first(simd_bar_data()$indicator), "\nbetween deprivation groups for ", first(simd_bar_data()$trend_axis)), 
+        text = paste0(input$indic_simd," by deprivation group for ", input$year_simd), 
         showarrow = F, 
         align = "left",
         font=list(size=13,face="bold"),
@@ -691,7 +690,7 @@
         align = "left",
         x = 0 ,
         y = 1.05, 
-        text = "Changes over time by deprivation group", 
+        text = paste0(input$indic_simd," over time by deprivation group"), 
         font=list(size=13,face="bold"),
         showarrow = F, 
         xref='paper', 
@@ -708,14 +707,13 @@
     
   })
   
-  
-  
+
   
 ###############################################.
-## Plots for RII/SII ----
+## Plots: RII/SII ----
 ###############################################.
   
-  #text for title sii
+  #text for title sii (as appears on dashboard)
   output$title_sii <- renderUI({
     div(p(tags$b("Inequalities over time: absolute differences")),
         p(paste0("The chart below shows the difference between most and least deprived areas 
@@ -725,7 +723,7 @@
   })
   
 
-  #SII plot 
+  # Chart 3.SII plot ----
   chart_3 <- reactive({
 
     simd_index <- simd_trend_data() %>% filter((quintile == "Total"))
@@ -782,7 +780,6 @@
     }
   })
   
-  
   # ssi plot (chart 3) to display on dashboard
   output$simd_sii_plot <- renderPlotly({
     
@@ -791,11 +788,9 @@
   })
   
   
+  #  Chart 4.RII plot ----
   
-  
-  
-  #RII plot
-  
+  # RII chart title for dashboard panel
   output$title_rii <- renderUI({
     div(p(tags$b("Inequalities over time: relative differences")),
         p(paste0("The chart below shows the differences between the least deprived area
@@ -805,11 +800,9 @@
   })
   
   
-  
   # rri plot
   chart_4 <- reactive({
 
-    
     simd_index <- simd_trend_data() %>% filter((quintile == "Total"))
     
     #If no SII for that period then plot message saying data is missing
@@ -870,30 +863,25 @@
     }
   })
   
-  
   # rri plot (to display on dashboard)
   output$simd_rii_plot <- renderPlotly({
-    
-    
+  
     chart_4() 
     
   })
   
   
-  
-  
-  # 2 charts within 'trend' measure
-  # combined into a subplot for the purpose of exporting together with legend and titles
+# Combined SII/RII plot ----
+
   combined_gap <- reactive({
-    
-    
+  
     chart_3 <-  chart_3 () %>%
       layout(annotations = list(
         xanchor = "left",
         yanchor = "top",
         x = 0 ,
         y = 1.05, 
-        text = paste0("Inequality gap over time\nAbsolute differences between the most and least deprived areas\nexpressed as ", tolower(unique(simd_trend_data()$type_definition))),
+        text = paste0("Absolute differences between the most and least deprived areas\nexpressed as ", tolower(unique(simd_trend_data()$type_definition))),
         showarrow = F, 
         align = "left",
         xref='paper', 
@@ -901,8 +889,6 @@
         font=list(size=13,face="bold")),
         xaxis = list(autorange = TRUE),
         yaxis = list(autorange = TRUE))
-    
-    
     
     chart_4 <-  chart_4 () %>%
       layout(showlegend = T,
@@ -912,7 +898,7 @@
                align = "left",
                x = 0 ,
                y = 1.05, 
-               text = "How the most deprived area compares with the average for Scotland\nRelative differences between the least deprived area\nand the overall average for the area.",
+               text = "Relative differences between the least deprived area\nand the overall average for the area.",
                showarrow = F, 
                xref='paper', 
                yref='paper',
@@ -920,8 +906,6 @@
              xaxis = list(autorange = TRUE),
              yaxis = list(autorange = TRUE),
              yaxis = list(title = "% more/less than average"))
-    
-    
     
     final <- subplot(chart_3, chart_4, margin = 0.07, titleY = TRUE) %>%
       layout(legend = list(orientation = "h",
@@ -933,12 +917,12 @@
   
   
   ###############################################.
-  ## Plots for PAR ----
+  ## Plots: PAR ----
   ###############################################.
   
-  #Bar plot for PAR
+  # Chart 5. Bar plot for PAR ----
 
-  #Title
+  #Title (as displayed within dashboard panel)
   output$simd_par_barplot_title <- renderUI({
     div(p(tags$b(paste0("Attributable to inequality, ", input$year_simd))),
         p("What percantage of ", tolower(input$indic_simd), " can be attributed to socioeconomic inequalities."))
@@ -985,7 +969,6 @@
     }
   })
   
-  
   # bar plot for PAR (for displaying on the dashboard)
   output$simd_par_barplot <- renderPlotly({
     
@@ -994,11 +977,9 @@
     
   })
   
+  # Chart 6. Line plot for PAR ----
   
-  
-  #Line plot for PAR
-  
-  #Title
+  # Title (as appears in dashboard)
   output$simd_par_trendplot_title <- renderUI({
     div(p(tags$b("Potential for improvement in ", tolower(input$indic_simd))),
     p(" If the levels of the least deprived area were experienced across the whole population."))
@@ -1031,14 +1012,13 @@
     
     par_trend_plot <- plot_ly(data=simd_partrend_data, x=~trend_axis,
                               text=tooltip_partrend, textposition="none",hoverinfo="text") %>%
-      add_lines(y = ~abs(par), type = 'scatter', mode = 'lines', line = list(color = "#4575b4")) %>%
+      add_lines(y = ~abs(par), type = 'scatter', mode = 'lines', line = list(color = "#4575b4"),name = "% attributable to deprivation") %>%
       layout(yaxis = yaxis_plots, xaxis = xaxis_plots, font = font_plots,
              margin = list(b = 140)) %>% #to avoid labels getting cut out
       config(displayModeBar = FALSE, displaylogo = F, editable =F) # taking out toolbar
     
     }
   })
-  
   
   # line plot PAR (to display on dashboard)
   output$simd_par_trendplot <- renderPlotly({
@@ -1048,11 +1028,10 @@
   })
   
   
-  #d. Combine into a subplot for the purpose of downloading
+  # Combine PAR charts ----
   
   combined_risk <- reactive({
-    
-    
+
     chart_5 <-  chart_5() %>%
       layout(annotations = list(
         xanchor = "left",
@@ -1061,13 +1040,11 @@
         y = 1.05, 
         align = "left",
         font=list(size=13,face="bold"),
-        text = paste0("Attributable to inequality, ",first(simd_bar_data()$trend_axis), "\nWhat part of ", first(simd_bar_data()$indicator), "\ncan be attributed to socioeconomic inequalities"),
+        text = paste0("What percantage of ", tolower(input$indic_simd), "\n can be attributed to socioeconomic inequalities\n, ",input$year_simd),
         yref='paper'),
         xaxis = list(autorange = TRUE),
         yaxis = list(autorange = TRUE))
-    
-    
-    
+
     chart_6 <-  chart_6() %>%
       layout(annotations = list(
         xanchor = "left",
@@ -1076,13 +1053,11 @@
         y = 1.05, 
         align = "left",
         font=list(size=13,face="bold"),
-        text = paste0("Potential for improvement.\nHow much ",first(simd_bar_data()$indicator)," could be reduced if the \nlevels of the least deprived area were experienced across\n the whole population."),
+        text = paste0("How much ",first(simd_bar_data()$indicator)," could be reduced if the \nlevels of the least deprived area were experienced across\n the whole population."),
         yref='paper'),
         xaxis = list(autorange = TRUE),
         yaxis = list(autorange = TRUE))
     
-      
-      
       final <- subplot(chart_5, chart_6, margin = 0.07, titleY = TRUE) %>%
       layout(width = 1200, height = 600,
             legend = list(orientation = "h",
