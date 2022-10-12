@@ -99,7 +99,7 @@ output$save_chart_ui <- renderUI({
   if (input$chart_summary %in% c("Trend", "Snapshot") ){
     savechart_button('download_summaryplot_no', 'Save chart',  class = "down", disabled=TRUE)
   } else if (input$chart_summary == "Spine") {
-    savechart_button('download_summaryplot', 'Save chart',  class = "down")
+    savechart_button('download_summaryplot', 'Save chart',  class = "down", disabled = FALSE)
   }
   
 })
