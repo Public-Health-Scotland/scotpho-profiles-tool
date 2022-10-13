@@ -1,9 +1,11 @@
 /* CSS styles used in the shiny app */
 
+.container-fluid {padding: 0;}
 
-/* to avoid red text error messages in the whole app, take out for testing*/
+/* to avoid red text error messages in the whole app*/
 .shiny-output-error { visibility: hidden; }
 .shiny-output-error:before { visibility: hidden; }
+
 
 /*for introjs sizing */
 .newClass {min-width: 50px;max-width: 50px;} 
@@ -13,21 +15,58 @@
        padding: 5px; box-shadow: none; }
        
 /* Background colour of header navBar */                        
-.navbar-brand {background-color: white}
 
 .navbar {font-size: 14px; border: 0} /* font size and border*/
 
 .dropdown-menu { font-size: 14px;} /* dropdown menu within navBar*/
 
-.container-fluid {padding-right: 0}
-                          
-/*Text size and line height. Padding needed for footer */
-body { font-size: 14px; line-height: 1.1; padding-bottom:30px}
 
-.checkbox label, .radio label, .checkbox-bs label, .radio-bs label
-                          { line-height: 1.6 }
-                          
-.radio-inline {line-height: 2}
+/* make navBar PHS purple*/
+.navbar-default {
+    background-color: #3f3685;
+    margin : 0 !important; 
+}
+
+
+.navbar-default .navbar-nav > li > a {
+  color: #ffffff;
+  
+  
+}
+
+.navbar-toggle collapsed{
+  background-color:#3f3685;
+}
+
+.navbar-default .navbar-toggle {
+    background-color: #3f3685;
+}
+
+
+.navbar-default .navbar-toggle:focus, .navbar-default .navbar-toggle:hover {
+    background-color: #3f3685;
+}
+
+
+.navbar-default .navbar-toggle .icon-bar {
+    background-color: white;
+}
+
+
+ .navbar-default .navbar-brand:hover {
+    background-color: white;
+}                         
+
+.navbar-default .navbar-nav>.active>a, .navbar-default .navbar-nav>.active>a:focus, .navbar-default .navbar-nav>.active>a:hover {
+    color: white;
+    background-color: #2e2761;
+}
+
+
+
+.navbar-nav>.active>a:focus {
+  outline: 3px solid orange;
+}
                           
 /* Padding and margins of filters and labels*/
 .form-group {margin: 3px}
@@ -63,58 +102,7 @@ body { font-size: 14px; line-height: 1.1; padding-bottom:30px}
  (This must come after .down so it will override background-color) */
 .down_disabled{ background-color:#a6a6a6}
                           
-/* landing page boxes*/
-.landing-page-box { width:100%; height:100%; min-height:23vh; background-color:white;
-                    border: 1px solid #AAAAAA; margin-bottom: 5px; float: left; 
-                    transition: 0.5s ease; position: relative; object-fit: scale-down;}
-                    
-.landing-page-box-about {width:100%; height:100%; min-height:11vh; background-color:white;
-                          border: 1px solid #AAAAAA; margin-bottom: 5px; float: left; 
-                          position: relative; object-fit: scale-down;}
-                          
-.landing-page-box:hover, .landing-page-box-about:hover {-webkit-transform: scale(1.05); 
-                          -ms-transform: scale(1.05); transform: scale(1.05); } /* hover effect on boxes*/ 
-                          
-/*landing page icons */
-.landing-page-icon {width:100%; height:65%; min-height:12vh; background-color: white;
-                     border: 0 ; position: absolute; object-fit: scale-down; }
 
-.landing-page-about-icon {width:100%; height:65%; min-height:5vh; background-color: white;
-                          border: 0; position: absolute; object-fit: scale-down;}
-                          
-/* landing-page titles for boxes*/
-.landing-page-box-title {font-size: 16px; text-align:center; color: darkblue;
-                          font-weight: bold; background-color: none; width:100%; 
-                          max-height: 20px; margin-top: 2vh;}
-                          
-/* landing-page description text of boxes*/
-.landing-page-box-description {font-size: 12px; text-align:center; color: darkblue;
-                          background-color: none; width:100%; max-height: 20px; 
-                          margin-top: 2vh; padding-bottom: 3vh;}
-                          
-/*landing page titles for ABOUT boxes */
-.landing-page-box-about-title { font-size: 16px; text-align:center; color: darkblue;
-                                font-weight: bold; background-color: none; 
-                                width:100%; max-height: 20px; margin-top: 5px; }
-                          
-/* landing page buttons*/
-.landing-page-button { position: absolute; top:0; width: 100%; 
-                        height: 100%; opacity: 0;}
-                          
-/*center image - for normal icons */
-img.center {object-fit: scale-down; position:absolute; width:100%; height:100%; 
-              margin-left:auto; margin-right: auto; display: block; padding:20px;}
-                 
-/* center image - for about icons*/
-img.centerabout {object-fit: scale-down; position:absolute; width:100%; 
-                  height:100%; margin-left:auto; margin-right: auto; 
-                  display: block; padding:8px;}
-                 
-/*landing-page column  */
-.landing-page-column {padding-right:3vh}
-               
-/* landing-page icons*/
-.icon-lp{font-size: 1.3em; padding-right: 4px;}
                
 /* flextable wrapping text*/
 .tabwid table {white-space: normal;}
@@ -122,12 +110,7 @@ img.centerabout {object-fit: scale-down; position:absolute; width:100%;
 /*External links underlined an open a new tab */
 .externallink{text-decoration: underline;} 
 
-/* Box layout for the indicator definitions tab */
-.definitionbox {width:100%; height:100%; text-align:left ;background-color:white;
-                  border: 2px solid #2FA4E7; padding: 10px; margin-top: 0; 
-                  margin-bottom: 5px; float: left; transition: 0.5s ease; 
-                  position: relative; object-fit: scale-down;}
-                  
+
 /* Deprivation boxes text */
 .depr-text-box {width:100%; height:100%; background-color:white;
     margin-bottom: 20px; box-shadow: 0 2px 5px 0 rgba(0,0,0,.26);
@@ -136,5 +119,562 @@ img.centerabout {object-fit: scale-down; position:absolute; width:100%;
     font-size: 20px; display:block; line-height:20px; padding: 5px; padding-left: 20px; }
 .depr-text-box .content{ color: black; overflow: hidden; padding: 10px; min-height: 0px;}
         
-        /* END */
+     
         
+/* HOMEPAGE STYLING ---------------------*/ 
+
+
+/* Section 1: (hero.html) */ 
+
+.hero{
+  display: flex;
+  justify-content: center;
+  background-color:#5545a8;
+  padding:40px 45px;
+}
+
+
+/* set width of content within hero*/
+.hero-inner{
+  max-width: 760px;
+}
+
+
+/* formatting the header within hero*/
+.hero h1{
+  font-size: 36px;
+  font-weight: 700;
+  color:white;
+  }
+  
+  
+/* formatting the sentence/tagline within hero*/
+.hero h2{
+ color:white;
+ font-size: 18px;
+    color: white;
+    margin-top: 5px;
+    margin-bottom: 15px;
+  }
+
+
+/* formatting the 2 buttons within hero*/
+.button{
+  background-color:black;
+  color:white;
+  text-decoration:none;
+  border-style:none;
+  padding:12px 20px;
+  font-size:1.5rem;
+  border-radius: 5px; /* make edges rounded*/
+  display:inline-block; /* add more space between button*/
+  
+}
+
+
+.links-item > a{
+  color:#d2cfeb;
+}
+
+.bottom-links > a{
+  color:#d2cfeb;
+}
+
+
+.small-card h3{
+  font-weight:600;
+}
+
+.small-card-inner h4{
+  font-weight:600;
+}
+
+
+.the-header h3 {
+    font-weight: 600;
+    margin-left: 30px;
+    font-size: 20px;
+}
+
+
+
+
+/* Section 2: features.html */ 
+
+.features{
+ padding-top: 15px;
+ padding-bottom: 5px;
+ flex-direction: column;
+ background-color:#f3f2f1;
+  
+}
+
+.features-inner {
+    max-width: 1500px;
+    margin: 0 auto;
+    display: flex;
+    flex: 1;
+}
+
+
+/* font style for individual feature headers*/ 
+.featured-item h3 {
+  color:#283593;
+  font-size:1.5rem;
+  font-weight:bold;
+}
+
+
+.featured-item {
+    display: flex;
+    flex:1;
+    padding: 10px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    margin: 5px;
+}
+
+ /* needs tweaked - overall section header?*/ 
+.features-header{
+  max-width:1500px;
+  margin:0 auto;
+  display:grid;
+  grid-column-gap: 45px;
+}
+
+
+/* responsive layout - display features top to bottom on smaller screens*/ 
+@media (max-width: 800px) {
+    .features-inner{
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+
+
+
+
+
+
+
+.h3{
+
+    font-size: 24px;
+    color:white;
+    font-weight:600;
+}
+
+ 
+
+
+/* colour of the feature items font*/ 
+a {
+    color: black;
+}
+
+
+
+.header-section{
+  display:flex;
+}    
+
+@media (max-width: 800px) {
+.header-section{
+  display:flex;
+  flex-direction:row;
+}    
+}
+
+
+
+
+.the-header{
+  margin-right:auto;
+} 
+
+
+
+.alert-info {
+    color: white;
+}
+
+.alert-info > a {
+    color: #0078d4;
+}
+
+
+
+.the-button{
+    color: #3f3685;
+    text-decoration: none;
+    font-size: 1.5rem;
+    border-radius: 5px;
+    margin: 10px;
+}
+
+
+.tour-button{
+    padding: 10px;
+    font-weight: 1000;
+    border-radius: 10px;
+    color: #fff;
+    background-color: #0078d4;
+    border-color: #0078d4;
+}
+
+
+.tour-button:focus {
+  outline: 3px solid orange;}
+
+.logo{
+  display:flex;
+}
+
+
+
+/* Section 4: Additional links */ 
+
+.links-inner{
+  display:flex;
+  flex-direction:row;
+  column-gap:20px;
+  padding:15px;
+}
+
+@media (max-width: 800px) {
+  .links-inner {
+   flex-direction:column;
+  }
+}
+
+
+@media (max-width: 800px) {
+  .links-item > a {
+   border-left-style:solid;
+   padding-left:10px;
+  }
+}
+
+
+
+@media (max-width: 800px) {
+    .features-inner{
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+
+
+.navbar-header{
+    background-color: #3f3685;
+}
+
+
+
+
+.links-item{
+  display:flex;
+  flex-direction:column;
+  flex:1
+}
+
+.links-container{
+  background-color:#3f3685;
+  color:#d2cfeb;
+}
+
+
+.links-container nth-child a {
+  color:#d2cfeb;
+  padding:3px;
+}
+
+
+.links-container > a:hover {
+  text-decoration: underline;
+}
+
+
+
+
+
+
+.bottom-links {
+  display:flex;
+  flex-direction:row;
+  column-gap:20px;
+}
+
+.navbar-default:hover .navbar-nav>li>a:hover{
+  color: white}
+
+
+
+.middle-container{
+  background-color:#f3f2f1
+}
+ 
+
+ 
+.middle-container-inner{
+  display: flex;
+  flex-direction:row;
+}  
+
+
+@media (max-width: 800px) {
+.middle-container-inner {
+    display: flex;
+    flex-direction: column;
+}
+}
+
+
+
+.small-card{
+  background-color:white;
+  padding:10px;
+  margin:10px;
+  flex: 1;
+  
+} 
+
+
+.tour-button {
+  appearance: none;
+  background-color: #0078d4;
+  border: 1px solid rgba(27, 31, 35, .15);
+  border-radius: 6px;
+  box-shadow: rgba(27, 31, 35, .1) 0 1px 0;
+  box-sizing: border-box;
+  color: #fff;
+  cursor: pointer;
+  display: inline-block;
+  font-family: -apple-system,system-ui,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji";
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+  padding: 6px 16px;
+  position: relative;
+  text-align: center;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.navbar-default .navbar-brand {
+    background-color: white;
+}
+
+.tour-button:hover {
+  background-color: #006eb8;
+  text-decoration:none;
+  color:white;
+}
+
+.btn-default {
+    appearance: none;
+  background-color: #0078d4;
+  border: 1px solid rgba(27, 31, 35, .15);
+  border-radius: 6px;
+  box-shadow: rgba(27, 31, 35, .1) 0 1px 0;
+  box-sizing: border-box;
+  color: #fff;
+  cursor: pointer;
+  display: inline-block;
+  font-family: -apple-system,system-ui,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji";
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+  padding: 6px 16px;
+  position: relative;
+  text-align: center;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+
+.btn-default:hover {
+  background-color: #0078d4;
+}
+
+
+.dataTables_scrollHead {
+  background-color:purple;
+  color:white;
+}
+
+.dataTables_scroll {
+  border-style:solid;
+  border-color:lightgray;
+}
+
+
+.features-button {
+  flex:1
+}
+
+
+
+.search-item {
+  flex:1;
+  margin:5px;
+}
+
+.search-item > h4 {
+  font-weight:600;
+}
+
+
+.drilldown-inner {
+  display:flex;
+  flex-direction:row;
+}
+
+
+
+
+.rt-search {align-self:flex-start;}
+
+
+.rt-tr-details{
+  padding: 24px;
+  box-shadow: inset 0 1px 3px #dbdbdb;
+  background: hsl(213, 20%, 99%);
+}
+
+
+.table-test th{
+  border:thin solid black;
+  background-color:purple;
+  color:white;
+  padding:3px;
+  word-break: break-all;
+  }
+  
+.table-test td{
+  border:thin solid black;
+  padding:3px;
+  }
+
+.spacer td{
+border-style:none;}
+
+
+.card-test{
+  padding-bottom:7px;
+}
+
+
+.card-test h4{
+  font-weight:bold;
+}
+
+
+.rt-td-inner{
+  display:flex;
+}
+
+
+.test-class{
+  margin-left:100px;
+  margin-right:100px;
+}
+
+
+@media (max-width: 800px) {
+.test-class{
+  margin-left:20px;
+  margin-right:10px;
+}    
+}
+
+.card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    word-wrap: break-word;
+    background-color: #fff;
+    background-clip: border-box;
+    box-shadow: rgb(27 31 35 / 10%) 0 1px 0;
+    border-radius: 6px;}
+    
+    
+ .card:hover{
+   cursor: pointer;
+    color: #fff;
+    background-color: #5a5c60;
+    text-decoration:none;
+ 
+}   
+
+
+
+.card:hover .text-center > h3{
+  color:white;
+  text-decoration:none;}
+  
+ 
+.card:hover .text-center > p{
+  color:white;
+  text-decoration:none;
+}
+  
+ 
+    
+.text-center {
+    text-align: center!important;
+    padding: 1rem;
+}
+
+
+
+.icon-box.icon-box--success {
+    background: #def4ff;
+    color: #3f3685;
+}
+
+.icon-box {
+    height: 75px;
+    width: 75px;
+    border-radius: 50%;
+    margin: 15px auto 35px auto;
+    margin-bottom:10px;
+    background: #a6a6a6;
+    color: #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+}
+
+
+a:focus {
+  outline: 3px solid orange;
+}
+
+
+.text-muted {
+    color: black
+}
+
+
+
+.button:focus {
+  outline: 3px solid orange;}
+  
+.btn-default:focus {
+    outline: 3px solid orange;
+    color: white;
+    background-color: #006eb8;
+    border-style:none;
+}
+ 
+.btn-default:active {
+   background-color: #006eb8;
+    text-decoration: none;
+    color: white;}
+  
+
