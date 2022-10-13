@@ -5,6 +5,7 @@
 ############################.
 ##Packages ----
 ############################.
+library(shinymanager)
 library(shiny)
 library(shinyBS) #modals
 library(shinythemes) # layouts for shiny
@@ -26,6 +27,12 @@ library(rmarkdown)
 library(flextable) #for tech document table
 library(webshot) #to download plotly charts
 library(rintrojs) # for help intros
+library(tidyr) # for pivoting
+library(stringr)
+library(DT)
+library(purrr)
+library(reactable)
+library(htmltools)
 # As well as webshot phantomjs is needed l to download Plotly charts
 # https://github.com/rstudio/shinyapps-package-dependencies/pull/180
 if (is.null(suppressMessages(webshot:::find_phantom()))) {
@@ -133,36 +140,8 @@ sum_ui <- function(title, plot_name) {
     div(align = "center", withSpinner(plotlyOutput(plot_name, height = "auto")))
   ) }
 
-# Indicator definition boxes for indicator definition tab
-ind_def_box <- function(label, text_output) {
-  div(class="definitionbox",
-      p(paste(label), style="font-weight:bold; font-size: 16px; color: #2FA4E7;"),
-      h5(style = "color: black", textOutput(text_output)))
-}
-
-#Creating big boxes for main tabs in the landing page (see ui for formatting css)
-lp_main_box <- function(title_box, image_name, button_name, description) {
-  div(class="landing-page-box",
-      div(title_box, class = "landing-page-box-title"),
-      div(description, class = "landing-page-box-description"),
-      div(class = "landing-page-icon", style= paste0("background-image: url(", image_name, ".png);
-          background-size: auto 80%; background-position: center; background-repeat: no-repeat; ")),
-      actionButton(button_name, NULL, class="landing-page-button")
-      )
-}
 
 
-#Creating small boxes for further information in the landing page (see ui for formatting css)
-lp_about_box <- function(title_box, image_name, button_name, description) {
-
-  div(class="landing-page-box-about",
-      div(title_box, class = "landing-page-box-title"),
-      div(class = "landing-page-about-icon", style= paste0("background-image: url(", image_name, ".png);
-          background-size: auto 80%; background-position: center; background-repeat: no-repeat; ")),
-          (actionButton(button_name, NULL,
-                   class="landing-page-button",
-                   icon = icon("arrow-circle-right", "icon-lp"),title=description)))
-}
 
 ###############################################.
 ## Data ----
@@ -215,6 +194,7 @@ areatype_depr_list <- c("Scotland", "Health board", "Council area") #for depriva
 indicator_list <- sort(unique(optdata$indicator))
 indicator_map_list <- sort(unique(optdata$indicator[optdata$interpret != 'O']))
 indicators_updated <- techdoc %>% filter(days_since_update<60) %>% pull(indicator_name)
+indicators_month_updated <- techdoc %>% filter(days_since_update<60) %>% pull(last_updated)
 ind_depr_list <- sort(unique(depr_data$indicator)) #list of indicators
 # Hsc deprivation indicators
 ind_hsc_list <- c("Preventable emergency hospitalisation for a chronic condition",
@@ -285,7 +265,7 @@ pal_map <- c('#2c7bb6','#abd9e9', '#ffffbf','#fdae61','#d7191c')
 
 ##########.
 #Cookie warning
-cookie_box <- div(class="alert alert-info", style = "margin-bottom: 0",
+cookie_box <- div(class="alert alert-info", style = "margin-bottom: 0; background-color: white; color:black",
       "This website places cookies on your device to help us improve our service 
       to you. To find out more, see our ",
       tags$a(href='https://www.scotpho.org.uk/about-us/scotpho-website-policies-and-statements/privacy-and-cookies',
@@ -305,8 +285,43 @@ yaxis_plots <- list(title = FALSE, rangemode="tozero", fixedrange=TRUE, size = 4
 
 font_plots <- list(family = '"Helvetica Neue", Helvetica, Arial, sans-serif')
 
-# Identify which geographies have data for each indicator
-# indic <- unique(optdata$indicator[!is.na(optdata$measure)])
-# indic_geog <- tapply(optdata$areatype[!is.na(optdata$measure)], optdata$indicator[!is.na(optdata$measure)], unique)
 
-##END
+#formatting techdoc data to be used in indicator definitions tab
+ind_dat <- techdoc %>%
+  mutate(across(contains("Profile_Domain"),  ~ sub("\\-.*", "", .))) %>%
+  rename(Profile_short1 = Profile_Domain1,
+         Profile_short2 = Profile_Domain2)%>%
+  mutate(profile_short = ifelse(is.na(Profile_short2), Profile_short1, paste0(Profile_short1, ",", Profile_short2)))%>%
+  bind_rows(mutate(., profile_short = "Show all")) %>%
+  select(-c("active", "interpretation", "team_updating", "indicator_author", "analyst_notes", "days_since_update","source_last_updated", "source_next_update", "scotpho_profiles", "Profile_short1", "Profile_short2")) %>%
+  mutate(across(everything(), ~replace_na(.,"N/A"))) %>% 
+  mutate(across(contains("update"),
+                ~ ifelse(
+                  . == "TBC", NA, paste("01-",., sep =""))))  
+
+ind_dat$next_update <- format(as.Date(ind_dat$next_update, "%d-%b-%Y"), "%Y-%m-%d")
+
+
+
+
+
+table_theme <- function() {
+  search_icon <- function(fill = "none") {
+    # Icon from https://boxicons.com
+    svg <- sprintf('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path fill="%s" d="M10 18c1.85 0 3.54-.64 4.9-1.69l4.4 4.4 1.4-1.42-4.39-4.4A8 8 0 102 10a8 8 0 008 8.01zm0-14a6 6 0 11-.01 12.01A6 6 0 0110 4z"/></svg>', fill)
+    sprintf("url('data:image/svg+xml;charset=utf-8,%s')", URLencode(svg))
+  }
+  reactableTheme(
+  borderWidth = '1px',
+  borderColor = 'lightgrey',
+  headerStyle = list(backgroundColor = "#ececec"),
+  searchInputStyle = list(
+    paddingLeft = "3.5rem",
+    width = "60%",
+    backgroundSize = "2rem",
+    backgroundPosition = "left 1rem center",
+    backgroundRepeat = "no-repeat",
+    backgroundImage = search_icon("black")))
+  
+}
+
