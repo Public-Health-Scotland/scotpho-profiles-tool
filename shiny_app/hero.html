@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<link rel="stylesheet" href="//use.fontawesome.com/releases/v6.0.0/css/all.css">
+<!-- top of homepage-->
+<div class = "hero">
+   <div class = "hero-inner">
+      <h1>Welcome to the ScotPHO Profiles</h1>
+      <h2>Explore over 250 indicators of public health grouped in seven different topic profiles.</h2>
+      <button class = "button" onclick="$('li:eq(7) a').tab('show');" role="button">About us <i class="fa-solid fa-circle-info"></i></button>
+      <button class = "button" onclick="$('li:eq(8) a').tab('show');" role="button">Explore indicators <i class="fa-solid fa-magnifying-glass"></i></button>
+   </div>
+</div>
+<!-- features-->
+<div class = "features">
+   <div class = header-section>
+      <div class = "the-header">
+         <h3>View indicators in multiple ways</h3>
+      </div>
+      <div class = "the-button">
+         <button class = "tour-button" onclick="$('li:eq(9) a').tab('show');" role="button">Need help? Take a tour</button>
+      </div>
+   </div>
+   <div class = "features-inner">
+      <div class="featured-item">
+         <div class="card border-top-0 border-bottom-0 border-left-0 border-right">
+            <a onclick="$('li:eq(1) a').tab('show');" role="button" class = "tab-link">
+               <div class="card-body text-center">
+                  <div class="icon-box icon-box--success">
+                     <i class="fa fa-list-ul fa-3x"></i>
+                  </div>
+                  <h3>profile summary</h3>
+                  <p class="text-muted">Get a high level view of an area across a set of indicators.</p>
+                  <div class="fa fa-chevron-right" aria-hidden="true"></div>
+               </div>
+            </a>
+         </div>
+      </div>
+      <div class="featured-item">
+         <div class="card border-top-0 border-bottom-0 border-left-0 border-right">
+            <a onclick="$('li:eq(2) a').tab('show');" role="button">
+               <div class="card-body text-center">
+                  <div class="icon-box icon-box--success">
+                     <i class="fa fa-line-chart fa-3x"></i>
+                  </div>
+                  <h3>Trend</h3>
+                  <p class="text-muted">See how indicators change over time across one or more areas.</p>
+                  <div class="fa fa-chevron-right" aria-hidden="true"></div>
+               </div>
+            </a>
+         </div>
+      </div>
+      <div class="featured-item">
+         <div class="card border-top-0 border-bottom-0 border-left-0 border-right">
+            <a onclick="$('li:eq(3) a').tab('show');" role="button">
+               <div class="card-body text-center">
+                  <div class="icon-box icon-box--success">
+                     <i class="fa fa-signal fa-3x"></i>
+                  </div>
+                  <h3>Rank</h3>
+                  <p class="text-muted">Compare geographical variation for an indicator.</p>
+                  <div class="fa fa-chevron-right" aria-hidden="true"></div>
+               </div>
+            </a>
+         </div>
+      </div>
+      <div class="featured-item">
+         <div class="card border-top-0 border-bottom-0 border-left-0 border-right">
+            <a onclick="$('li:eq(4) a').tab('show');" role="button">
+               <div class="card-body text-center">
+                  <div class="icon-box icon-box--success">
+                     <i class="fa-solid fa-scale-unbalanced fa-3x"></i>
+                  </div>
+                  <h3>Inequalities</h3>
+                  <p class="text-muted">Explore how indicators vary by level of deprivation across time.</p>
+                  <div class="fa fa-chevron-right" aria-hidden="true"></div>
+               </div>
+            </a>
+         </div>
+      </div>
+      <div class="featured-item">
+         <div class="card border-top-0 border-bottom-0 border-left-0 border-right">
+            <a onclick="$('li:eq(5) a').tab('show');" role="button">
+               <div class="card-body text-center">
+                  <div class="icon-box icon-box--success">
+                     <i class="fa-solid fa-table fa-3x"></i>
+                  </div>
+                  <h3>Data</h3>
+                  <p class="text-muted">View and download the data behind the tool.</p>
+                  <div class="fa fa-chevron-right" aria-hidden="true"></div>
+               </div>
+            </a>
+         </div>
+      </div>
+   </div>
+</div>
+<!-- What's new / indicator updates section -->
+<div class = "middle-container">
+   <div class = "middle-container-inner">
+      <div class = "small-card">
+         <h3>Indicator updates</h3>
+         <hr>
+         <div class = small-card-inner>
+            <h4>Updates schedule</h4>
+            <p>Click below to find out when an indicator is due to be updated.</p>
+            <button class = "tour-button" onclick="$('li:eq(8) a').tab('show');" role="button">View updates schedule</button>  
+            <hr>
+            <h4>Recent updates</h4>
+            <p> Click below to view all indicators updated in the last 3 months. </p>
+            {{ latest_updates_button }}
+         </div>
+      </div>
+      <div class = "small-card">
+         <h3>What's new</h3>
+         <hr>
+         <div class = "small-card-inner">
+            <h4>Inequalities in life expectancy</h4>
+            <p>Life expectancy indicators for males and females are now available to view by scottish multiple deprivation index (SIMD). See how deprivation impacts life expectancy and how this has changed over time.
+            </p>
+         </div>
+         {{ see_more_button }}
+      </div>
+   </div>
+</div>
+<!-- bottom section - additional links -->
+<div class = "links-container">
+   <div class = "links-inner">
+      <div class = "links-item">
+         <h3>Other Profiles</h3>
+         <a href="https://www.nssdiscovery.scot.nhs.uk/" target="_blank">NSS Discovery</a>
+         <a href="http://www.understandingglasgow.com/" target="_blank">The Glagow Indicators Project</a>
+         <a href="https://www.environment.gov.scot/" target="_blank">Scotlands Environment Web</a>
+         <a href="https://statistics.gov.scot/home" target="_blank">Statistics.gov.scot</a>
+         <a href="https://www.nrscotland.gov.uk/statistics-and-data/statistics/stats-at-a-glance/council-area-profiles" target="_blank">NRS Council Area Profiles</a>
+         <a href="https://scotland.shinyapps.io/is-community-planning-outcomes-profile/" target="_blank">IS Community Planning Outcomes Profiles</a>
+      </div>
+      <div class = "links-item">
+         <h3>Source Code</h3>
+         <a href="https://github.com/Public-Health-Scotland/scotpho-indicator-production" target="_blank">Indicator Production Github Repository</a>
+         <a href="https://github.com/Public-Health-Scotland/scotpho-profiles-tool" target="_blank">Profiles Tool Shiny App Github Repository</a>
+         <a href="https://ckan.publishing.service.gov.uk/organization/scottish-government-spatial-data-infrastructure" target="_blank">Shapefiles</a>
+         <a href="https://www.opendata.nhs.scot/dataset/population-estimates" target="_blank">Population Estimates</a>
+         <a href="https://www.opendata.nhs.scot/dataset/geography-codes-and-labels" target="_blank">Geography Codes and names</a>
+      </div>
+      <div class = "links-item">
+         <h3>Learning Resources</h3>
+         <a href="https://www.scotpho.org.uk/comparative-health/profiles/resources/evidence-for-action/" target="_blank">Evidence for Action Briefings</a>
+         <a href="https://www.WordPress.com" target="_blank">Indicator updates schedule</a>
+         <a href="http://www.scotpho.org.uk/media/1026/explanation-of-statistics-used-in-profiles-v2.pptx" target="_blank">Explanation of Statistics</a>
+         <a href="http://www.scotpho.org.uk/comparative-health/profiles/resources/" target="_blank">Profile Overview Reports</a>
+         <a href="https://www.scotpho.org.uk/media/1880/scotpho-profiles-quick-reference-guide-sep2019.docx" target="_blank">Profiles Tool User Guide</a>
+      </div>
+      <div class = "links-item">
+         <h3>Stay in touch</h3>
+         <a href="https://twitter.com/scotpho" target="_blank">Follow us <i class = "fab fa-twitter fa-2x"></i></a>
+         <a href="mailto:phs.scotpho@phs.scot" target="_blank">Contact us</a>
+         <a href="https://www.scotpho.org.uk/register" target="_blank">Sign up to our newsletter</a>
+      </div>
+   </div>
+   <hr>
+   <div class = "bottom-links" >
+      <a href="https://www.scotpho.org.uk/" target="_blank">Cookies & Privacy</a>
+      <p> Scottish Public Health Observatory 2022 
+      </p>
+      <a href="https://www.scotpho.org.uk/about-us/scotpho-website-policies-and-statements/privacy-and-cookies" target="_blank">Visit our website</a>
+   </div>
+   <div class="ogl-details" style="padding:15px;">
+      <div class="clearfix">
+         <div class="pull-left" style="padding-right:30px;"><img src="ogl-symbol.png" width="50" alt="OGL Logo"></div>
+         <div class="pull-left" style="padding-top:3px;">
+            <p>All content is available under the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/">Open Government Licence v3.0</a>, except where stated otherwise.</p>
+         </div>
+      </div>
+   </div>
+</div>
