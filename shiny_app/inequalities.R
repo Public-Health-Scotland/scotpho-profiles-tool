@@ -925,7 +925,7 @@
   #Title (as displayed within dashboard panel)
   output$simd_par_barplot_title <- renderUI({
     div(p(tags$b(paste0("Attributable to inequality, ", input$year_simd))),
-        p("What percantage of ", tolower(input$indic_simd), " can be attributed to socioeconomic inequalities."))
+        p("What percentage of ", tolower(input$indic_simd), " can be attributed to socioeconomic inequalities."))
   })
   
   #Bar plot for PAR
