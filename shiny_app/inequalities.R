@@ -495,7 +495,7 @@
     content = function(file){
       #select plots to download, depending on measure type selected
       export(p = if(input$measure_simd == "Patterns of inequality"){combined_trend()}
-             else if(input$measure_simd == "Inequality gap"){combined_gap()}
+             else if(input$measure_simd == "Inequality gap"){combined_siirii()}
              else if(input$measure_simd == "Potential for impact"){combined_risk()}, file = 'tempPlot.png')
       # hand over the file
       file.copy('tempPlot.png',file)
@@ -520,7 +520,7 @@
   
   # Chart 1. barplot ----
  
-   chart_1 <- reactive({
+   ineq_chart_1 <- reactive({
 
     #If no data available for that period then plot message saying data is missing
     if (is.data.frame(simd_bar_data()) && nrow(simd_bar_data()) == 0)
@@ -581,7 +581,7 @@
   # Chart 1 - bar plot (version to display on dashboard)
   output$simd_bar_plot <- renderPlotly({
     
-    chart_1() %>%
+    ineq_chart_1() %>%
       layout(showlegend = F)
     
   })
@@ -595,7 +595,7 @@
   })
 
 
-  chart_2 <- reactive({
+  ineq_chart_2 <- reactive({
 
     #If no data available for that period then plot message saying data is missing
     if (is.data.frame(simd_trend_data()) && nrow(simd_trend_data()) == 0)
@@ -659,7 +659,7 @@
   # Chart 2 - trend plot (command to displaying on the dashboard)
   output$simd_trend_plot <- renderPlotly({
     
-    chart_2() 
+    ineq_chart_2() 
     
   })
   
@@ -668,7 +668,7 @@
 
   combined_trend <- reactive({
     
-    chart_1 <-  chart_1 () %>%
+    chart_1 <-  ineq_chart_1 () %>%
       layout(annotations = list(
         xanchor = "left",
         yanchor = "top",
@@ -683,7 +683,7 @@
         yaxis = list(title = first(simd_trend_data()$type_definition)))
     
     
-    chart_2 <- chart_2() %>%
+    chart_2 <- ineq_chart_2() %>%
       layout(annotations = list(
         xanchor = "left",
         yanchor = "top",
@@ -724,7 +724,7 @@
   
 
   # Chart 3.SII plot ----
-  chart_3 <- reactive({
+  ineq_chart_3 <- reactive({
 
     simd_index <- simd_trend_data() %>% filter((quintile == "Total"))
     
@@ -783,7 +783,7 @@
   # ssi plot (chart 3) to display on dashboard
   output$simd_sii_plot <- renderPlotly({
     
-    chart_3() 
+    ineq_chart_3() 
     
   })
   
@@ -801,7 +801,7 @@
   
   
   # rri plot
-  chart_4 <- reactive({
+  ineq_chart_4 <- reactive({
 
     simd_index <- simd_trend_data() %>% filter((quintile == "Total"))
     
@@ -866,16 +866,16 @@
   # rri plot (to display on dashboard)
   output$simd_rii_plot <- renderPlotly({
   
-    chart_4() 
+    ineq_chart_4() 
     
   })
   
   
 # Combined SII/RII plot ----
 
-  combined_gap <- reactive({
+  combined_siirii <- reactive({
   
-    chart_3 <-  chart_3 () %>%
+    chart_3 <-  ineq_chart_3 () %>%
       layout(annotations = list(
         xanchor = "left",
         yanchor = "top",
@@ -890,7 +890,7 @@
         xaxis = list(autorange = TRUE),
         yaxis = list(autorange = TRUE))
     
-    chart_4 <-  chart_4 () %>%
+    chart_4 <-  ineq_chart_4 () %>%
       layout(showlegend = T,
              annotations = list(
                xanchor = "left",
@@ -929,7 +929,7 @@
   })
   
   #Bar plot for PAR
-  chart_5 <- reactive({
+  ineq_chart_5 <- reactive({
     
     #If no PAR for that period then plot message saying data is missing
     if (is.na(simd_bar_data()$par))
@@ -972,7 +972,7 @@
   # bar plot for PAR (for displaying on the dashboard)
   output$simd_par_barplot <- renderPlotly({
     
-    chart_5()  %>%
+    ineq_chart_5()  %>%
       layout(showlegend = F)
     
   })
@@ -985,7 +985,7 @@
     p(" If the levels of the least deprived area were experienced across the whole population."))
   })
   
-  chart_6 <- reactive({ 
+  ineq_chart_6 <- reactive({ 
     
     #preparing data needed
     simd_partrend_data <- simd_quint_data() %>%
@@ -1023,7 +1023,7 @@
   # line plot PAR (to display on dashboard)
   output$simd_par_trendplot <- renderPlotly({
     
-    chart_6() 
+    ineq_chart_6() 
     
   })
   
@@ -1032,7 +1032,7 @@
   
   combined_risk <- reactive({
 
-    chart_5 <-  chart_5() %>%
+    chart_5 <-  ineq_chart_5() %>%
       layout(annotations = list(
         xanchor = "left",
         yanchor = "top",
@@ -1045,7 +1045,7 @@
         xaxis = list(autorange = TRUE),
         yaxis = list(autorange = TRUE))
 
-    chart_6 <-  chart_6() %>%
+    chart_6 <-  ineq_chart_6() %>%
       layout(annotations = list(
         xanchor = "left",
         yanchor = "top",
