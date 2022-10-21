@@ -416,10 +416,10 @@
       tags$ul( #if no data available for PAR only first two points
                 #statement #1 : identifies which quintile has the least desirable rate (this statement changes according to 'interpret' field which flags if Higher or Lower rates are best)
                 tags$li(class= "li-custom",
-                        p(paste0(simd_text_data$statement1a," have the ",simd_text_data$statement1b," ",tolower(simd_text_data$label_ineq)," (see 'Patterns of inequality')"))),
+                        p(paste0(simd_text_data$statement1a," have the ",simd_text_data$statement1b," ",tolower(simd_text_data$label_ineq),". (see 'Patterns of inequality')"))),
                 #statement #2 : whe absolute inequality (from sii) has increased or decreased over time
                 tags$li(class= "li-custom",
-                        p(paste0("Over time ", simd_text_data$statement2," (see 'Inequality gap')"))),
+                        p(paste0("Over time ", simd_text_data$statement2,". (see 'Inequality gap')"))),
                 #statement #3 based on rii
                 tags$li(class= "li-custom",
                         p(paste0("The most deprived areas have ", abs(round(unique(simd_bar_data()$rii_int), 0)),
@@ -430,10 +430,10 @@
       tags$ul( 
         #statement #1 : identifies which quintile has the least desirable rate (this statement changes according to 'interpret' field which flags if Higher or Lower rates are best)
         tags$li(class= "li-custom",
-                p(paste0(simd_text_data$statement1a," have the ",simd_text_data$statement1b," ",tolower(simd_text_data$label_ineq)," (see 'Patterns of inequality')"))),
+                p(paste0(simd_text_data$statement1a," have the ",simd_text_data$statement1b," ",tolower(simd_text_data$label_ineq),". (see 'Patterns of inequality')"))),
         #statement #2 : whe absolute inequality (from sii) has increased or decreased over time
         tags$li(class= "li-custom",
-                p(paste0("Over time ", simd_text_data$statement2," (see 'Inequality gap')"))),
+                p(paste0("Over time ", simd_text_data$statement2,". (see 'Inequality gap')"))),
         #statement #3 based on rii
         tags$li(class= "li-custom",
                 p(paste0("The most deprived areas have ", abs(round(unique(simd_bar_data()$rii_int), 0)),
