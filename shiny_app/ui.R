@@ -417,7 +417,7 @@ tabPanel("Inequalities", icon = icon("balance-scale"), value = "ineq",
                                            withSpinner(plotlyOutput("simd_rii_plot")))
                    ),
                    #Population attributable risk
-                   conditionalPanel("input.measure_simd == 'Potential for impact'",
+                   conditionalPanel("input.measure_simd == 'Potential for improvement'",
                                     column(6,
                                            br(),br(),#improve alignment with selection menu
                                            htmlOutput("simd_par_barplot_title"),
@@ -436,7 +436,7 @@ tabPanel("Inequalities", icon = icon("balance-scale"), value = "ineq",
                                            withSpinner(plotlyOutput("simd_par_trendplot")))
                    ),
                    #Which measure to look at
-                   conditionalPanel("input.measure_simd == 'About these options?'",
+                   conditionalPanel("input.measure_simd == 'About these options'",
                                     column(12,
                                            uiOutput("inequality_options_help") # text displayed generated in inequalities server script
                                     ) # close column
