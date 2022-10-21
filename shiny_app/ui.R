@@ -371,15 +371,15 @@ tabPanel("Inequalities", icon = icon("balance-scale"), value = "ineq",
                    bsModal("mod_defs_simd", "Definitions", "defs_simd", htmlOutput('defs_text_simd')),
                    #testing moving the overview text to only displaying when trend is selected rather than above every graph?
                    #Summary text
-                    div(class= "depr-text-box",
-                        div(class= "title", textOutput("simd_nutshell_title")),
-                        div(class= "content", htmlOutput("simd_text"))),
+                    # div(class= "depr-text-box",
+                    #     div(class= "title", textOutput("simd_nutshell_title")),
+                    #     div(class= "content", htmlOutput("simd_text"))),
                    #Bar chart and trend
                    conditionalPanel("input.measure_simd == 'Patterns of inequality'",
-                                    # column(12,
-                                    #        div(class= "depr-text-box",
-                                    #            div(class= "title", textOutput("simd_nutshell_title")),
-                                    #            div(class= "content", htmlOutput("simd_text")))),
+                                    column(12,
+                                           div(class= "depr-text-box",
+                                               div(class= "title", textOutput("simd_nutshell_title")),
+                                               div(class= "content", htmlOutput("simd_text")))),
                                     column(6,
                                            htmlOutput("simd_barplot_title"),
                                            withSpinner(plotlyOutput("simd_bar_plot"))),
@@ -419,20 +419,21 @@ tabPanel("Inequalities", icon = icon("balance-scale"), value = "ineq",
                    #Population attributable risk
                    conditionalPanel("input.measure_simd == 'Potential for improvement'",
                                     column(6,
-                                           br(),br(),#improve alignment with selection menu
+                                           br(),br(),#improve alignment with sidepanel dropdowns 
                                            htmlOutput("simd_par_barplot_title"),
                                            actionButton("help_paf", label="What does this chart show?", 
                                                         icon= icon('question-circle'), class ="down"),
-                                           withSpinner(plotlyOutput("simd_par_barplot")),
-                                           p(img(src= "signif_worse.png", height = "16px"),
-                                             "Attributable to inequality",
-                                             style= "text-align: center; padding-bottom: 40px")
+                                           p(img(src= "signif_better.png", height = "16px"),"Baseline",
+                                             img(src= "signif_worse.png", height = "16px"),"Attributable to inequality",
+                                             style= "text-align: left; padding-top: 10px; padding-bottom: 10px"),
+                                           withSpinner(plotlyOutput("simd_par_barplot"))
                                     ),
                                     column(6,
-                                           br(),br(),#improve alignment with selection menu
+                                           br(),br(),#improve alignment with sidepanel dropdowns
                                            htmlOutput("simd_par_trendplot_title"),
                                            actionButton("help_paf2", label="What does this chart show?", 
                                                         icon= icon('question-circle'), class ="down"),
+                                           p(" "), # create whitespace and help alignment of charts
                                            withSpinner(plotlyOutput("simd_par_trendplot")))
                    ),
                    #Which measure to look at
