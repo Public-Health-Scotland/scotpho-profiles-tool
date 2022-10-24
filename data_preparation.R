@@ -309,7 +309,7 @@ data_depr <- data_depr %>%
 group_by(ind_id, year, quint_type, code) %>%
   arrange(ind_id, year, quint_type, code, desc(measure)) %>%
   mutate(sii_gradient = case_when(sii>0 ~ "positive", sii<0 ~ "negative", sii==0 ~ "zero")) %>% 
-  mutate(rii_gradient = case_when(rii>0 ~ "positive", rii<0 ~ "negative", rii==0 ~ "zero")) %>% # label if rii positive or negative (helps with health inequality dynamic summary text)
+  mutate(rii_gradient = case_when(rii_int>0 ~ "positive", rii_int<0 ~ "negative", rii_int==0 ~ "zero")) %>% # label if rii positive or negative (helps with health inequality dynamic summary text)
   mutate(par_gradient = case_when(par>0 ~ "positive", par<0 ~ "negative", par==0 ~ "zero")) %>% # label if par positive or negative (helps with health inequality dynamic summary text)
   mutate(qmax=quintile[which.max(measure)], # which quintile contains highest rate/value - quicker to add into dataset rather than do calculation in app?
          qmin=quintile[which.min(measure)]) %>% # which quintile contains lowest rate/value - quicker to add into dataset rather than do calculation in app?
