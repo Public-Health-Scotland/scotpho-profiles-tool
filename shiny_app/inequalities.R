@@ -496,7 +496,7 @@
       #select plots to download, depending on measure type selected
       export(p = if(input$measure_simd == "Patterns of inequality"){combined_trend()}
              else if(input$measure_simd == "Inequality gap"){combined_siirii()}
-             else if(input$measure_simd == "Potential for impact"){combined_risk()}, file = 'tempPlot.png')
+             else if(input$measure_simd == "Potential for improvement"){combined_risk()}, file = 'tempPlot.png')
       # hand over the file
       file.copy('tempPlot.png',file)
     }
@@ -935,6 +935,7 @@
     if (is.na(simd_bar_data()$par))
     {
       plot_nodata()
+      
     } else { #If data is available plot it
     
     #preparing data needed, creates two dummy variables for stacked bar chart
@@ -955,10 +956,9 @@
     
     
     par_bar_plot <- plot_ly(data = simd_parbar_data, x = ~quintile, 
-                            text=tooltip_parbar,textposition="none", hoverinfo="text") %>%
+                    text=tooltip_parbar,textposition="none", hoverinfo="text") %>%
       add_bars(y = ~baseline, name= "baseline", marker = list(color = "#4da6ff"), showlegend = TRUE) %>%   
-      add_bars(y = ~diff_baseline, name = "Attributable to deprivation", 
-               marker = list(color = "#ffa64d"), showlegend = TRUE) %>% 
+      add_bars(y = ~diff_baseline, name = "Attributable to deprivation", marker = list(color = "#ffa64d"), showlegend = TRUE) %>% 
       layout(bargap = 0.1, barmode = 'stack', showlegend = T, 
              legend = list(x = 0.9, y = 0.9),
              margin = list(b = 140), #to avoid labels getting cut out
@@ -971,10 +971,8 @@
   
   # bar plot for PAR (for displaying on the dashboard)
   output$simd_par_barplot <- renderPlotly({
-    
-    ineq_chart_5()  %>%
+      ineq_chart_5()  %>%
       layout(showlegend = F)
-    
   })
   
   # Chart 6. Line plot for PAR ----
@@ -1022,17 +1020,15 @@
   
   # line plot PAR (to display on dashboard)
   output$simd_par_trendplot <- renderPlotly({
-    
-    ineq_chart_6() 
-    
-  })
+        ineq_chart_6() 
+      })
   
   
   # Combine PAR charts ----
   
   combined_risk <- reactive({
 
-    chart_5 <-  ineq_chart_5() %>%
+    chart_5 <- ineq_chart_5() %>%
       layout(annotations = list(
         xanchor = "left",
         yanchor = "top",
