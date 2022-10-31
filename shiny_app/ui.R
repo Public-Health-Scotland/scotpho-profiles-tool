@@ -428,6 +428,7 @@ tabPanel("Inequalities", icon = icon("balance-scale"), value = "ineq",
                                            actionButton("help_paf2", label="What does this chart show?", 
                                                         icon= icon('question-circle'), class ="down"),
                                            p(" "), # create whitespace and help alignment of charts
+                                           br(),
                                            withSpinner(plotlyOutput("simd_par_trendplot")))
                    ),
                    #Which measure to look at
