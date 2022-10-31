@@ -351,11 +351,12 @@
       mutate(statement1a = case_when(interpret=="H" ~ qmin_statement, interpret=="L" ~ qmax_statement, interpret=="O" ~ qmax_statement, TRUE ~ "N/A"),
              statement1b = case_when(interpret=="H" ~ "lowest", interpret=="L" ~ "highest", interpret=="O"~ "highest", TRUE ~ "N/A")) %>%
       #buidling components behind statement 2 around for 'gap' charts 
-      # first what is max and min sii and rii for time period selected.  
-      mutate(sii_y_start=sii[which.min(year)],
-             sii_y_end=sii[which.max(year)],
-             rii_y_start=rii[which.min(year)],
-             rii_y_end=rii[which.max(year)]) %>%
+      # first what is max and min sii and rii for time period selected.
+      # some rii/sii are negative so need to consider absolute value to maek logic work
+      mutate(sii_y_start=abs(sii[which.min(year)]),
+             sii_y_end=abs(sii[which.max(year)]),
+             rii_y_start=abs(rii_int[which.min(year)]),
+             rii_y_end=abs(rii_int[which.max(year)])) %>%
       #has sii has increased or decreased
       mutate(sii_change=case_when(sii_y_start>sii_y_end ~"narrowed",
                                   sii_y_start<sii_y_end ~"widened",
@@ -957,7 +958,7 @@
     
     par_bar_plot <- plot_ly(data = simd_parbar_data, x = ~quintile, 
                     text=tooltip_parbar,textposition="none", hoverinfo="text") %>%
-      add_bars(y = ~baseline, name= "baseline", marker = list(color = "#4da6ff"), showlegend = TRUE) %>%   
+      add_bars(y = ~baseline, name= "Baseline", marker = list(color = "#4da6ff"), showlegend = TRUE) %>%   
       add_bars(y = ~diff_baseline, name = "Attributable to deprivation", marker = list(color = "#ffa64d"), showlegend = TRUE) %>% 
       layout(bargap = 0.1, barmode = 'stack', showlegend = T, 
              legend = list(x = 0.9, y = 0.9),
@@ -1011,7 +1012,9 @@
     par_trend_plot <- plot_ly(data=simd_partrend_data, x=~trend_axis,
                               text=tooltip_partrend, textposition="none",hoverinfo="text") %>%
       add_lines(y = ~abs(par), type = 'scatter', mode = 'lines', line = list(color = "#4575b4"),name = "% attributable to deprivation") %>%
-      layout(yaxis = yaxis_plots, xaxis = xaxis_plots, font = font_plots,
+      layout(yaxis = yaxis_plots, 
+             xaxis = xaxis_plots,
+             font = font_plots,
              margin = list(b = 140)) %>% #to avoid labels getting cut out
       config(displayModeBar = FALSE, displaylogo = F, editable =F) # taking out toolbar
     
@@ -1063,7 +1066,6 @@
              margin = list(l = 50, r = 50, b = 100, t = 100, pad = 4))
   })
   
-  
   ##Summary text object----
   ## Summary text an output object so that it can be shown/hidden depending on which conditional panel is being shown
   output$inequality_summary_text <- renderUI({
@@ -1091,7 +1093,6 @@
     }
     
   })
-  
   
   
 ##END
