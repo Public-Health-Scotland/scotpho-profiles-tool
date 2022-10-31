@@ -208,8 +208,8 @@
                  class="externallink"),
           " in Scotland."))
     })
+  
     
-
     
   ###############################################.
   ## Indicator definitions ----
@@ -1062,6 +1062,36 @@
                            y = -0.3),
              margin = list(l = 50, r = 50, b = 100, t = 100, pad = 4))
   })
+  
+  
+  ##Summary text object----
+  ## Summary text an output object so that it can be shown/hidden depending on which conditional panel is being shown
+  output$inequality_summary_text <- renderUI({
+    div(class= "depr-text-box",
+        div(class= "title", textOutput("simd_nutshell_title")),
+        div(class= "content", htmlOutput("simd_text")))
+  })
+  
+  
+  ##Main panel objects show/hide----
+  observeEvent(input$measure_simd,{
+    
+    if (input$measure_simd == "About these options") {
+      #objects to hide when displaying meta data about 
+      shinyjs::hide("inequality_summary_text") 
+      shinyjs::hide("download_simd") 
+      shinyjs::hide("report_simd")
+    }
+    
+    if (input$measure_simd %in% c("Patterns of inequality", "Inequality gap", "Potential for improvement")) {
+      #objects to show when conditional panel is one of the data panels
+      shinyjs::show("inequality_summary_text")
+      shinyjs::show("download_simd") 
+      shinyjs::show("report_simd")
+    }
+    
+  })
+  
   
   
 ##END

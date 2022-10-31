@@ -369,21 +369,15 @@ tabPanel("Inequalities", icon = icon("balance-scale"), value = "ineq",
          ),
          mainPanel(width = 9, #Main panel
                    bsModal("mod_defs_simd", "Definitions", "defs_simd", htmlOutput('defs_text_simd')),
-                   #testing moving the overview text to only displaying when trend is selected rather than above every graph?
-                   #Summary text
-                    # div(class= "depr-text-box",
-                    #     div(class= "title", textOutput("simd_nutshell_title")),
-                    #     div(class= "content", htmlOutput("simd_text"))),
+                   uiOutput("inequality_summary_text"), #dynamic bullet points - appearance controlled using reactive element in inequalities server scrcipt
                    #Bar chart and trend
                    conditionalPanel("input.measure_simd == 'Patterns of inequality'",
-                                    column(12,
-                                           div(class= "depr-text-box",
-                                               div(class= "title", textOutput("simd_nutshell_title")),
-                                               div(class= "content", htmlOutput("simd_text")))),
                                     column(6,
+                                           br(),br(),#improve alignment with selection menu
                                            htmlOutput("simd_barplot_title"),
                                            withSpinner(plotlyOutput("simd_bar_plot"))),
                                     column(6,
+                                           br(),br(),#improve alignment with selection menu
                                            htmlOutput("simd_trendplot_title"),
                                            withSpinner(plotlyOutput("simd_trend_plot"))),
                                     column(12, align="center", #legend

@@ -7,6 +7,7 @@
 ############################.
 library(shiny)
 library(shinyBS) #modals
+library(shinyjs) # for enable/disable functions
 library(shinythemes) # layouts for shiny
 library(dplyr) # data manipulation
 library(ggplot2) #data visualization
