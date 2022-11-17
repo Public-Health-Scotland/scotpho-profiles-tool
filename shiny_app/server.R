@@ -23,18 +23,6 @@ function(input, output, session) {
   #    Modal ----
   ################################################################.
   ## Latest indicator updates modal window ----
-  updates_modal <- modalDialog(
-    fluidRow(
-      
-      column(12, #tells to display indicators updated within 60 days
-             h5(HTML(paste(indicators_updated, collapse='<br>')))),
-      
-      column(4, h5(HTML(paste(indicators_month_updated, collapse='<br>'))))
-      ),
-    
-    size = "l", align= "center",
-    easyClose = TRUE, fade=TRUE, footer = modalButton("Close (Esc)")
-  )
   
   observeEvent(input$btn_indicator_updates, { showModal(updates_modal) }) # Link action button click to modal launch 
  
@@ -50,19 +38,15 @@ function(input, output, session) {
   source(file.path("data_tab.R"),  local = TRUE)$value # Data tab
   source(file.path("tech_doc_tab.R"),  local = TRUE)$value # Technical document tab
  
- 
-### summary dev work
   
+ # Start guided tour when button clicked on homepage
+  guide$init()
   
-### 1. reactive data 
-  
-  
-  
-  
-  
-  
-  
-  
+  observeEvent(input$guide, {
+    guide$start()
+  })
+
+
 } #server closing bracket
 
 #########################  END ----
