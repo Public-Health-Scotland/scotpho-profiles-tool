@@ -5,13 +5,12 @@
 ############################.
 ##Packages ----
 ############################.
-library(shinymanager)
+library(cicerone) # for guided tours
 library(shiny)
 library(shinyBS) #modals
 library(shinythemes) # layouts for shiny
 library(dplyr) # data manipulation
 library(ggplot2) #data visualization
-library (DT) # for data tables
 library(leaflet) #javascript maps
 library(plotly) #interactive graphs
 library(shinyWidgets) # for extra widgets
@@ -24,15 +23,14 @@ library(shinycssloaders) #for loading icons, see line below
 # it uses github version devtools::install_github("andrewsali/shinycssloaders")
 # This is to avoid issues with loading symbols behind charts and perhaps with bouncing of app
 library(rmarkdown)
-library(flextable) #for tech document table
 library(webshot) #to download plotly charts
 library(rintrojs) # for help intros
 library(tidyr) # for pivoting
 library(stringr)
-library(DT)
 library(purrr)
 library(reactable)
 library(htmltools)
+
 # As well as webshot phantomjs is needed l to download Plotly charts
 # https://github.com/rstudio/shinyapps-package-dependencies/pull/180
 if (is.null(suppressMessages(webshot:::find_phantom()))) {
@@ -193,9 +191,8 @@ areatype_depr_list <- c("Scotland", "Health board", "Council area") #for depriva
 #Indicator names
 indicator_list <- sort(unique(optdata$indicator))
 indicator_map_list <- sort(unique(optdata$indicator[optdata$interpret != 'O']))
-indicators_updated <- techdoc %>% filter(days_since_update<60) %>% pull(indicator_name)
-indicators_month_updated <- techdoc %>% filter(days_since_update<60) %>% pull(last_updated)
 ind_depr_list <- sort(unique(depr_data$indicator)) #list of indicators
+
 # Hsc deprivation indicators
 ind_hsc_list <- c("Preventable emergency hospitalisation for a chronic condition",
                   "Repeat emergency hospitalisation in the same year",
@@ -295,16 +292,13 @@ ind_dat <- techdoc %>%
   bind_rows(mutate(., profile_short = "Show all")) %>%
   select(-c("active", "interpretation", "team_updating", "indicator_author", "analyst_notes", "days_since_update","source_last_updated", "source_next_update", "scotpho_profiles", "Profile_short1", "Profile_short2")) %>%
   mutate(across(everything(), ~replace_na(.,"N/A"))) %>% 
-  mutate(across(contains("update"),
-                ~ ifelse(
-                  . == "TBC", NA, paste("01-",., sep =""))))  
+  mutate(next_update_column = ifelse(next_update == "TBC", NA, paste("01-", next_update, sep = "")))
 
-ind_dat$next_update <- format(as.Date(ind_dat$next_update, "%d-%b-%Y"), "%Y-%m-%d")
-
+ind_dat$next_update_column <- format(
+  as.Date(ind_dat$next_update_column, "%d-%b-%Y") , "%Y-%m-%d")
 
 
-
-
+# Theme for reactables in tool
 table_theme <- function() {
   search_icon <- function(fill = "none") {
     # Icon from https://boxicons.com
@@ -312,16 +306,61 @@ table_theme <- function() {
     sprintf("url('data:image/svg+xml;charset=utf-8,%s')", URLencode(svg))
   }
   reactableTheme(
+  backgroundColor = 'white',
   borderWidth = '1px',
   borderColor = 'lightgrey',
   headerStyle = list(backgroundColor = "#ececec"),
   searchInputStyle = list(
+    borderColor = '#cccccc',
     paddingLeft = "3.5rem",
-    width = "60%",
+    width = "100%",
     backgroundSize = "2rem",
     backgroundPosition = "left 1rem center",
     backgroundRepeat = "no-repeat",
     backgroundImage = search_icon("black")))
   
 }
+
+# Table of indicators updated in the last 60 days
+indicators_updated <- techdoc %>% filter(days_since_update<60) %>% 
+  select(indicator_name, last_updated)
+
+#updates modal to appear when click on 'latest updates' button on homepage
+updates_modal <- modalDialog(
+  reactable(indicators_updated,
+  columns = list(
+    indicator_name = colDef(show = T, name = "Indicator"),
+    last_updated= colDef(show = T, name = "Last updated")
+  )),
+  size = "l", align= "left",
+  easyClose = TRUE, fade=TRUE, footer = modalButton("Close (Esc)")
+)
+
+
+# define the step-by-step guided tour of the tool for homepage
+guide <- Cicerone$
+  new(allow_close = FALSE)$
+  
+  step(
+    "explore",
+    "Exploring indicators in the tool",
+    "A helpful starting point is exploring what types of indicators are included and at what geography level. 
+    Click this button to start exploring what is available. When you find an indicator you are interested in, there are further buttons to quickly explore the indicator in various ways. 
+    There are more guided-tours on each tab to help you find what you are looking for."
+  ) $
+  step("tab-buttons",
+       "View indicators in multiple ways",
+       "Alternatively, you can navigate directly to tabs using the boxes below to start viewing data. Use the buttons highlighted (or the navigation bar at the top) to go to different tabs, depending on how you want to view the data.")$
+  step("ind-updates-section",
+       "Check when indicators are updated",
+       "Use the buttons higlighted to see when an indicator is due to be updated and what has been updated recently"
+       )$
+  step("whats-new-section", 
+       "New indicators",
+       "We are continously reviewing and adding to our suite of indicators. Use the buttons highlighted to see what's been added recently.")$
+  step("further-links-section",
+       "Further ScotPHO Profiles links",
+       "Other useful links relating to the ScotPHO Collaboration and the profiles can be found below")
+
+
 
