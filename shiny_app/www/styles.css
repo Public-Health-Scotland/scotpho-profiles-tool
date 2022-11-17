@@ -1,72 +1,69 @@
 /* CSS styles used in the shiny app */
 
+/* 1. STYLING APPLICABLE TO WHOLE DASHBOARD ----------------------------*/
+
+
+/* Add orange border to all links in dashboard when focused on*/
+a:focus {
+  outline: 3px solid orange;
+}
+
+
+/* Remove dashboard padding*/
 .container-fluid {padding: 0;}
+
 
 /* to avoid red text error messages in the whole app*/
 .shiny-output-error { visibility: hidden; }
 .shiny-output-error:before { visibility: hidden; }
 
 
-/*for introjs sizing */
-.newClass {min-width: 50px;max-width: 50px;} 
-
 /* Style sidebars/well panels */
 .well {background-color:#ffffff; border: 0 solid #336699;
        padding: 5px; box-shadow: none; }
-       
-/* Background colour of header navBar */                        
+ 
+      
 
-.navbar {font-size: 14px; border: 0} /* font size and border*/
-
-.dropdown-menu { font-size: 14px;} /* dropdown menu within navBar*/
-
-
-/* make navBar PHS purple*/
+/* Changes colour of Navigation bar to PHS purple */
 .navbar-default {
-    background-color: #3f3685;
-    margin : 0 !important; 
+  background-color: #3F3685;
+  border: none;
+  margin: 0 !important;
+
 }
 
+/* Creates a white background for PHS logo in navbar */
+.navbar-brand, .navbar-default:hover .navbar-brand:hover {
+  background-color: #ffffff;
+  padding: 10px;
 
+}
+
+/* Changes font to white in nav bar */
 .navbar-default .navbar-nav > li > a {
   color: #ffffff;
-  
-  
+
 }
 
-.navbar-toggle collapsed{
-  background-color:#3f3685;
+/* Changes colour of active (clicked) tab on the nav bar */
+.navbar-default .navbar-nav > .active > a, .navbar-default .navbar-nav > .active > a:focus, .navbar-default .navbar-nav > .active > a:hover {
+  color: #ffffff;
+  background-color: #312760;
+
 }
 
-.navbar-default .navbar-toggle {
-    background-color: #3f3685;
+/* Style the tab when hovered over */
+.navbar-default .navbar-nav > li > a:hover, .navbar-default .navbar-nav > li > a:focus {
+  color: #ffffff;
+  background-color: #5343a3;
+
 }
 
-
-.navbar-default .navbar-toggle:focus, .navbar-default .navbar-toggle:hover {
-    background-color: #3f3685;
-}
-
-
-.navbar-default .navbar-toggle .icon-bar {
-    background-color: white;
-}
-
-
- .navbar-default .navbar-brand:hover {
-    background-color: white;
-}                         
-
-.navbar-default .navbar-nav>.active>a, .navbar-default .navbar-nav>.active>a:focus, .navbar-default .navbar-nav>.active>a:hover {
-    color: white;
-    background-color: #2e2761;
-}
-
-
-
+/* Add orange border to tabs when focused on*/
 .navbar-nav>.active>a:focus {
   outline: 3px solid orange;
 }
+
                           
 /* Padding and margins of filters and labels*/
 .form-group {margin: 3px}
@@ -83,64 +80,178 @@
 
 .control-label { margin-bottom: 1px}
                           
-/* Padding of columns*/
-.col-xs-1, .col-sm-1, .col-md-1, .col-lg-1, .col-xs-2, .col-sm-2, .col-md-2, 
-      .col-lg-2, .col-xs-3, .col-sm-3, .col-md-3, .col-lg-3, .col-xs-4, .col-sm-4, 
-      .col-md-4, .col-lg-4, .col-xs-5, .col-sm-5, .col-md-5, .col-lg-5, .col-xs-6, 
-      .col-sm-6, .col-md-6, .col-lg-6, .col-xs-7, .col-sm-7, .col-md-7, .col-lg-7, 
-      .col-xs-8, .col-sm-8, .col-md-8, .col-lg-8, .col-xs-9, .col-sm-9, .col-md-9, 
-      .col-lg-9, .col-xs-10, .col-sm-10, .col-md-10, .col-lg-10, .col-xs-11, .col-sm-11, 
-       .col-md-11, .col-lg-11, .col-xs-12, .col-sm-12, .col-md-12, .col-lg-12 
-           {padding-left: 5px; padding-right: 5px;}
+
 
 /*Style for download buttons */
 .down{ background-color:#4da6ff; color: white; background-image:none; 
        min-width: 23vh;  font-size: 14px; padding: 5px 10px; 
        margin-top: 5px; margin-left: 3px}
        
+       
  /*Colour for disabled download buttons 
  (This must come after .down so it will override background-color) */
 .down_disabled{ background-color:#a6a6a6}
                           
-
-               
-/* flextable wrapping text*/
-.tabwid table {white-space: normal;}
                
 /*External links underlined an open a new tab */
 .externallink{text-decoration: underline;} 
 
 
+/* Set size of all headers */
+h3{
+
+    font-size: 24px;
+    font-weight:600
+}
+
+ 
+ 
+ h4{
+  font-weight:bold;
+}
+
+ 
+ 
+ 
+/* Styling of blue buttons to match PHS website*/ 
+.button {
+    display: inline-block;
+    margin-bottom: 0;
+    margin:5px;
+    font-weight: 700;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    cursor: pointer;
+    background-image: none;
+    color: #fff;
+    background-color: #0078d4;
+    border-color: #0078d4;
+    border: 1px solid transparent;
+    padding: 6px 12px;
+    font-size: 15px;
+    line-height: 1.42857143;
+    border-radius: 0;}
+    
+    
+ /* Make buttons darker blue when user hovers over button*/ 
+.button:hover {
+    color: #fff;
+    background-color: #005ba1;
+    border-color: #005597;
+}
+
+
+ /* Add orange border to buttons when user focuses on button*/ 
+.button:focus {
+  outline: 3px solid orange;}
+  
+  
+/* Changes button styling when user clicks*/ 
+.button:active{  
+  color: #fff;
+    background-color: #005ba1;
+    background-image: none;
+    border-color: #005597;
+  box-shadow: inset 0 3px 5px rgb(0 0 0 / 13%);
+}
+
+
+
+
+/* This defines the colour of the active (clicked) button */
+.btn-default.active:focus, .btn-default.active:hover {
+color: #fff;
+    background-color: #005ba1;
+    background-image: none;
+    border-color: #005597;
+  box-shadow: inset 0 3px 5px rgb(0 0 0 / 13%);
+  outline: 3px solid orange;
+}
+
+/* This defines the colour of the button that is selected when you first go to the tab */
+.btn-default.active, .btn-default:active, .open>.dropdown-toggle.btn-primary {
+  color: #fff;
+    background-color: #005ba1;
+    background-image: none;
+    border-color: #005597;
+  box-shadow: inset 0 3px 5px rgb(0 0 0 / 13%);
+  outline: 3px solid orange;
+
+}
+
+/* This defines the colour of the button in the instant it is clicked  */
+.btn-default:hover:focus:active {
+  color: #fff;
+    background-color: #005ba1;
+    background-image: none;
+    border-color: #005597;
+  box-shadow: inset 0 3px 5px rgb(0 0 0 / 13%);
+  outline: 3px solid orange;
+
+}
+
+
+/* a grey container to place dashboard items in*/ 
+.grey-container{
+  background-color:#F7F7F7
+}
+ 
+
+ /* responsive layout for items placed in container - for larger screens*/
+.container-inner-contents{
+  display: flex;
+  flex-direction: row;
+  padding-left:10px;
+  padding-right:10px;
+}  
+
+ /* responsive layout for items placed in container - for for smaller screens*/
+@media (max-width: 800px) {
+.container-inner-contents {
+    flex-direction: column;
+}
+}
+
+
+
 /* Deprivation boxes text */
 .depr-text-box {width:100%; height:100%; background-color:white;
     margin-bottom: 20px; box-shadow: 0 2px 5px 0 rgba(0,0,0,.26);
-    transition: 0.5s ease; }             
+    transition: 0.5s ease; } 
+    
 .depr-text-box .title{background-color: #4da6ff; color: white;   font-weight:bold;
     font-size: 20px; display:block; line-height:20px; padding: 5px; padding-left: 20px; }
+    
 .depr-text-box .content{ color: black; overflow: hidden; padding: 10px; min-height: 0px;}
         
      
-        
+
 /* HOMEPAGE STYLING ---------------------*/ 
 
-
-/* Section 1: (hero.html) */ 
+/* section 1: the hero at top of homepage*/ 
 
 .hero{
+  /* Using "linear-gradient" to add gradient to the image. This will make the text easier to read */
+  background-image: linear-gradient(to bottom right, #0078d4, rgba(0, 0, 0, 0)), url("logo_scotpho_updated.png");
+
+ /* Set a specific height/add padding */
+  height: 50%;
   display: flex;
-  justify-content: center;
-  background-color:#5545a8;
-  padding:40px 45px;
+  padding-left:45px;
+  padding-right:45px;
+  padding-top:20px;
+  padding-bottom:25px;
+
+  /* Position and center the image to scale nicely on all screens */
+  background-position: bottom;
+  background-repeat: no-repeat;
+  background-size: cover;
+  position: relative;
 }
 
 
-/* set width of content within hero*/
-.hero-inner{
-  max-width: 760px;
-}
-
-
-/* formatting the header within hero*/
+/* formatting the header within the hero*/
 .hero h1{
   font-size: 36px;
   font-weight: 700;
@@ -148,449 +259,45 @@
   }
   
   
-/* formatting the sentence/tagline within hero*/
+/* formatting the tagline within the hero*/
 .hero h2{
- color:white;
  font-size: 18px;
     color: white;
     margin-top: 5px;
     margin-bottom: 15px;
   }
 
-
-/* formatting the 2 buttons within hero*/
-.button{
-  background-color:black;
-  color:white;
-  text-decoration:none;
-  border-style:none;
-  padding:12px 20px;
-  font-size:1.5rem;
-  border-radius: 5px; /* make edges rounded*/
-  display:inline-block; /* add more space between button*/
-  
-}
-
-
-.links-item > a{
-  color:#d2cfeb;
-}
-
-.bottom-links > a{
-  color:#d2cfeb;
-}
-
-
-.small-card h3{
-  font-weight:600;
-}
-
-.small-card-inner h4{
-  font-weight:600;
-}
-
-
-.the-header h3 {
-    font-weight: 600;
-    margin-left: 30px;
-    font-size: 20px;
-}
-
-
-
-
-/* Section 2: features.html */ 
-
-.features{
- padding-top: 15px;
- padding-bottom: 5px;
- flex-direction: column;
- background-color:#f3f2f1;
-  
-}
-
-.features-inner {
-    max-width: 1500px;
-    margin: 0 auto;
-    display: flex;
-    flex: 1;
-}
-
-
-/* font style for individual feature headers*/ 
-.featured-item h3 {
-  color:#283593;
-  font-size:1.5rem;
-  font-weight:bold;
-}
-
-
-.featured-item {
-    display: flex;
-    flex:1;
-    padding: 10px;
-    margin-top: 5px;
-    margin-bottom: 5px;
+/* formatting the two buttons within the hero*/
+.hero-button{
+  display: inline-block;
     margin: 5px;
-}
-
- /* needs tweaked - overall section header?*/ 
-.features-header{
-  max-width:1500px;
-  margin:0 auto;
-  display:grid;
-  grid-column-gap: 45px;
-}
-
-
-/* responsive layout - display features top to bottom on smaller screens*/ 
-@media (max-width: 800px) {
-    .features-inner{
-    display: flex;
-    flex-direction: column;
-  }
-}
-
-
-
-
-
-
-
-
-.h3{
-
-    font-size: 24px;
-    color:white;
-    font-weight:600;
-}
-
- 
-
-
-/* colour of the feature items font*/ 
-a {
-    color: black;
-}
-
-
-
-.header-section{
-  display:flex;
-}    
-
-@media (max-width: 800px) {
-.header-section{
-  display:flex;
-  flex-direction:row;
-}    
-}
-
-
-
-
-.the-header{
-  margin-right:auto;
-} 
-
-
-
-.alert-info {
-    color: white;
-}
-
-.alert-info > a {
+    font-weight: 700;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    cursor: pointer;
+    background-image: none;
     color: #0078d4;
+    background-color: #def4ff;
+    padding: 6px 12px;
+    font-size: 15px;
+    line-height: 1.42857143;
+    border-radius: 2px;
+    border-style:none;
+  
 }
 
 
-
-.the-button{
-    color: #3f3685;
-    text-decoration: none;
-    font-size: 1.5rem;
-    border-radius: 5px;
-    margin: 10px;
-}
-
-
-.tour-button{
-    padding: 10px;
-    font-weight: 1000;
-    border-radius: 10px;
-    color: #fff;
-    background-color: #0078d4;
-    border-color: #0078d4;
-}
-
-
-.tour-button:focus {
+/* Adding orange border to buttons when 'focused' on for accessibility reasons*/
+.hero-button:focus {
   outline: 3px solid orange;}
-
-.logo{
-  display:flex;
-}
-
-
-
-/* Section 4: Additional links */ 
-
-.links-inner{
-  display:flex;
-  flex-direction:row;
-  column-gap:20px;
-  padding:15px;
-}
-
-@media (max-width: 800px) {
-  .links-inner {
-   flex-direction:column;
-  }
-}
-
-
-@media (max-width: 800px) {
-  .links-item > a {
-   border-left-style:solid;
-   padding-left:10px;
-  }
-}
-
-
-
-@media (max-width: 800px) {
-    .features-inner{
-    display: flex;
-    flex-direction: column;
-  }
-}
-
-
-
-.navbar-header{
-    background-color: #3f3685;
-}
-
-
-
-
-.links-item{
-  display:flex;
-  flex-direction:column;
-  flex:1
-}
-
-.links-container{
-  background-color:#3f3685;
-  color:#d2cfeb;
-}
-
-
-.links-container nth-child a {
-  color:#d2cfeb;
-  padding:3px;
-}
-
-
-.links-container > a:hover {
-  text-decoration: underline;
-}
-
-
-
-
-
-
-.bottom-links {
-  display:flex;
-  flex-direction:row;
-  column-gap:20px;
-}
-
-.navbar-default:hover .navbar-nav>li>a:hover{
-  color: white}
-
-
-
-.middle-container{
-  background-color:#f3f2f1
-}
- 
-
- 
-.middle-container-inner{
-  display: flex;
-  flex-direction:row;
-}  
-
-
-@media (max-width: 800px) {
-.middle-container-inner {
-    display: flex;
-    flex-direction: column;
-}
-}
-
-
-
-.small-card{
-  background-color:white;
-  padding:10px;
-  margin:10px;
-  flex: 1;
   
-} 
+
+/* section 2: boxes on homepage linking to different tabs*/ 
 
 
-.tour-button {
-  appearance: none;
-  background-color: #0078d4;
-  border: 1px solid rgba(27, 31, 35, .15);
-  border-radius: 6px;
-  box-shadow: rgba(27, 31, 35, .1) 0 1px 0;
-  box-sizing: border-box;
-  color: #fff;
-  cursor: pointer;
-  display: inline-block;
-  font-family: -apple-system,system-ui,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji";
-  font-size: 14px;
-  font-weight: 600;
-  line-height: 20px;
-  padding: 6px 16px;
-  position: relative;
-  text-align: center;
-  vertical-align: middle;
-  white-space: nowrap;
-}
-
-.navbar-default .navbar-brand {
-    background-color: white;
-}
-
-.tour-button:hover {
-  background-color: #006eb8;
-  text-decoration:none;
-  color:white;
-}
-
-.btn-default {
-    appearance: none;
-  background-color: #0078d4;
-  border: 1px solid rgba(27, 31, 35, .15);
-  border-radius: 6px;
-  box-shadow: rgba(27, 31, 35, .1) 0 1px 0;
-  box-sizing: border-box;
-  color: #fff;
-  cursor: pointer;
-  display: inline-block;
-  font-family: -apple-system,system-ui,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji";
-  font-size: 14px;
-  font-weight: 600;
-  line-height: 20px;
-  padding: 6px 16px;
-  position: relative;
-  text-align: center;
-  vertical-align: middle;
-  white-space: nowrap;
-}
-
-
-.btn-default:hover {
-  background-color: #0078d4;
-}
-
-
-.dataTables_scrollHead {
-  background-color:purple;
-  color:white;
-}
-
-.dataTables_scroll {
-  border-style:solid;
-  border-color:lightgray;
-}
-
-
-.features-button {
-  flex:1
-}
-
-
-
-.search-item {
-  flex:1;
-  margin:5px;
-}
-
-.search-item > h4 {
-  font-weight:600;
-}
-
-
-.drilldown-inner {
-  display:flex;
-  flex-direction:row;
-}
-
-
-
-
-.rt-search {align-self:flex-start;}
-
-
-.rt-tr-details{
-  padding: 24px;
-  box-shadow: inset 0 1px 3px #dbdbdb;
-  background: hsl(213, 20%, 99%);
-}
-
-
-.table-test th{
-  border:thin solid black;
-  background-color:purple;
-  color:white;
-  padding:3px;
-  word-break: break-all;
-  }
-  
-.table-test td{
-  border:thin solid black;
-  padding:3px;
-  }
-
-.spacer td{
-border-style:none;}
-
-
-.card-test{
-  padding-bottom:7px;
-}
-
-
-.card-test h4{
-  font-weight:bold;
-}
-
-
-.rt-td-inner{
-  display:flex;
-}
-
-
-.test-class{
-  margin-left:100px;
-  margin-right:100px;
-}
-
-
-@media (max-width: 800px) {
-.test-class{
-  margin-left:20px;
-  margin-right:10px;
-}    
-}
-
-.card {
+/* Homepage - styling clickable buttons to take to new tab*/
+.featured-item {
     position: relative;
     display: flex;
     flex-direction: column;
@@ -599,43 +306,48 @@ border-style:none;}
     background-color: #fff;
     background-clip: border-box;
     box-shadow: rgb(27 31 35 / 10%) 0 1px 0;
-    border-radius: 6px;}
+    flex:1; /* ensures that the boxes are evenly spaced in the container*/
+    margin:5px;
+    color:black;
+    }
     
-    
- .card:hover{
+/* Homepage - styling clickable buttons to take to new tab - change backaground color to lght grey on hover*/    
+ .featured-item:hover{
    cursor: pointer;
-    color: #fff;
-    background-color: #5a5c60;
-    text-decoration:none;
- 
+   background-color: #e0e0e0;
+   
+
 }   
 
 
 
-.card:hover .text-center > h3{
-  color:white;
-  text-decoration:none;}
-  
- 
-.card:hover .text-center > p{
-  color:white;
-  text-decoration:none;
+/* font style for individual box headers*/ 
+.featured-item h3 {
+  color:black;
+  font-size:1.7rem; 
+  font-weight:bold;
 }
-  
- 
-    
-.text-center {
+
+
+.header-section{
+  display:flex;
+  margin-left:20px;
+}    
+
+
+
+
+
+/* Tab buttons - centre position all the text  */     
+.features-text-section {
     text-align: center!important;
     padding: 1rem;
 }
 
 
 
-.icon-box.icon-box--success {
-    background: #def4ff;
-    color: #3f3685;
-}
 
+/* Format icons on homepage*/ 
 .icon-box {
     height: 75px;
     width: 75px;
@@ -647,34 +359,169 @@ border-style:none;}
     display: flex;
     align-items: center;
     justify-content: center;
+    background: #def4ff;
+    color: #3f3685;
 
 }
 
 
-a:focus {
-  outline: 3px solid orange;
+/* section 3: what's new/ indicator updates boxes*/ 
+
+
+/* make small cards in middle container white with even space between them in the container */
+.white-box{
+  background-color:white;
+  padding:10px;
+  margin:10px;
+  flex: 1;
+} 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Section 4: Additional links ------------------*/ 
+
+/* Footer container for bottom of homepage*/ 
+.phs-purple-container{
+  background-color:#3f3685; /* Make PHS purple to match PHS website footer*/
 }
 
 
-.text-muted {
-    color: black
+
+/* Add left border to groups of links on smaller screens to make easier to read */ 
+@media (max-width: 800px) {
+  .links-item > a {
+   border-left-style:solid;
+   padding-left:10px;
+  }
+}
+
+.links-item > a{
+  color:#d2cfeb;
+}
+
+.bottom-links > a{
+  color: #d2cfeb;
 }
 
 
 
-.button:focus {
-  outline: 3px solid orange;}
-  
-.btn-default:focus {
-    outline: 3px solid orange;
-    color: white;
-    background-color: #006eb8;
-    border-style:none;
+/* Displays links in footer from top to bottom */ 
+.links-item{
+  display:flex;
+  flex-direction:column;
+  flex:1;
+  color: #d2cfeb; /* Changes links 'groups' headers colorn to light purple*/ 
 }
- 
-.btn-default:active {
-   background-color: #006eb8;
-    text-decoration: none;
-    color: white;}
-  
 
+
+
+/* Styling bottom section of footer (i.e. links to stay in contact, newsletter sign up etc.*/
+.bottom-links {
+  display:flex;
+  flex-direction:row;
+  column-gap:20px;
+  padding:15px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ /* INDICATOR DEFINITIONS TAB STYLING*/ 
+
+
+
+/* Ensures indicator search bar on indicator definitions tab is left-aligned*/ 
+.rt-search {align-self:flex-start;
+            margin-left:18px;
+}
+
+
+/* Styling the content that is expanded when user clicks on row*/ 
+.rt-tr-details{
+  padding: 24px;
+  box-shadow: inset 0 1px 3px #dbdbdb;
+  background: hsl(213, 20%, 99%);
+}
+
+
+/* PHS table styling for metholody section*/ 
+
+/* Style the table headers*/ 
+.phs-table th{
+  border:thin solid black;
+  background-color:purple;
+  color:white;
+  padding:3px;
+  word-break: break-all;
+  }
+
+/* Style the table cells*/  
+.phs-table td{
+  border:thin solid black;
+  padding:3px;
+  }
+
+
+/* Format reactable column headers */
+.rt-thead {
+    border-bottom: solid;
+    margin-top:20px;
+    font-size:15px;
+}
+
+/* Expandable row details - responsive layout*/
+.rt-td-inner{
+  display:flex;
+}
+
+
+/* Smaller screens display button under text*/
+@media (max-width: 800px) {
+    .tech-doc-download{
+    display:flex;
+    flex-direction:column;
+  }
+}
