@@ -13,7 +13,7 @@ tagList(
 
   navbarPage(id = "intabset", 
              title = div(class = "logo",
-                         div(tags$a(img(src="phs-logo-test.png", width=120, alt = "link to Public Health Scotland website"),
+                         div(tags$a(img(src="phs-logo-updated.png", width=120, alt = "link to Public Health Scotland website"),
                                     href= "https://www.publichealthscotland.scot/", # PHS logo which links to PHS website
                                     target = "_blank"),
                              style = "position: relative; top: -15px; margin-left: 10px; margin-top: 5px;")),
