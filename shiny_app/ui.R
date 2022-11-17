@@ -1,35 +1,32 @@
 #Code to create ScotPHO's Shiny profile platform
 # This script includes the user-interface definition of the app.
 
+
+
+
 ###############################################.
 ## Header ---- 
 ###############################################.
-tagList( #needed for shinyjs
+tagList( 
   useShinyjs(),  # Include shinyjs
-  useShinyjs(),
-  introjsUI(), 
+  introjsUI(), # Required to enable introjs scripts
 
-  # Required to enable introjs scripts
-  navbarPage(id = "intabset", #needed for landing page
-             title = div(class = "logo", 
-                         div(tags$a(img(src="phs-logo.png", width=120, alt = "link to Public Health Scotland website"),
-                                    href= "https://www.publichealthscotland.scot/",
+  navbarPage(id = "intabset", 
+             title = div(class = "logo",
+                         div(tags$a(img(src="phs-logo-test.png", width=120, alt = "link to Public Health Scotland website"),
+                                    href= "https://www.publichealthscotland.scot/", # PHS logo which links to PHS website
                                     target = "_blank"),
-                             style = "position: relative; top: -15px;"),
-                         div(tags$a(img(src="scotpho_reduced.png", height=40,  alt = "link to ScotPHO website"), href= "http://www.scotpho.org.uk/"),
-                
-                             style = "position: relative; top: -10px;")),
+                             style = "position: relative; top: -15px; margin-left: 10px; margin-top: 5px;")),
 
            # Navigation bar
-           windowTitle = "ScotPHO profiles", #title for browser tab
-           collapsible = TRUE, #tab panels collapse into menu in small screens
+           windowTitle = "ScotPHO profiles", # title for browser tab
+           collapsible = TRUE, # tab panels collapse into menu on small screens
            header = tags$head(includeCSS("www/styles.css"), # CSS styles
                               HTML("<html lang='en'>"),
-                              tags$link(rel="shortcut icon", href="favicon_scotpho.ico"), #Icon for browser tab
-                              #Including Google analytics
+                              tags$link(rel="shortcut icon", href="favicon_scotpho.ico"), # Icon for browser tab
+                              # Including Google analytics script
                               includeScript("google-analytics.js"),
-                              HTML("<base target='_blank'>") ,
-                              cookie_box
+                              HTML("<base target='_blank'>") 
                               ),
           
 
@@ -39,61 +36,109 @@ tagList( #needed for shinyjs
 ###############################################.
 tabPanel(
   div(
-      div(class="fa fa-home", role = "navigation"),"Home"),
-  value = "home",
-  htmlTemplate("hero.html",
-               latest_updates_button = actionButton('btn_indicator_updates', "View recent updates", class = "tour-button"),
-               see_more_button = actionButton("jump_to_life_exp", "View life expectancy by SIMD", class = "tour-button"))),
+      div(class="fa fa-home", role = "navigation"), "Home"), # wrap in div for screenreader / accessibility purposes 
+  value = "home", # tab ID
+  use_cicerone(), # guided tour
+  htmlTemplate("landing-page.html", # html file containing landing page contents
+               # variables defined in landing-page.html file to be built in Rshiny.
+               latest_updates_button = actionButton('btn_indicator_updates', "View recent updates", class = "button"),
+               see_more_button = actionButton("jump_to_life_exp", "View life expectancy by SIMD", class = "button"),
+               guide_button = actionButton("guide", "Need help? Take a guided tour", class = "hero-button")
+  )),
 
 
 ###############################################.
 ## Summary ----
 ###############################################.
-tabPanel(div(
-  div(class="fa fa-list-ul", role = "navigation"),
-  "Summary"),
-  value = "summary",
-         #sidebarLayout(
+tabPanel("Summary", icon = icon("list-ul"), value = "summary",
+         introBox(
+           wellPanel(fluidRow( #Filter options
+             column(3,
+                    div(title="Select a geography level first, then select the are you want from the list. You can click in the box, hit backspace and start to type if you want to start searching.",
+                        p(tags$b("Step 1. Select a geography level and then an area of interest.")),
+                        selectInput("geotype_summary", label = NULL, choices=areatype_list,
+                                    selected = "Health board"),
+                        conditionalPanel(#Conditional panel for extra dropdown for localities & IZ
+                          condition = "input.geotype_summary== 'HSC locality' | input.geotype_summary == 'Intermediate zone' ",
+                          div(title="This option restricts the HSC locality or IZ options below to only areas within a parent geography",                      
+                              selectInput("loc_iz_summary", label = "Step 1b. Select a region for localities or intermediate zones",
+                                          choices = partnership_name))
+                        ),
+                        uiOutput("geoname_ui_summary"))
+             ),
+             column(3,
+                    div(title="Select the profile you are interested in. Not all profiles are available for all geographies",
+                        p(tags$b("Step 2. Select a profile ")),
+                        div(id= "summary_div", uiOutput("profile_ui_summary")),
+                        # domain if spine selected
+                        conditionalPanel(condition = 'input.chart_summary == "Spine"',
+                                         uiOutput("topic_ui_spine")))
+             ),
+             column(3,
+                    div(title="Compare against another area (e.g. Scotland) or against a previous period to see the evolution of the area",
+                        p(tags$b("Step 3. Select to compare by ")),
+                        awesomeRadio("comp_summary", label = NULL,
+                                     choices = list("Area or" = 1, "Time" = 2), 
+                                     selected = 1, inline=TRUE, checkbox = TRUE),
+                        uiOutput("comp_ui_summary")) # comparator options
+             ),
+             column(3,
+                    actionButton("help_summary",label="Help", icon= icon('question-circle'), class ="down"),
+                    actionButton("defs_summary",label="Definitions", icon= icon('info'), class ="down"),
+                    downloadButton('download_summary', 'Download data', class = "down"),
+                    uiOutput("save_chart_ui"))),
+             fluidRow(column(12,
+                             column(3),#empty column to replicate offset and center content
+                             column(6,
+                                    p(tags$b("Step 4. Select what type of summary you want to see:"), 
+                                      " snapshot is a comparison with the latest data available, 
+                                      trend will show how things are changing over time, and 
+                                      spine compares indicators with the rest of areas of the same level."),
+                                    radioGroupButtons("chart_summary", status = "primary", justified = TRUE,
+                                                      choices = c("Snapshot", "Trend", "Spine"), label=NULL  )),
+                             column(3) #empty column to replicate offset and center content
+                             )) # column and row brackets
+           ), #well panel bracket
+           data.step = 4, 
+           data.intro =(p(h5("Throughout the tool use the dropdown menus to change which indicators or geographies are displayed in the charts."),
+                          br(),
+                          h5("While using dropdown menus mouse click within a dropdown menu and press backspace on your keyboard ('<-') then start typing a word to quickly find the options you are looking for"),
+                          img(src='introjs_how_to_select.png')))
            
-           #filters on the left
-          # sidebarPanel(
-             
-            #geography level filters
-                  div(title="Select a geography level first, then select the are you want from the list. You can click in the box, hit backspace and start to type if you want to start searching.",
-                  p(tags$b("Step 1. Select a geography level and then an area of interest.")),
-                  selectInput("geotype_summary", label = NULL, choices=areatype_list,
-                              selected = "Health board"),
-                  
-                  conditionalPanel(#Conditional panel for extra dropdown for localities & IZ
-                    condition = "input.geotype_summary== 'HSC locality' | input.geotype_summary == 'Intermediate zone' ",
-                    div(title="This option restricts the HSC locality or IZ options below to only areas within a parent geography",                      
-                    selectInput("loc_iz_summary", label = "Step 1b. Select a region for localities or intermediate zones",
-                                choices = partnership_name))
-                  ),
-            
-                  uiOutput("geoname_ui_summary")
-           ),
-           
-           #profile filter
-                  p(tags$b("Step 2. Select a profile ")),
-                  div(id= "summary_div", uiOutput("profile_ui_summary")),
-
-           #comparator options
-                  p(tags$b("Step 3. Select to compare by ")),
-                  awesomeRadio("comp_summary", label = NULL,
-                               choices = list("Area or" = 1, "Time" = 2), 
-                               selected = 1, inline=TRUE, checkbox = TRUE),
-                  uiOutput("comp_ui_summary"), # comparaison options depending on whether area or time selected
-          # ),#close side panel
-        # mainPanel(
-
+           ), #introbox bracket
+         mainPanel(width = 12,
+                   shiny::hr(),
+                   bsModal("mod_defs_summary", "Definitions", "defs_summary",
+                           htmlOutput('defs_text_summary')),
+                   fluidRow(column(4,
+                                   h4(textOutput("summary_title"), style="color: black; text-align: left"),
+                                   h5(textOutput("summary_subtitle"), style="color: black; text-align: left")
+                   ),
+                   column(3,
+                          br(),
+                          br(),
+                          p(img(src='signif_better.png', height=18, style="padding-right: 2px; vertical-align:middle"), 
+                            "Better than comparator", br(),
+                            img(src='non_signif.png', height=18, style="padding-right: 2px; vertical-align:middle"), 
+                            "Not different to comparator", br(),
+                            img(src='signif_worse.png', height=18, style="padding-right: 2px; vertical-align:middle"), 
+                            "Worse than comparator", br(),
+                            img(src='signif_nocalc.png', height=18, style="padding-right: 2px; vertical-align:middle"), 
+                            "No differences can be calculated")),
+                   conditionalPanel(condition = 'input.chart_summary == "Spine"', 
+                                    column(5,
+                                           br(),
+                                           br(),
+                                           uiOutput("ui_spine_legend_selected"),
+                                           uiOutput("ui_spine_legend_areatype"),
+                                           uiOutput("ui_spine_legend_comparator")))),
                    # Depending what users selects different visualizations
-           reactableOutput("summary_ui_plots") %>% withSpinner(color="#0dc5c1")
-    
-       # ) # close main panel
-        
-        #) # closes side bar layour 
-  ), #Tab panel bracket
+                   uiOutput("summary_expl_text"),
+                   uiOutput("summary_ui_plots")
+         )
+           ), #Tab panel bracket
+
+
 
 ###############################################.
 ## Time trend ----
@@ -462,24 +507,22 @@ navbarMenu("Info",
                     br()
            ),#Tab panel
 ###############################################.
-## Indicator definitions ----
+## Indicator definitions tab ----
 ###############################################.
 
            tabPanel("Indicator definitions",
-                    fluidPage(class = "test-class",
+                    
+                    
+                    div(class = "container-test", style = "padding:30px;",
 
-                    fluidRow(style = "width:80%; ",
-                             h3("Indicator definitions and technical information", style = "color:black; font-weight:600;"),
-                             h5(style = "color:black",
-                                "ScotPHO Profiles are made up of a collection of indicators related to a specific theme
-                                e.g. 'Alcohol' or 'Drugs'. Profiles are further divided into topic areas to group similar indicators together.
-                                 This page allows users to see available indicators and geographies as well as finding detailed technical information
-                                  about how indicators are created.")),
-
-                                fluidRow(
-                                  column(4, selectInput("profile_search", label = "Filter by profile", 
+                             h3("Indicator definitions and schedule", style = "font-weight:600;"),
+                    hr(),
+p("Use the filters below to search for indicators by profile and/or geography level. Alternatively you can search using key words (e.g. 'cancer'). You can then click on an indicator in the search results table to view metadata and links to quickly navigate to analysis in this tool for that particular indicator.", style = "font-size:16px; padding:5px"),
+div(class = "tech-doc-download", style = "display:flex; margin-bottom: 10px; justify-content:space-between;", p("To view technical information and updates schedule for all indicators at once, use the download button.", style = "font-size:16px;"), downloadButton('btn_techdoc_download', "Download as CSV", class = "button")),
+fluidRow(style = "border-top: 1px solid #eee;",
+                                  column(3, selectInput("profile_search", label = "Filter by profile", 
                                             choices=profile_list_filter)),
-                                  column(4, selectizeInput("geo_search", label = "Filter by geography level", choices = areatype_list, selected = NULL, multiple = TRUE,
+                                  column(3, selectizeInput("geo_search", label = "Filter by geography level", choices = areatype_list, selected = NULL, multiple = TRUE,
                                                options = list(placeholder = 'Select geography level(s)')))),
 
                                 fluidRow(reactableOutput("ind_search_results") %>% withSpinner(color="#0dc5c1"))
