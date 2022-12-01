@@ -41,7 +41,7 @@ library(rgdal) #for reading shapefiles
 # If indicator is presented as crude rate or percentage and suppression required
 # then suppress numerator where count is less than specified value.
 # crude rate and percentages DO require suppression of rates and CI as well as numerator.
-apply_supressions <- function(dataset) {
+apply_suppressions <- function(dataset) {
   dataset %<>%
     mutate(numerator = case_when(#std rate case
       supression=="Y" & substr(type_id,1,2)=='sr' & numerator<supress_less_than ~ NA_real_,
@@ -200,7 +200,20 @@ View(optdata %>% filter(is.na(indicator)))
 optdata <- left_join(x=optdata, y=geo_lookup, by="code")
 
 #Apply supressions.
-optdata %<>% apply_supressions()
+optdata %<>% apply_suppressions()
+
+
+# Check that suppression has been applied properly
+# If there are rows appearing it means there are figures that meet the criteria for suppression still being included
+# i.e. numerator is 1, but suppression threshold is <5
+# Check the indicator_lookup tab in the tech doc and make sure there is no text in the suppress_less_than column
+opt_suppression_check <- optdata %>%
+  filter(supression == "Y") %>%
+  subset(numerator < supress_less_than)
+
+
+View(opt_suppression_check)
+
 
 # Scaling measures (0 to 1) in groups by year, area type and indicator.
 optdata %<>% group_by(ind_id, year, areatype) %>%
@@ -289,7 +302,18 @@ data_depr <- left_join(x=data_depr, y=geo_lookup, by="code") %>%
                            "5" = "5 - least deprived")) %>%
   droplevels()
 
-data_depr <- data_depr %>% apply_supressions() #Apply supressions.
+data_depr <- data_depr %>% apply_suppressions() #Apply supressions.
+
+
+
+# Check suppression has been applied properly
+depr_suppression_check <- data_depr %>%
+  filter(supression == "Y") %>%
+  subset(numerator < supress_less_than)
+
+
+View(depr_suppression_check)
+
 
 #selecting out indicators where higher is better as app doesn't work with them
 data_depr <- data_depr %>%
