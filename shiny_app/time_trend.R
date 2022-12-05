@@ -44,11 +44,16 @@ output$iz_ui_trend <- renderUI({
                  multiple=TRUE, selected = "")
 })
 
-
+covid_impacted_Indicators = techdoc %>% filter(!is.na(`COVID impact`)) %>% select(indicator_name)
 ###############################################.
 # disabling controls if no data available for a type of geography and
 # changing labels to indicate no data is available
 observeEvent(input$indic_trend, {
+  
+  if (input$indic_trend %in% covid_impacted_Indicators$indicator_name){
+    showModal(modalDialog(title = "NOtice","gaps may exist in the chart where data collection has been affected by the covid pandemic",
+                          easyClose = TRUE,size="s"))
+  }
   
   trend <- optdata %>% subset(indicator == input$indic_trend) %>% 
     droplevels() 
