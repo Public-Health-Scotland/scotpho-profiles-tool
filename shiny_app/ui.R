@@ -269,6 +269,7 @@ div(title="Use the options below to add geographies to the trend chart, remember
          mainPanel(width = 8, #Main panel
                    bsModal("mod_defs_trend", "Definitions", "defs_trend", htmlOutput('defs_text_trend')),
                    h4(textOutput("title_trend"), style="color: black; text-align: left"),
+                   h4(textOutput("gap_year_notice"), style="color: red; text-align: left"),
                    h5(textOutput("subtitle_trend"), style="color: black; text-align: left"),
                    withSpinner(plotlyOutput("trend_plot"))
          )

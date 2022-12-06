@@ -50,11 +50,6 @@ covid_impacted_Indicators = techdoc %>% filter(!is.na(`COVID impact`)) %>% selec
 # changing labels to indicate no data is available
 observeEvent(input$indic_trend, {
   
-  if (input$indic_trend %in% covid_impacted_Indicators$indicator_name){
-    showModal(modalDialog(title = "NOtice","gaps may exist in the chart where data collection has been affected by the covid pandemic",
-                          easyClose = TRUE,size="s"))
-  }
-  
   trend <- optdata %>% subset(indicator == input$indic_trend) %>% 
     droplevels() 
   
@@ -192,6 +187,13 @@ trend_data <- reactive({
 # titles 
 output$title_trend <- renderText(paste0(input$indic_trend))
 output$subtitle_trend <- renderText(paste0(trend_type()))                                     
+
+observeEvent(input$indic_trend, {
+  # subtitle text to display if gap years are present due to the pandemic
+  output$gap_year_notice <- renderText(case_when(
+    (input$indic_trend %in% indicators_with_gap_years$indicator) ~ "Please note that due to the impact of the COVID-19 pandemic on data collections required to produce this indicator, there is a gap in the trend for affected years.", 
+    !(input$indic_trend %in% indicators_with_gap_years$indicator) ~ "")) 
+})
 
 trend_type <- function () {
   # y axis title
