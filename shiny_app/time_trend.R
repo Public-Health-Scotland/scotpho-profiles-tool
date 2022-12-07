@@ -44,7 +44,7 @@ output$iz_ui_trend <- renderUI({
                  multiple=TRUE, selected = "")
 })
 
-
+covid_impacted_Indicators = techdoc %>% filter(!is.na(`COVID impact`)) %>% select(indicator_name)
 ###############################################.
 # disabling controls if no data available for a type of geography and
 # changing labels to indicate no data is available
@@ -187,6 +187,13 @@ trend_data <- reactive({
 # titles 
 output$title_trend <- renderText(paste0(input$indic_trend))
 output$subtitle_trend <- renderText(paste0(trend_type()))                                     
+
+observeEvent(input$indic_trend, {
+  # subtitle text to display if gap years are present due to the pandemic
+  output$gap_year_notice <- renderText(case_when(
+    (input$indic_trend %in% indicators_with_gap_years$indicator) ~ "Please note that due to the impact of the COVID-19 pandemic on data collections required to produce this indicator, there is a gap in the trend for affected years.", 
+    !(input$indic_trend %in% indicators_with_gap_years$indicator) ~ "")) 
+})
 
 trend_type <- function () {
   # y axis title

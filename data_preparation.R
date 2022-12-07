@@ -357,3 +357,44 @@ iz_bound <- readRDS(paste0(shapefiles, "IZ_boundary.rds"))
 saveRDS(iz_bound, "shiny_app/data/IZ_boundary.rds")
 
 ##END
+
+
+
+################################################################
+# Gap year data generation
+#################################################################
+# indicator_id = the indicator number to generate data for
+# gap_year = the missing year
+# gap_trend_axis = the string to use in the trend axis,should follow pattern for years in that indicator e.g 20122/12, 2017-2018 , 2016 etc
+# base_year = a year present in the data, on which basis faux data can be generated 
+
+create_gap_year = function(indicator_id,gap_year,base_year,gap_trend_axis) {
+  
+  indicator = optdata %>% filter(ind_id==indicator_id)
+  
+  if(!(gap_year %in% unique(indicator$year))){
+    
+    gap_year_data = indicator %>% filter(year==base_year) %>% 
+      mutate(year = gap_year ) %>%
+      mutate(across(c("def_period", "trend_axis"), ~ gsub(unique(trend_axis),gap_trend_axis,.))) %>%
+      mutate(across(c("numerator","measure","lowci","upci","measure_sc"), ~ NA))
+    
+    return(gap_year_data) 
+  } 
+  
+  else {
+    print(paste0("ABORT!!: ",gap_year," is already contained in the data for indicator ",indicator_id))
+  }
+  
+}
+
+optdata_with_gap_years = rbind(
+  optdata,
+  create_gap_year(21005,2020,2019,"2020/21"), # child dental health pri 1
+  create_gap_year(20901,2020,2019,"2020") # Population within 500 metres of a derelict site 
+)
+
+# saving the optdata with gap years as the final optdata
+saveRDS(optdata_with_gap_years, "shiny_app/data/optdata.rds")
+
+

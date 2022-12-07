@@ -216,6 +216,11 @@ indicator_list <- sort(unique(optdata$indicator))
 indicator_map_list <- sort(unique(optdata$indicator[optdata$interpret != 'O']))
 indicators_updated <- techdoc %>% filter(days_since_update<60) %>% pull(indicator_name)
 ind_depr_list <- sort(unique(depr_data$indicator)) #list of indicators
+
+# indicators that contain gap years
+gap_indicators_ids = c(21005,20901)
+indicators_with_gap_years = optdata %>% filter(ind_id %in% gap_indicators_ids)%>% select(indicator) %>% unique()
+
 # Hsc deprivation indicators
 ind_hsc_list <- c("Preventable emergency hospitalisation for a chronic condition",
                   "Repeat emergency hospitalisation in the same year",
