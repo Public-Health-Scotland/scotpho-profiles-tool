@@ -26,11 +26,19 @@ tagList(
                               tags$link(rel="shortcut icon", href="favicon_scotpho.ico"), # Icon for browser tab
                               # Including Google analytics script
                               includeScript("google-analytics.js"),
+<<<<<<< HEAD
                               HTML("<base target='_blank'>") 
                               ),
           
 
          
+=======
+                              HTML("<base target='_blank'>"),
+                              # including google analytics 4
+                              HTML('<script async src="https://www.googletagmanager.com/gtag/js?id=G-KE1C59RLNS"></script>'),
+                              includeScript("gtag.js"),
+                              cookie_box),
+>>>>>>> master
 ###############################################.
 ## Landing page ----
 ###############################################.
@@ -191,6 +199,7 @@ div(title="Use the options below to add geographies to the trend chart, remember
          mainPanel(width = 8, #Main panel
                    bsModal("mod_defs_trend", "Definitions", "defs_trend", htmlOutput('defs_text_trend')),
                    h4(textOutput("title_trend"), style="color: black; text-align: left"),
+                   h4(textOutput("gap_year_notice"), style="color: red; text-align: left"),
                    h5(textOutput("subtitle_trend"), style="color: black; text-align: left"),
                    withSpinner(plotlyOutput("trend_plot"))
          )
@@ -594,13 +603,46 @@ tabPanel("Tour of the tool", value = "tour",
                                style = "color:black;"),
                    img(src='tour_about1.PNG', width="100%"))
          )#main panel bracket
+
 )
          
 
 
+), #tab panel bracket
+###############################################.             
+##############Other profiles----    
+###############################################.
+tabPanel("Other profiles", value = "others",
+         sidebarPanel(width=1),
+         mainPanel(
+           h4("Alternative profiles & resources", style = "color:black;"),
+           p("There are a number of organisations that provide local information relating to the wider determinants of health in Scotland.
+             Below are links to some of alternative profiling products."),
+           tags$ul( 
+             #Link to GCPH
+             tags$li(class= "li-custom", tags$a(href="http://www.nssdiscovery.scot.nhs.uk/",
+                                                "NSS Discovery",  class="externallink")), 
+             #Link to GCPH
+             tags$li(class= "li-custom", tags$a(href="http://www.understandingglasgow.com/",
+                                                "Glasgow Centre for Population Health (GCPH)",  class="externallink")), 
+             #Link to IS
+             tags$li(class= "li-custom", tags$a(href="http://www.improvementservice.org.uk/community-planning-outcomes-profile.html",
+                                                "Improvement Service (IS) - Community planning outcomes profile (CPOP)",  class="externallink")), 
+             #Link to NRS
+             tags$li(class= "li-custom", tags$a(href="https://www.nrscotland.gov.uk/statistics-and-data/statistics/stats-at-a-glance/council-area-profiles", 
+                                                "National Records of Scotland (NRS) Council Area Profiles",  class="externallink")), 
+             #Link to stats.gov.scot
+             tags$li(class= "li-custom", tags$a(href="http://statistics.gov.scot/home", 
+                                                "Statistics.gov.scot",  class="externallink")), 
+             #Link to Scottish nation
+             tags$li(class= "li-custom", tags$a(href="http://www.environment.gov.scot/", 
+                                                "Scotland's Environment Hub",  class="externallink"))
+           ), #Bullet point list bracket
+           br()
+           ) # mainPanel bracket
+           ) #tabPanel bracket
+
   )# NavbarMenu bracket
-) )
-################################################.
- #bracket tagList
+
 ###END
-#)
+

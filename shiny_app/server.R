@@ -8,12 +8,12 @@ function(input, output, session) {
   
   output$latest_updates <- renderUI(latest_updates_output)
   
-  observeEvent(input$jump_to_life_exp, {
-    updateTabsetPanel(session, "intabset", selected = "ineq")
-    updateSelectInput(session, "indic_simd", label = "Step 2 - Choose an indicator (type to search)",
-                      choices = ind_depr_list, selected = "Cancer registrations") # change to life expectancy
-   
-  })
+  # observeEvent(input$jump_to_life_exp, {
+  #   updateTabsetPanel(session, "intabset", selected = "ineq")
+  #   updateSelectInput(session, "indic_simd", label = "Step 2 - Choose an indicator (type to search)",
+  #                     choices = ind_depr_list, selected = "Cancer registrations") # change to life expectancy
+  #  
+  # })
   
   
  

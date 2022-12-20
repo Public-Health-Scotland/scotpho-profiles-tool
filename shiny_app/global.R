@@ -193,6 +193,12 @@ indicator_list <- sort(unique(optdata$indicator))
 indicator_map_list <- sort(unique(optdata$indicator[optdata$interpret != 'O']))
 ind_depr_list <- sort(unique(depr_data$indicator)) #list of indicators
 
+
+# indicators that contain gap years
+gap_indicators_ids = c(21005,20901)
+indicators_with_gap_years = optdata %>% filter(ind_id %in% gap_indicators_ids)%>% select(indicator) %>% unique()
+
+
 # Hsc deprivation indicators
 ind_hsc_list <- c("Preventable emergency hospitalisation for a chronic condition",
                   "Repeat emergency hospitalisation in the same year",
@@ -335,6 +341,8 @@ updates_modal <- modalDialog(
   size = "l", align= "left",
   easyClose = TRUE, fade=TRUE, footer = modalButton("Close (Esc)")
 )
+
+
 
 
 # define the step-by-step guided tour of the tool for homepage

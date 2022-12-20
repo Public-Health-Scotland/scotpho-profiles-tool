@@ -41,7 +41,7 @@ library(rgdal) #for reading shapefiles
 # If indicator is presented as crude rate or percentage and suppression required
 # then suppress numerator where count is less than specified value.
 # crude rate and percentages DO require suppression of rates and CI as well as numerator.
-apply_supressions <- function(dataset) {
+apply_suppressions <- function(dataset) {
   dataset %<>%
     mutate(numerator = case_when(#std rate case
       supression=="Y" & substr(type_id,1,2)=='sr' & numerator<supress_less_than ~ NA_real_,
@@ -200,7 +200,20 @@ View(optdata %>% filter(is.na(indicator)))
 optdata <- left_join(x=optdata, y=geo_lookup, by="code")
 
 #Apply supressions.
-optdata %<>% apply_supressions()
+optdata %<>% apply_suppressions()
+
+
+# Check that suppression has been applied properly
+# If there are rows appearing it means there are figures that meet the criteria for suppression still being included
+# i.e. numerator is 1, but suppression threshold is <5
+# Check the indicator_lookup tab in the tech doc and make sure there is no text in the suppress_less_than column
+opt_suppression_check <- optdata %>%
+  filter(supression == "Y") %>%
+  subset(numerator < supress_less_than)
+
+
+View(opt_suppression_check)
+
 
 # Scaling measures (0 to 1) in groups by year, area type and indicator.
 optdata %<>% group_by(ind_id, year, areatype) %>%
@@ -289,7 +302,18 @@ data_depr <- left_join(x=data_depr, y=geo_lookup, by="code") %>%
                            "5" = "5 - least deprived")) %>%
   droplevels()
 
-data_depr <- data_depr %>% apply_supressions() #Apply supressions.
+data_depr <- data_depr %>% apply_suppressions() #Apply supressions.
+
+
+
+# Check suppression has been applied properly
+depr_suppression_check <- data_depr %>%
+  filter(supression == "Y") %>%
+  subset(numerator < supress_less_than)
+
+
+View(depr_suppression_check)
+
 
 #selecting out indicators where higher is better as app doesn't work with them
 data_depr <- data_depr %>%
@@ -333,3 +357,44 @@ iz_bound <- readRDS(paste0(shapefiles, "IZ_boundary.rds"))
 saveRDS(iz_bound, "shiny_app/data/IZ_boundary.rds")
 
 ##END
+
+
+
+################################################################
+# Gap year data generation
+#################################################################
+# indicator_id = the indicator number to generate data for
+# gap_year = the missing year
+# gap_trend_axis = the string to use in the trend axis,should follow pattern for years in that indicator e.g 20122/12, 2017-2018 , 2016 etc
+# base_year = a year present in the data, on which basis faux data can be generated 
+
+create_gap_year = function(indicator_id,gap_year,base_year,gap_trend_axis) {
+  
+  indicator = optdata %>% filter(ind_id==indicator_id)
+  
+  if(!(gap_year %in% unique(indicator$year))){
+    
+    gap_year_data = indicator %>% filter(year==base_year) %>% 
+      mutate(year = gap_year ) %>%
+      mutate(across(c("def_period", "trend_axis"), ~ gsub(unique(trend_axis),gap_trend_axis,.))) %>%
+      mutate(across(c("numerator","measure","lowci","upci","measure_sc"), ~ NA))
+    
+    return(gap_year_data) 
+  } 
+  
+  else {
+    print(paste0("ABORT!!: ",gap_year," is already contained in the data for indicator ",indicator_id))
+  }
+  
+}
+
+optdata_with_gap_years = rbind(
+  optdata,
+  create_gap_year(21005,2020,2019,"2020/21"), # child dental health pri 1
+  create_gap_year(20901,2020,2019,"2020") # Population within 500 metres of a derelict site 
+)
+
+# saving the optdata with gap years as the final optdata
+saveRDS(optdata_with_gap_years, "shiny_app/data/optdata.rds")
+
+

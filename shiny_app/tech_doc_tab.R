@@ -186,7 +186,6 @@ output$ind_search_results <- renderReactable({
       source_details = colDef(show = F),
       related_publications = colDef(show = F),
       supporting_information = colDef(show = F),
-      statistics_publications = colDef(show = F),
       inclusion_rationale = colDef(show = F),
       numerator = colDef(show = F),
       available_geographies = colDef(show = F),

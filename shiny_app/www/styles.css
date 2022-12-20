@@ -9,6 +9,8 @@ a:focus {
 }
 
 
+
+
 /* Remove dashboard padding*/
 .container-fluid {padding: 0;}
 
@@ -110,6 +112,12 @@ h3{
   font-weight:bold;
 }
 
+ 
+p{
+
+    font-size: 16px;
+}
+ 
  
  
  
@@ -241,7 +249,7 @@ color: #fff;
   padding-left:45px;
   padding-right:45px;
   padding-top:20px;
-  padding-bottom:25px;
+  padding-bottom:35px;
 
   /* Position and center the image to scale nicely on all screens */
   background-position: bottom;
@@ -321,23 +329,6 @@ color: #fff;
 
 
 
-/* font style for individual box headers*/ 
-.featured-item h3 {
-  color:black;
-  font-size:1.7rem; 
-  font-weight:bold;
-}
-
-
-.header-section{
-  display:flex;
-  margin-left:20px;
-}    
-
-
-
-
-
 /* Tab buttons - centre position all the text  */     
 .features-text-section {
     text-align: center!important;
@@ -378,22 +369,6 @@ color: #fff;
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /* Section 4: Additional links ------------------*/ 
 
 /* Footer container for bottom of homepage*/ 
@@ -413,10 +388,12 @@ color: #fff;
 
 .links-item > a{
   color:#d2cfeb;
+  font-size:16px;
 }
 
 .bottom-links > a{
   color: #d2cfeb;
+  font-size:16px;
 }
 
 
@@ -424,6 +401,7 @@ color: #fff;
 /* Displays links in footer from top to bottom */ 
 .links-item{
   display:flex;
+  margin:10px;
   flex-direction:column;
   flex:1;
   color: #d2cfeb; /* Changes links 'groups' headers colorn to light purple*/ 
@@ -441,37 +419,7 @@ color: #fff;
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
  /* INDICATOR DEFINITIONS TAB STYLING*/ 
-
-
 
 /* Ensures indicator search bar on indicator definitions tab is left-aligned*/ 
 .rt-search {align-self:flex-start;
