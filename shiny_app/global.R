@@ -296,7 +296,7 @@ ind_dat <- techdoc %>%
          Profile_short2 = Profile_Domain2)%>%
   mutate(profile_short = ifelse(is.na(Profile_short2), Profile_short1, paste0(Profile_short1, ",", Profile_short2)))%>%
   bind_rows(mutate(., profile_short = "Show all")) %>%
-  select(-c("active", "interpretation", "team_updating", "indicator_author", "analyst_notes", "days_since_update","source_last_updated", "source_next_update", "scotpho_profiles", "Profile_short1", "Profile_short2")) %>%
+  select(-c("active", "interpretation", "COVID impact", "indicator_author", "analyst_notes", "days_since_update","source_last_updated", "source_next_update", "scotpho_profiles", "Profile_short1", "Profile_short2")) %>%
   mutate(across(everything(), ~replace_na(.,"N/A"))) %>% 
   mutate(next_update_column = ifelse(next_update == "TBC", NA, paste("01-", next_update, sep = "")))
 
