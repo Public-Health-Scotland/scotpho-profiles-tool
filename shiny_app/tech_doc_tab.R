@@ -1,245 +1,212 @@
-#Code for technical document tab
-
 #################################################.
-##  Technical Doc Page ----
+##  Indicator definitions tab ----
 #################################################.
-#### Techdoc for summary of indicators.
-## Reactive filter of available geography types based on which profile is selected.
-output$tecdoc_geographies <- renderUI ({
-  
-  if (input$profile_picked != "Show all"){
-    geo_selection <- sort(unique(c(as.character(optdata$areatype[grep(input$profile_picked,optdata$profile_domain1)]),
-                                   as.character(optdata$areatype[grep(input$profile_picked,optdata$profile_domain2)] ))))
-  } else {geo_selection <- areatype_list }
-  
-  
-  div(title="Filter table selecting only indicators available for a specific geography type", 
-      selectizeInput("techdoc_geotype", 
-                     label = "Step 3. Select a geography type to see indicators available at that level (optional)",
-                     width = "100%", choices = c("Show all", geo_selection), 
-                     selected = "Show all", multiple=TRUE, 
-                     options = list(placeholder = "Select....", maxItems = 1))) 
-}) 
 
-output$profile_picked_ui <- renderUI({
+# Reactive data to be used in table
+# Filter data by a) profile and b) geography levels selected by user
+tech_info <- reactive({
   
-  if (input$techdoc_selection == "List of available indicators") {
-    label_filter <- "Step 2. Select a profile to see indicators included on it (optional)"
-    div_title <- "Filter table selecting only indicators available for a specific profile"
-  } else if (input$techdoc_selection == "Detailed information about single indicator") {
-    label_filter <- "Step 3a. Filter indicator list selecting a single profile (optional)"
-    div_title <- "Filter indicator list from step 2 selecting only indicators from a specific profile"
-  }
+  ind_dat %>%
+    filter(grepl(paste(input$profile_search, collapse="|"), profile_short)) %>%
+    filter(grepl(paste(input$geo_search, collapse="|"), available_geographies))
   
-  div(title= div_title, 
-      selectizeInput("profile_picked", label = label_filter,
-                     width = "100%",choices = profile_list_filter, 
-                     selected = "Show all", multiple=FALSE))
 })
 
-###############################################.
-# Reactive dataset filtered for flextable - four possible combinations of data
-techdoc_indicator_data <- reactive({  
-  if (input$profile_picked != "Show all"){ # if a single profile selected
-    if(input$techdoc_geotype != "Show all"){ #further filter if user selects a geography type
-      techdoc %>%
-        subset(grepl(input$techdoc_geotype,available_geographies)) %>%
-        subset(grepl(names(profile_list[unname(profile_list) == input$profile_picked]),profile))} 
-    else { # dataset if user wants a single profile but all geography types 
-      techdoc %>%
-        subset(grepl(names(profile_list[unname(profile_list) == input$profile_picked]),profile))}}
-  else if (input$profile_picked == "Show all"){ #subset applied if user selects all profiles
-    if(input$techdoc_geotype == "Show all"){  # user selects all geography types
-      techdoc}
-    else { # user selects a single geography type
-      techdoc %>%
-        subset(grepl(input$techdoc_geotype,available_geographies))}}
-})
 
-## Function to manipulate filtered data - easier for data download if manipulations done after filters
-formatted_techdoc_data <- function(){
-  if (input$profile_picked != "Show all"){
-    techdoc_indicator_data() %>%
-      mutate(prof_start=regexpr((names(profile_list[unname(profile_list) == input$profile_picked])), domain), #find start position of profile name in domain column
-             prof_name_text=substr(domain,prof_start, nchar(domain)),  #generate column that starts with filtered profile
-             findcomma=regexpr(",",prof_name_text), #find position of comma (where domain description ends
-             findhyp=regexpr("-",prof_name_text), #find position of hyphen (where domain description starts)
-             domain1= case_when(findcomma<0 ~ substr(prof_name_text,findhyp+1,nchar(prof_name_text)),
-                                findcomma>0 ~ substr(prof_name_text,findhyp+1,findcomma-1),
-                                TRUE ~ "")) %>% # extract domain string linked to seletec profile
-      mutate (profilename=input$profile_picked) %>%  #sort on profile name since some indicators in multiple profiles
-      arrange(profilename, domain1, indicator_name) %>%
-      rownames_to_column(var="ind_index")} 
-  else{
-    techdoc_indicator_data()}}
-
-## Function to construct flextable displaying techdoc info
-plot_techdoc <- function(){
+# Download technical info data when button clicked
+output$btn_techdoc_download <- downloadHandler(
   
-  if (input$profile_picked != "Show all"){ # table for a single profile selection
-    formatted_techdoc_data() %>%
-      select(domain1, ind_index,indicator_name, indicator_definition,available_geographies,aggregation) %>%
-      flextable() %>%
-      add_header_lines(paste0((names(profile_list[unname(profile_list) == input$profile_picked]))," profile")) %>%
-      set_header_labels (domain1="Domain",ind_index= "",indicator_name="Indicator",indicator_definition="Indicator Definition",
-                         available_geographies="Available geographies", aggregation="Level of aggregation") %>%
-      theme_box() %>%
-      merge_v(j = ~ domain1) %>%
-      align_text_col(align = "left") %>%
-      color(i = 1, color = "white", part = "header") %>% # format text colour of header to identify profile 
-      bg(i=1,bg="#007ba7",part="header") %>%  # format background colour of header to identify profile
-      fontsize(size = 14, part = "all") %>% 
-      autofit() %>%
-      htmltools_value()
-  } else { #table all indicators (ie "show all") profiles selected - additional column for profile(s)
-    formatted_techdoc_data() %>%
-      arrange(profile, domain) %>%
-      rownames_to_column(var="ind_index") %>%
-      select (profile, domain,ind_index,indicator_name, indicator_definition,available_geographies, aggregation) %>%
-      flextable() %>%
-      set_header_labels (profile="Profile(s)",domain="Domain(s)",ind_index="",indicator_name="Indicator",indicator_definition="Indicator Definition",
-                         available_geographies="Available geographies", aggregation="Level of aggregation") %>%
-      theme_box() %>%
-      merge_v(j = ~ profile) %>%
-      merge_v(j = ~ domain) %>%
-      align_text_col(align = "left") %>%
-      fontsize(size = 14, part = "all") %>% 
-      autofit() %>%
-      htmltools_value()}
-}
-
-## RenderUI for which version flextable to display on techdoc page
-#render techincal info depending on whether selected to see summary of 
-# available indictors or single indicator definition
-output$techdoc_display <- renderUI({  
-  # Preparing a brief explanation for each visualisation 
-  if (input$techdoc_selection == "List of available indicators") {
-    plot_techdoc()
-  } else if (input$techdoc_selection == "Detailed information about single indicator")
-    p("loading..")}  #shows 'loading' as there can be a small delay while switching back between views
-)
-
-## Function to format data for csv according to whether showing single profile or all profiles
-techdoc_csv <- function() {
-  if (input$profile_picked != "Show all"){
-    formatted_techdoc_data() %>%
-      rename(profile_selection=profilename, all_profiles=profile, domain_selection=domain1) %>%  
-      select(c(profile_selection, domain_selection,ind_index,indicator_name, indicator_number, indicator_definition, all_profiles, domain,inclusion_rationale, data_source,
-               diagnostic_code_position, numerator, denominator, measure, disclosure_control, rounding, age_group, sex, year_type,
-               trends_from, aggregation, update_frequency, available_geographies, confidence_interval_method, notes_caveats, 
-               related_publications, supporting_information, last_updated, next_update))}
-  else { #table all indicators (ie "show all") profiles selected - additional column for profile(s)
-    formatted_techdoc_data() %>%
-      arrange(indicator_name) %>%
-      select(c(indicator_name, indicator_number, indicator_definition,profile, domain, inclusion_rationale, data_source,
-               diagnostic_code_position, numerator, denominator, measure, disclosure_control, rounding, age_group, sex, year_type,
-               trends_from, aggregation, update_frequency, available_geographies, confidence_interval_method, notes_caveats, 
-               related_publications, supporting_information, last_updated, next_update))}
-}
-
-## Download techdoc data from conditional panel (flextable)
-output$download_techdoc1_csv <- downloadHandler(
-  filename ="indicator_definitions.csv",
+  filename ="Indicator_definitions.csv",
   content = function(file) {
-    write.csv(techdoc_csv(),
-              file, row.names=FALSE) } 
+    write.csv(ind_dat %>% select(-next_update_column, -indicator_number, - profile_short), 
+              file, row.names=FALSE) }
 )
 
-#################################################.  
-#### Techdoc for individual indicator.
 
-## Reactive filters for technical details document - filter for indicator dependent on profile/topic selected
-output$indicator_choices <- renderUI ({
+
+# Display indicator search results in a table with expandable rows
+# Using reactive data from above
+output$ind_search_results <- renderReactable({
   
-  if (input$profile_picked != "Show all"){
-    indic_selection <- sort(unique(c(as.character(optdata$indicator[grep(input$profile_picked,optdata$profile_domain1)]),
-                                     as.character(optdata$indicator[grep(input$profile_picked,optdata$profile_domain2)] ))))
-  } else if (input$topic_defined != "Show all"){
-    indic_selection <- sort(unique(
-      optdata$indicator[substr(optdata$profile_domain1, 5, nchar(as.vector(optdata$profile_domain1)))
-                        == input$topic_defined |
-                          substr(optdata$profile_domain2, 5, nchar(as.vector(optdata$profile_domain2)))
-                        == input$topic_defined]))
-  } else {indic_selection <- indicator_list}
+  reactable(
+    tech_info(), # reactive data created above
+    searchable = TRUE, # include a global search bar
+    defaultPageSize = 25, # set max number of rows per page
+    theme = table_theme(), # table_theme() can be found in global script
+    rowStyle = list(cursor = "pointer"),
+    onClick = "expand", # expand rows when clicked on
+    highlight = TRUE, # changes row colour when user hovers over it
+    language = reactableLang(
+      searchPlaceholder = "Type to search for an indicator", # olaceholder text for global search bar
+      noData = "No results found", # text to display in table when no results to display
+      pageInfo = "{rowStart}\u2013{rowEnd} of {rows} indicators" # text to display in table footer
+    ),
+    
+    # Customising all the columns in the table:
+    columns = list(
+      # Column 1: Indicator name 
+      indicator_name = colDef(
+        minWidth = 350,
+        show = T, 
+        html = T, 
+        name = "Indicator search results",
+        # display profile(s) under each indicator name
+        cell = function(value, index) {
+          profile <- tech_info()$profile[index]
+          div(
+            div(style = list(fontWeight = "Medium"), value),
+            div(style = list(fontSize = "1.0rem"), profile)
+          )
+        },
+        # Technical information to display when row expanded
+        # ${rowInfo.values['column name'] returns the value in that column for the particular row of data the user has expanded
+        details = JS(" function(rowInfo) {
+
+                     
+                     const input = `${rowInfo.values['related_publications']}`
+                     
+                     const urlRegex = /(https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*))/g;
+                     
+                     const matches = input.match(urlRegex) || []
+                     
+                     let output = matches.length ? input : 'N/A';
+                     
+                     for(let match of matches){
+                     output = output.replace(match, `<a style = 'text-decoration: underline; color:#337ab7;' href='${match}'>${match}</a>`);
+                     }
+
+
+                     return  `<div class = 'prof-dom' style='display: flex;'>
+                     <div class='date-info' style = 'display: flex; font-size:medium; margin-right:20px;'>
+                     <p style = 'font-weight:600'>Last updated:  </p>
+                     <div>${rowInfo.values['last_updated']}</div>
+                     </div>
+                     <div class='date-info' style = 'display: flex; font-size:medium;'>
+                     <p style = 'font-weight:600'>Next update due:  </p>
+                     <div>${rowInfo.values['next_update']}</div>
+                     </div>
+                     </div>
+
+
+                     <h4 style = 'font-weight:bold;'>Quick links</h4>
+                     <div class = 'link-buttons'>
+                     <a class = 'button' onclick = \"$('#indic_trend')[0].selectize.setValue('${rowInfo.values['indicator_name']}');$('a[data-value=&quot;trend&quot;]').tab('show'); \" role='button'>See time trend</a>
+                     <a class = 'button' onclick = \"$('#indic_rank')[0].selectize.setValue('${rowInfo.values['indicator_name']}');$('a[data-value=&quot;rank&quot;]').tab('show'); \" role='button'>Compare different areas</a> 
+                     <a class = 'button' onclick = \"$('#indic_simd')[0].selectize.setValue('${rowInfo.values['indicator_name']}');$('a[data-value=&quot;ineq&quot;]').tab('show'); \" role='button'>Explore inequalities</a>
+                     </div>
+
   
-  selectizeInput("indicator_selection", 
-                 label = shiny::HTML("<p>Step 2. Select an indicator for detailed technical information <br/> <span style='font-weight: 400'>(hit backspace and start typing to search for an indicator)</span></p>"),
-                 width = "510px", choices = indic_selection, 
-                 selected = character(0), multiple=TRUE, 
-                 options = list(placeholder = "Make a selection to see information", maxItems = 1)) 
-}) 
+                     <div class='indicator-info'>
+                     <h4>Indicator definition</h4>
+                     <div>${rowInfo.values['indicator_definition']}</div>
+                     </div>
 
-#To keep it simple, when you change profile, reset topic and vice versa.
-observeEvent(input$profile_picked, { 
-  if (input$topic_defined != "Show all" && input$profile_picked != "Show all"){ 
-    updateSelectizeInput(session,"topic_defined", label = "Or by domain",
-                         choices = topic_list_filter, selected = "Show all")}
-})
+                     <div class='indicator-info'>
+                     <h4>Data source</h4>
+                     <div>${rowInfo.values['data_source']}</div>
+                     </div>
 
-observeEvent(input$topic_defined, { 
-  if (input$profile_picked != "Show all" && input$topic_defined != "Show all"){ 
-    updateSelectizeInput(session,"profile_picked", label = "Filter by profile",
-                         choices = profile_list_filter, selected = "Show all")}
-})
+                     <div class='indicator-info'>
+                     <h4>Numerator</h4>
+                     <div>${rowInfo.values['numerator']}</div>
+                     </div>
 
-###############################################.
-# Creating text and titles for info to display
-
-#reactive selection for single indicator
-indicator_selected <- reactive({ 
-  filter(techdoc, techdoc$indicator_name==input$indicator_selection)
-})
-
-#Text for title of indicator selected
-output$indicator <- renderValueBox({
-  valueBox(p(indicator_selected()$indicator_name, style="color: white; font-size: 30px; font-weight: bold;"), 
-           HTML(paste("<b>","Profile:","</b>",indicator_selected()$profile,br(),
-                      "<b>","Domain:","</b>",indicator_selected()$domain)), icon = icon ("book"),color = "blue")
-})
-
-# Text for all metadata parts of the indicator
-output$definition <- renderText ({indicator_selected()$indicator_definition })
-output$rationale <- renderText ({ indicator_selected()$inclusion_rationale})
-output$source <- renderText ({indicator_selected()$data_source})
-output$numerator <- renderText ({indicator_selected()$numerator})
-output$diagnosis <- renderText ({indicator_selected()$diagnostic_code_position})
-output$numerator <- renderText ({indicator_selected()$numerator})
-output$measure <- renderText ({indicator_selected()$measure})
-output$rounding <- renderText ({indicator_selected()$rounding})
-output$year <- renderText ({indicator_selected()$year_type})
-output$geos <- renderText ({indicator_selected()$available_geographies})
-output$trends_from <- renderText ({indicator_selected()$trends_from})
-output$notes <- renderText ({indicator_selected()$notes_caveats})
-output$last_updated <- renderText ({indicator_selected()$last_updated})
-output$denominator <- renderText ({indicator_selected()$denominator})
-output$disclosure <- renderText ({indicator_selected()$disclosure_control})
-output$age <- renderText ({indicator_selected()$age_group})
-output$sex <- renderText ({indicator_selected()$sex})  #change this when combined
-output$aggregation <- renderText ({indicator_selected()$aggregation})
-output$update_frequency <- renderText ({indicator_selected()$update_frequency})
-output$confidence_interval <- renderText ({indicator_selected()$confidence_interval_method})
-output$related_pubs <- renderText ({indicator_selected()$related_publications})
-output$supporting_info <- renderText ({indicator_selected()$supporting_information})
-output$next_update <- renderText ({indicator_selected()$next_update})
+                     <div class='indicator-info'>
+                     <h4>Denominator</h4>
+                     <div>${rowInfo.values['denominator']}</div>
+                     </div>
 
 
-## Download techdoc data from 2nd conditional panel (detailed indicator)
-#Download definitions table for selected indicator - not
+                     <h4 style = 'font-weight:bold;'>Methodology</h4>
+                     <table style='width:100%; table-layout: fixed' class = 'phs-table'>
+                     <tr>
+                     <th>Confidence interval</th>
+                     <th>Rounding</th>
+                     <th>Disclosure control</th>
+                     <th>Measure</th>
+                     </tr>
+                     <tr>
+                     <td>${rowInfo.values['confidence_interval_method']}</td>
+                     <td>${rowInfo.values['rounding']}</td>
+                     <td>${rowInfo.values['disclosure_control']}</td>
+                     <td>${rowInfo.values['measure']}</td>
+                     </tr>
+                     <tr class='spacer' style = 'line-height:5px; border-style:none;'>
+                     <td colspan='4'>&nbsp;</td>
+                     </tr>
+                     <tr>
+                     <th>Age group</th>
+                     <th>Sex</th>
+                     <th>Available geographies</th>
+                     <th>Inequalities</th>
+                     </tr>
+                     <tr>
+                     <td>${rowInfo.values['age_group']}</td>
+                     <td>${rowInfo.values['sex']}</td>
+                     <td>${rowInfo.values['available_geographies']}</td>
+                     <td>${rowInfo.values['`label inequality`']}</td>
+                     </tr>
+                     </table>
+                      <br>
+                     <div>For a detailed explanation on how our indicators are calculated, please refer to our <a href='http://www.scotpho.org.uk/media/1026/explanation-of-statistics-used-in-profiles-v2.pptx' target='_blank'>Explanation of Statistics</a></div>
+ 
+                     <div class='indicator-info'>
+                     <h4>Related publications</h4>
+                     <div>${output}</div>
+                     </div>
 
-indicator_csv <- reactive({ format_definitions_csv(indicator_selected()) })
+                     <div class='indicator-info'>
+                     <h4>Supporting information</h4>
+                     <div><a style = 'text-decoration: underline; color:#337ab7;' href='${rowInfo.values['output']}' target='_blank'>${rowInfo.values['supporting_information']}</a></div>
+                     </div>
 
-allindicator_csv <- reactive({ format_definitions_csv(techdoc) })
+                     <div class='indicator-info'>
+                     <h4>Inclusion rationale</h4>
+                     <div>${rowInfo.values['inclusion_rationale']}</div>
+                     </div>
 
-output$download_detailtechdoc_csv <- downloadHandler(
-  filename ="indicator_definitions.csv",
-  content = function(file) {
-    write.csv(indicator_csv(),
-              file, row.names=FALSE) } 
-)
+                     <div class='indicator-info'>
+                     <h4>Notes and caveats</h4>
+                     <div>${rowInfo.values['notes_caveats']}</div>
+                     </div>`
+                     
+}")),
+      # 2. format date column
+      next_update_column = colDef(cell = function(value) strftime(value, "%b-%Y"),
+                           defaultSortOrder = "desc", sortable = TRUE, name = "Next update due", na = "TBC"),
+      
+      # 3. hide all other columns in the table. 
+      profile = colDef(show = F),
+      domain = colDef(show = F),
+      last_updated = colDef(show = F),
+      next_update = colDef(show = F),
+      trends_from = colDef(show = F),
+      indicator_definition = colDef(show = F),
+      data_source = colDef(show = F),
+      source_details = colDef(show = F),
+      related_publications = colDef(show = F),
+      supporting_information = colDef(show = F),
+      inclusion_rationale = colDef(show = F),
+      numerator = colDef(show = F),
+      available_geographies = colDef(show = F),
+      disclosure_control = colDef(show = F),
+      confidence_interval_method = colDef(show = F),
+      measure = colDef(show = F),
+      notes_caveats = colDef(show = F),
+      denominator = colDef(show = F),
+      year_type = colDef(show = F),
+      diagnostic_code_position = colDef(show = F),
+      rounding = colDef(show = F),
+      aggregation = colDef(show = F),
+      indicator_number = colDef(show = F),
+      age_group = colDef(show = F),
+      sex = colDef(show = F),
+      update_frequency = colDef(show = F),
+      profile_short = colDef(show = F) ,
+      `label inequality` = colDef(show = F)
+       )
+        )
+  })
 
-output$download_alltechdoc_csv <- downloadHandler(
-  filename ="indicator_definitions.csv",
-  content = function(file) {
-    write.csv(allindicator_csv(),
-              file, row.names=FALSE) } 
-)
+### END 
+

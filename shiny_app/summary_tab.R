@@ -990,4 +990,4 @@ output$download_spineplot <- downloadHandler(
            device = "png",width=15, limitsize=FALSE)
   })
 
-##END
+

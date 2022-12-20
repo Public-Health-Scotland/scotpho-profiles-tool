@@ -1,33 +1,71 @@
 /* CSS styles used in the shiny app */
 
+/* 1. STYLING APPLICABLE TO WHOLE DASHBOARD ----------------------------*/
 
-/* to avoid red text error messages in the whole app, take out for testing*/
+
+/* Add orange border to all links in dashboard when focused on*/
+a:focus {
+  outline: 3px solid orange;
+}
+
+
+
+
+/* Remove dashboard padding*/
+.container-fluid {padding: 0;}
+
+
+/* to avoid red text error messages in the whole app*/
 .shiny-output-error { visibility: hidden; }
 .shiny-output-error:before { visibility: hidden; }
 
-/*for introjs sizing */
-.newClass {min-width: 50px;max-width: 50px;} 
 
 /* Style sidebars/well panels */
 .well {background-color:#ffffff; border: 0 solid #336699;
        padding: 5px; box-shadow: none; }
-       
-/* Background colour of header navBar */                        
-.navbar-brand {background-color: white}
+ 
+      
 
-.navbar {font-size: 14px; border: 0} /* font size and border*/
+/* Changes colour of Navigation bar to PHS purple */
+.navbar-default {
+  background-color: #3F3685;
+  border: none;
+  margin: 0 !important;
 
-.dropdown-menu { font-size: 14px;} /* dropdown menu within navBar*/
+}
 
-.container-fluid {padding-right: 0}
-                          
-/*Text size and line height. Padding needed for footer */
-body { font-size: 14px; line-height: 1.1; padding-bottom:30px}
+/* Creates a white background for PHS logo in navbar */
+.navbar-brand, .navbar-default:hover .navbar-brand:hover {
+  background-color: #ffffff;
+  padding: 10px;
 
-.checkbox label, .radio label, .checkbox-bs label, .radio-bs label
-                          { line-height: 1.6 }
-                          
-.radio-inline {line-height: 2}
+}
+
+/* Changes font to white in nav bar */
+.navbar-default .navbar-nav > li > a {
+  color: #ffffff;
+
+}
+
+/* Changes colour of active (clicked) tab on the nav bar */
+.navbar-default .navbar-nav > .active > a, .navbar-default .navbar-nav > .active > a:focus, .navbar-default .navbar-nav > .active > a:hover {
+  color: #ffffff;
+  background-color: #312760;
+
+}
+
+/* Style the tab when hovered over */
+.navbar-default .navbar-nav > li > a:hover, .navbar-default .navbar-nav > li > a:focus {
+  color: #ffffff;
+  background-color: #5343a3;
+
+}
+
+/* Add orange border to tabs when focused on*/
+.navbar-nav>.active>a:focus {
+  outline: 3px solid orange;
+}
+
                           
 /* Padding and margins of filters and labels*/
 .form-group {margin: 3px}
@@ -44,97 +82,394 @@ body { font-size: 14px; line-height: 1.1; padding-bottom:30px}
 
 .control-label { margin-bottom: 1px}
                           
-/* Padding of columns*/
-.col-xs-1, .col-sm-1, .col-md-1, .col-lg-1, .col-xs-2, .col-sm-2, .col-md-2, 
-      .col-lg-2, .col-xs-3, .col-sm-3, .col-md-3, .col-lg-3, .col-xs-4, .col-sm-4, 
-      .col-md-4, .col-lg-4, .col-xs-5, .col-sm-5, .col-md-5, .col-lg-5, .col-xs-6, 
-      .col-sm-6, .col-md-6, .col-lg-6, .col-xs-7, .col-sm-7, .col-md-7, .col-lg-7, 
-      .col-xs-8, .col-sm-8, .col-md-8, .col-lg-8, .col-xs-9, .col-sm-9, .col-md-9, 
-      .col-lg-9, .col-xs-10, .col-sm-10, .col-md-10, .col-lg-10, .col-xs-11, .col-sm-11, 
-       .col-md-11, .col-lg-11, .col-xs-12, .col-sm-12, .col-md-12, .col-lg-12 
-           {padding-left: 5px; padding-right: 5px;}
+
 
 /*Style for download buttons */
 .down{ background-color:#4da6ff; color: white; background-image:none; 
        min-width: 23vh;  font-size: 14px; padding: 5px 10px; 
        margin-top: 5px; margin-left: 3px}
        
+       
  /*Colour for disabled download buttons 
  (This must come after .down so it will override background-color) */
 .down_disabled{ background-color:#a6a6a6}
                           
-/* landing page boxes*/
-.landing-page-box { width:100%; height:100%; min-height:23vh; background-color:white;
-                    border: 1px solid #AAAAAA; margin-bottom: 5px; float: left; 
-                    transition: 0.5s ease; position: relative; object-fit: scale-down;}
-                    
-.landing-page-box-about {width:100%; height:100%; min-height:11vh; background-color:white;
-                          border: 1px solid #AAAAAA; margin-bottom: 5px; float: left; 
-                          position: relative; object-fit: scale-down;}
-                          
-.landing-page-box:hover, .landing-page-box-about:hover {-webkit-transform: scale(1.05); 
-                          -ms-transform: scale(1.05); transform: scale(1.05); } /* hover effect on boxes*/ 
-                          
-/*landing page icons */
-.landing-page-icon {width:100%; height:65%; min-height:12vh; background-color: white;
-                     border: 0 ; position: absolute; object-fit: scale-down; }
-
-.landing-page-about-icon {width:100%; height:65%; min-height:5vh; background-color: white;
-                          border: 0; position: absolute; object-fit: scale-down;}
-                          
-/* landing-page titles for boxes*/
-.landing-page-box-title {font-size: 16px; text-align:center; color: darkblue;
-                          font-weight: bold; background-color: none; width:100%; 
-                          max-height: 20px; margin-top: 2vh;}
-                          
-/* landing-page description text of boxes*/
-.landing-page-box-description {font-size: 12px; text-align:center; color: darkblue;
-                          background-color: none; width:100%; max-height: 20px; 
-                          margin-top: 2vh; padding-bottom: 3vh;}
-                          
-/*landing page titles for ABOUT boxes */
-.landing-page-box-about-title { font-size: 16px; text-align:center; color: darkblue;
-                                font-weight: bold; background-color: none; 
-                                width:100%; max-height: 20px; margin-top: 5px; }
-                          
-/* landing page buttons*/
-.landing-page-button { position: absolute; top:0; width: 100%; 
-                        height: 100%; opacity: 0;}
-                          
-/*center image - for normal icons */
-img.center {object-fit: scale-down; position:absolute; width:100%; height:100%; 
-              margin-left:auto; margin-right: auto; display: block; padding:20px;}
-                 
-/* center image - for about icons*/
-img.centerabout {object-fit: scale-down; position:absolute; width:100%; 
-                  height:100%; margin-left:auto; margin-right: auto; 
-                  display: block; padding:8px;}
-                 
-/*landing-page column  */
-.landing-page-column {padding-right:3vh}
-               
-/* landing-page icons*/
-.icon-lp{font-size: 1.3em; padding-right: 4px;}
-               
-/* flextable wrapping text*/
-.tabwid table {white-space: normal;}
                
 /*External links underlined an open a new tab */
 .externallink{text-decoration: underline;} 
 
-/* Box layout for the indicator definitions tab */
-.definitionbox {width:100%; height:100%; text-align:left ;background-color:white;
-                  border: 2px solid #2FA4E7; padding: 10px; margin-top: 0; 
-                  margin-bottom: 5px; float: left; transition: 0.5s ease; 
-                  position: relative; object-fit: scale-down;}
-                  
+
+/* Set size of all headers */
+h3{
+
+    font-size: 24px;
+    font-weight:600
+}
+
+ 
+ 
+ h4{
+  font-weight:bold;
+}
+
+ 
+p{
+
+    font-size: 16px;
+}
+ 
+ 
+ 
+ 
+/* Styling of blue buttons to match PHS website*/ 
+.button {
+    display: inline-block;
+    margin-bottom: 0;
+    margin:5px;
+    font-weight: 700;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    cursor: pointer;
+    background-image: none;
+    color: #fff;
+    background-color: #0078d4;
+    border-color: #0078d4;
+    border: 1px solid transparent;
+    padding: 6px 12px;
+    font-size: 15px;
+    line-height: 1.42857143;
+    border-radius: 0;}
+    
+    
+ /* Make buttons darker blue when user hovers over button*/ 
+.button:hover {
+    color: #fff;
+    background-color: #005ba1;
+    border-color: #005597;
+}
+
+
+ /* Add orange border to buttons when user focuses on button*/ 
+.button:focus {
+  outline: 3px solid orange;}
+  
+  
+/* Changes button styling when user clicks*/ 
+.button:active{  
+  color: #fff;
+    background-color: #005ba1;
+    background-image: none;
+    border-color: #005597;
+  box-shadow: inset 0 3px 5px rgb(0 0 0 / 13%);
+}
+
+
+
+
+/* This defines the colour of the active (clicked) button */
+.btn-default.active:focus, .btn-default.active:hover {
+color: #fff;
+    background-color: #005ba1;
+    background-image: none;
+    border-color: #005597;
+  box-shadow: inset 0 3px 5px rgb(0 0 0 / 13%);
+  outline: 3px solid orange;
+}
+
+/* This defines the colour of the button that is selected when you first go to the tab */
+.btn-default.active, .btn-default:active, .open>.dropdown-toggle.btn-primary {
+  color: #fff;
+    background-color: #005ba1;
+    background-image: none;
+    border-color: #005597;
+  box-shadow: inset 0 3px 5px rgb(0 0 0 / 13%);
+  outline: 3px solid orange;
+
+}
+
+/* This defines the colour of the button in the instant it is clicked  */
+.btn-default:hover:focus:active {
+  color: #fff;
+    background-color: #005ba1;
+    background-image: none;
+    border-color: #005597;
+  box-shadow: inset 0 3px 5px rgb(0 0 0 / 13%);
+  outline: 3px solid orange;
+
+}
+
+
+/* a grey container to place dashboard items in*/ 
+.grey-container{
+  background-color:#F7F7F7
+}
+ 
+
+ /* responsive layout for items placed in container - for larger screens*/
+.container-inner-contents{
+  display: flex;
+  flex-direction: row;
+  padding-left:10px;
+  padding-right:10px;
+}  
+
+ /* responsive layout for items placed in container - for for smaller screens*/
+@media (max-width: 800px) {
+.container-inner-contents {
+    flex-direction: column;
+}
+}
+
+
+
 /* Deprivation boxes text */
 .depr-text-box {width:100%; height:100%; background-color:white;
     margin-bottom: 20px; box-shadow: 0 2px 5px 0 rgba(0,0,0,.26);
-    transition: 0.5s ease; }             
+    transition: 0.5s ease; } 
+    
 .depr-text-box .title{background-color: #4da6ff; color: white;   font-weight:bold;
     font-size: 20px; display:block; line-height:20px; padding: 5px; padding-left: 20px; }
+    
 .depr-text-box .content{ color: black; overflow: hidden; padding: 10px; min-height: 0px;}
         
-        /* END */
-        
+     
+
+/* HOMEPAGE STYLING ---------------------*/ 
+
+/* section 1: the hero at top of homepage*/ 
+
+.hero{
+  /* Using "linear-gradient" to add gradient to the image. This will make the text easier to read */
+  background-image: linear-gradient(to bottom right, #0078d4, rgba(0, 0, 0, 0)), url("logo_scotpho_updated.png");
+
+ /* Set a specific height/add padding */
+  height: 50%;
+  display: flex;
+  padding-left:45px;
+  padding-right:45px;
+  padding-top:20px;
+  padding-bottom:35px;
+
+  /* Position and center the image to scale nicely on all screens */
+  background-position: bottom;
+  background-repeat: no-repeat;
+  background-size: cover;
+  position: relative;
+}
+
+
+/* formatting the header within the hero*/
+.hero h1{
+  font-size: 36px;
+  font-weight: 700;
+  color:white;
+  }
+  
+  
+/* formatting the tagline within the hero*/
+.hero h2{
+ font-size: 18px;
+    color: white;
+    margin-top: 5px;
+    margin-bottom: 15px;
+  }
+
+/* formatting the two buttons within the hero*/
+.hero-button{
+  display: inline-block;
+    margin: 5px;
+    font-weight: 700;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    cursor: pointer;
+    background-image: none;
+    color: #0078d4;
+    background-color: #def4ff;
+    padding: 6px 12px;
+    font-size: 15px;
+    line-height: 1.42857143;
+    border-radius: 2px;
+    border-style:none;
+  
+}
+
+
+/* Adding orange border to buttons when 'focused' on for accessibility reasons*/
+.hero-button:focus {
+  outline: 3px solid orange;}
+  
+
+/* section 2: boxes on homepage linking to different tabs*/ 
+
+
+/* Homepage - styling clickable buttons to take to new tab*/
+.featured-item {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    word-wrap: break-word;
+    background-color: #fff;
+    background-clip: border-box;
+    box-shadow: rgb(27 31 35 / 10%) 0 1px 0;
+    flex:1; /* ensures that the boxes are evenly spaced in the container*/
+    margin:5px;
+    color:black;
+    }
+    
+/* Homepage - styling clickable buttons to take to new tab - change backaground color to lght grey on hover*/    
+ .featured-item:hover{
+   cursor: pointer;
+   background-color: #e0e0e0;
+   
+
+}   
+
+
+
+/* Tab buttons - centre position all the text  */     
+.features-text-section {
+    text-align: center!important;
+    padding: 1rem;
+}
+
+
+
+
+/* Format icons on homepage*/ 
+.icon-box {
+    height: 75px;
+    width: 75px;
+    border-radius: 50%;
+    margin: 15px auto 35px auto;
+    margin-bottom:10px;
+    background: #a6a6a6;
+    color: #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #def4ff;
+    color: #3f3685;
+
+}
+
+
+/* section 3: what's new/ indicator updates boxes*/ 
+
+
+/* make small cards in middle container white with even space between them in the container */
+.white-box{
+  background-color:white;
+  padding:10px;
+  margin:10px;
+  flex: 1;
+} 
+
+
+
+/* Section 4: Additional links ------------------*/ 
+
+/* Footer container for bottom of homepage*/ 
+.phs-purple-container{
+  background-color:#3f3685; /* Make PHS purple to match PHS website footer*/
+}
+
+
+
+/* Add left border to groups of links on smaller screens to make easier to read */ 
+@media (max-width: 800px) {
+  .links-item > a {
+   border-left-style:solid;
+   padding-left:10px;
+  }
+}
+
+.links-item > a{
+  color:#d2cfeb;
+  font-size:16px;
+}
+
+.bottom-links > a{
+  color: #d2cfeb;
+  font-size:16px;
+}
+
+
+
+/* Displays links in footer from top to bottom */ 
+.links-item{
+  display:flex;
+  margin:10px;
+  flex-direction:column;
+  flex:1;
+  color: #d2cfeb; /* Changes links 'groups' headers colorn to light purple*/ 
+}
+
+
+
+/* Styling bottom section of footer (i.e. links to stay in contact, newsletter sign up etc.*/
+.bottom-links {
+  display:flex;
+  flex-direction:row;
+  column-gap:20px;
+  padding:15px;
+}
+
+
+
+ /* INDICATOR DEFINITIONS TAB STYLING*/ 
+
+/* Ensures indicator search bar on indicator definitions tab is left-aligned*/ 
+.rt-search {align-self:flex-start;
+            margin-left:18px;
+}
+
+
+/* Styling the content that is expanded when user clicks on row*/ 
+.rt-tr-details{
+  padding: 24px;
+  box-shadow: inset 0 1px 3px #dbdbdb;
+  background: hsl(213, 20%, 99%);
+}
+
+
+/* PHS table styling for metholody section*/ 
+
+/* Style the table headers*/ 
+.phs-table th{
+  border:thin solid black;
+  background-color:purple;
+  color:white;
+  padding:3px;
+  word-break: break-all;
+  }
+
+/* Style the table cells*/  
+.phs-table td{
+  border:thin solid black;
+  padding:3px;
+  }
+
+
+/* Format reactable column headers */
+.rt-thead {
+    border-bottom: solid;
+    margin-top:20px;
+    font-size:15px;
+}
+
+/* Expandable row details - responsive layout*/
+.rt-td-inner{
+  display:flex;
+}
+
+
+/* Smaller screens display button under text*/
+@media (max-width: 800px) {
+    .tech-doc-download{
+    display:flex;
+    flex-direction:column;
+  }
+}
