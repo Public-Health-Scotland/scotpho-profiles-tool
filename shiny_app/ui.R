@@ -2,15 +2,12 @@
 # This script includes the user-interface definition of the app.
 
 
-
-
 ###############################################.
 ## Header ---- 
 ###############################################.
 tagList( 
   useShinyjs(),  # Include shinyjs
   introjsUI(), # Required to enable introjs scripts
-
   navbarPage(id = "intabset", 
              title = div(class = "logo",
                          div(tags$a(img(src="phs-logo-updated.png", width=120, alt = "link to Public Health Scotland website"),
@@ -26,19 +23,13 @@ tagList(
                               tags$link(rel="shortcut icon", href="favicon_scotpho.ico"), # Icon for browser tab
                               # Including Google analytics script
                               includeScript("google-analytics.js"),
-<<<<<<< HEAD
-                              HTML("<base target='_blank'>") 
-                              ),
-          
-
-         
-=======
                               HTML("<base target='_blank'>"),
                               # including google analytics 4
                               HTML('<script async src="https://www.googletagmanager.com/gtag/js?id=G-KE1C59RLNS"></script>'),
-                              includeScript("gtag.js"),
-                              cookie_box),
->>>>>>> master
+                              includeScript("gtag.js") #,
+                              #cookie_box
+                              ),
+
 ###############################################.
 ## Landing page ----
 ###############################################.
@@ -49,9 +40,9 @@ tabPanel(
   use_cicerone(), # guided tour
   htmlTemplate("landing-page.html", # html file containing landing page contents
                # variables defined in landing-page.html file to be built in Rshiny.
-               latest_updates_button = actionButton('btn_indicator_updates', "View recent updates", class = "button"),
-               see_more_button = actionButton("jump_to_life_exp", "View life expectancy by SIMD", class = "button"),
-               guide_button = actionButton("guide", "Need help? Take a guided tour", class = "hero-button")
+               latest_updates_button = actionButton('btn_indicator_updates', "View recent updates", class = "button") #,
+               #see_more_button = actionButton("jump_to_life_exp", "View life expectancy by SIMD", class = "button"),
+               #guide_button = actionButton("guide", "Need help? Take a guided tour", class = "hero-button")
   )),
 
 
@@ -519,130 +510,40 @@ navbarMenu("Info",
 ## Indicator definitions tab ----
 ###############################################.
 
-           tabPanel("Indicator definitions",
-                    
-                    
-                    div(class = "container-test", style = "padding:30px;",
-
-                             h3("Indicator definitions and schedule", style = "font-weight:600;"),
-                    hr(),
-p("Use the filters below to search for indicators by profile and/or geography level. Alternatively you can search using key words (e.g. 'cancer'). You can then click on an indicator in the search results table to view metadata and links to quickly navigate to analysis in this tool for that particular indicator.", style = "font-size:16px; padding:5px"),
-div(class = "tech-doc-download", style = "display:flex; margin-bottom: 10px; justify-content:space-between;", p("To view technical information and updates schedule for all indicators at once, use the download button.", style = "font-size:16px;"), downloadButton('btn_techdoc_download', "Download as CSV", class = "button")),
-fluidRow(style = "border-top: 1px solid #eee;",
-                                  column(3, selectInput("profile_search", label = "Filter by profile", 
-                                            choices=profile_list_filter)),
-                                  column(3, selectizeInput("geo_search", label = "Filter by geography level", choices = areatype_list, selected = NULL, multiple = TRUE,
-                                               options = list(placeholder = 'Select geography level(s)')))),
-
-                                fluidRow(reactableOutput("ind_search_results") %>% withSpinner(color="#0dc5c1"))
-                                
-                                ))
-,
-
+tabPanel(
+  "Indicator definitions",
+  div(class = "container",style = "padding:30px;",
+    h3("Indicator definitions and schedule", style = "font-weight:600;"),
+    hr(),
+    p("Use the filters below to search for indicators by profile and/or geography level. Alternatively you can search using key words (e.g. 'cancer'). You can then click on an indicator in the search results table to view metadata and links to quickly navigate to analysis in this tool for that particular indicator.",
+      style = "font-size:16px; padding:5px"),
+    div(class = "tech-doc-download",style = "display:flex; margin-bottom: 10px; justify-content:space-between;",
+      p("To view technical information and updates schedule for all indicators at once, use the download button.",
+        style = "font-size:16px;"),
+      downloadButton('btn_techdoc_download', "Download as CSV", class = "button")),
+    fluidRow(style = "border-top: 1px solid #eee;",
+             column(3,
+                    selectInput(
+                      "profile_search", 
+                      label = "Filter by profile",
+                      choices = profile_list_filter)),
+             column(3,
+               selectizeInput(
+                 "geo_search",
+                 label = "Filter by geography level",
+                 choices = areatype_list,
+                 selected = NULL,
+                 multiple = TRUE,
+                 options = list(placeholder = 'Select geography level(s)'))
+             )),
     
+    fluidRow(reactableOutput("ind_search_results") %>% withSpinner(color = "#0dc5c1"))
+    ) # close container 
+)) # close tabpanel
+) # close navbarpage
+) # close taglist
 
-###############################################.             
-############## Tour of the tool----    
-###############################################.
-tabPanel("Tour of the tool", value = "tour",
-         sidebarPanel(width=1),
-         mainPanel(width=10,
-                   fluidRow(p(h4("Welcome to the ScotPHO Profiles Tool"),
-                     h5("This interactive tool provides access to a range of public
-              health related indicators at different geographies including NHS boards, council areas and health and
-              social care partnerships.", style = "color:black;"),
-                     h5("There are different ways to navigate around the tool.", style = "color:black;"),
-                     h5("Different visualisations can be opened using the menu bar (the blue strip) at the top of the screen.",
-                        style = "color:black;"),
-                     img(src='introjs_tabset_panel.PNG',width=300),
-                     br(),
-                     h5("The 'Home' option in the menu bar will return to the profiles tool homepage.",
-                        style = "color:black;"),
-                     style = "font-size:20px")),
-                   hr(),
-                   fluidRow(column(6,
-                          h5("The profile summary allows you to look at multiple indicators within an area at the same time.",
-                             style = "color:black;")),
-                   column(6, img(src='tour_summary1.PNG'))),
-                   hr(),
-                   fluidRow(column(3,
-                          h5("The trend and rank charts allow detailed exploration of one indicator at a time.",
-                             style = "color:black;")),
-                   column(9, img(src='tour_trendrank1.PNG'))),
-                   hr(),
-                   fluidRow(p(h5("Throughout the tool use the dropdown menus to change which indicators or geographies are displayed in the charts.",
-                                 style = "color:black;"),
-                     img(src='tour_summary2.png', style = "vertical-align: middle; border-style: solid; border-color: black; border-width: 1px"),
-                     column(6, h5("While using dropdown menus mouse click within a dropdown menu and press backspace on your keyboard ('<-') then start typing a word to quickly find the options you are looking for",
-                                  style = "color:black;")),
-                     column(6, img(src='introjs_how_to_select.png')))),
-                   hr(),
-                   br(),
-                   fluidRow(column(8,
-                          p(h5("Throughout the tool look out for options in each window that provide",
-                               style = "color:black;"),
-                            tags$ul( tags$li("indicator definitions or help to interpret a visualisation,"),
-                            tags$li("data download options for individual charts,"),
-                            tags$li("image downloads for individual charts.")))),
-                   column(4, img(src='tour_rankmap2.PNG'))),
-                   hr(),
-                   br(),
-                   fluidRow(column(6,
-                          h5("The 'Data' window can be used to filter and download profiles data.",
-                             style = "color:black;")),
-                   column(6, img(src='tour_data1.PNG'))),
-                   hr(),
-                   br(),
-                   fluidRow(column(6,
-                          h5("The inequalities module allows exploration of deprivation effects for a selection of indicators from the main profiles tool.",
-                             style = "color:black;")),
-                   column(6, img(src='tour_ineq1.png'))),
-                   hr(),
-                   br(),
-                   fluidRow(h5("There are also options to find out information such as detailed descriptions of the profile indicators, indicator update schedules and links to evidence for action briefings.",
-                               style = "color:black;"),
-                   img(src='tour_about1.PNG', width="100%"))
-         )#main panel bracket
-
-)
-         
+#END 
 
 
-), #tab panel bracket
-###############################################.             
-##############Other profiles----    
-###############################################.
-tabPanel("Other profiles", value = "others",
-         sidebarPanel(width=1),
-         mainPanel(
-           h4("Alternative profiles & resources", style = "color:black;"),
-           p("There are a number of organisations that provide local information relating to the wider determinants of health in Scotland.
-             Below are links to some of alternative profiling products."),
-           tags$ul( 
-             #Link to GCPH
-             tags$li(class= "li-custom", tags$a(href="http://www.nssdiscovery.scot.nhs.uk/",
-                                                "NSS Discovery",  class="externallink")), 
-             #Link to GCPH
-             tags$li(class= "li-custom", tags$a(href="http://www.understandingglasgow.com/",
-                                                "Glasgow Centre for Population Health (GCPH)",  class="externallink")), 
-             #Link to IS
-             tags$li(class= "li-custom", tags$a(href="http://www.improvementservice.org.uk/community-planning-outcomes-profile.html",
-                                                "Improvement Service (IS) - Community planning outcomes profile (CPOP)",  class="externallink")), 
-             #Link to NRS
-             tags$li(class= "li-custom", tags$a(href="https://www.nrscotland.gov.uk/statistics-and-data/statistics/stats-at-a-glance/council-area-profiles", 
-                                                "National Records of Scotland (NRS) Council Area Profiles",  class="externallink")), 
-             #Link to stats.gov.scot
-             tags$li(class= "li-custom", tags$a(href="http://statistics.gov.scot/home", 
-                                                "Statistics.gov.scot",  class="externallink")), 
-             #Link to Scottish nation
-             tags$li(class= "li-custom", tags$a(href="http://www.environment.gov.scot/", 
-                                                "Scotland's Environment Hub",  class="externallink"))
-           ), #Bullet point list bracket
-           br()
-           ) # mainPanel bracket
-           ) #tabPanel bracket
-
-  )# NavbarMenu bracket
-
-###END
 
