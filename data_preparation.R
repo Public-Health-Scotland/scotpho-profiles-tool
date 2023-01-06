@@ -279,9 +279,22 @@ View(gsub(paste0(shiny_files, "/"), "", files_depr))
 data_depr <- do.call(rbind, lapply(files_depr, readRDS)) %>%
   rename(measure = rate)
 
+############TEMPORARY SCRIPT UNTIL LE/UPDATING ANDY P DATA IS READY FOR INCLUSION 
+## don't want to put new indicators in shiny data folder until we are ready incase loading them breaks live tool
+##life expectancy data
+le_inequalities_m <- readRDS("/PHI_conf/ScotPHO/Profiles/Data/Data to be checked/life_expectancy_male_ineq.rds") %>%
+  mutate(quint_type=case_when(code=="S00000001" ~ "sc_quin", TRUE ~ quint_type))  
+le_inequalities_f <- readRDS("/PHI_conf/ScotPHO/Profiles/Data/Data to be checked/life_expectancy_female_ineq.rds") %>%
+  mutate(quint_type=case_when(code=="S00000001" ~ "sc_quin", TRUE ~ quint_type))  
+##new dying in hospital data
+dying_in_hosp_michael <-readRDS("/PHI_conf/ScotPHO/Profiles/Data/Data to be checked/dying_in_hosp_depr_ineq.rds") %>%
+  rename(measure = rate)
+##end of temp chunk ( need to adjust line 283 too when removing this)
+
 # Merging with Andy's data and then formatting
-data_depr <- bind_rows(data_depr, andyp_data) %>%
-  mutate_if(is.character,factor) %>% #converting characters into factors
+#data_depr <- bind_rows(data_depr, andyp_data) %>% ## JUST BEFORE THIS GOES LIVE REVERT TO THIS LINE
+data_depr <- bind_rows(data_depr, andyp_data,le_inequalities_m,le_inequalities_f,dying_in_hosp_michael) %>% ##adjust this line when removing temp chunk 
+ mutate_if(is.character,factor) %>% #converting characters into factors
   mutate_at(c("numerator", "measure", "lowci", "upci", "rii", "upci_rii",
               "lowci_rii", "sii", "lowci_sii", "upci_sii", "par", "abs_range",
               "rel_range", "rii_int", "lowci_rii_int", "upci_rii_int"),
@@ -304,31 +317,30 @@ data_depr <- left_join(x=data_depr, y=geo_lookup, by="code") %>%
 
 data_depr <- data_depr %>% apply_suppressions() #Apply supressions.
 
-
-
 # Check suppression has been applied properly
 depr_suppression_check <- data_depr %>%
   filter(supression == "Y") %>%
   subset(numerator < supress_less_than)
 
-
 View(depr_suppression_check)
 
-
-#selecting out indicators where higher is better as app doesn't work with them
+# Manipulations/calculations required for inequalities module charting/dynamic text
 data_depr <- data_depr %>%
-  filter(!(indicator %in% c("Child dental health in primary 1",
-                            "Child dental health in primary 7",
-                            "Healthy birth weight",
-                            "Bowel screening uptake",
-                            "Single adult dwellings",
-                            "Immunisation uptake at 24 months - 6 in 1",
-                            "Immunisation uptake at 24 months - MMR",
-                            "Teenage pregnancies"))) %>% droplevels()
+  group_by(ind_id, year, quint_type, code) %>%
+  arrange(ind_id, year, quint_type, code, desc(measure)) %>%
+  mutate(sii_gradient = case_when(sii>0 ~ "positive", sii<0 ~ "negative", sii==0 ~ "zero")) %>%  # label if sii positive or negative (helps with health inequality dynamic summary text)
+  mutate(rii_gradient = case_when(rii_int>0 ~ "positive", rii_int<0 ~ "negative", rii_int==0 ~ "zero")) %>% # label if rii positive or negative (helps with health inequality dynamic summary text)
+  mutate(par_gradient = case_when(par>0 ~ "positive", par<0 ~ "negative", par==0 ~ "zero")) %>% # label if par positive or negative (helps with health inequality dynamic summary text)
+  mutate(qmax=quintile[which.max(measure)], # which quintile contains highest rate/value (quicker to add into dataset rather than do calculation in app?)
+         qmin=quintile[which.min(measure)]) %>% # which quintile contains lowest rate/value (quicker to add into dataset rather than do calculation in app?)
+  ungroup() %>%
+  arrange(ind_id, year, code, quint_type, quintile) 
 
-# Temporary until we decide to add new indicators
+# Exclude indicators which need some additional investigation
 data_depr <- data_depr %>%
-  filter(!(indicator %in% c("Deaths from suicide"))) %>% droplevels()
+  filter(!(indicator %in% c("Healthy birth weight", # check healthy weight as seems like reverse of what i'd expect
+                            "People living in 15% most 'access deprived' areas" # does this indicator make sense in inequalities module - can't quite get my head around what this means
+                            ))) %>% droplevels()
 
 saveRDS(data_depr, "shiny_app/data/deprivation_data.rds")
 
