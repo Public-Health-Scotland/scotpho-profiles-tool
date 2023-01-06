@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# Global script 
+# Global script ---- 
 #
 ###############################################################################
 
@@ -72,7 +72,7 @@ ind_dat <- techdoc %>%
   mutate(profile_short = ifelse(is.na(Profile_short2), Profile_short1, paste0(Profile_short1, ",", Profile_short2)))%>%
   bind_rows(mutate(., profile_short = "Show all")) %>%
   select(-c("active", "interpretation", "COVID impact", "indicator_author", "analyst_notes", "days_since_update","source_last_updated", "source_next_update", "scotpho_profiles", "Profile_short1", "Profile_short2")) %>%
-  mutate(across(everything(), ~replace_na(.,"N/A"))) %>% 
+  mutate(across(profile:profile_short, ~replace_na(.,"N/A"))) %>%
   mutate(next_update_column = ifelse(next_update == "TBC", NA, paste("01-", next_update, sep = "")))
 
 
@@ -84,7 +84,6 @@ ind_dat$next_update_column <- format(
 indicators_updated <- techdoc %>% 
   filter(days_since_update<60) %>% 
   select(indicator_name, last_updated)
-
 
 
 #3. lists for filter dropdowns ------------------------------------------------------
@@ -118,11 +117,21 @@ areatype_list <- c("Alcohol & drug partnership",
                    "Intermediate zone", 
                    "Scotland")
 
+topic_list_filter <- as.factor(c("Show all",unique(sort(c(
+  substr(optdata$profile_domain1, 5, nchar(as.vector(optdata$profile_domain1))), 
+  substr(optdata$profile_domain2, 5, nchar(as.vector(optdata$profile_domain2)))))))) 
+
+topic_list <- topic_list_filter[-1] #taking out show all from list
+
 
 # for inequalities tab
 areatype_depr_list <- c("Scotland", 
                         "Health board", 
                         "Council area")
+
+# for data tab
+min_year <- min(optdata$year)
+max_year <- max(optdata$year)
 
 
 # indicators names -----
@@ -134,7 +143,6 @@ indicator_list <- sort(unique(optdata$indicator)) # for all other tabs
 # indicators that contain gap years due to COVID-19
 gap_indicators_ids <- c(21005,
                         20901)
-
 
 indicators_with_gap_years <- optdata %>% 
   filter(ind_id %in% gap_indicators_ids) %>% 
@@ -164,6 +172,8 @@ profile_list <- setNames(c('HWB',
                            'Mental Health', 
                            'Tobacco control', 
                            'Population'))
+
+profile_list_filter <-c(setNames("Show all", "Show all"), sort(profile_list))
 
 
 profile_areatype <- list(
