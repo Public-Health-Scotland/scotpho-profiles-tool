@@ -5,63 +5,6 @@
 ###############################################.        
 #### Help modals ----
 ###############################################.  
- # Inequality help pop-up
-  #links to SIMD, deprivation and inequality scotpho and measuring inequalities report
-observeEvent(input$help_simd, {
-  showModal(modalDialog(
-    title = "Interpretation and methodology",
-    p("This tool shows how ",
-      tags$a(href="https://www.scotpho.org.uk/life-circumstances/deprivation/key-points/", 
-             "inequality and deprivation",  class="externallink"), 
-      "affect different indicators of public health. We use different measures to 
-      look at various aspects of inequality. The short description on the top of 
-      the page provides an overview of these calculations. "),
-    p("The 'Trend', 'Gap' and 'Risk' buttons show charts representing these 
-      different measures of inequality." ),
-    img(src="help_simd1.png"),
-    #trend explanation
-    h5("Trend", style = "font-weight: bold; color: black; margin-bottom: 0px;"),
-    p("The ", tags$b("'Trend'"), " charts show how an indicator varies between the 
-      most and least deprived areas over time using rates or percentages."),
-    h5("Gap", style = "font-weight: bold; color: black; margin-bottom: 0px;"),
-    #gap explanation
-    p("The ", tags$b("'Gap'"), " charts show two common measures of inequality - 
-      the Slope Index of Inequality (SII), which is used to calculate the absolute 
-      inequality gap using a regression model and the Relative Index of Inequality (RII), 
-      which is used to quantify the difference between the most deprived group 
-      and the overall average value. This means that in some cases absolute 
-      inequalities can get better, while relative inequalities get worse. "),
-    #risk explanation
-    h5("Risk", style = "font-weight: bold; color: black; margin-bottom: 0px;"),
-    p("The ", tags$b("'Risk'"), " charts explore the potential for improvement 
-      in the overall value of an indicator, if the value of the least deprived 
-      group were experienced across the whole population. We use the Population 
-      Attributable Risk (PAR) to calculate this. "),
-    p("You can read more about the measures used and presented in the",
-      tags$a(href="https://www.scotpho.org.uk/comparative-health/measuring-inequalities/",
-             "Measuring inequalities section",class="externallink"), 
-      "of the ScotPHO website."),
-    #simd explanation
-    p("To prepare the data shown in this tab we have divided the Scotland population 
-      into five groups (quintiles) based on their deprivation level. This has been done using the ",
-      tags$a(href="https://www2.gov.scot/simd",  "Scottish Index of Multiple Deprivation (SIMD).",
-             class="externallink")),
-    #quintile explanation
-    p("You can access both local and Scotland quintile data. Each local quintile 
-      represents roughly a fifth of the population of an area. They are better suited to 
-      understand the inequality patterns in a local area. "),
-    p("Scotland quintiles can be used to make comparisons between different 
-      areas on an equal basis. It is important to note, however, that some 
-      areas might not have all five quintiles represented and the populations of each 
-      quintile can vary vastly between different areas."),
-    p("We recommend using the local quintiles to understand inequalities in a specific area 
-      and only using Scotland quintiles if you need to compare between areas. Please refer to the ", 
-      tags$a(href="http://www.isdscotland.org/Products-and-Services/GPD-Support/Deprivation/SIMD/_docs/PHI-Deprivation-Guidance.pdf",
-             "ISD guidance on deprivation analysis"), " for more information on this topic."),
-    img(src="help_simd2.png"),
-    size = "l", easyClose = TRUE, fade=FALSE, footer = modalButton("Close (Esc)")
-  ))
-}) 
 
 ## Help on SII
 observeEvent(input$help_sii, {
@@ -157,7 +100,7 @@ observeEvent(input$help_paf2, {
 
 
 ###############################################.
-## Which measure option to pick help text ----
+## "About these options" Conditional Panel Text ----
 ###############################################.
 
 output$inequality_options_help <- renderUI({
@@ -219,7 +162,8 @@ output$inequality_options_help <- renderUI({
     HTML(paste(sprintf("<b><u>%s</b></u> <br> %s ", defs_data$indicator_name, 
                        defs_data$indicator_definition), collapse = "<br><br>"))
   })
-  
+
+
   ###############################################.
   ## Reactive controls ----
   ###############################################.
@@ -241,7 +185,7 @@ output$inequality_options_help <- renderUI({
                 choices = time_period, selected = last(time_period))
   })
   
-  #Disabling quintile option for those created for HSC report
+    #Disabling quintile option for those created for HSC report
   # better approach will be list of these indicators with no scquintile
   # disable but also update so selection is local.!("sc_quin" %in% simd_quint_data()$quint_type)
   # Patients GP are only calculated for Scotland quintiles
@@ -306,6 +250,7 @@ output$inequality_options_help <- renderUI({
       filter(quintile != "Total") %>%
       droplevels()
   })
+
   
   #reactive dataset for the simd trend plot
   simd_trend_data <- reactive({
@@ -314,46 +259,92 @@ output$inequality_options_help <- renderUI({
                areatype == input$geotype_simd &
                indicator == input$indic_simd) %>%
       arrange(quintile) %>% #this is needed to make palette assignments work well
+      mutate(across(sii:abs_range,abs)) %>% #absolute values for sii, rii and paf (plus confidence intervals) so charts and dynamic summary text reads better
+      mutate(qmax_statement=case_when(qmax=="1 - most deprived" ~ "The most deprived areas",
+                                      qmax=="5 - least deprived" ~ "The least deprived areas",
+                                      qmax=="2" ~ "More deprived areas",
+                                      qmax=="4" ~ "Less deprived areas",
+                                      qmax=="3" ~ "No particular areas of deprivation",TRUE ~ " "),
+             qmin_statement=case_when(qmin=="1 - most deprived" ~ "The most deprived areas",
+                                      qmin=="5 - least deprived" ~ "The least deprived areas",
+                                      qmin=="2" ~ "More deprived areas",
+                                      qmin=="4" ~ "Less deprived areas",
+                                      qmin=="3" ~ "No particular areas of deprivation",TRUE ~ " ")) %>%
       droplevels()
   })
   
-  ###############################################.
-  ## Dynamic text ----
-  ###############################################.
+  ###############################################################.
+  ## Dynamic summary text ----
+  ## i.e the summary bullet points that appear in box above charts 
+  ##############################################################.
+  
   # Title of summary box
   output$simd_nutshell_title <- renderText(paste0(input$indic_simd, ": ",
                                                   input$geoname_simd, " ", input$year_simd))
   
   output$simd_text <- renderUI({
     
-    #Data used to translate measure into numerator 
+    #Data used to generate dynamic text for summary box
     simd_text_data <- simd_trend_data() %>%
-      filter(quintile == "Total" & trend_axis == input$year_simd) %>%
-    # OUT FOR THE MOMENT Until we clarify message/method
-      # mutate(stand_rate = case_when(
-      #   type_definition == "Age-sex standardised rate per 100,000" ~ sii * (denominator/100000),
-      #   type_definition == "Crude rate per 1,000" ~ sii * (denominator/1000),
-      #   type_definition == "Percentage" ~ sii/100 * denominator
-      # )) %>% 
-      droplevels()
-
-    #To have dynamic text depending on if rii is positive or negative
+      filter(quintile == "Total") %>%
+      #Statement #1 (states which quintile has the least desirable rate)
+      #When interpret is H (higher rates better) tell me which quintile has lowest rate
+      #When interpret is L (Lower rates better) tell me which quintile has highest rate
+      mutate(statement1a = case_when(interpret=="H" ~ qmin_statement, interpret=="L" ~ qmax_statement, interpret=="O" ~ qmax_statement, TRUE ~ "N/A"),
+             statement1b = case_when(interpret=="H" ~ "lowest", interpret=="L" ~ "highest", interpret=="O"~ "highest", TRUE ~ "N/A")) %>%
+      #buidling components behind statement 2 around for 'gap' charts 
+      # first what is max and min sii and rii for time period selected.
+      # some rii/sii are negative so need to consider absolute value to maek logic work
+      mutate(sii_y_start=abs(sii[which.min(year)]),
+             sii_y_end=abs(sii[which.max(year)]),
+             rii_y_start=abs(rii_int[which.min(year)]),
+             rii_y_end=abs(rii_int[which.max(year)])) %>%
+      #has sii has increased or decreased
+      mutate(sii_change=case_when(sii_y_start>sii_y_end ~"narrowed",
+                                  sii_y_start<sii_y_end ~"widened",
+                                  sii_y_start==sii_y_end~"remained unchanged", TRUE ~"other")) %>%
+      #has rii has increased or decreased
+      mutate(rii_change=case_when(rii_y_start>rii_y_end ~"narrowed",
+                                  rii_y_start<rii_y_end ~"widened",
+                                  rii_y_start==rii_y_end~"remained unchanged", TRUE ~"other")) %>%
+      #statement 2 - what has happened with absolute and relative inequalities.
+      mutate(statement2 = case_when(sii_change=="narrowed" & rii_change=="narrowed" ~ "both absolute and relative inequalities have reduced",
+                                    sii_change=="widened" & rii_change=="widened" ~ "both absolute and relative inequalities have increased",
+                                    sii_change=="remained unchanged" & rii_change=="remained unchanged" ~ "both absolute and relative inequalities have remained unchanged",
+                                    sii_change=="narrowed" & rii_change=="widened" ~ "absolute inequalities have decreased but relative inequalities have increased",
+                                    sii_change=="narrowed" & rii_change=="remained unchanged" ~ "absolute inequalities have decreased but relative inequalities have remained unchanged",
+                                    sii_change=="widened" & rii_change=="narrowed" ~ "absolute inequalities have increased but relative inequalities have decreased",
+                                    sii_change=="widened" & rii_change=="remained unchanged" ~ "absolute inequalities have increased but relative inequalities have remained unchanged", TRUE ~"N/A")) %>%
+      #statement 4 - describe % by which rates would be higher or lower in most/least deprived quintile if rates were all the same.
+      #logic changes depending on if higher rates are better or worse and whether higher or lower values are most desirable.
+      mutate(statement4a = case_when(interpret=="H" & par_gradient =="negative" ~ "higher", 
+                                     interpret=="H" & par_gradient =="positive" ~ "lower", 
+                                     interpret=="L" & par_gradient =="negative" ~ "higher",
+                                     interpret=="L" & par_gradient =="positive" ~ "lower", TRUE ~ "na"),
+             statement4b = case_when(interpret=="H" & par_gradient =="negative" ~ "least deprived", 
+                                     interpret=="H" & par_gradient =="positive" ~ "most deprived", 
+                                     interpret=="L" & par_gradient =="negative" ~ "most deprived",
+                                     interpret=="L" & par_gradient =="positive" ~ "least deprived", TRUE ~ "na")) %>%
+      filter(trend_axis == input$year_simd)
+    
+    # Statement #3 (part one)- what percentage higher or lower are the levels are in most deprived quintile compared to average 
     more_less <- case_when(
-      unique(simd_text_data$rii_int) < 0 ~ "less ",
-      unique(simd_text_data$rii_int) > 0 ~ "more ",
-      unique(simd_text_data$rii_int) == 0 ~ "the same " 
+      unique(simd_text_data$rii_gradient) =="positive" ~ "higher ",
+      unique(simd_text_data$rii_gradient) == "negative" ~ "lower ",
+      unique(simd_text_data$rii_gradient) == "zero" ~ "the same "
     )
     
+    #Statement #3 (part two) - getting grammar of sentence correct
     than_as <- case_when(
-      unique(simd_text_data$rii_int) != 0 ~ " than ",
-      unique(simd_text_data$rii_int) == 0 ~ " as " 
+      unique(simd_text_data$rii_gradient) != 0 ~ " than ",
+      unique(simd_text_data$rii_gradient) == 0 ~ " as "
     )
     
     #To have dynamic text depending on if par is positive or negative
-    par_more_less <- case_when(
-      unique(simd_bar_data()$par) > 0 ~ "lower ",
-      unique(simd_bar_data()$par) < 0 ~ "higher ",
-      unique(simd_bar_data()$par) == 0 ~ "different " 
+    par_most_least <- case_when(
+      unique(simd_bar_data()$interpret) =="H" ~ "most deprived ",
+      unique(simd_bar_data()$interpret) =="L" ~ "least deprived ",
+      TRUE ~ "different "
     )
     
     #If no data can be calculated for sii, rii, par, just have a no data available message
@@ -361,42 +352,72 @@ output$inequality_options_help <- renderUI({
       tags$ul( 
         #Link to user guide
         tags$li(class= "li-custom",
-                p("This information cannot be provided for Scotland quintiles."))
+                p("Summary not available"))
       )
       
-    } else if (!(is.na(simd_text_data$rii_int)) & is.na(simd_text_data$par)) { 
+    } else if (!(is.na(simd_text_data$rii_int)) & is.na(simd_text_data$par)) { # andy pulfords hsc indicators no PAR calculated so no statement 4 available
       tags$ul( #if no data available for PAR only first two points
-        #Link to user guide
-        # tags$li(class= "li-custom", #out until we clarify the message/method
-        #         p(paste0("The inequality gap in ", input$geoname_simd ," is equivalent to ", 
-        #                  format(round(abs(simd_text_data$stand_rate), 0), big.mark=","), " ",
-        #                  tolower(unique(simd_bar_data()$label_ineq)), " each year."))),
-        # conditionalPanel("!(is.na(simd_bar_data()$rii_int)",
-        tags$li(class= "li-custom",  
-                p(paste0("The most deprived areas have ", abs(round(unique(simd_text_data$rii_int), 0)),
-                         "% ", more_less, tolower(unique(simd_text_data$label_ineq)), than_as, 
-                         " the overall average." )))
-                )
+        #statement #1 : identifies which quintile has the least desirable rate (this statement changes according to 'interpret' field which flags if Higher or Lower rates are best)
+        tags$li(class= "li-custom",
+                p(paste0(simd_text_data$statement1a," have the ",simd_text_data$statement1b," ",tolower(simd_text_data$label_ineq),". (see 'Patterns of inequality')"))),
+        #statement #2 : whe absolute inequality (from sii) has increased or decreased over time
+        tags$li(class= "li-custom",
+                p(paste0("Over time ", simd_text_data$statement2,". (see 'Inequality gap')"))),
+        #statement #3 based on rii
+        tags$li(class= "li-custom",
+                p(paste0("The most deprived areas have ", abs(round(unique(simd_bar_data()$rii_int), 0)),
+                         "% ", more_less, tolower(unique(simd_bar_data()$label_ineq)), than_as," ",input$geoname_simd," as a whole. (see 'Inequality gap')" )))
+      )
       
     } else { #if the data is available print the following messages
       tags$ul( 
-        #Link to user guide
-        # tags$li(class= "li-custom", #out until we clarify the message/method
-        #         p(paste0("The inequality gap in ", input$geoname_simd ," is equivalent to ", 
-        #                  format(round(simd_text_data$stand_rate, 0), big.mark=","), " ",
-        #                  tolower(unique(simd_bar_data()$label_ineq)), " each year."))),
-        # conditionalPanel("!(is.na(simd_bar_data()$rii_int)",
-        tags$li(class= "li-custom",  
+        #statement #1 : identifies which quintile has the least desirable rate (this statement changes according to 'interpret' field which flags if Higher or Lower rates are best)
+        tags$li(class= "li-custom",
+                p(paste0(simd_text_data$statement1a," have the ",simd_text_data$statement1b," ",tolower(simd_text_data$label_ineq),". (see 'Patterns of inequality')"))),
+        #statement #2 : whe absolute inequality (from sii) has increased or decreased over time
+        tags$li(class= "li-custom",
+                p(paste0("Over time ", simd_text_data$statement2,". (see 'Inequality gap')"))),
+        #statement #3 based on rii
+        tags$li(class= "li-custom",
                 p(paste0("The most deprived areas have ", abs(round(unique(simd_bar_data()$rii_int), 0)),
-                         "% ", more_less, tolower(unique(simd_bar_data()$label_ineq)), than_as, 
-                         " the overall average." ))),
-                tags$li(class= "li-custom",
-                        p(paste0(input$indic_simd, " would be ",
-                                 abs(round(unique(simd_bar_data()$par), 0)),"% ", par_more_less, "if the levels of the 
-                                 least deprived area were experienced across the whole population.")))
-                        )
+                         "% ", more_less, tolower(unique(simd_bar_data()$label_ineq)), than_as," ",input$geoname_simd," as a whole. (see 'Inequality gap')" ))),
+        #statement #4 based on PAR
+        tags$li(class= "li-custom",
+                (paste0(unique(simd_bar_data()$label_ineq)," across ",input$geoname_simd," would be ", abs(round(unique(simd_bar_data()$par), 0)),"% ", unique(simd_text_data$statement4a)," if the levels of the ",
+                        unique(simd_text_data$statement4b)," areas were experienced across the whole population. (see 'Potential for impact')")))
+      )
     }
   })
+
+  ## Output object for title and bullet points that can be shown/hidden depending on which conditional panel is being shown
+  output$inequality_summary_text <- renderUI({
+    div(class= "depr-text-box",
+        div(class= "title", textOutput("simd_nutshell_title")),
+        div(class= "content", htmlOutput("simd_text")))
+  })
+  
+  ## Controlling show/hide behaviour of dynamic summary text ----
+  # use shinyjs to chose when the dynamic text appears, it looks better if some options are hidden then looking at about option
+  observeEvent(input$measure_simd,{
+    
+    if (input$measure_simd == "About these options") {
+      #objects to hide when displaying meta data about 
+      shinyjs::hide("inequality_summary_text") 
+      shinyjs::hide("download_simd") 
+      shinyjs::hide("report_simd")
+    }
+    
+    if (input$measure_simd %in% c("Patterns of inequality", "Inequality gap", "Potential for improvement")) {
+      #objects to show when conditional panel is one of the data panels
+      shinyjs::show("inequality_summary_text")
+      shinyjs::show("download_simd") 
+      shinyjs::show("report_simd")
+    }
+    
+  })
+  
+  
+  
   
   ###############################################.
   ## Downloading data ----
