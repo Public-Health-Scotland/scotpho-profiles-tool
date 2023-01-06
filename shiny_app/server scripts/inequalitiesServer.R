@@ -1,72 +1,211 @@
-###############################################
-#
-# Server logic for inequalities tab
-#
-###############################################
+
+## Server logic for inequalities tab ----
 
 
-
-
-  ###############################################.        
-  #### Modal ----
-  ###############################################.   
-  # Inequality help pop-up
+###############################################.        
+#### Help modals ----
+###############################################.  
+ # Inequality help pop-up
   #links to SIMD, deprivation and inequality scotpho and measuring inequalities report
-  observeEvent(input$help_simd, {
-    showModal(modalDialog(
-      title = "Interpretation and methodology",
-      p("This tool shows how ",
-        tags$a(href="https://www.scotpho.org.uk/life-circumstances/deprivation/key-points/", 
-               "inequality and deprivation",  class="externallink"), 
+observeEvent(input$help_simd, {
+  showModal(modalDialog(
+    title = "Interpretation and methodology",
+    p("This tool shows how ",
+      tags$a(href="https://www.scotpho.org.uk/life-circumstances/deprivation/key-points/", 
+             "inequality and deprivation",  class="externallink"), 
       "affect different indicators of public health. We use different measures to 
       look at various aspects of inequality. The short description on the top of 
       the page provides an overview of these calculations. "),
-      p("The 'Trend', 'Gap' and 'Risk' buttons show charts representing these 
-        different measures of inequality." ),
-      img(src="help_simd1.png"),
-      #trend explanation
-      h5("Trend", style = "font-weight: bold; color: black; margin-bottom: 0px;"),
-      p("The ", tags$b("'Trend'"), " charts show how an indicator varies between the 
-         most and least deprived areas over time using rates or percentages."),
-      h5("Gap", style = "font-weight: bold; color: black; margin-bottom: 0px;"),
-      #gap explanation
-      p("The ", tags$b("'Gap'"), " charts show two common measures of inequality - 
-        the Slope Index of Inequality (SII), which is used to calculate the absolute 
-        inequality gap using a regression model and the Relative Index of Inequality (RII), 
-        which is used to quantify the difference between the most deprived group 
-        and the overall average value. This means that in some cases absolute 
-        inequalities can get better, while relative inequalities get worse. "),
-      #risk explanation
-      h5("Risk", style = "font-weight: bold; color: black; margin-bottom: 0px;"),
-      p("The ", tags$b("'Risk'"), " charts explore the potential for improvement 
-        in the overall value of an indicator, if the value of the least deprived 
-        group were experienced across the whole population. We use the Population 
-        Attributable Risk (PAR) to calculate this. "),
-      p("You can read more about the measures used and presented in the",
-        tags$a(href="https://www.scotpho.org.uk/comparative-health/measuring-inequalities/", #to change
-               "Measuring inequalities section",  class="externallink"), 
-                "of the ScotPHO website."),
-      #simd explanation
-      p("To prepare the data shown in this tab we have divided the Scotland population 
-        into five groups (quintiles) based on their deprivation level. This has been done using the ",
-        tags$a(href="https://www2.gov.scot/simd",  "Scottish Index of Multiple Deprivation (SIMD).",
-               class="externallink")),
-      #quintile explanation
-      p("You can access both local and Scotland quintile data. Each local quintile 
-        represents roughly a fifth of the population of an area. They are better suited to 
-        understand the inequality patterns in a local area. "),
-      p("Scotland quintiles can be used to make comparisons between different 
-        areas on an equal basis. It is important to note, however, that some 
-        areas might not have all five quintiles represented and the populations of each 
-        quintile can vary vastly between different areas."),
-      p("We recommend using the local quintiles to understand inequalities in a specific area 
-        and only using Scotland quintiles if you need to compare between areas. Please refer to the ", 
-        tags$a(href="http://www.isdscotland.org/Products-and-Services/GPD-Support/Deprivation/SIMD/_docs/PHI-Deprivation-Guidance.pdf",
-               "ISD guidance on deprivation analysis"), " for more information on this topic."),
-        img(src="help_simd2.png"),
-      size = "l", easyClose = TRUE, fade=FALSE, footer = modalButton("Close (Esc)")
-    ))
-  }) 
+    p("The 'Trend', 'Gap' and 'Risk' buttons show charts representing these 
+      different measures of inequality." ),
+    img(src="help_simd1.png"),
+    #trend explanation
+    h5("Trend", style = "font-weight: bold; color: black; margin-bottom: 0px;"),
+    p("The ", tags$b("'Trend'"), " charts show how an indicator varies between the 
+      most and least deprived areas over time using rates or percentages."),
+    h5("Gap", style = "font-weight: bold; color: black; margin-bottom: 0px;"),
+    #gap explanation
+    p("The ", tags$b("'Gap'"), " charts show two common measures of inequality - 
+      the Slope Index of Inequality (SII), which is used to calculate the absolute 
+      inequality gap using a regression model and the Relative Index of Inequality (RII), 
+      which is used to quantify the difference between the most deprived group 
+      and the overall average value. This means that in some cases absolute 
+      inequalities can get better, while relative inequalities get worse. "),
+    #risk explanation
+    h5("Risk", style = "font-weight: bold; color: black; margin-bottom: 0px;"),
+    p("The ", tags$b("'Risk'"), " charts explore the potential for improvement 
+      in the overall value of an indicator, if the value of the least deprived 
+      group were experienced across the whole population. We use the Population 
+      Attributable Risk (PAR) to calculate this. "),
+    p("You can read more about the measures used and presented in the",
+      tags$a(href="https://www.scotpho.org.uk/comparative-health/measuring-inequalities/",
+             "Measuring inequalities section",class="externallink"), 
+      "of the ScotPHO website."),
+    #simd explanation
+    p("To prepare the data shown in this tab we have divided the Scotland population 
+      into five groups (quintiles) based on their deprivation level. This has been done using the ",
+      tags$a(href="https://www2.gov.scot/simd",  "Scottish Index of Multiple Deprivation (SIMD).",
+             class="externallink")),
+    #quintile explanation
+    p("You can access both local and Scotland quintile data. Each local quintile 
+      represents roughly a fifth of the population of an area. They are better suited to 
+      understand the inequality patterns in a local area. "),
+    p("Scotland quintiles can be used to make comparisons between different 
+      areas on an equal basis. It is important to note, however, that some 
+      areas might not have all five quintiles represented and the populations of each 
+      quintile can vary vastly between different areas."),
+    p("We recommend using the local quintiles to understand inequalities in a specific area 
+      and only using Scotland quintiles if you need to compare between areas. Please refer to the ", 
+      tags$a(href="http://www.isdscotland.org/Products-and-Services/GPD-Support/Deprivation/SIMD/_docs/PHI-Deprivation-Guidance.pdf",
+             "ISD guidance on deprivation analysis"), " for more information on this topic."),
+    img(src="help_simd2.png"),
+    size = "l", easyClose = TRUE, fade=FALSE, footer = modalButton("Close (Esc)")
+  ))
+}) 
+
+## Help on SII
+observeEvent(input$help_sii, {
+  showModal(modalDialog(
+    title = "Absolute inequality and the Slope Index of Inequality (SII)",
+    p("The chart below shows how the absolute inequalty (the gap between the most and least disadvantaged groups) has changed over time."),
+    #trend explanation
+    p("The values in the chart are known as the ", tags$b("'Slope Index of Inequality (SII)'"), " for each year they are calcuated using a regression model of the rank 
+      of the social variable (in this case the SIMD quintiles) and the selected indicator measure (e.g. rate of hospitalisations/deaths/etc)."),br(),
+    p("The SII represents the inequality gap across the whole population between the most and the least disadvantaged. For example an SII
+      of 127 for the asthma hospitalisation rate means that the difference between the most and the least disadvantaged groups is 127 
+      hospitalisations per 100,000 population."),br(),
+    p("Ideally there should be no difference between indicator values in the most and least deprived areas, in this situation the SII would be zero. The larger the SII the great the disparity between the most and least deprived areas.
+      In this chart an SII that is decreasing over time would suggest that absolute inequality is reducing.
+      It is possible for absolute inequality to reduce but relative inequality to increase which is important to consider trends in both the SII and RII."),
+    p("You can read more about the measures used and presented in the",
+      tags$a(href="https://www.scotpho.org.uk/comparative-health/measuring-inequalities/", 
+             "Measuring inequalities section",  class="externallink"), 
+      "of the ScotPHO website."),
+    #simd explanation
+    p("To prepare the data shown in this tab we have divided the Scotland population 
+      into five groups (quintiles) based on their deprivation level. This has been done using the ",
+      tags$a(href="https://www2.gov.scot/simd",  "Scottish Index of Multiple Deprivation (SIMD).",
+             class="externallink")),
+    size = "l", easyClose = TRUE, fade=FALSE, footer = modalButton("Close (Esc)")
+  ))
+}) 
+
+
+## Help on RII
+observeEvent(input$help_rii, {
+  showModal(modalDialog(
+    title = "Relative inequality and the Relative Index of Inequality (RII)",
+    p("The chart below shows how relative inequalty (the gap between the least disadvantaged group and the average of all groups) has changed over time."),
+    #trend explanation
+    p("The values in the chart are known as the ", tags$b("'Relative Index of Inequality (RII)'"), "for each year this is calcuated using the a linear regression model of the social variable (in this case the SIMD quintiles) and the selected indicator measure (e.g. rate of hospitalisations/deaths/etc)."),br(),
+    p("The RII represents the inequality gap between the most disadvantaged and the overall average. ScotPHO use a linear regressiong model and have converted the RII
+      so that the value in the chart represents the percentage difference of the rate in the most deprived group relative to the rate in the overall population."),br(),
+    p("Ideally there should be no gap meaning an RII of zero. RII typically range from between -2 and 2. The larger the RII the greater the inequity between the most deprived areas and the population average.
+      It is possible for absolute inequality to reduce but relative inequality to increase which is important to consider trends in both the SII and RII."),
+    p("You can read more about the measures used and presented in the",
+      tags$a(href="https://www.scotpho.org.uk/comparative-health/measuring-inequalities/",
+             "Measuring inequalities section",  class="externallink"), 
+      "of the ScotPHO website."),
+    #simd explanation
+    p("To prepare the data shown in this tab we have divided the Scotland population 
+      into five groups (quintiles) based on their deprivation level. This has been done using the ",
+      tags$a(href="https://www2.gov.scot/simd",  "Scottish Index of Multiple Deprivation (SIMD).",
+             class="externallink")),
+    size = "l", easyClose = TRUE, fade=FALSE, footer = modalButton("Close (Esc)")
+  ))
+}) 
+
+## Help on PAF chart 1 (snapshot year bar chart)
+observeEvent(input$help_paf, {
+  showModal(modalDialog(
+    title = "Estimating proportions attributable to inequality",
+    p("The bar chart shows indicator values split by the deprivation quintiles. The area shaded in blue is the same across all 5 quintiles, it shows the rate observed in the least deprived quintile.
+      The area shaded in orange represents the additional activity the 4 remaining quintiles have over and above that seen in the least deprived quintile."),
+    p("Looking at data in this way illustrates the potential impact of removing deprivation (i.e. in the hypothetical situation that all deprivation quintiles expereinced the same rates)."),
+    p("You can read more about the Population Attributable Risk in the",
+      tags$a(href="https://www.scotpho.org.uk/comparative-health/measuring-inequalities/",
+             "Measuring inequalities section",  class="externallink"),"of the ScotPHO website."),
+    #simd explanation
+    p("To prepare the data shown in this tab we have divided the Scotland population 
+      into five groups (quintiles) based on their deprivation level. This has been done using the ",
+      tags$a(href="https://www2.gov.scot/simd",  "Scottish Index of Multiple Deprivation (SIMD).",
+             class="externallink")),
+    size = "l", easyClose = TRUE, fade=FALSE, footer = modalButton("Close (Esc)")
+  ))
+}) 
+
+## Help on PAF chart 2 (timeseries trend line chart)
+observeEvent(input$help_paf2, {
+  showModal(modalDialog(
+    title = "The Population Attributable Risk (PAR)",
+    p("The line chart shows the ",tags$b("Population Attributable Risk (PAR)"), "also known as Population Attributable Fraction (PAF)."),
+    #trend explanation
+    p("The PAR is presented as a percentage, and describes by how much the overall rate of an indicator would increase or decrease if all areas were to expereince the rates observed in the most favourable area.
+      The higher the PAR values the greater the impact of inequality on that indicator and the greater the potential fo rimpact if this inequailty could be removed."),br(),
+    p("The PAF describes a hypothetical situation and makes the assumption that all of the association between the risk factor and indicator is causal. In reality there could a number of other factors influencing the trends observed."),
+    p("You can read more about the PAR in the",
+      tags$a(href="https://www.scotpho.org.uk/comparative-health/measuring-inequalities/",
+             "Measuring inequalities section",  class="externallink"),"of the ScotPHO website."),
+    #simd explanation
+    p("To prepare the data shown in this tab we have divided the Scotland population 
+      into five groups (quintiles) based on their deprivation level. This has been done using the ",
+      tags$a(href="https://www2.gov.scot/simd",  "Scottish Index of Multiple Deprivation (SIMD).",
+             class="externallink")),
+    size = "l", easyClose = TRUE, fade=FALSE, footer = modalButton("Close (Esc)")
+  ))
+}) 
+
+
+###############################################.
+## Which measure option to pick help text ----
+###############################################.
+
+output$inequality_options_help <- renderUI({
+  tagList(
+    h5("Which option should I look at?",style = "font-weight: bold; color: black; margin-bottom: 0px;"),
+    p("There multiple different ways that health inequality can be measured. Understanding inequality has often requires looking at more than one measure. 
+      This tool presents 3 different views of data to help users understand different aspects of inequality. 
+      We recommend considering the data options in turn as each will build on the understanding of previous."),
+    
+    #trend explanation
+    p("The ", tags$b("'Patterns of inequality'"), " option includes a bar chart showing how the measure for a particular indicator varies according to the relative deprivation of the area people live in.
+      A line chart is also available which shows the same information over time. Together these charts illustrate how rates in the most and least deprived areas compare for a single year or over time and also whether
+      there is a simple relationship between relative deprivation and a particular indicator."),
+    
+    #gap explanation
+    p("The ", tags$b("'Inequality gap'"), " option includes charts displaying two commonly used measures of inequality - 
+      the Slope Index of Inequality (SII), which represents the absolute 
+      inequality gap using a regression model and the Relative Index of Inequality (RII), 
+      which quantifies the difference between the most deprived group and the overall average value. 
+      It is possible for absolute inequalities to reduce, while relative inequalities increase (or vice-versa) which is why it is helpful to consider both the SII and RII."),
+    
+    #PAR/risk explanation
+    p("The ", tags$b("'Potential for impact'"), " option includes charts which indicate the potential for improvement for a given indicator.  
+      The measure shown is a theoretical value known as the Population Attributable Risk (PAR). 
+      Interpreting this measure requires an appreciation of whether higher indicator values are considered more desirable or less desirable.  
+      For example higher values for deaths or hospital admissions would be considered less desirable but higher values for indicators like life expectancy or immunisation update would be more desirable. 
+      The PAR produces a summary value that describes the percentage an indicator might reduce, or increase by, if the population as a whole experienced the same rate as that of the most desirable group.
+      The PAR enables generation of summary statements such as 'hospitalisations would be 50% lower if the levels of the least deprived areas were experienced across the whole population' which can be powerful in demonstrating the impact that reducing or removing inequalities might be."),
+    
+    #Deprivation
+    h5("How does ScotPHO define deprivation? ", style = "font-weight: bold; color: black; margin-bottom: 0px;"),
+    #p("Indicators within the inequality module of the profiles tool show rates split by the ",
+    p("This tool uses the ",
+      tags$a(href="https://www.gov.scot/collections/scottish-index-of-multiple-deprivation-2020/", "Scottish Indicies of Multiple Deprivation (SIMD)",
+             class="externallink"),
+      " to subdivide geographic areas into 5 groups (also know as quintiles) experiencing different degrees of relavtive deprivation. In this tool those living in quintile 1 tend to experience the most relative deprivation and those living in quintile 5 the least.
+      However it is important to note that SIMD is not a perfect measure of deprivation, SIMD is an area-based measure of relative deprivation and individuals living within an area may experience different levels of deprivation."),
+    
+    #Further information about measuring inequality
+    h5("Further information about measuring inequality ", style = "font-weight: bold; color: black; margin-bottom: 0px;"),
+    p("Additional information about ",
+      tags$a(href="http://www.healthscotland.scot/health-inequalities", "health inequalities",
+             class="externallink"),
+      " and ",
+      tags$a(href="https://www.scotpho.org.uk/comparative-health/measuring-inequalities/", "measuring health inequalities",
+             class="externallink"),
+      " in Scotland."))
+})
   
   ###############################################.
   ## Indicator definitions ----

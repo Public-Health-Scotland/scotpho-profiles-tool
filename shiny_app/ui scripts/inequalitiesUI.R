@@ -28,7 +28,7 @@ tabPanel(div(
                    style = "margin-top: 10px; margin-bottom: 20px;", 
                    radioGroupButtons("measure_simd", 
                                      label= "Step 4 - Select what aspect of inequality you want to explore.", 
-                                     choices = depr_measure_types, status = "primary",
+                                     choices = depr_measure_options, status = "primary",direction = "vertical",
                                      justified = TRUE
                    )),
                awesomeCheckbox("ci_simd", label = "Show/hide 95% confidence intervals", value = F),
@@ -45,7 +45,7 @@ tabPanel(div(
             div(class= "depr-text-box",
                 div(class= "title", textOutput("simd_nutshell_title")),
                 div(class= "content", htmlOutput("simd_text"))),
-            conditionalPanel("input.measure_simd == 'Trend'",
+            conditionalPanel("input.measure_simd == 'Patterns of inequality'",
                              column(6,
                                     htmlOutput("simd_barplot_title"),
                                     withSpinner(plotlyOutput("simd_bar_plot"))),
@@ -63,25 +63,55 @@ tabPanel(div(
                                       column(2, img(src="simd_overall.png", height = "8px"), "Average"),
                                       column(1)))
             ),#trend minitab bracket
+            
             #Absolute and realtive inequality
-            conditionalPanel("input.measure_simd == 'Gap'",
-                             column(6, htmlOutput("title_sii"), br(),
-                                    withSpinner(plotlyOutput("simd_sii_plot"))), 
+            conditionalPanel("input.measure_simd ==  'Inequality gap'",
                              column(6, 
+                                    br(),#improve alignment with selection menu
+                                    htmlOutput("title_sii"),
+                                    br(),
+                                    actionButton("help_sii", label="What does this chart show?", 
+                                                 icon= icon('question-circle'), class ="down"), 
+                                    br(),
+                                    withSpinner(plotlyOutput("simd_sii_plot"))), 
+                             column(6,
+                                    br(),#improve alignment with selection menu
                                     htmlOutput("title_rii"),
+                                    br(),
+                                    actionButton("help_rii", label="What does this chart show?", 
+                                                 icon= icon('question-circle'), class ="down"), 
+                                    br(),
                                     withSpinner(plotlyOutput("simd_rii_plot"))) 
             ),
+            
             #Population attributable risk
-            conditionalPanel("input.measure_simd == 'Risk'",
+            conditionalPanel("input.measure_simd == 'Potential for improvement'",
                              column(6,
+                                    br(),#improve alignment with sidepanel dropdowns 
                                     htmlOutput("simd_par_barplot_title"),
-                                    withSpinner(plotlyOutput("simd_par_barplot")),
-                                    p(img(src= "signif_worse.png", height = "16px"),
-                                      "Attributable to inequality", 
-                                      style= "text-align: center; padding-bottom: 40px")),
+                                    actionButton("help_paf", label="What does this chart show?", 
+                                                 icon= icon('question-circle'), class ="down"),
+                                    p(img(src= "signif_better.png", height = "16px"),"Baseline",
+                                      img(src= "signif_worse.png", height = "16px"),"Attributable to inequality",
+                                      style= "text-align: left; padding-top: 10px; padding-bottom: 10px"),
+                                    withSpinner(plotlyOutput("simd_par_barplot"))
+                             ),
                              column(6,
+                                    br(),#improve alignment with sidepanel dropdowns
                                     htmlOutput("simd_par_trendplot_title"),
+                                    actionButton("help_paf2", label="What does this chart show?", 
+                                                 icon= icon('question-circle'), class ="down"),
+                                    p(" "), # create whitespace and help alignment of charts
+                                    br(),
                                     withSpinner(plotlyOutput("simd_par_trendplot")))
+            ),
+            
+          #Which measure to look at
+            conditionalPanel("input.measure_simd == 'About these options'",
+                             column(12,
+                                    uiOutput("inequality_options_help") # text displayed generated in inequalities server script
+                             ) # close column
+                             
             )
   )
 ) #Tab panel bracket
