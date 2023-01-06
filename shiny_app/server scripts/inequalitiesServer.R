@@ -363,10 +363,10 @@ output$inequality_options_help <- renderUI({
         #statement #2 : whe absolute inequality (from sii) has increased or decreased over time
         tags$li(class= "li-custom",
                 p(paste0("Over time ", simd_text_data$statement2,". (see 'Inequality gap')"))),
-        #statement #3 based on rii
+        #statement #3 based on rii (andy P data doesn't have same fields populated so need to call on simd_text_data object rather than simd_bar_data())
         tags$li(class= "li-custom",
-                p(paste0("The most deprived areas have ", abs(round(unique(simd_bar_data()$rii_int), 0)),
-                         "% ", more_less, tolower(unique(simd_bar_data()$label_ineq)), than_as," ",input$geoname_simd," as a whole. (see 'Inequality gap')" )))
+                p(paste0("The most deprived areas have ", abs(round(unique(simd_text_data$rii_int), 0)),
+                         "% ", more_less, tolower(unique(simd_text_data$label_ineq)), than_as," ",input$geoname_simd," as a whole. (see 'Inequality gap')" )))
       )
       
     } else { #if the data is available print the following messages
