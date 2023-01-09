@@ -51,7 +51,7 @@ observeEvent(input$help_rii, {
     p("The values in the chart are known as the ", tags$b("'Relative Index of Inequality (RII)'"), "for each year this is calcuated using the a linear regression model of the social variable (in this case the SIMD quintiles) and the selected indicator measure (e.g. rate of hospitalisations/deaths/etc)."),br(),
     p("The RII represents the inequality gap between the most disadvantaged and the overall average. ScotPHO use a linear regressiong model and have converted the RII
       so that the value in the chart represents the percentage difference of the rate in the most deprived group relative to the rate in the overall population."),br(),
-    p("Ideally there should be no gap meaning an RII of zero. RII typically range from between -2 and 2. The larger the RII the greater the inequity between the most deprived areas and the population average.
+    p("Ideally there should be no gap meaning an RII of zero. The larger the RII the greater the inequity between the most deprived areas and the population average.
       It is possible for absolute inequality to reduce but relative inequality to increase which is important to consider trends in both the SII and RII."),
     p("You can read more about the measures used and presented in the",
       tags$a(href="https://www.scotpho.org.uk/comparative-health/measuring-inequalities/",
@@ -397,7 +397,9 @@ output$inequality_options_help <- renderUI({
     }
   })
 
-  ## Output object for title and bullet points that can be shown/hidden depending on which conditional panel is being shown
+  
+  # Summary textbox object----
+  ## Summary text can be shown/hidden depending on which conditional panel is selected (it gives more space for explanation if user decides to select 'about these options')
   output$inequality_summary_text <- renderUI({
     div(class= "depr-text-box",
         div(class= "title", textOutput("simd_nutshell_title")),
@@ -436,13 +438,13 @@ output$inequality_options_help <- renderUI({
   ## Plots: Trend ----
   ###############################################.
   
-  #Title for barplot from trend
+  # Chart 1. barplot ----
+
+  # Title for barplot from trend (appears within dashboard)
   output$simd_barplot_title <- renderUI({
-    p(tags$b(paste0("Differences in ", tolower(input$indic_simd), 
-                    " between deprivation groups for ", input$year_simd)))
+    p(tags$b(paste0(input$indic_simd," by deprivation group for ", input$year_simd)))
   })
   
-  # Chart 1. barplot ----
   
   ineq_chart_1 <- reactive({
     
@@ -509,6 +511,13 @@ output$inequality_options_help <- renderUI({
   
   
   # Chart 2. trend plot ----
+  
+  # Title (as appears on dashboard panel)
+  output$simd_trendplot_title <- renderUI({
+    p(tags$b(paste0(input$indic_simd," over time by deprivation group")))
+  })
+  
+  
   ineq_chart_2 <- reactive({
   
     #If no data available for that period then plot message saying data is missing
@@ -568,12 +577,7 @@ output$inequality_options_help <- renderUI({
         config(displayModeBar = FALSE, displaylogo = F, editable =F) # taking out toolbar
     }
   })
-  
-  
-  #Title
-  output$simd_trendplot_title <- renderUI({
-    p(tags$b(paste0("Changes over time by deprivation group")))
-  })
+
   
   # Chart 2 - trend plot (command to displaying on the dashboard)
   output$simd_trend_plot <- renderPlotly({
@@ -581,7 +585,6 @@ output$inequality_options_help <- renderUI({
       })
   
   # Combined trend charts ----
-  
   combined_trend <- reactive({
     
     chart_1 <- ineq_chart_1() %>%
@@ -628,11 +631,13 @@ output$inequality_options_help <- renderUI({
   ## Plots: RII/SII ----
   ###############################################.
 
-  #text for title sii
+  #text for title sii (as appears on dashboard)
   output$title_sii <- renderUI({
-    div(p(tags$b("Inequality gap over time")),
-        p(paste0("Absolute differences between most and least deprived areas, 
-                 expressed as ", tolower(unique(simd_trend_data()$type_definition)), ".")))
+    div(p(tags$b("Inequalities over time: absolute differences")),
+        p(paste0("The chart below shows the difference between most and least deprived areas 
+               (expressed as ", tolower(unique(simd_trend_data()$type_definition)), ")")),
+        br(),
+        p("An increasing trend suggests the gap between the most and least deprived areas is growing."))
   })
   
 
@@ -649,26 +654,20 @@ output$inequality_options_help <- renderUI({
     
     # #Text for tooltips
       if (input$ci_simd == FALSE) {  
-        
-        tool_tip_label <- case_when(simd_index$type_id == "sr" ~ "per 100,000", 
-                                    simd_index$type_id == "cr" ~ "per 100,000",  
-                                    simd_index$type_id == "%" ~ "percent",  
-                                    simd_index$type_id == "years" ~ "years",  
-                                    TRUE ~ '')
-        
-        tooltip_sii <- paste0("Gap between least & most deprived in ",simd_index$trend_axis,"<br>", 
-                              simd_index$sii," ",tool_tip_label, "<br>", 
-                               "Also known as Slope Index of Inequality")
+
+        tooltip_sii <- paste0("Difference between most and least deprived areas,","<br>",
+                              "also known as Slope Index of Inequality (SII)", "<br>",
+                              simd_index$trend_axis, ": ", abs(simd_index$sii), "<br>", 
+                              simd_index$type_definition)
       } else { 
         tooltip_sii <- paste0(simd_index$trend_axis, ": ", simd_index$sii, "<br>",
-                                "95% confidence interval: ",
-                                simd_index$lowci_sii, "-", simd_index$upci_sii,
-                                "<br>", simd_index$type_definition, "<br>", 
+                              "95% confidence interval: ",
+                              simd_index$lowci_sii, "-", simd_index$upci_sii,
+                              "<br>", simd_index$type_definition, "<br>", 
                               "Also known as Slope Index of Inequality")
       }
 
-      
-      
+    
     #Modifying standard layout
     yaxis_plots[["title"]] <- ~type_definition
     xaxis_plots[["autotick"]] <- F
@@ -707,16 +706,14 @@ output$inequality_options_help <- renderUI({
 
 ##  Chart 4.RII plot ----
   
-  #text for title rii
+  # RII chart title for dashboard panel
   output$title_rii <- renderUI({
-    # div(p(tags$b(paste0("How the most deprived area compares with the average for ",
-    #                     input$geoname_simd)),
-    div(p(tags$b(paste0(" a")),
-          p("Relative differences between the most deprived area 
-            and the overall average for the area.")))
+    div(p(tags$b("Inequalities over time: relative differences")),
+        p(paste0("The chart below shows the differences between the most deprived area
+               and the overall average for ",input$geoname_simd," (expressed as a percentage).")),
+        br(),
+        p("An increasing trend suggests that the gap between the most deprived areas and the average is growing."))
   })
-  
-  
   
   # rri plot
   ineq_chart_4 <- reactive({
@@ -835,16 +832,11 @@ output$inequality_options_help <- renderUI({
   ###############################################.
   
   # Chart 5. Bar plot for PAR ----
-
-  #Title
+  
+  #Title (as displayed within dashboard panel)
   output$simd_par_barplot_title <- renderUI({
     div(p(tags$b(paste0("Attributable to inequality, ", input$year_simd))),
-        p("What part of ", tolower(input$indic_simd), " can be attributed to socioeconomic inequalities."))
-  })
-  output$simd_par_trendplot_title <- renderUI({
-    div(p(tags$b(paste0("Potential for improvement"))),
-        p("How much ", tolower(input$indic_simd), "could be reduced if the levels 
-          of the least deprived area were experienced across the whole population."))
+        p("What percentage of ", tolower(input$indic_simd), " can be attributed to socioeconomic inequalities."))
   })
   
   
@@ -893,15 +885,12 @@ output$inequality_options_help <- renderUI({
       layout(showlegend = F)
   })
   
-  
-  
   # Chart 6. Line plot for PAR ----
   
-  #Title
   output$simd_par_trendplot_title <- renderUI({
-    div(p(tags$b("Potential for improvement of ", tolower(input$indic_simd))),
-    p(" If the levels of the least deprived area were experienced across the whole population."))
-
+    div(p(tags$b(paste0("Potential for improvement"))),
+        p("How much ", tolower(input$indic_simd), "could be reduced if the levels 
+          of the least deprived area were experienced across the whole population."))
   })
   
   ineq_chart_6 <- reactive({ 
@@ -918,8 +907,8 @@ output$inequality_options_help <- renderUI({
       plot_nodata()
     } else { #If data is available plot it
       
-    #Tooltip
-    tooltip_partrend <- paste0(simd_partrend_data$trend_axis, "<br>",
+      #Tooltip
+      tooltip_partrend <- paste0(simd_partrend_data$trend_axis, "<br>",
                                  simd_partrend_data$par, "%")
       
     #Modifying standard layout
