@@ -3,7 +3,7 @@
 # explain local/national quintiles
 # data tab needs to include inequality data
 #Summary text boxes at top: (see xx section) could this link to each section.
-#chart tooltip language? could this be improved
+#chart tooltip language? could this be improved - rii chart
 #confidence intervals for sii/rii large - possilby because app looks at quintiles but maybe deciles would be better 
 #dynamic text refers to absolute/relative gaps increasing or reducing but this doesn't factor in CI so is this really a good thing to point out
 
