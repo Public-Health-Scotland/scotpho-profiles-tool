@@ -38,10 +38,9 @@ tabPanel(div(
                savechart_button('report_simd', 'Save charts', class = "down", disabled=FALSE)
   ),
   mainPanel(width = 9, #Main panel
-            bsModal("mod_defs_simd", "Definitions", "defs_simd", htmlOutput('defs_text_simd')),
+            style = "margin-top: 30px",
+            #bsModal("mod_defs_simd", "Definitions", "defs_simd", htmlOutput('defs_text_simd')), ##not sure if this line is needed? seems to be unconnected to any current object
             uiOutput("inequality_summary_text"), #dynamic bullet points - appearance controlled using reactive element in inequalities server script
-            #  div(class= "title", textOutput("simd_nutshell_title")),
-            #  div(class= "content", htmlOutput("simd_text"))),
             #Overview: trend and bar chart
             conditionalPanel("input.measure_simd == 'Patterns of inequality'",
                              column(6,
@@ -50,16 +49,16 @@ tabPanel(div(
                              column(6,
                                     htmlOutput("simd_trendplot_title"),
                                     withSpinner(plotlyOutput("simd_trend_plot"))),
-                             column(12, align="center", #legend
+                             column(12, align="left", #legend hack for bar plot
                                     style= "padding-bottom: 40px;",
-                                    p(column(1),
+                                    p(#column(1),
                                       column(2, img(src="quintile1.png", height = "16px"), "1 - most deprived"), 
                                       column(1, img(src="quintile2.png", height = "16px"), "2"),
                                       column(1, img(src="quintile3.png", height = "16px"), "3"),
                                       column(1, img(src="quintile4.png", height = "16px"), "4"),
                                       column(2, img(src="quintile5.png", height = "16px"), "5 - least deprived"),
                                       column(2, img(src="simd_overall.png", height = "8px"), "Average"),
-                                      column(1)))
+                                      column(3)))
             ),#trend minitab bracket
             
             #Absolute and realtive inequality

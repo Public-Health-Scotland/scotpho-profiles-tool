@@ -1,3 +1,11 @@
+##to do
+
+# explain local/national quintiles
+# data tab needs to include inequality data
+#Summary text boxes at top: (see xx section) could this link to each section.
+#chart tooltip language? could this be improved
+#confidence intervals for sii/rii large - possilby because app looks at quintiles but maybe deciles would be better 
+#dynamic text refers to absolute/relative gaps increasing or reducing but this doesn't factor in CI so is this really a good thing to point out
 
 ## Server logic for inequalities tab ----
 
@@ -100,7 +108,7 @@ observeEvent(input$help_paf2, {
 
 
 ###############################################.
-## "About these options" Conditional Panel Text ----
+## About these options (Conditional Panel Text) ----
 ###############################################.
 
 output$inequality_options_help <- renderUI({
@@ -383,7 +391,7 @@ output$inequality_options_help <- renderUI({
                          "% ", more_less, tolower(unique(simd_bar_data()$label_ineq)), than_as," ",input$geoname_simd," as a whole. (see 'Inequality gap')" ))),
         #statement #4 based on PAR
         tags$li(class= "li-custom",
-                (paste0(unique(simd_bar_data()$label_ineq)," across ",input$geoname_simd," would be ", abs(round(unique(simd_bar_data()$par), 0)),"% ", unique(simd_text_data$statement4a)," if the levels of the ",
+                p(paste0(unique(simd_bar_data()$label_ineq)," across ",input$geoname_simd," would be ", abs(round(unique(simd_bar_data()$par), 0)),"% ", unique(simd_text_data$statement4a)," if the levels of the ",
                         unique(simd_text_data$statement4b)," areas were experienced across the whole population. (see 'Potential for impact')")))
       )
     }
@@ -416,67 +424,16 @@ output$inequality_options_help <- renderUI({
     
   })
   
-  
-  
-  
+ 
+###############################################.
+## Plots logic----
+## Plots in inequalities tab are set up as reactive elements which are then rendered in separate command
+## Pressing 'Save chart' option within dashboard will trigger formation of a subplot containing both 2 charts on dashboard into one image
+## Combined into a subplot also allows exporting of charts together with legend and titles
+###############################################.
+ 
   ###############################################.
-  ## Downloading data ----
-  ###############################################.
-  simd_csv <- reactive({
-    simd_trend_data() %>% 
-      arrange(year, code, quintile) %>% 
-      select(c(indicator, code, quintile, def_period, numerator, measure, 
-               lowci, upci, type_definition, rii_int,	lowci_rii_int,	upci_rii_int,	
-               sii,	lowci_sii,	upci_sii, par)) %>% 
-      #Converting into NA for all but total quintile
-      mutate(rii_int = case_when(quintile != "Total" ~ NA_real_,
-                                 TRUE ~ rii_int),
-             lowci_rii_int = case_when(quintile != "Total" ~ NA_real_,
-                                       TRUE ~ lowci_rii_int),
-             upci_rii_int = case_when(quintile != "Total" ~ NA_real_,
-                                      TRUE ~ upci_rii_int),
-             sii = case_when(quintile != "Total" ~ NA_real_,
-                             TRUE ~ sii),
-             upci_sii = case_when(quintile != "Total" ~ NA_real_,
-                                  TRUE ~ upci_sii),
-             lowci_sii = case_when(quintile != "Total" ~ NA_real_,
-                                   TRUE ~ lowci_sii),
-             par = case_when(quintile != "Total" ~ NA_real_,
-                             TRUE ~ par)) %>% 
-      rename(geography_code = code, indicator_measure = measure,
-             lower_confidence_interval=lowci, upper_confidence_interval=upci,
-             period = def_period, definition = type_definition, relative_inequality_gap = rii_int,
-             lower_confidence_interval_relative_ineq = lowci_rii_int, upper_confidence_interval_relative_ineq = upci_rii_int,
-             absolute_inequality_gap = sii, lower_confidence_interval_absolute_ineq = lowci_sii,
-             upper_confidence_interval_absolute_ineq = upci_sii,
-             population_attributable_risk = par)
-  })	
-  
-  
-  output$download_simd <- downloadHandler(
-    filename =  'deprivation_data.csv',content = function(file) {
-      write.csv(simd_csv(), file, row.names=FALSE)
-      })
-  
-  
-  #####################.
-  # Downloading charts
-  output$report_simd <- downloadHandler(
-    # file name
-    filename <- 'plot.png',
-    # content
-    content = function(file){
-      #select plots to download, depending on measure type selected
-      export(p = if(input$measure_simd == "Trend"){combined_trend()}
-             else if(input$measure_simd == "Gap"){combined_gap()}
-             else if(input$measure_simd == "Risk"){combined_risk()}, file = 'tempPlot.png')
-      # hand over the file
-      file.copy('tempPlot.png',file)
-    }
-  )
-  
-  ###############################################.
-  ## Trend charts  ----
+  ## Plots: Trend ----
   ###############################################.
   
   #Title for barplot from trend
@@ -486,8 +443,8 @@ output$inequality_options_help <- renderUI({
   })
   
   # Chart 1. barplot ----
-  chart_1 <- reactive({
-    
+  
+  ineq_chart_1 <- reactive({
     
     #If no data available for that period then plot message saying data is missing
     if (is.data.frame(simd_bar_data()) && nrow(simd_bar_data()) == 0)
@@ -498,17 +455,17 @@ output$inequality_options_help <- renderUI({
       
       #Text for tooltip
       if (input$ci_simd == FALSE) {  
-        tooltip_simd <- paste0("Quintile ", simd_bar_data()$quintile, "<br>",
-                               simd_bar_data()$trend_axis, ": ", simd_bar_data()$measure,
-                               "<br>", simd_bar_data()$type_definition)
+        
+        tooltip_simd <- paste0("Population living within SIMD quintile ", simd_bar_data()$quintile, "<br>",
+                               simd_bar_data()$measure,"<br>",
+                               simd_bar_data()$type_definition, "<br>",
+                               simd_bar_data()$trend_axis)
       } else { 
-        tooltip_simd <- paste0("Quintile ", simd_bar_data()$quintile, "<br>",
-                               simd_bar_data()$trend_axis, ": ", 
-                               simd_bar_data()$measure, "<br>",
+        tooltip_simd <- paste0("Population living within SIMD quintile ", simd_bar_data()$quintile, "<br>",
+                               simd_bar_data()$trend_axis, ": ", simd_bar_data()$measure, "<br>",
                                "95% confidence interval: ", simd_bar_data()$lowci, "-", simd_bar_data()$upci, 
                                "<br>", simd_bar_data()$type_definition)
       }
-      
       #Palette for plot 
       pal_simd_bar <- case_when(simd_bar_data()$quintile == "1 - most deprived" ~ '#022031', 
                                 simd_bar_data()$quintile == "2" ~ '#313695', 
@@ -546,26 +503,21 @@ output$inequality_options_help <- renderUI({
   
   # Chart 1 - bar plot (version to display on dashboard)
   output$simd_bar_plot <- renderPlotly({
-    
-    chart_1() %>%
+        ineq_chart_1() %>%
       layout(showlegend = F)
-    
-  })
+      })
   
   
+  # Chart 2. trend plot ----
+  ineq_chart_2 <- reactive({
   
-  # Chart 2 - trend plot ----
-  chart_2 <- reactive({
-    
-    
-    
     #If no data available for that period then plot message saying data is missing
     if (is.data.frame(simd_trend_data()) && nrow(simd_trend_data()) == 0)
     {
       plot_nodata()
     } else { #If there is data plot it
-      #Text for tooltip
       
+      #Text for tooltip
       if (input$ci_simd == FALSE) {  
         tooltip_simd <- paste0(simd_trend_data()$quintile, "<br>",
                                simd_trend_data()$trend_axis, ": ", simd_trend_data()$measure,
@@ -618,26 +570,21 @@ output$inequality_options_help <- renderUI({
   })
   
   
-  
   #Title
   output$simd_trendplot_title <- renderUI({
     p(tags$b(paste0("Changes over time by deprivation group")))
   })
   
-  #chart 2 - trend plot (for displaying on the dashboard)
+  # Chart 2 - trend plot (command to displaying on the dashboard)
   output$simd_trend_plot <- renderPlotly({
-    
-    chart_2() 
-    
-  })
+        ineq_chart_2() 
+      })
   
-  
-  # 2 charts within 'trend' measure
-  # combined into a subplot for the purpose of exporting together with legend and titles
+  # Combined trend charts ----
   
   combined_trend <- reactive({
     
-    chart_1 <-  chart_1 () %>%
+    chart_1 <- ineq_chart_1() %>%
       layout(annotations = list(
         xanchor = "left",
         yanchor = "top",
@@ -652,7 +599,7 @@ output$inequality_options_help <- renderUI({
         yaxis = list(title = first(simd_trend_data()$type_definition)))
     
     
-    chart_2 <- chart_2() %>%
+    chart_2 <- ineq_chart_2() %>%
       layout(annotations = list(
         xanchor = "left",
         yanchor = "top",
@@ -677,11 +624,9 @@ output$inequality_options_help <- renderUI({
   })
   
   
-  
-  
-###############################################.
-## Plots for RII/SII ----
-###############################################.
+  ###############################################.
+  ## Plots: RII/SII ----
+  ###############################################.
 
   #text for title sii
   output$title_sii <- renderUI({
@@ -691,8 +636,8 @@ output$inequality_options_help <- renderUI({
   })
   
 
-  #SII plot 
-  chart_3 <- reactive({
+  # Chart 3.SII plot ----
+  ineq_chart_3 <- reactive({
     
     simd_index <- simd_trend_data() %>% filter((quintile == "Total"))
     
@@ -704,8 +649,15 @@ output$inequality_options_help <- renderUI({
     
     # #Text for tooltips
       if (input$ci_simd == FALSE) {  
-        tooltip_sii <- paste0(simd_index$trend_axis, ": ", simd_index$sii, "<br>", 
-                               simd_index$type_definition, "<br>", 
+        
+        tool_tip_label <- case_when(simd_index$type_id == "sr" ~ "per 100,000", 
+                                    simd_index$type_id == "cr" ~ "per 100,000",  
+                                    simd_index$type_id == "%" ~ "percent",  
+                                    simd_index$type_id == "years" ~ "years",  
+                                    TRUE ~ '')
+        
+        tooltip_sii <- paste0("Gap between least & most deprived in ",simd_index$trend_axis,"<br>", 
+                              simd_index$sii," ",tool_tip_label, "<br>", 
                                "Also known as Slope Index of Inequality")
       } else { 
         tooltip_sii <- paste0(simd_index$trend_axis, ": ", simd_index$sii, "<br>",
@@ -715,7 +667,8 @@ output$inequality_options_help <- renderUI({
                               "Also known as Slope Index of Inequality")
       }
 
-    
+      
+      
     #Modifying standard layout
     yaxis_plots[["title"]] <- ~type_definition
     xaxis_plots[["autotick"]] <- F
@@ -749,30 +702,24 @@ output$inequality_options_help <- renderUI({
   
   # ssi plot (chart 3) to display on dashboard
   output$simd_sii_plot <- renderPlotly({
-    
-    chart_3() 
-    
-  })
-  
-  
-  
-  
-  
-  #RII plot
+       ineq_chart_3() 
+    })
+
+##  Chart 4.RII plot ----
   
   #text for title rii
   output$title_rii <- renderUI({
-    div(p(tags$b(paste0("How the most deprived area compares with the average for ",
-                        input$geoname_simd)),
-          p("Relative differences between the least deprived area 
+    # div(p(tags$b(paste0("How the most deprived area compares with the average for ",
+    #                     input$geoname_simd)),
+    div(p(tags$b(paste0(" a")),
+          p("Relative differences between the most deprived area 
             and the overall average for the area.")))
   })
   
   
   
   # rri plot
-  chart_4 <- reactive({
-
+  ineq_chart_4 <- reactive({
     
     simd_index <- simd_trend_data() %>% filter((quintile == "Total"))
     
@@ -827,24 +774,18 @@ output$inequality_options_help <- renderUI({
     }
   })
   
-  
   # rri plot (to display on dashboard)
   output$simd_rii_plot <- renderPlotly({
     
-    
-    chart_4() 
+    ineq_chart_4() 
     
   })
   
   
-  
-  
-  # 2 charts within 'trend' measure
-  # combined into a subplot for the purpose of exporting together with legend and titles
+  # Combined SII/RII plot ----
   combined_gap <- reactive({
     
-    
-    chart_3 <-  chart_3 () %>%
+    chart_3 <-  ineq_chart_3 () %>%
       layout(annotations = list(
         xanchor = "left",
         yanchor = "top",
@@ -861,7 +802,7 @@ output$inequality_options_help <- renderUI({
     
     
     
-    chart_4 <-  chart_4 () %>%
+    chart_4 <-  ineq_chart_4 () %>%
       layout(showlegend = T,
              annotations = list(
                xanchor = "left",
@@ -889,12 +830,11 @@ output$inequality_options_help <- renderUI({
   })
   
 
-  
   ###############################################.
-  ## Plots for PAR ----
+  ## Plots: PAR ----
   ###############################################.
   
-  #Bar plot for PAR
+  # Chart 5. Bar plot for PAR ----
 
   #Title
   output$simd_par_barplot_title <- renderUI({
@@ -908,10 +848,8 @@ output$inequality_options_help <- renderUI({
   })
   
   
-  
-  
   #Bar plot for PAR
-  chart_5 <- reactive({
+  ineq_chart_5 <- reactive({
     
     #If no PAR for that period then plot message saying data is missing
     if (is.na(simd_bar_data()$par))
@@ -949,18 +887,15 @@ output$inequality_options_help <- renderUI({
     }
   })
   
-  
   # bar plot for PAR (for displaying on the dashboard)
   output$simd_par_barplot <- renderPlotly({
-    
-    chart_5()  %>%
+    ineq_chart_5()  %>%
       layout(showlegend = F)
-    
   })
   
   
   
-  #Line plot for PAR
+  # Chart 6. Line plot for PAR ----
   
   #Title
   output$simd_par_trendplot_title <- renderUI({
@@ -969,7 +904,7 @@ output$inequality_options_help <- renderUI({
 
   })
   
-  chart_6 <- reactive({ 
+  ineq_chart_6 <- reactive({ 
     
     #preparing data needed
     simd_partrend_data <- simd_quint_data() %>%
@@ -992,11 +927,8 @@ output$inequality_options_help <- renderUI({
     yaxis_plots[["title"]] <- "Percentage attributable to deprivation"
     xaxis_plots[["dtick"]] <- ifelse(length(unique(simd_partrend_data$trend_axis)) >=10, 3, 1)
     xaxis_plots[["tickangle"]] <- ifelse(max(nchar(as.character(simd_partrend_data$trend_axis)))>7, -45, 0)
-    
-    
    
-    
-    
+   
     par_trend_plot <- plot_ly(data=simd_partrend_data, x=~trend_axis,
                               text=tooltip_partrend, textposition="none",hoverinfo="text") %>%
       add_lines(y = ~par, type = 'scatter', mode = 'lines', line = list(color = "#4575b4"), name = "% attributable to deprivation") %>%
@@ -1007,21 +939,17 @@ output$inequality_options_help <- renderUI({
     }
   })
   
-  
   # line plot PAR (to display on dashboard)
   output$simd_par_trendplot <- renderPlotly({
-    
-    chart_6() 
-    
+    ineq_chart_6() 
   })
   
   
-  #d. Combine into a subplot for the purpose of downloading
+  # Combine PAR charts ----
   
   combined_risk <- reactive({
-    
-    
-    chart_5 <-  chart_5() %>%
+  
+    chart_5 <- ineq_chart_5() %>%
       layout(annotations = list(
         xanchor = "left",
         yanchor = "top",
@@ -1034,9 +962,7 @@ output$inequality_options_help <- renderUI({
         xaxis = list(autorange = TRUE),
         yaxis = list(autorange = TRUE))
     
-    
-    
-    chart_6 <-  chart_6() %>%
+    chart_6 <-  ineq_chart_6() %>%
       layout(annotations = list(
         xanchor = "left",
         yanchor = "top",
@@ -1061,4 +987,62 @@ output$inequality_options_help <- renderUI({
   })
   
   
+  ###############################################.
+  ## Download Data/Charts----
+  ###############################################.
+  
+  #CSV data download ----
+  simd_csv <- reactive({
+    simd_trend_data() %>% 
+      arrange(year, code, quintile) %>% 
+      select(c(indicator, code, quintile, def_period, numerator, measure, 
+               lowci, upci, type_definition, rii_int,	lowci_rii_int,	upci_rii_int,	
+               sii,	lowci_sii,	upci_sii, par)) %>% 
+      #Converting into NA for all but total quintile
+      mutate(rii_int = case_when(quintile != "Total" ~ NA_real_,
+                                 TRUE ~ rii_int),
+             lowci_rii_int = case_when(quintile != "Total" ~ NA_real_,
+                                       TRUE ~ lowci_rii_int),
+             upci_rii_int = case_when(quintile != "Total" ~ NA_real_,
+                                      TRUE ~ upci_rii_int),
+             sii = case_when(quintile != "Total" ~ NA_real_,
+                             TRUE ~ sii),
+             upci_sii = case_when(quintile != "Total" ~ NA_real_,
+                                  TRUE ~ upci_sii),
+             lowci_sii = case_when(quintile != "Total" ~ NA_real_,
+                                   TRUE ~ lowci_sii),
+             par = case_when(quintile != "Total" ~ NA_real_,
+                             TRUE ~ par)) %>% 
+      rename(geography_code = code, indicator_measure = measure,
+             lower_confidence_interval=lowci, upper_confidence_interval=upci,
+             period = def_period, definition = type_definition, relative_inequality_gap = rii_int,
+             lower_confidence_interval_relative_ineq = lowci_rii_int, upper_confidence_interval_relative_ineq = upci_rii_int,
+             absolute_inequality_gap = sii, lower_confidence_interval_absolute_ineq = lowci_sii,
+             upper_confidence_interval_absolute_ineq = upci_sii,
+             population_attributable_risk = par)
+  })	
+  
+  
+  output$download_simd <- downloadHandler(
+    filename =  'deprivation_data.csv',content = function(file) {
+      write.csv(simd_csv(), file, row.names=FALSE)
+    })
+  
+  # PNG chart image download----
+  
+  output$report_simd <- downloadHandler(
+    # file name
+    filename <- 'plot.png',
+    # content
+    content = function(file){
+      #select plots to download, depending on measure type selected
+      export(p = if(input$measure_simd == "Patterns of inequality"){combined_trend()}
+             else if(input$measure_simd == "Inequality gap"){combined_gap()}
+             else if(input$measure_simd == "Potential for improvement"){combined_risk()}, file = 'tempPlot.png')
+      # hand over the file
+      file.copy('tempPlot.png',file)
+    }
+  )
+  
+    
 ##END
