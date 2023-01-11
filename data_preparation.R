@@ -383,7 +383,7 @@ create_gap_year = function(indicator_id,gap_year,base_year,gap_trend_axis) {
   } 
   
   else {
-    print(paste0("ABORT!!: ",gap_year," is already contained in the data for indicator ",indicator_id))
+    warning(paste0("ABORT!!: ",gap_year," is already contained in the data for indicator ",indicator_id))
   }
   
 }
