@@ -264,9 +264,7 @@ andyp_data <- rbind( # merging together all indicators
   prepare_andyp_data("01_pc_access_sii_rii_opt", 1),
   prepare_andyp_data("04_prev_hosp_sii_rii_opt", 4),
   prepare_andyp_data("05_rep_hosp_sii_rii_opt", 5),
-  prepare_andyp_data("06_dying_hosp_sii_rii_opt", 6),
-  prepare_andyp_data("07_hc_amenable_mort_3-year aggregate_sii_rii_opt", 7),
-  prepare_andyp_data("08_prem_mort_3-year aggregate_sii_rii_opt", 8)) %>%
+  prepare_andyp_data("07_hc_amenable_mort_3-year aggregate_sii_rii_opt", 7)) %>%
   # patients by gp is all scotland simd
   mutate(quint_type = case_when(ind_id ==1  ~ "sc_quin",
                                 TRUE ~ quint_type))
@@ -289,11 +287,15 @@ le_inequalities_f <- readRDS("/PHI_conf/ScotPHO/Profiles/Data/Data to be checked
 ##new dying in hospital data
 dying_in_hosp_michael <-readRDS("/PHI_conf/ScotPHO/Profiles/Data/Data to be checked/dying_in_hosp_depr_ineq.rds") %>%
   rename(measure = rate)
+##new deaths <75 years
+deaths_under75_michael <-readRDS("/PHI_conf/ScotPHO/Profiles/Data/Data to be checked/deaths_under75_depr_ineq.rds") %>%
+  rename(measure = rate)
+
 ##end of temp chunk ( need to adjust line 283 too when removing this)
 
 # Merging with Andy's data and then formatting
 #data_depr <- bind_rows(data_depr, andyp_data) %>% ## JUST BEFORE THIS GOES LIVE REVERT TO THIS LINE
-data_depr <- bind_rows(data_depr, andyp_data,le_inequalities_m,le_inequalities_f,dying_in_hosp_michael) %>% ##adjust this line when removing temp chunk 
+data_depr <- bind_rows(data_depr, andyp_data,le_inequalities_m,le_inequalities_f,dying_in_hosp_michael,deaths_under75_michael) %>% ##adjust this line when removing temp chunk 
  mutate_if(is.character,factor) %>% #converting characters into factors
   mutate_at(c("numerator", "measure", "lowci", "upci", "rii", "upci_rii",
               "lowci_rii", "sii", "lowci_sii", "upci_sii", "par", "abs_range",

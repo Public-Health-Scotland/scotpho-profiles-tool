@@ -20,7 +20,7 @@ tabPanel(div(
                uiOutput("geoname_ui_simd"),
                selectInput("indic_simd", label = "Step 2 - Choose an indicator (type to search)",
                            choices = ind_depr_list),
-               actionButton("defs_simd",label="Indicator definitions", icon= icon('info'), class ="down"),
+               actionButton("defs_simd",label="Definitions", icon= icon('info'), class ="down"), #action button linked to module - needed to dislpay pop up with indicator description
                uiOutput("year_ui_simd"),
                div(title="Select what aspect of inequality you want to explore.", # tooltip
                    style = "margin-top: 10px; margin-bottom: 20px;", 
@@ -39,7 +39,7 @@ tabPanel(div(
   ),
   mainPanel(width = 9, #Main panel
             style = "margin-top: 30px",
-            #bsModal("mod_defs_simd", "Definitions", "defs_simd", htmlOutput('defs_text_simd')), ##not sure if this line is needed? seems to be unconnected to any current object
+            bsModal("mod_defs_simd", "Definitions", "defs_simd", htmlOutput('defs_text_simd')), #modal box that pops up containting indicator definitions text
             uiOutput("inequality_summary_text"), #dynamic bullet points - appearance controlled using reactive element in inequalities server script
             #Overview: trend and bar chart
             conditionalPanel("input.measure_simd == 'Patterns of inequality'",
