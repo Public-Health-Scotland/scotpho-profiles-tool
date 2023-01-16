@@ -303,10 +303,10 @@ output$inequality_options_help <- renderUI({
       #buidling components behind statement 2 around for 'gap' charts 
       # first what is max and min sii and rii for time period selected.
       # some rii/sii are negative so need to consider absolute value to maek logic work
-      mutate(sii_y_start=abs(sii[which.min(year)]),
-             sii_y_end=abs(sii[which.max(year)]),
-             rii_y_start=abs(rii_int[which.min(year)]),
-             rii_y_end=abs(rii_int[which.max(year)])) %>%
+      mutate(sii_y_start=abs(round(sii[which.min(year)],0)),
+             sii_y_end=abs(round(sii[which.max(year)],0)),
+             rii_y_start=abs(round(rii_int[which.min(year)],0)),
+             rii_y_end=abs(round(rii_int[which.max(year)],0))) %>%
       #has sii has increased or decreased
       mutate(sii_change=case_when(sii_y_start>sii_y_end ~"narrowed",
                                   sii_y_start<sii_y_end ~"widened",
@@ -317,12 +317,14 @@ output$inequality_options_help <- renderUI({
                                   rii_y_start==rii_y_end~"remained unchanged", TRUE ~"other")) %>%
       #statement 2 - what has happened with absolute and relative inequalities.
       mutate(statement2 = case_when(sii_change=="narrowed" & rii_change=="narrowed" ~ "both absolute and relative inequalities have reduced",
-                                    sii_change=="widened" & rii_change=="widened" ~ "both absolute and relative inequalities have increased",
-                                    sii_change=="remained unchanged" & rii_change=="remained unchanged" ~ "both absolute and relative inequalities have remained unchanged",
                                     sii_change=="narrowed" & rii_change=="widened" ~ "absolute inequalities have decreased but relative inequalities have increased",
                                     sii_change=="narrowed" & rii_change=="remained unchanged" ~ "absolute inequalities have decreased but relative inequalities have remained unchanged",
+                                    sii_change=="remained unchanged" & rii_change=="remained unchanged" ~ "both absolute and relative inequalities have remained unchanged",
+                                    sii_change=="remained unchanged" & rii_change=="widened" ~ "absolute inequalities have remained unchanged but relative inequalities have increased",
+                                    sii_change=="remained unchanged" & rii_change=="narrowed" ~ "absolute inequalities have remained unchanged but relative inequalities have reduced",
+                                    sii_change=="widened" & rii_change=="widened" ~ "both absolute and relative inequalities have increased",
                                     sii_change=="widened" & rii_change=="narrowed" ~ "absolute inequalities have increased but relative inequalities have decreased",
-                                    sii_change=="widened" & rii_change=="remained unchanged" ~ "absolute inequalities have increased but relative inequalities have remained unchanged", TRUE ~"N/A")) %>%
+                                    sii_change=="widened" & rii_change=="remained unchanged" ~ "absolute inequalities have increased but relative inequalities have remained unchanged", TRUE ~"N/A"))  %>%
       #statement 4 - describe % by which rates would be higher or lower in most/least deprived quintile if rates were all the same.
       #logic changes depending on if higher rates are better or worse and whether higher or lower values are most desirable.
       mutate(statement4a = case_when(interpret=="H" & par_gradient =="negative" ~ "higher", 
@@ -1033,5 +1035,21 @@ output$inequality_options_help <- renderUI({
     }
   )
   
+  ###############################################.
+  ## Indicator definitions ----
+  ###############################################.
+  #Subsetting by domain and profile. Profile is fiddly as vector uses abbreviations 
+  # so needs to be converted to the names to match techdoc.
+  output$defs_text_simd <- renderUI({
     
+    defs_data <- techdoc %>% subset(indicator_name == input$indic_simd)
+    
+    HTML(paste(sprintf("<b><u>%s</b></u> <br> %s ", defs_data$indicator_name, 
+                       defs_data$indicator_definition), collapse = "<br><br>"))
+  })
+  
+  
+  
+  
+      
 ##END
