@@ -23,10 +23,9 @@ observeEvent(input$help_sii, {
     p("The values in the chart are known as the ", tags$b("'Slope Index of Inequality (SII)'"), " for each year they are calcuated using a regression model of the rank 
       of the social variable (in this case the SIMD quintiles) and the selected indicator measure (e.g. rate of hospitalisations/deaths/etc)."),br(),
     p("The SII represents the inequality gap across the whole population between the most and the least disadvantaged. For example an SII
-      of 127 for the asthma hospitalisation rate means that the difference between the most and the least disadvantaged groups is 127 
+      of 127 for the asthma hospitalisation rate suggests that the difference between the most and the least disadvantaged groups is 127 
       hospitalisations per 100,000 population."),br(),
-    p("Ideally there should be no difference between indicator values in the most and least deprived areas, in this situation the SII would be zero. The larger the SII the great the disparity between the most and least deprived areas.
-      In this chart an SII that is decreasing over time would suggest that absolute inequality is reducing.
+    p("If there were no difference between indicator values in the most and least deprived areas the SII would be zero. The larger the SII the great the disparity between the most and least deprived areas.
       It is possible for absolute inequality to reduce but relative inequality to increase which is important to consider trends in both the SII and RII."),
     p("You can read more about the measures used and presented in the",
       tags$a(href="https://www.scotpho.org.uk/comparative-health/measuring-inequalities/", 
@@ -50,9 +49,9 @@ observeEvent(input$help_rii, {
     #trend explanation
     p("The values in the chart are known as the ", tags$b("'Relative Index of Inequality (RII)'"), "for each year this is calcuated using the a linear regression model of the social variable (in this case the SIMD quintiles) and the selected indicator measure (e.g. rate of hospitalisations/deaths/etc)."),br(),
     p("The RII represents the inequality gap between the most disadvantaged and the overall average. ScotPHO use a linear regressiong model and have converted the RII
-      so that the value in the chart represents the percentage difference of the rate in the most deprived group relative to the rate in the overall population."),br(),
-    p("Ideally there should be no gap meaning an RII of zero. The larger the RII the greater the inequity between the most deprived areas and the population average.
-      It is possible for absolute inequality to reduce but relative inequality to increase which is important to consider trends in both the SII and RII."),
+      so that the value in the chart represents the percentage difference of the rate in the most disadvantaged group relative to the rate in the overall population."),br(),
+    p("If there were no difference between indicator values in the most disadvantaged area and the overall average the RII would be zero. The larger the RII the greater the inequity between the most disadvantaged areas and the overall average.
+      It is possible for relative inequality to reduce but absolute inequality to increase which is important to consider trends in both the SII and RII."),
     p("You can read more about the measures used and presented in the",
       tags$a(href="https://www.scotpho.org.uk/comparative-health/measuring-inequalities/",
              "Measuring inequalities section",  class="externallink"), 
@@ -127,7 +126,7 @@ output$inequality_options_help <- renderUI({
     p("The ", tags$b("'Inequality gap'"), " option includes charts displaying two commonly used measures of inequality - 
       the Slope Index of Inequality (SII), which represents the absolute 
       inequality gap using a regression model and the Relative Index of Inequality (RII), 
-      which quantifies the difference between the most deprived group and the overall average value. 
+      which quantifies the difference between the most disadvatnaged group and the overall average value. 
       It is possible for absolute inequalities to reduce, while relative inequalities increase (or vice-versa) which is why it is helpful to consider both the SII and RII."),
     
     #PAR/risk explanation
@@ -408,7 +407,7 @@ output$inequality_options_help <- renderUI({
         div(class= "content", htmlOutput("simd_text")))
   })
   
-  ## Controlling show/hide behaviour of dynamic summary text ----
+    ## Controlling show/hide behaviour of dynamic summary text ----
   # use shinyjs to chose when the dynamic text appears, it looks better if some options are hidden then looking at about option
   observeEvent(input$measure_simd,{
     
@@ -637,9 +636,10 @@ output$inequality_options_help <- renderUI({
   output$title_sii <- renderUI({
     div(p(tags$b("Inequalities over time: absolute differences")),
         p(paste0("The chart below shows the difference between most and least deprived areas 
-               (expressed as ", tolower(unique(simd_trend_data()$type_definition)), ")")),
+               (expressed as ", tolower(unique(simd_trend_data()$type_definition)), ").")),
         br(),
-        p("An increasing trend suggests the gap between the most and least deprived areas is growing."))
+        p("An increasing trend suggests the gap between the most and least deprived areas is growing."),
+        p("For each time period, a linear regression model is fitted and differences are calculated from the modelled estimates."))
   })
   
 
@@ -711,12 +711,13 @@ output$inequality_options_help <- renderUI({
   # RII chart title for dashboard panel
   output$title_rii <- renderUI({
     div(p(tags$b("Inequalities over time: relative differences")),
-        p(paste0("The chart below shows the differences between the most deprived area
+        p(paste0("The chart below shows the differences between the most disadvantaged area
                and the overall average for ",input$geoname_simd," (expressed as a percentage).")),
         br(),
-        p("An increasing trend suggests that the gap between the most deprived areas and the average is growing."))
+        p("An increasing trend suggests that the gap between the most disadvantaged area and the average is growing."),
+        p("For each time period, a linear regression model is fitted and percentages are calculated from the modelled estimates."))
   })
-  
+
   # rri plot
   ineq_chart_4 <- reactive({
     
@@ -1036,7 +1037,7 @@ output$inequality_options_help <- renderUI({
   )
   
   ###############################################.
-  ## Indicator definitions ----
+  ## Indicator definitions text ----
   ###############################################.
   #Subsetting by domain and profile. Profile is fiddly as vector uses abbreviations 
   # so needs to be converted to the names to match techdoc.
@@ -1049,6 +1050,25 @@ output$inequality_options_help <- renderUI({
   })
   
   
+  ###############################################.
+  ## About deprivation groupings/quintiles text ----
+  ###############################################.
+
+  output$defs_text_quintile <- renderUI({
+    tagList(
+    #simd explanation
+    p("To prepare the charts shown we divide geogrpahical areas into five groups (also known as quintiles) based on their relative levels of deprivation, as measured by the ",
+      tags$a(href="https://www2.gov.scot/simd",  "Scottish Index of Multiple Deprivation (SIMD).",
+             class="externallink")),
+    p("Those living in areas assigned to quntile 1 experience the highest levels of relative deprivation and those living in quintile 5 the lowest relative deprivation."),
+    p("Geogrpahical areas are assigned to a within Scotland quintile or a local quintile (e.g. within NHS board or within local authority quintile) based on the SIMD ranking."),
+    p("Indicator data for an NHS board or council area is presented by local deprivation quintiles by default. This tool allows users to switch from the default local quintiles to view the same data according to Scotland quintiles.
+      However, when using local quintiles it may not be possible to provide additional information about absolute or relative inequality (e.g. SII/RII) if
+      not all the Scotland quintiles are present in the dataset.This is often the case with areas that have smaller populations or within indicators where the event is rare.")
+    ) #close taglist
+ 
+   })
+
   
   
       

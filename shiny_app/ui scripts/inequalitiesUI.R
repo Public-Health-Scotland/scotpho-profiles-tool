@@ -27,12 +27,12 @@ tabPanel(div(
                    radioGroupButtons("measure_simd", 
                                      label= "Step 4 - Select what aspect of inequality you want to explore.", 
                                      choices = depr_measure_options, status = "primary",direction = "vertical",
-                                     justified = TRUE
-                   )),
+                                     justified = TRUE)),
                awesomeCheckbox("ci_simd", label = "Show/hide 95% confidence intervals", value = F),
                tags$div(title="Select if you want to use local or national quintiles", # tooltip
-                        awesomeRadio("quint_type", label= "Local/Scotland quintiles",
-                                     choices = c("Local", "Scotland"),  inline=TRUE, checkbox = TRUE)),
+                         awesomeRadio("quint_type", label= "Local/Scotland quintiles",
+                                      choices = c("Local", "Scotland"),  inline=TRUE, checkbox = TRUE)),
+               actionButton("defs_quintile",label="Deprivation grouping", icon= icon('info'), class ="down"), #action button linked to module - needed to dislpay pop up with indicator description
                downloadButton(outputId = 'download_simd',
                               "Download data", class = "down"),
                savechart_button('report_simd', 'Save charts', class = "down", disabled=FALSE)
@@ -40,6 +40,7 @@ tabPanel(div(
   mainPanel(width = 9, #Main panel
             style = "margin-top: 30px",
             bsModal("mod_defs_simd", "Definitions", "defs_simd", htmlOutput('defs_text_simd')), #modal box that pops up containting indicator definitions text
+            bsModal("mod_defs_quintile", "About deprivation groupings", "defs_quintile", htmlOutput('defs_text_quintile')), #modal box that pops up containting indicator definitions text
             uiOutput("inequality_summary_text"), #dynamic bullet points - appearance controlled using reactive element in inequalities server script
             #Overview: trend and bar chart
             conditionalPanel("input.measure_simd == 'Patterns of inequality'",
