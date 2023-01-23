@@ -18,7 +18,7 @@
 observeEvent(input$help_sii, {
   showModal(modalDialog(
     title = "Absolute inequality and the Slope Index of Inequality (SII)",
-    p("The chart below shows how the absolute inequalty (the gap between the most and least disadvantaged groups) has changed over time."),
+    p("The chart below shows how the absolute inequality (the gap between the most and least disadvantaged groups) has changed over time."),
     #trend explanation
     p("The values in the chart are known as the ", tags$b("'Slope Index of Inequality (SII)'"), " for each year they are calcuated using a regression model of the rank 
       of the social variable (in this case the SIMD quintiles) and the selected indicator measure (e.g. rate of hospitalisations/deaths/etc)."),br(),
@@ -45,12 +45,12 @@ observeEvent(input$help_sii, {
 observeEvent(input$help_rii, {
   showModal(modalDialog(
     title = "Relative inequality and the Relative Index of Inequality (RII)",
-    p("The chart below shows how relative inequalty (the gap between the least disadvantaged group and the average of all groups) has changed over time."),
+    p("The chart below shows how relative inequality (the gap between the least disadvantaged group and the average of all groups) has changed over time."),
     #trend explanation
-    p("The values in the chart are known as the ", tags$b("'Relative Index of Inequality (RII)'"), "for each year this is calcuated using the a linear regression model of the social variable (in this case the SIMD quintiles) and the selected indicator measure (e.g. rate of hospitalisations/deaths/etc)."),br(),
-    p("The RII represents the inequality gap between the most disadvantaged and the overall average. ScotPHO use a linear regressiong model and have converted the RII
+    p("The values in the chart are known as the ", tags$b("'Relative Index of Inequality (RII)'"), "for each year this is calculated using the a linear regression model of the social variable (in this case the SIMD quintiles) and the selected indicator measure (e.g. rate of hospitalisations/deaths/etc)."),br(),
+    p("The RII represents the inequality gap between the most disadvantaged and the overall average. ScotPHO use a linear regression model and have converted the RII
       so that the value in the chart represents the percentage difference of the rate in the most disadvantaged group relative to the rate in the overall population."),br(),
-    p("If there were no difference between indicator values in the most disadvantaged area and the overall average the RII would be zero. The larger the RII the greater the inequity between the most disadvantaged areas and the overall average.
+    p("If there were no difference between indicator values in the most disadvantaged area and the overall average the RII would be zero. The larger the RII the greater the inequality between the most disadvantaged areas and the overall average.
       It is possible for relative inequality to reduce but absolute inequality to increase which is important to consider trends in both the SII and RII."),
     p("You can read more about the measures used and presented in the",
       tags$a(href="https://www.scotpho.org.uk/comparative-health/measuring-inequalities/",
@@ -71,7 +71,7 @@ observeEvent(input$help_paf, {
     title = "Estimating proportions attributable to inequality",
     p("The bar chart shows indicator values split by the deprivation quintiles. The area shaded in blue is the same across all 5 quintiles, it shows the rate observed in the least deprived quintile.
       The area shaded in orange represents the additional activity the 4 remaining quintiles have over and above that seen in the least deprived quintile."),
-    p("Looking at data in this way illustrates the potential impact of removing deprivation (i.e. in the hypothetical situation that all deprivation quintiles expereinced the same rates)."),
+    p("Looking at data in this way illustrates the potential impact of removing deprivation (i.e. in the hypothetical situation that all deprivation quintiles experienced the same rates)."),
     p("You can read more about the Population Attributable Risk in the",
       tags$a(href="https://www.scotpho.org.uk/comparative-health/measuring-inequalities/",
              "Measuring inequalities section",  class="externallink"),"of the ScotPHO website."),
@@ -90,8 +90,8 @@ observeEvent(input$help_paf2, {
     title = "The Population Attributable Risk (PAR)",
     p("The line chart shows the ",tags$b("Population Attributable Risk (PAR)"), "also known as Population Attributable Fraction (PAF)."),
     #trend explanation
-    p("The PAR is presented as a percentage, and describes by how much the overall rate of an indicator would increase or decrease if all areas were to expereince the rates observed in the most favourable area.
-      The higher the PAR values the greater the impact of inequality on that indicator and the greater the potential fo rimpact if this inequailty could be removed."),br(),
+    p("The PAR is presented as a percentage, and describes by how much the overall rate of an indicator would increase or decrease if all areas were to experience the rates observed in the most favourable area.
+      The higher the PAR values the greater the impact of inequality on that indicator and the greater the potential for impact if this inequailty could be removed."),br(),
     p("The PAF describes a hypothetical situation and makes the assumption that all of the association between the risk factor and indicator is causal. In reality there could a number of other factors influencing the trends observed."),
     p("You can read more about the PAR in the",
       tags$a(href="https://www.scotpho.org.uk/comparative-health/measuring-inequalities/",
@@ -112,8 +112,9 @@ observeEvent(input$help_paf2, {
 
 output$inequality_options_help <- renderUI({
   tagList(
-    h5("Which option should I look at?",style = "font-weight: bold; color: black; margin-bottom: 0px;"),
-    p("There multiple different ways that health inequality can be measured. Understanding inequality has often requires looking at more than one measure. 
+    h3("Which option should I look at?",style = "font-weight: bold; color: black; margin-bottom: 0px;"),
+    br(),
+    p("There multiple different ways that health inequality can be measured. Understanding inequality often requires looking at more than one measure. 
       This tool presents 3 different views of data to help users understand different aspects of inequality. 
       We recommend considering the data options in turn as each will build on the understanding of previous."),
     
@@ -133,21 +134,23 @@ output$inequality_options_help <- renderUI({
     p("The ", tags$b("'Potential for impact'"), " option includes charts which indicate the potential for improvement for a given indicator.  
       The measure shown is a theoretical value known as the Population Attributable Risk (PAR). 
       Interpreting this measure requires an appreciation of whether higher indicator values are considered more desirable or less desirable.  
-      For example higher values for deaths or hospital admissions would be considered less desirable but higher values for indicators like life expectancy or immunisation update would be more desirable. 
+      For example higher values for deaths or hospital admissions would be considered less desirable but higher values for indicators like life expectancy or immunisation uptake would be more desirable. 
       The PAR produces a summary value that describes the percentage an indicator might reduce, or increase by, if the population as a whole experienced the same rate as that of the most desirable group.
       The PAR enables generation of summary statements such as 'hospitalisations would be 50% lower if the levels of the least deprived areas were experienced across the whole population' which can be powerful in demonstrating the impact that reducing or removing inequalities might be."),
     
     #Deprivation
-    h5("How does ScotPHO define deprivation? ", style = "font-weight: bold; color: black; margin-bottom: 0px;"),
+    h3("How does ScotPHO define deprivation? ", style = "font-weight: bold; color: black; margin-bottom: 0px;"),
+    br(),
     #p("Indicators within the inequality module of the profiles tool show rates split by the ",
     p("This tool uses the ",
       tags$a(href="https://www.gov.scot/collections/scottish-index-of-multiple-deprivation-2020/", "Scottish Indicies of Multiple Deprivation (SIMD)",
              class="externallink"),
-      " to subdivide geographic areas into 5 groups (also know as quintiles) experiencing different degrees of relavtive deprivation. In this tool those living in quintile 1 tend to experience the most relative deprivation and those living in quintile 5 the least.
+      " to subdivide geographic areas into 5 groups (also know as quintiles) experiencing different degrees of relative deprivation. In this tool those living in quintile 1 tend to experience the most relative deprivation and those living in quintile 5 the least.
       However it is important to note that SIMD is not a perfect measure of deprivation, SIMD is an area-based measure of relative deprivation and individuals living within an area may experience different levels of deprivation."),
     
     #Further information about measuring inequality
-    h5("Further information about measuring inequality ", style = "font-weight: bold; color: black; margin-bottom: 0px;"),
+    h3("Further information about measuring inequality ", style = "font-weight: bold; color: black; margin-bottom: 0px;"),
+    br(),
     p("Additional information about ",
       tags$a(href="http://www.healthscotland.scot/health-inequalities", "health inequalities",
              class="externallink"),
