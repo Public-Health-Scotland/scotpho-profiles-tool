@@ -13,9 +13,9 @@ format_csv <- function(reactive_dataset, extra_vars = NULL ) {
     select(indicator_name, data_source)
   left_join(reactive_dataset, techdoc, by = c("indicator" = "indicator_name")) %>%
     select(c("indicator", 
-             "areaname", 
+             "area_name" = "areaname", 
              "area_code" = "code", 
-             "areatype", 
+             "area_type" = "areatype", 
              "year", 
              "period" = "def_period", 
              "numerator", 
