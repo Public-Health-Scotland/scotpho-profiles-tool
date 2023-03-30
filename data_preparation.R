@@ -265,8 +265,8 @@ andyp_data <- rbind( # merging together all indicators
   prepare_andyp_data("04_prev_hosp_sii_rii_opt", 4),
   prepare_andyp_data("05_rep_hosp_sii_rii_opt", 5),
   prepare_andyp_data("06_dying_hosp_sii_rii_opt", 6),
-  prepare_andyp_data("07_hc_amenable_mort_3-year aggregate_sii_rii_opt", 7),
-  prepare_andyp_data("08_prem_mort_3-year aggregate_sii_rii_opt", 8)) %>%
+  prepare_andyp_data("07_hc_amenable_mort_3-year aggregate_sii_rii_opt", 7)) %>%
+  #prepare_andyp_data("08_prem_mort_3-year aggregate_sii_rii_opt", 8)) %>%
   # patients by gp is all scotland simd
   mutate(quint_type = case_when(ind_id ==1  ~ "sc_quin",
                                 TRUE ~ quint_type))
