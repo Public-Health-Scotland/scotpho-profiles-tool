@@ -28,8 +28,9 @@ library(data.table) #reading data
 library(zoo) # dealing with dates
 library(lubridate) #for automated list of dates in welcome modal
 library(janitor) #cleaning names
-library(gsheet) #for reading google sheets
+library(readxl)
 library(rgdal) #for reading shapefiles
+library(openxlsx)
 
 ###############################################.
 ## Functions ----
@@ -81,14 +82,23 @@ prepare_andyp_data <- function(filename, indic_id) {
 #This code updates the Technical Document table based on an online Google Drive version of the table
 #Run every time you want to refresh the data in the local copy to represent what's in the online copy
 #This file is where indicator names and definitions are stored and are loaded into the shiny tool.
-definition_table <- read_csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vTzrwAG7IFBjLvxuxUO0vJ7mn2AgilWVA1ZJQ9oVaLOSG4mgkquMKWga8MY5g2OFkFn-3awM_GYaHjL/pub?gid=94312583&single=true&output=csv") %>%
-  as.data.frame() %>% mutate(indicator_number = as.factor(indicator_number))
 
-#automating dates
-new_date <- fast_strptime(paste("01",definition_table$last_updated,sep="-"),"%d-%b-%Y")
+# definition_table <- read_csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vTzrwAG7IFBjLvxuxUO0vJ7mn2AgilWVA1ZJQ9oVaLOSG4mgkquMKWga8MY5g2OFkFn-3awM_GYaHjL/pub?gid=94312583&single=true&output=csv") %>%
+#   as.data.frame() %>% mutate(indicator_number = as.factor(indicator_number))
+# 
+# #automating dates
+# new_date <- fast_strptime(paste("01",definition_table$last_updated,sep="-"),"%d-%b-%Y")
+# 
+# definition_table %<>%
+#   mutate(days_since_update=day(as.period(new_date %--% today(), unit="days"))) %>%
+#   #filtering out non-active indicators
+#   filter(active == "A")
 
-definition_table %<>%
-  mutate(days_since_update=day(as.period(new_date %--% today(), unit="days"))) %>%
+definition_table <- read.xlsx(paste0(lookups,"Technical_Document.xlsx"),sheet=1,sep.names = " ") %>%
+  mutate(indicator_number = as.factor(indicator_number)) %>%
+  mutate(across(c(source_last_updated,source_next_update,last_updated,next_update), ~ convertToDate(.)),
+         days_since_update=day(as.period(floor_date(last_updated, "month") %--% today(), unit="days")),
+         across(c(source_last_updated,source_next_update,last_updated,next_update), ~ strftime(.,'%b-%Y')))%>%
   #filtering out non-active indicators
   filter(active == "A")
 
@@ -108,10 +118,16 @@ saveRDS(geo_lookup, "shiny_app/data/geo_lookup.rds")
 ## Indicator lookup table
 #Can't use read_csv as it's not the first tab of the spreadsheet.
 # For some reason, it's important that the raw tab is alphabetically sorted for this to work properly
-ind_lookup <- gsheet2tbl("docs.google.com/spreadsheets/d/1JOr1_MSnKdQfg4o8qEiqX-EKDsbXUjejnAV4NzbSg78#gid=2036303524") %>%
+
+# ind_lookup <- gsheet2tbl("docs.google.com/spreadsheets/d/1JOr1_MSnKdQfg4o8qEiqX-EKDsbXUjejnAV4NzbSg78#gid=2036303524") %>%
+#   setNames(tolower(names(.))) %>% #variables to lower case
+#   mutate(ind_id =as.numeric(ind_id)) %>%
+#   mutate_if(is.character, factor)  # converting variables into factors
+
+ind_lookup <- read_excel(paste0(lookups,"Technical_Document.xlsx"),sheet=2) %>%
   setNames(tolower(names(.))) %>% #variables to lower case
   mutate(ind_id =as.numeric(ind_id)) %>%
-  mutate_if(is.character, factor)  # converting variables into factors
+  mutate_if(is.character, factor) # converting variables into factors
 
 ###############################################.
 ## Indicator data ----
