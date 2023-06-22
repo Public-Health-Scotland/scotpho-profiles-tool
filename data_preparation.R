@@ -288,14 +288,14 @@ le_inequalities_f <- readRDS("/PHI_conf/ScotPHO/Profiles/Data/Data to be checked
 dying_in_hosp_michael <-readRDS("/PHI_conf/ScotPHO/Profiles/Data/Data to be checked/dying_in_hosp_depr_ineq.rds") %>%
   rename(measure = rate)
 ##new deaths <75 years
-deaths_under75_michael <-readRDS("/PHI_conf/ScotPHO/Profiles/Data/Data to be checked/deaths_under75_depr_ineq.rds") %>%
-  rename(measure = rate)
+# deaths_under75_michael <-readRDS("/PHI_conf/ScotPHO/Profiles/Data/Data to be checked/deaths_under75_depr_ineq.rds") %>%
+#   rename(measure = rate)
 
 ##end of temp chunk ( need to adjust line 283 too when removing this)
 
 # Merging with Andy's data and then formatting
 #data_depr <- bind_rows(data_depr, andyp_data) %>% ## JUST BEFORE THIS GOES LIVE REVERT TO THIS LINE
-data_depr <- bind_rows(data_depr, andyp_data,le_inequalities_m,le_inequalities_f,dying_in_hosp_michael,deaths_under75_michael) %>% ##adjust this line when removing temp chunk 
+data_depr <- bind_rows(data_depr, andyp_data,le_inequalities_m,le_inequalities_f,dying_in_hosp_michael) %>% ##adjust this line when removing temp chunk 
   mutate_if(is.character,factor) %>% #converting characters into factors
   mutate_at(c("numerator", "measure", "lowci", "upci", "rii", "upci_rii",
               "lowci_rii", "sii", "lowci_sii", "upci_sii", "par", "abs_range",
@@ -317,7 +317,7 @@ data_depr <- left_join(x=data_depr, y=geo_lookup, by="code") %>%
                            "5" = "5 - least deprived")) %>%
   droplevels()
 
-data_depr <- data_depr %>% apply_suppressions() #Apply supressions.
+data_depr <- data_depr %>% apply_suppressions() #Apply suppressions.
 
 # Check suppression has been applied properly
 depr_suppression_check <- data_depr %>%
