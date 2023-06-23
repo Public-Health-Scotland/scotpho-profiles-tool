@@ -18,17 +18,13 @@
 observeEvent(input$help_sii, {
   showModal(modalDialog(
     title = "Absolute inequality and the Slope Index of Inequality (SII)",
-    p("The chart below shows how the absolute inequality (the gap between the most and least disadvantaged groups) has changed over time."),
+    p("The chart below shows the absolute inequality has changed over time."),
     #trend explanation
-    p("The values in the chart are known as the ", tags$b("'Slope Index of Inequality (SII)'"), " for each year they are calculated using a regression model of the rank 
-      of the social variable (in this case the SIMD quintiles) and the selected indicator measure (e.g. rate of hospitalisations/deaths/etc)."),br(),
-    p("The SII represents the inequality gap across the whole population between the most and the least disadvantaged. For example an SII
-      of 127 for the asthma hospitalisation rate suggests that the difference between the most and the least disadvantaged groups is 127 
-      hospitalisations per 100,000 population."),br(),
-    p("If there were no difference between indicator values in the most and least deprived areas the SII would be zero. The larger the SII the great the disparity between the most and least deprived areas.
-      It is possible for absolute inequality to reduce but relative inequality to increase which is important to consider trends in both the SII and RII."),
-    p("You can read more about the measures used and presented in the",
-      tags$a(href="https://www.scotpho.org.uk/comparative-health/measuring-inequalities/","Measuring inequalities section",  class="externallink"),"of the ScotPHO website."),
+    p("Absolute inequality is measured using a value called the ", tags$b("'Slope Index of Inequality (SII)'"), ".",
+      "This is a measure of the gap between the most and least disadvantaged populations.The larger the SII the greater the disparity between the most and least deprived areas."),
+     br(),
+    p("Information on how the SII is calculated is available on the",
+      tags$a(href="https://www.scotpho.org.uk/methods-and-data/measuring-health-inequalities/","Measuring inequalities section",  class="externallink"),"of the ScotPHO website."),
     #simd explanation
     p("To prepare the data shown in this tab we have divided the Scotland population 
       into five groups (quintiles) based on their deprivation level. This has been done using the ",
@@ -51,7 +47,7 @@ observeEvent(input$help_rii, {
     p("If there were no difference between indicator values in the most disadvantaged area and the overall average the RII would be zero. The larger the RII the greater the inequity between the most disadvantaged areas and the overall average.
       It is possible for relative inequality to reduce but absolute inequality to increase which is important to consider trends in both the SII and RII."),
     p("You can read more about the measures used and presented in the",
-      tags$a(href="https://www.scotpho.org.uk/comparative-health/measuring-inequalities/","Measuring inequalities section",  class="externallink"), 
+      tags$a(href="https://www.scotpho.org.uk/methods-and-data/measuring-health-inequalities/","Measuring inequalities section",  class="externallink"), 
       "of the ScotPHO website."),
     #simd explanation
     p("To prepare the data shown in this tab we have divided the Scotland population 
@@ -70,7 +66,7 @@ observeEvent(input$help_paf, {
       The area shaded in orange represents the additional activity the 4 remaining quintiles have over and above that seen in the least deprived quintile."),
     p("Looking at data in this way illustrates the potential impact of removing deprivation (i.e. in the hypothetical situation that all deprivation quintiles experienced the same rates)."),
     p("You can read more about the Population Attributable Risk in the",
-      tags$a(href="https://www.scotpho.org.uk/comparative-health/measuring-inequalities/",
+      tags$a(href="https://www.scotpho.org.uk/methods-and-data/measuring-health-inequalities/",
              "Measuring inequalities section",  class="externallink"),"of the ScotPHO website."),
     #simd explanation
     p("To prepare the data shown in this tab we have divided the Scotland population 
@@ -91,7 +87,7 @@ observeEvent(input$help_paf2, {
       The higher the PAR values the greater the impact of inequality on that indicator and the greater the potential for improvement if this inequality could be removed."),br(),
     p("The PAF describes a hypothetical situation and makes the assumption that all of the association between the risk factor and indicator is causal. In reality there could a number of other factors influencing the trends observed."),
     p("You can read more about the PAR in the",
-      tags$a(href="https://www.scotpho.org.uk/comparative-health/measuring-inequalities/",
+      tags$a(href="https://www.scotpho.org.uk/methods-and-data/measuring-health-inequalities/",
              "Measuring inequalities section",  class="externallink"),"of the ScotPHO website."),
     #simd explanation
     p("To prepare the data shown in this tab we have divided the Scotland population 
@@ -146,10 +142,10 @@ output$inequality_options_help <- renderUI({
     #Further information about measuring inequality
     h5("Further information about measuring inequality ", style = "font-weight: bold; color: black; margin-bottom: 0px;"),
     p("Additional information about ",
-      tags$a(href="http://www.healthscotland.scot/health-inequalities", "health inequalities",
+      tags$a(href="https://www.scotpho.org.uk/methods-and-data/measuring-health-inequalities/", "health inequalities",
              class="externallink"),
       " and ",
-      tags$a(href="https://www.scotpho.org.uk/comparative-health/measuring-inequalities/", "measuring health inequalities",
+      tags$a(href="https://www.scotpho.org.uk/methods-and-data/measuring-health-inequalities/", "measuring health inequalities",
              class="externallink"),
       " in Scotland."))
 })
@@ -368,7 +364,7 @@ output$simd_text <- renderUI({
               p(paste0(simd_text_data$statement1a," have the ",simd_text_data$statement1b," ",tolower(simd_text_data$label_ineq),". (see 'Patterns of inequality')"))),
       #statement #2 : whe absolute inequality (from sii) has increased or decreased over time
       tags$li(class= "li-custom",
-              p(paste0("Over time ", simd_text_data$statement2,". (see 'Inequality gap')"))),
+              p(paste0("Over the time period available ", simd_text_data$statement2,". (see 'Inequality gap')"))),
       #statement #3 based on rii (andy P data doesn't have same fields populated so need to call on simd_text_data object rather than simd_bar_data())
       tags$li(class= "li-custom",
               p(paste0("The most deprived areas have ", abs(round(unique(simd_text_data$rii_int), 0)),
@@ -635,8 +631,7 @@ output$title_sii <- renderUI({
       p(paste0("The chart below shows the difference between most and least deprived areas 
                (expressed as ", tolower(unique(simd_trend_data()$type_definition)), ").")),
       br(),
-      p("An increasing trend suggests the gap between the most and least deprived areas is growing."),
-      p("For each time period, a linear regression model is fitted and differences are calculated from the modelled estimates."))
+      p("An increasing trend suggests the gap between the most and least deprived areas is growing."))
 })
 
 
@@ -670,8 +665,8 @@ ineq_chart_3 <- reactive({
     #Modifying standard layout
     yaxis_plots[["title"]] <- ~type_definition
     xaxis_plots[["autotick"]] <- F
-    xaxis_plots[["dtick"]] <- 2
-    xaxis_plots[["tickangle"]] <- -45
+    xaxis_plots[["dtick"]] <- ifelse(length(unique(simd_index$trend_axis)) >=10, 3, 1)
+    xaxis_plots[["tickangle"]] <- ifelse(max(nchar(as.character(simd_index$trend_axis)))>7, -45, 0)
     
     #Create plot SII
     sii_plot <- plot_ly(data=simd_index, x=~trend_axis,
@@ -711,8 +706,7 @@ output$title_rii <- renderUI({
       p(paste0("The chart below shows the differences between the most disadvantaged area
                and the overall average for ",input$geoname_simd," (expressed as a percentage).")),
       br(),
-      p("An increasing trend suggests that the gap between the most disadvantaged area and the average is growing."),
-      p("For each time period, a linear regression model is fitted and percentages are calculated from the modelled estimates."))
+      p("An increasing trend suggests that the gap between the most disadvantaged area and the average is growing."))
 })
 
 # rri plot
@@ -889,7 +883,7 @@ output$simd_par_barplot <- renderPlotly({
 
 output$simd_par_trendplot_title <- renderUI({
   div(p(tags$b(paste0("Potential for improvement"))),
-      p("How much ", tolower(input$indic_simd), "could be reduced if the levels 
+      p("How much ", tolower(input$indic_simd), "could be improved if the levels 
         of the least deprived area were experienced across the whole population."))
 })
 
@@ -897,6 +891,7 @@ ineq_chart_6 <- reactive({
   
   #preparing data needed
   simd_partrend_data <- simd_quint_data() %>%
+    mutate(across(sii:abs_range,abs)) %>% #absolute values for values to avoid instances where axis are negative
     subset(code == as.character(geo_lookup$code[geo_lookup$areaname == input$geoname_simd]) &
              indicator == input$indic_simd & quintile == "Total") %>% 
     droplevels()
