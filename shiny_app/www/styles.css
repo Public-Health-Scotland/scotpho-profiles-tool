@@ -454,16 +454,17 @@ color: #fff;
 
 
 /* Format reactable column headers */
-.rt-thead {
-    border-bottom: solid;
-    margin-top:20px;
-    font-size:15px;
-}
 
-/* Expandable row details - responsive layout*/
+
+/* Expandable row details - responsive layout - temporary removal so column names align with cells on summary tab
 .rt-td-inner{
   display:flex;
 }
+*/
+
+
+/* apply to tablecontainer only otherwise expandable details in definitions tab are hidden?*/
+
 
 
 /* Smaller screens display button under text*/
@@ -473,3 +474,13 @@ color: #fff;
     flex-direction:column;
   }
 }
+
+
+@media (max-width: 800px) {
+    .summary-instructions{
+    display:flex;
+    flex-direction:column;
+  }
+}
+
+
