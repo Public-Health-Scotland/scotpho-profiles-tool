@@ -15,7 +15,25 @@ function(input, output, session) {
   source(file.path("server scripts/inequalitiesServer.R"), local = TRUE)$value # Health Inequalities tab
   source(file.path("server scripts/dataServer.R"), local = TRUE)$value # Data tab
   source(file.path("server scripts/definitionsServer.R"), local = TRUE)$value # Indicator definitions tab
-}
+
+  # Keeps the shiny app from timing out quickly 
+  
+  
+  auto_invalidate <- reactiveTimer(10000) 
+  
+  
+  observe({ 
+    
+    
+    auto_invalidate() 
+    
+    
+    cat(".") 
+    
+    
+  })
+  
+  }
  
 
 ## END 
