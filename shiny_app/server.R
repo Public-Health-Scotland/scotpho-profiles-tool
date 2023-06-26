@@ -7,7 +7,7 @@
 
 function(input, output, session) {
   
-  # Source files with server code for each tab -----------------------------------------
+ # Source files with server code for each tab -----------------------------------------
   source(file.path("server scripts/homepageServer.R"), local = TRUE)$value # Homepage tab
   source(file.path("server scripts/summaryServer.R"), local = TRUE)$value # Summary tab
   source(file.path("server scripts/trendServer.R"), local = TRUE)$value # Time trend tab
@@ -15,6 +15,14 @@ function(input, output, session) {
   source(file.path("server scripts/inequalitiesServer.R"), local = TRUE)$value # Health Inequalities tab
   source(file.path("server scripts/dataServer.R"), local = TRUE)$value # Data tab
   source(file.path("server scripts/definitionsServer.R"), local = TRUE)$value # Indicator definitions tab
+
+  autoInvalidate <- reactiveTimer(10000)
+  observe({
+    autoInvalidate()
+    cat(".")
+  })
+  
+
 }
  
 
