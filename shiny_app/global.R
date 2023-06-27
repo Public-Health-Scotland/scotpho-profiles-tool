@@ -132,9 +132,6 @@ topic_list_filter <- as.factor(c("Show all",unique(sort(c(
 
 topic_list <- topic_list_filter[-1] #taking out show all from list
 
-
-profile_list_filter <-c(setNames("Show all", "Show all"), sort(profile_list))
-
 # for inequalities tab
 areatype_depr_list <- c("Scotland", 
                         "Health board", 
