@@ -181,7 +181,7 @@ profile_list <- setNames(c('HWB',
                            'Tobacco control', 
                            'Population'))
 
-
+profile_list_filter <-c(setNames("Show all", "Show all"), sort(profile_list))
   
 #  measure types -----
 
