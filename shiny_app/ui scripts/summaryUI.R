@@ -58,12 +58,12 @@ summaryTab <- tabPanel(
               # download as csv
               downloadButton("download_summary_csv",
                              "Download summary as CSV",
-                             class = "button")#,
+                             class = "button"),
               
-              # download as pdf (in progress)
-              # actionButton("report", 
-              #              "Download summary as PDF",
-              #              class = "button")
+              # download as pdf 
+              downloadButton("report",
+                           "Download summary as PDF",
+                           class = "button")
          
           ), 
           
@@ -105,7 +105,7 @@ summaryTab <- tabPanel(
                div(style = "display: flex; justify-content: space-between; background-color: hsl(205, 100%, 36%);",
                    div(style = "color: white; margin-left: 10px;", uiOutput("profile_title")), 
                    div(style = "margin: 5px;", img(src = "scotpho_reduced.png", width = 120))),
-               uiOutput("summary_table")
+      shinycssloaders::withSpinner(uiOutput("summary_table"))
       )
            
 )

@@ -1,0 +1,183 @@
+---
+title: ""
+output: pdf_document
+geometry: margin=0.5cm
+params:
+  reactive_df: NA
+  chosen_area: NA
+  chosen_profile: NA
+  chosen_geography_level: NA
+header-includes:
+   - \usepackage{fancyhdr}
+   - \addtolength{\headheight}{2cm}
+   - \fancypagestyle{plain}{}
+   - \thispagestyle{fancy}
+   - \fancyhead[R]{\includegraphics[width = 100pt]{logo_scotpho_updated.png}}
+   - \renewcommand{\headrulewidth}{0pt}
+   - \usepackage[default]{sourcesanspro}
+   - \usepackage[T1]{fontenc}
+mainfont: SourceSansPro
+
+
+---
+
+
+ 
+
+```{r setup, include=FALSE, dev="cairo_pdf"} 
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+```
+
+
+```{r echo=FALSE, message= FALSE}
+# required packages
+library(ggplot2)=
+library(dplyr) 
+library(kableExtra)
+library(tidyr)
+library(knitr)
+library(stringr)
+
+
+# function to create spine plot for each indicator
+create_indicator_plot <- function(data, chosen_area_colour) {
+  plot <- ggplot(data, aes(x = indicator, y = GraphPoint, fill = quantiles)) +
+    geom_bar(stat = "identity", width = 0.75) +
+    scale_fill_manual(values = c("one" = "#D3D3D3", "two" = "#A4A4A4", "three" = "#D3D3D3", "four" = "white")) +
+    geom_hline(yintercept = 0.5, col = "red") +
+    ylim(0, 1) +
+    geom_point(data = NULL, aes(x = indicator, y = chosen_value), shape = 19, size = 4, col = chosen_area_colour) +
+    coord_flip() +
+    theme_void() +
+    guides(fill = "none")
+
+  return(plot)
+}
+
+ 
+# temporary folder to save charts to 
+  graph_directory <- tempdir()
+
+
+
+# pivot reactive dataframe in longer format (required for ggplot)
+ df <- params$reactive_df %>%
+   select(indicator, one, two, three, four, scotland_value, measure, chosen_value, colour, def_period, type_definition) %>%
+   pivot_longer(cols = c("one", "two", "three", "four"), values_to = "GraphPoint", names_to = "quantiles") %>%
+   mutate(colour = case_when(colour == "red" ~ "orange", TRUE ~ colour))
+ 
+ 
+# required to ensure % symbol displays correctly
+df$indicator <- str_replace(df$indicator, "%", "\\\\%")
+
+# trim down some measure descriptions 
+df <- df %>%
+  mutate(across('type_definition', str_replace, 'Age-sex standardised rate', 'EASR')) %>%
+  mutate(across('type_definition', str_replace, 'children aged', ',')) %>%
+  mutate(across('type_definition', str_replace, 'Population', '')) %>%
+  mutate(across('type_definition', str_replace, 'population', ''))
+
+# order quantiles so stacked in correct order.
+df$quantiles <- factor(df$quantiles, levels = c("one", "two", "three", "four"))
+
+df <- df
+
+# the data to be displayed in table
+table <- df %>%
+  select(indicator, scotland_value, measure, def_period, type_definition) %>%
+  distinct() %>%
+  mutate(ind = paste0(
+    "\\textbf{",indicator, "}\n", "\\textit{\\small", def_period, " . ", type_definition, "}"))%>%
+  select(ind, measure, scotland_value) %>%
+  rename(scotland  = scotland_value) %>%
+  mutate(id = row_number())
+
+
+table$ind <- linebreak(table$ind)
+
+
+
+# get unique indicator list
+unique_indicators <- unique(df$indicator)
+
+# Counter variable to keep track of which chart being generated
+counter <- 1
+
+# Iterate over each indicator and create/save a spineplot
+for (indicator in unique_indicators) {
+  
+  # Filter the data for the current indicator
+  indicator_data <- df %>% filter(indicator == !!indicator)
+  
+  # get colour for point 
+  chosen_area_colour <- unique(indicator_data$colour)
+
+  # create the plot
+  plot <- create_indicator_plot(indicator_data, chosen_area_colour)
+
+  # create filename 
+  filename <- sprintf("%s/%s.png", graph_directory, counter)
+
+  # increase counter variable
+  counter <- counter + 1
+
+  # Save the plot as a PNG with the filename created
+  ggsave(filename, plot = plot, units="mm", width=60, height=5, dpi=1200)
+}
+
+
+
+
+```
+
+# ScotPHO Profile: `r params$chosen_profile`
+# `r params$chosen_geography_level` : `r params$chosen_area`
+
+
+```{r, echo= FALSE, message = FALSE}
+
+# the final table to be displayed with charts embedded
+
+
+# Still to be done:
+
+
+# 2. instructions box
+
+table %>%
+
+  knitr::kable(
+    format = "latex", # must be in latex format for pdf download
+    booktabs = TRUE, # generic formatting
+    escape = FALSE, # ensures latex formatting on indicator column works (i.e.bold/italics,linebreaks)
+    longtable = TRUE) %>% # ensures table goes across multiple pages when too long
+
+  # format header
+  row_spec(0, background = "#032F4F", color = "white") %>%
+
+  # set column widths
+   column_spec(1, width = "30em") %>% # indicator column
+   column_spec(2, width = "3em") %>% # chosen area column
+   column_spec(3, width = "3em") %>% # scotland column
+
+  # embed chart images on each row of final column
+   kableExtra::column_spec(4, image = sprintf("%s/%s.png", graph_directory, table$id)) %>%
+
+  # repeats column headings when table goes across multiple pages
+   kable_styling(latex_options = c("repeat_header")) %>%
+
+  # add footnote with link to profiles tool
+  footnote(general="\\\\url{https://scotland.shinyapps.io/ScotPHO_profiles_tool/}",
+           general_title = "Source: ", footnote_as_chunk = T, escape=F) %>%
+
+  # add lines under each row
+  row_spec(1:nrow(table), hline_after = T, background = "white")
+
+
+
+
+
+
+
+
+```

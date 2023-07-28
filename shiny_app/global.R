@@ -40,6 +40,8 @@ library(htmltools) # for using html tags
 library(purrr) # for applying function to lists
 library(data.table) # for working with large datasets
 library(jsonlite)
+library(rmarkdown)
+library(knitr)
 
 
 
@@ -312,6 +314,8 @@ updates_modal <- modalDialog(
 # 6. sourcing functions created for app (see functions folder) -------------------------------
 list.files("functions") %>% 
   map(~ source(paste0("functions/", .)))
+
+
 
 
 

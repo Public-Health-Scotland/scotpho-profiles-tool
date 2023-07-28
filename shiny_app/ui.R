@@ -32,12 +32,6 @@ tagList(
     collapsible = TRUE,
     
     header = tags$head(
-      
-      # JS dependencies and custom function to download profiles summary table as pdf
-     tags$script(src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.min.js"),
-      tags$script(src = "https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js"),
-     tags$script(src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.6/jspdf.plugin.autotable.min.js"),
-     
 
       # sourcing css style sheet 
       includeCSS("www/styles.css"),
@@ -56,6 +50,7 @@ tagList(
     
     
     # order of tabs --------------------------------
+    
     homepageTab,
     summaryTab,
     trendTab,

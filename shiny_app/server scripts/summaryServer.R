@@ -39,40 +39,30 @@ summary_data <- reactive ({
   dt <- dt[substr(profile_domain1, 1, 3) == input$summary_profile | substr(profile_domain2, 1, 3) == input$summary_profile]
   
   # filter by chosen area and get latest data for each indicator
-  chosen_area <- dt[areaname == input$geoname_summary & areatype == input$geotype_summary,
-                    .SD[year == max(year)], by = indicator]
+  chosen_area <- dt[areaname == input$geoname_summary & areatype == input$geotype_summary & type_definition != "Number",
+                    .SD[!is.na(measure) & year == max(year)], by = indicator]
   
   # include scotland figures for comparison
   scotland <- dt[areaname == "Scotland"]
   chosen_area <- chosen_area[scotland, on = c("ind_id", "year"), scotland_value := scotland$measure]
   
-  # find min and max values for each indicator within chosen geography level for spine chart (i.e. "best" and "worst" performing areas)
+  # calculate quantiles for each indicator within chosen geography level for spine chart 
   other_areas <- dt[areatype == input$geotype_summary][chosen_area, on = .(ind_id, year), nomatch = 0][,
-                                                                                                       .(min_value = min(measure),
-                                                                                                         max_value = max(measure)),
+                                                                                                       .(Q0 = quantile(measure, probs = 0, na.rm = TRUE),
+                                                                                                         Q100 = quantile(measure, probs = 1, na.rm = TRUE),
+                                                                                                         Q25 = quantile(measure, probs = 0.25, na.rm = TRUE),
+                                                                                                         Q75 = quantile(measure, probs = 0.75, na.rm = TRUE)),
                                                                                                        by = .(ind_id, year)]
-  # add min and max values for each indicator to table
+  # add quantile values for each indicator to table
   chosen_area <- chosen_area[other_areas, on = c("ind_id", "year"),
-                             c("min_value", "max_value") := .(other_areas$min_value, other_areas$max_value)]
+                             c("Q0", "Q100", "Q25", "Q75") := .(other_areas$Q0, 
+                                                                other_areas$Q100,
+                                                                other_areas$Q25,
+                                                                other_areas$Q75)]
   
 
-  # transpose values for the spine plot to ensure worse = left and better = right
-  # these columns will be used to populate the charts but will not be visible in the table
-  final <- chosen_area %>%
-    mutate(across(c(measure, min_value, max_value), ~
-                    case_when(interpret=='L' & . > scotland_value ~ -(. / scotland_value - 1),
-                              interpret=='L' & . <= scotland_value ~ (1 - . /scotland_value),
-                              TRUE ~ -(1 - . / scotland_value)), .names = "{.col}_plot"),
-           
-           # ensures scotland is plotted in the centre of the chart
-           scotland_plot = 0) %>%
-    
-    # round values displayed in table to 1 decimal place
-    mutate(across(c(measure, scotland_value), ~ round(., digits = 1)))
-  
-  
   # assign colours to values depending on statistical significance
-  final <- final %>%
+  final <- chosen_area %>%
     mutate(
       # colours for values in table
       colour = case_when(lowci <= scotland_value & upci >= scotland_value & interpret %in% c("H", "L") ~'gray',
@@ -81,12 +71,12 @@ summary_data <- reactive ({
                          upci < scotland_value & interpret == "L" ~ 'blue',
                          upci < scotland_value & interpret == "H" ~ 'red',
                          interpret == "O" ~ 'white', TRUE ~ 'white'),
-      
-      # colours for values in spine plot
+
+
       marker_colour = case_when(colour == "blue" ~ "#1B7CED",
                                 colour == "red" ~ "#FFA500",
                                 colour == "gray" ~ "#6A6C6D", TRUE ~ "#FFFFFF"))
-  
+
   # identify correct domain and arrange by domain
   # this is because there are 2 domain columns in dataset as some indicators belong to more than 1 profile/domain
   final <- final %>%
@@ -97,13 +87,42 @@ summary_data <- reactive ({
     arrange(domain)
   
   
-  final$row_number <- 1:nrow(final) # assign each row an 'id' to be used when constructing highchart
-  final$spine_chart <- NA # create empty column to populate with in-line highcharts
+  # creating spine chart data
+  final <- final %>%
+    # duplicate chosen area value in another column so one can be used in the table and one can be used for spine chart
+    mutate(chosen_value = measure) %>%
+    
+    mutate(scale_min = case_when(scotland_value - Q0 > Q100 - scotland_value ~ Q0,
+                                 TRUE ~ scotland_value - (Q100 - scotland_value))) %>%
+    mutate(scale_max = case_when(scale_min == Q0 ~ scotland_value + (scotland_value - Q0), TRUE ~ Q100)) %>%
+    mutate(across(c(chosen_value, Q0, Q25, Q75, Q100), ~ (. - scale_min) / (scale_max - scale_min))) 
   
-  # selecting columns required for table on dashboard
+  
+  final <- final %>%
+    mutate(across(c("Q0", "Q25", "Q75", "Q100", "chosen_value"), ~ case_when(interpret == "L" ~ 1 - ., TRUE ~ .)))
+    
+
+   # conditionally calculating worst to best, depending on whether a lower is value is better or a higher value is better
+   # this ensures that 'worst' is always to the left of the spine, and 'best' is always to the right
+   final <- final %>%
+    mutate(one = case_when(interpret == "L" ~ Q0 - Q25, TRUE ~ Q100 - Q75), # worst
+           two = case_when(interpret == "L" ~ Q75 - Q100, TRUE ~ Q25 - Q0), # 25th percentile
+           three = case_when(interpret == "L" ~ Q25 - Q75, TRUE ~ Q75 - Q25), # 75th percentile
+           four = case_when(interpret == "L" ~ Q100, TRUE ~ Q0) # best
+           )
+
+   
+   final$row_number <- 1:nrow(final) # assign each row an 'id' to be used when constructing highchart
+   final$spine_chart <- NA # create empty column to populate with in-line highcharts
+   
+
+  # selecting columns required for table
   final <- final %>%
     select(domain, indicator, measure, scotland_value, type_definition, def_period, colour,
-           measure_plot, min_value_plot, max_value_plot, marker_colour, row_number, spine_chart)
+           row_number, spine_chart, one, two, three, four, chosen_value, marker_colour)
+  
+  final <- final
+  
 })
 
 
@@ -127,92 +146,47 @@ output$download_summary_csv <- downloadHandler(
     paste(input$summary_profile, "-summary-", input$geoname_summary, ".csv", sep="")
   },
   content = function(file) {
-    write.csv(summary_data() %>% select(domain, indicator, measure, scotland_value, type_definition, def_period, colour), file, row.names=FALSE)
+    write.csv(summary_data() %>% select(domain, indicator, measure, scotland_value, type_definition, def_period), file, row.names=FALSE)
   })
 
 
+
 # download as PDF
-# observeEvent(input$report, {
-#   # Get the reactive dataframe
-#   data <- summary_data()
-# 
-#   # Convert the dataframe to a JSON string
-#   json_str <- jsonlite::toJSON(data)
-# 
-#   jsCode <- paste0('
-#     // step 1: create a pdf ------------------------------------------
-#     var doc = new jsPDF("p", "pt", "a4");
-# 
-#     // step 2: define data/headers for table  ------------------------------
-#     var tableData = ', json_str, ';
-#     var headers = ["Domain", "Indicator", "Measure", "Scotland","Chart"];
-# 
-#     // step 3: function to include charts inside table -----------------------------
-#     function captureHighcharts() {
-#       // 3.a: get highchart ids -------
-#       var highchartElements = $(".highchart.html-widget");
-# 
-#       // 3.b: keep track of completed captures ------
-#       var capturesCompleted = 0;
-# 
-#       // 3.c: array to store image data for each row
-#       var imageDataArray = [];
-# 
-#       // 3.d: Loop through each chart and convert to png -----
-#       highchartElements.each(function(index, element) {
-#         domtoimage.toPng(element)
-#           .then(function(dataUrl) {
-#             capturesCompleted++; // Increase the captures completed count
-# 
-#             // 3.e: Add each png to the image data array -----
-#             imageDataArray.push(dataUrl);
-# 
-#             // 3.f: If all converted, build the table and add images -------
-#             if (capturesCompleted === highchartElements.length) {
-#               // 3.g: Build the table --------
-#               var tableConfig = {
-#                 head: [headers],
-#                 body: tableData.map(function(row, rowIndex) {
-#                   return [row.domain, row.indicator, row.measure, row.scotland_value];
-#                 }),
-#                 // 3.h: Define the column widths
-#                 columnStyles: {
-#                   0: { columnWidth: 70 },
-#                   1: { columnWidth: 200 },
-#                   2: { columnWidth: 40 },
-#                   3: { columnWidth: 40 },
-#                   3: { columnWidth: 100 }
-#                 },
-#                 // 3.i: Customize the table appearance if needed
-#                 styles: { overflow: "linebreak" },
-#                 // 3.j: Use didDrawCell to add images inside each cell
-#                 didDrawCell: function(data) {
-#                   if (data.column.index === 4 && data.cell.section === "body") {
-#                     var rowIndex = data.row.index;
-#                     var imageData = imageDataArray[rowIndex];
-#                     doc.addImage(imageData, "PNG", data.cell.x + 5, data.cell.y + 5, 100, 40);
-#                   }
-#                 }
-#               };
-# 
-#               doc.autoTable(tableConfig);
-# 
-# 
-#               // 4. Save the PDF file ----------------------------------
-#               doc.save("tbl.pdf");
-#             }
-#           });
-#       });
-#     }
-# 
-#     // Call the function
-#     captureHighcharts();
-#   ')
+output$report <- downloadHandler(
 
-  # Use the shinyjs package to run the JS code
-#   shinyjs::runjs(jsCode)
-# })
+  filename = function() { 
+    paste(input$summary_profile, "-summary-", input$geoname_summary, ".pdf", sep="")
+  },
+  
+  content = function(file) {
+    
 
+    td <- tempdir()
+    
+    tempReport <- file.path(td, "spinecharts.Rmd")
+    #tempLogo <- file.path(td, "/www/logo_scotpho_updated.png")
+    
+    file.copy("spinecharts.Rmd", tempReport, overwrite = TRUE)
+    #file.copy("/www/logo_scotpho_updated.png", tempLogo, overwrite = TRUE)
+    
+    # Set up parameters to pass to Rmd document
+    params <- list(reactive_df = summary_data(),
+                   chosen_area = input$geoname_summary,
+                   chosen_profile = input$summary_profile,
+                   chosen_geography_level = input$geotype_summary
+    )
+    
+    rmarkdown::render(tempReport, output_file = file,
+                      params = params,
+                      envir = new.env(parent = globalenv())
+    )
+    
+    # unload package after each render execution 
+    # otherwise users can only download 1 pdf, and any other download attempts will fail
+    # details of issue here: https://stackoverflow.com/questions/46080853/why-does-rendering-a-pdf-from-rmarkdown-require-closing-rstudio-between-renders
+    detach("package:kableExtra", unload=TRUE)
+  }
+)
 
 
 # 5. summary table of results  ------------
@@ -222,7 +196,7 @@ output$summary_table <- renderUI({
                                
                                columns = list(
                                  
-                                 # Domain column ---------
+                                 # # Domain column ---------
                                  domain = colDef(
                                    name = "",
                                    maxWidth = 120,
@@ -239,7 +213,7 @@ output$summary_table <- renderUI({
                                          }
                                        }
                                      ")),
-                                 
+
                                  # indicator column --------
                                  indicator = colDef(
                                    name = "",
@@ -323,50 +297,26 @@ output$summary_table <- renderUI({
                                                                      </div>
                                                                    </div>`;}")),
 
-                                 
-                                 # # Scotland column -------
+
+                                 # Scotland column -------
                                   scotland_value = colDef(
                                                       maxWidth = 80,
                                                       name = "Scotland",
                                                       cell = function(value){
-                                                           div(style = "margin-top: 10px;", value)
+                                                           div(style = "margin-top: 19px;font-size:1.5rem;", value)
                                                          }),
-
-                                 # # Chosen area column -------
+                                 
+                                 # Chosen area column -------
                                  measure = colDef(
-                                              maxWidth = 80,
-                                              name = input$geoname_summary,
+                                   maxWidth = 80,
+                                   name = input$geoname_summary,
+                                   cell = function(value){
+                                     div(style = "margin-top: 19px;font-size:1.5rem;", value)
+                                   }),
 
-                                              # this function adds colour formatting to chosen area
-                                              cell = function(value, index) {
+                                
 
-                                     # define style of value in cell (adding rounded edges)
-                                     styles <- list(`border-radius` = "16px", padding = "4px 12px")
-
-
-                                     # define background colour of cell, depending on whether statistically significantly different to comparator
-                                     background_colour_value <- case_when(summary_data()$colour[index] == "red" ~ "#FFBD88",
-                                                                          summary_data()$colour[index] == "blue" ~ "hsl(230, 70%, 90%)",
-                                                                          summary_data()$colour[index] == "gray" ~ "#D3D3D3",
-                                                                          TRUE ~ "white")
-
-                                     # define colour of cell, depending on whether statistically significantly different to comparator
-                                     colour_value <- case_when(summary_data()$colour[index] == "red" ~ "hsl(350, 45%, 30%)",
-                                                               summary_data()$colour[index] == "blue" ~ "hsl(230, 45%, 30%)",
-                                                               summary_data()$colour[index] == "gray" ~ "black",
-                                                               TRUE ~ "black")
-
-                                     # assign text colour and background colour to styles
-                                     styles$color <- colour_value
-                                     styles$`background-color` <- background_colour_value
-
-                                     # final value to be displayed, using styling created above
-                                     div(style = "margin-top: 10px;",span(value, style = styles))
-                                   }
-                                 ),
-                                 
-                                 
-                                 # in-line chart -------
+                                  # in-line chart -------
                                   spine_chart = colDef(
                                                     html = T,
                                                     minWidth = 200,
@@ -378,50 +328,140 @@ output$summary_table <- renderUI({
                                                         div("<- worse"), div("better ->")),
 
 
-                                                      # this function renders chart on each row
-                                                      # taking values from that row to populate
+                                                    # this function renders chart on each row
+                                                    # taking values from that row to populate
+                                                    ## SPINE PLOT
+                                                    cell = JS("function(rowInfo) {
 
-                                                      cell = JS("function(rowInfo, global_min, global_max) {
-                                                      
-                                                      
+
 
                                                                              return `<div id='htmlwidget-${rowInfo.values['row_number']}' style='width:100%;height:70;' class='highchart html-widget'>
                                                                              </div><script type='application/json' data-for='htmlwidget-${rowInfo.values['row_number']}'>
 
-                                                                             {\"x\":{\"hc_opts\":{\"chart\":{\"reflow\":true,\"inverted\":true,\"height\":70,\"accessibility\":{\"enabled\":true,\"linkedDescription\":\"alt text\"}},\"title\":{\"text\":null},
-                                                                             \"yAxis\":{\"title\":{\"text\":[]},\"type\":\"linear\",\"min\":-1,\"max\":1,\"labels\":{\"format\":\"{enabled: false}\"},
-                                                                             \"gridLineColor\":\"transparent\",\"plotLines\":[{\"color\":\"red\",\"width\":3,\"value\":0,\"zIndex\":1000}]},
-                                                                             \"credits\":{\"enabled\":false},\"exporting\":{\"enabled\":false},\"boost\":{\"enabled\":false},
-                                                                             \"plotOptions\":{\"series\":{\"label\":{\"enabled\":false},\"turboThreshold\":0,\"showInLegend\":false},
-                                                                             \"treemap\":{\"layoutAlgorithm\":\"squarified\"},\"scatter\":{\"marker\":{}}},
-                                                                             \"series\":[{\"group\":\"group\",\"data\":[{\"indicator\":\"${rowInfo.values['row_number']}\",
-                                                                             \"low\":${rowInfo.values['min_value_plot']},\"high\":${rowInfo.values['max_value_plot']},\"name\":\"x\"}],\"type\"
-                                                                             :\"columnrange\",\"enableMouseTracking\":false,\"borderRadius\":6},{\"group\":\"group\",\"data\":[{\"indicator\":\"${rowInfo.values['row_number']}\",\"color\":\"${rowInfo.values['marker_colour']}\",
-                                                                             \"low\":${rowInfo.values['min_value_plot']},\"high\":${rowInfo.values['max_value_plot']},\"scotland_value\":0,\"measure\":${rowInfo.values['measure_plot']},\"y\":${rowInfo.values['measure_plot']}}],
-                                                                             \"type\":\"line\",\"enableMouseTracking\":false}],\"xAxis\":{\"type\":\"category\",\"title\":\"\",\"labels\":{\"format\":\"{enabled: false}\"}}},
-                                                                             \"theme\":{\"chart\":{\"backgroundColor\":\"transparent\"}},\"conf_opts\":{\"global\":{
-                                                                             \"Date\":null}},\"type\":\"chart\",
-                                                                             \"debug\":false},\"evals\":[],\"jsHooks\":[]}</script>`}")),
+                                                                             {\"x\":{
+
+                                                                             \"hc_opts\":{
+
+                                                                             \"chart\":{
+                                                                                        \"inverted\":true,
+                                                                                        \"height\":70,
+                                                                                        \"accessibility\":{\"enabled\":true,
+                                                                                        \"linkedDescription\":\"alt text\"}
+                                                                                        },
+
+                                                                             \"title\":{\"text\":null},
+
+                                                                             \"yAxis\":{\"title\":{\"text\":[]},
+                                                                                        \"type\":\"linear\",
+                                                                                        \"min\":0,
+                                                                                        \"max\":1,
+                                                                                        \"labels\":{\"format\":\"{enabled: false}\"},
+                                                                                        \"gridLineColor\":\"transparent\",
+                                                                                        \"plotLines\":[{\"color\":\"red\",\"width\":3,\"value\":0.5,\"zIndex\":1000}]
+                                                                                        },
+
+                                                                             \"credits\":{\"enabled\":false},
+                                                                             \"exporting\":{\"enabled\":false},
+                                                                             \"boost\":{\"enabled\":false},
+
+                                                                             \"plotOptions\":{
+                                                                             \"series\":{\"label\":{\"enabled\":false}
+                                                                             },
+
+
+
+                                                                             \"bar\":{\"dataLabels\":{\"enabled\":false},
+                                                                             \"stacking\":\"normal\",
+                                                                             \"borderWidth\":0,
+                                                                             \"enableMouseTracking\":false}
+                                                                             },
+
+
+                                                                             \"series\":[
+
+
+                                                                             {\"data\":[{\"name\":\"\",\"y\":${rowInfo.values['one']}}],
+                                                                             \"type\":\"bar\",
+                                                                             \"color\":\"#D3D3D3\"},
+
+
+
+                                                                             {\"data\":[{\"name\":\"\",\"y\":${rowInfo.values['two']}}],
+                                                                             \"type\":\"bar\",
+                                                                             \"color\":\"#A4A4A4\"},
+
+
+                                                                             {\"data\":[{\"name\":\"\",\"y\":${rowInfo.values['three']}}],
+                                                                             \"type\":\"bar\",
+                                                                             \"color\":\"#D3D3D3\"},
+
+
+                                                                             {\"data\":[{\"name\":\"\",\"y\":${rowInfo.values['four']}}],
+                                                                             \"type\":\"bar\",
+                                                                             \"color\":\"white\"},
+
+                                                                             {\"group\":\"group\",
+                                                                             \"data\":[{\"y\":${rowInfo.values['chosen_value']}}],
+                                                                             \"type\":\"scatter\",
+                                                                             \"color\":\"${rowInfo.values['marker_colour']}\",
+                                                                             \"marker\":{\"lineColor\":\"black\",\"lineWidth\":1,\"radius\":8},
+                                                                             \"enableMouseTracking\":false}
+
+                                                                             ],
+
+
+                                                                             \"xAxis\":{
+                                                                             \"type\":\"category\",
+                                                                             \"title\":{\"text\":null}},
+
+                                                                             \"legend\":{\"enabled\":false}
+
+                                                                             },
+
+                                                                             \"theme\":{
+                                                                             \"chart\":{\"backgroundColor\":\"transparent\"}
+                                                                             },
+
+                                                                             \"conf_opts\":{
+                                                                             \"global\":{
+                                                                             \"Date\":null}
+                                                                             },
+
+                                                                             \"type\":\"chart\"
+
+                                                                             },
+
+                                                                             \"evals\":[],\"jsHooks\":[]
+
+                                                                                  }</script>`}")
+
+
+
+                                                    ),
+
+                                                  
 
                                  # hide some columns
                                  # note these columns are hidden but are used within various functions above for those columns that are displayed
-                                 type_definition = colDef(show = FALSE), # required for indicator col
+                                 type_definition = colDef(show = FALSE),#, # required for indicator col
                                  def_period = colDef(show = FALSE), # required for indicator col
                                  colour = colDef(show = FALSE), # required for measure col
-                                 measure_plot = colDef(show = FALSE), # required for chart 
-                                 min_value_plot = colDef(show = FALSE), # required for chart
-                                 max_value_plot = colDef(show = FALSE), # required for chart
                                  row_number = colDef(show = FALSE), # required for chart
+                                 one = colDef(show = FALSE), # required for chart
+                                 two = colDef(show = FALSE), # required for chart
+                                 three = colDef(show = FALSE), # required for chart
+                                 four = colDef(show = FALSE), # required for chart
+                                 chosen_value = colDef(show = FALSE), # required for chart
                                  marker_colour = colDef(show = FALSE) # required for chart
-                                 
+                               
                       ), # close columns list 
                               
                                # include highchart dependencies otherwise charts won't render
-                               deps = htmlwidgets::getDependency("highchart" , "highcharter"))
+                               deps = htmlwidgets::getDependency("highchart" , "highcharter")
+                               
+                               )
   
                         })
-
-
 
 
 
