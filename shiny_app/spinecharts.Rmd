@@ -8,12 +8,6 @@ params:
   chosen_profile: NA
   chosen_geography_level: NA
 header-includes:
-   - \usepackage{fancyhdr}
-   - \addtolength{\headheight}{2cm}
-   - \fancypagestyle{plain}{}
-   - \thispagestyle{fancy}
-   - \fancyhead[R]{\includegraphics[width = 100pt]{logo_scotpho_updated.png}}
-   - \renewcommand{\headrulewidth}{0pt}
    - \usepackage[default]{sourcesanspro}
    - \usepackage[T1]{fontenc}
 mainfont: SourceSansPro
@@ -31,12 +25,29 @@ knitr::opts_chunk$set(warning = FALSE, message = FALSE)
 
 ```{r echo=FALSE, message= FALSE}
 # required packages
-library(ggplot2)=
+library(ggplot2)
 library(dplyr) 
 library(kableExtra)
 library(tidyr)
 library(knitr)
 library(stringr)
+
+
+# Profile name to be displayed in pdf
+profile <- if(params$chosen_profile == "HWB"){
+  "Health & Wellbeing"
+} else if (params$chosen_profile == "CYP"){
+  "Children & Young People"
+} else if (params$chosen_profile == "MEN"){
+  "Mental Health"
+} else if (params$chosen_profile == "ALC"){
+  "Alcohol"
+} else if (params$chosen_profile == "TOB"){
+  "Tobacco control"
+} else if (params$chosen_profile == "DRG"){
+  "Drugs"
+} else {"Population"
+}
 
 
 # function to create spine plot for each indicator
@@ -80,7 +91,7 @@ df <- df %>%
 # order quantiles so stacked in correct order.
 df$quantiles <- factor(df$quantiles, levels = c("one", "two", "three", "four"))
 
-df <- df
+
 
 # the data to be displayed in table
 table <- df %>%
@@ -130,20 +141,13 @@ for (indicator in unique_indicators) {
 
 ```
 
-# ScotPHO Profile: `r params$chosen_profile`
+# ScotPHO Profile: `r profile`
 # `r params$chosen_geography_level` : `r params$chosen_area`
 
 
 ```{r, echo= FALSE, message = FALSE}
 
-# the final table to be displayed with charts embedded
-
-
-# Still to be done:
-
-
-# 2. instructions box
-
+ # the final table to be displayed with charts embedded
 table %>%
 
   knitr::kable(
