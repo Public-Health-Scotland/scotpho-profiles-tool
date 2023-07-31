@@ -76,27 +76,43 @@ summaryTab <- tabPanel(
               
     
               p(style = "font-size:16px; padding:5px",
-              "The results below provide a snapshot of the latest data for a chosen profile and geographical area, compared to Scotland.
-               The colour of the result for your chosen area signals whether the results are statistically significantly different to Scotland."),
+              "The results below provide a snapshot of the latest data for a chosen profile and geographical area, compared to Scotland. The spine charts show where
+              your chosen area fits in amongst the range of values, as explained in the key below."),
+              
+              div(img(src='spinechart.PNG', width = "75%"), style="text-align: center;"),
+              
+              br(),
+              
+
+              fluidRow(
+                column(6, style = "padding-bottom: 2px", div(class = "summary-key", 
+                    div(class="summary-key-circle", style = "background-color: orange;"),
+                    p("Orange - statistically significantly worse",  style = "margin: 0;padding: 0;"))),
+                
+                column(6,style = "padding-bottom: 2px", div(class = "summary-key",
+                    div(class="summary-key-circle", style = "background-color: #1B7CED;"),
+                    p("Blue - statistically significantly better", style = "margin: 0;padding: 0;")))
+                
+                ),
+              
+              br(),
               
               fluidRow(
-                column(1, tags$span(class="dot", style = "height: 25px; width: 25px; background-color: orange; border-radius: 50%; display: inline-block;")),
-                column(9, p("Orange - statistically significantly worse than Scotland"))),
+                column(6, style = "padding-bottom: 2px", div(class = "summary-key", 
+                           div(class="summary-key-circle", style = "background-color: grey;"),
+                           p("Grey - not statistically significantly different to Scotland",  style = "margin: 0;padding: 0;"))),
+                
+                column(6, style = "padding-bottom: 2px", div(class = "summary-key",
+                           div(class="summary-key-circle", style = "background-color: white;"),
+                           p("White - no difference to be calculated", style = "margin: 0;padding: 0;")))
+                
+              )
               
-              fluidRow(
-                column(1, tags$span(class="dot", style = "height: 25px; width: 25px; background-color: #1B7CED; border-radius: 50%; display: inline-block;")),
-                column(9, p("Blue - statistically significantly better than Scotland"))),
-              
-              fluidRow(
-                column(1, tags$span(class="dot", style = "height: 25px; width: 25px; background-color: grey; border-radius: 50%; display: inline-block;")),
-                column(9, p("Grey - not statistically significantly different to Scotland"))),
-               p("The shaded blue bar shows the range of values for that indicator across all areas within your chosen geography level. 
-               The coloured dots show the relative position of your selected geography and the red line shows the value for Scotland. 
-                 and how far it is from the best and worse performing areas at your chosen geographical level.")
+
           )
           
-          
       )
+      
   ),
   
 
