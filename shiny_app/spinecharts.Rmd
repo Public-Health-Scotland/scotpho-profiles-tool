@@ -154,7 +154,8 @@ table %>%
     format = "latex", # must be in latex format for pdf download
     booktabs = TRUE, # generic formatting
     escape = FALSE, # ensures latex formatting on indicator column works (i.e.bold/italics,linebreaks)
-    longtable = TRUE) %>% # ensures table goes across multiple pages when too long
+    longtable = TRUE,
+    col.names = c("indicator", "chosen area", "Scotland", "spine chart")) %>% # ensures table goes across multiple pages when too long
 
   # format header
   row_spec(0, background = "#032F4F", color = "white") %>%
