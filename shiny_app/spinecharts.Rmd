@@ -67,7 +67,7 @@ create_indicator_plot <- function(data, chosen_area_colour) {
 
  
 # temporary folder to save charts to 
-  graph_directory <- tempdir()
+graph_directory <- tempdir()
 
 
 
@@ -137,7 +137,11 @@ for (indicator in unique_indicators) {
 }
 
 
+# escape the '&' symbol from chosen geography so displays in column headers
+chosen_area <- gsub("&", "\\\\&", params$chosen_area)
 
+# define column headers for the pdf table
+col_names = c("indicator", chosen_area, "Scotland", "Spine chart")
 
 ```
 
@@ -155,18 +159,20 @@ table %>%
     booktabs = TRUE, # generic formatting
     escape = FALSE, # ensures latex formatting on indicator column works (i.e.bold/italics,linebreaks)
     longtable = TRUE,
-    col.names = c("indicator", "chosen area", "Scotland", "spine chart")) %>% # ensures table goes across multiple pages when too long
+    #col.names = c("indicator", "chosen area", "Scotland", "<- worse   better ->")
+    col.names = col_names
+    ) %>% # ensures table goes across multiple pages when too long
 
   # format header
   row_spec(0, background = "#032F4F", color = "white") %>%
 
   # set column widths
-   column_spec(1, width = "30em") %>% # indicator column
-   column_spec(2, width = "3em") %>% # chosen area column
+   column_spec(1, width = "27em") %>% # indicator column
+   column_spec(2, width = "6em") %>% # chosen area column
    column_spec(3, width = "3em") %>% # scotland column
 
   # embed chart images on each row of final column
-   kableExtra::column_spec(4, image = sprintf("%s/%s.png", graph_directory, table$id)) %>%
+   kableExtra::column_spec(4, image = sprintf("%s/%s.png", graph_directory, table$id), color = "white") %>%
 
   # repeats column headings when table goes across multiple pages
    kable_styling(latex_options = c("repeat_header")) %>%
