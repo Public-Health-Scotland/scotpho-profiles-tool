@@ -152,7 +152,7 @@ output$download_summary_csv <- downloadHandler(
 
 
 # download as PDF
-output$report <- downloadHandler(
+output$download_summary_pdf <- downloadHandler(
 
   filename = function() { 
     paste(input$summary_profile, "-summary-", input$geoname_summary, ".pdf", sep="")

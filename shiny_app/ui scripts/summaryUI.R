@@ -61,7 +61,7 @@ summaryTab <- tabPanel(
                              class = "button"),
               
               # download as pdf 
-              downloadButton("report",
+              downloadButton("download_summary_pdf",
                            "Download summary as PDF",
                            class = "button")
          
