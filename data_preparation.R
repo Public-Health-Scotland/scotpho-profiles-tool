@@ -30,6 +30,8 @@ library(lubridate) #for automated list of dates in welcome modal
 library(janitor) #cleaning names
 library(gsheet) #for reading google sheets
 library(rgdal) #for reading shapefiles
+library(openxlsx)
+library(readxl)
 
 ###############################################.
 ## Functions ----
@@ -108,10 +110,14 @@ saveRDS(geo_lookup, "shiny_app/data/geo_lookup.rds")
 ## Indicator lookup table
 #Can't use read_csv as it's not the first tab of the spreadsheet.
 # For some reason, it's important that the raw tab is alphabetically sorted for this to work properly
-ind_lookup <- gsheet2tbl("docs.google.com/spreadsheets/d/1JOr1_MSnKdQfg4o8qEiqX-EKDsbXUjejnAV4NzbSg78#gid=2036303524") %>%
+# ind_lookup <- gsheet2tbl("docs.google.com/spreadsheets/d/1JOr1_MSnKdQfg4o8qEiqX-EKDsbXUjejnAV4NzbSg78#gid=2036303524") %>%
+#   setNames(tolower(names(.))) %>% #variables to lower case
+#   mutate(ind_id =as.numeric(ind_id)) %>%
+#   mutate_if(is.character, factor)  # converting variables into factors
+ind_lookup <- read_excel(paste0(lookups,"Technical_Document.xlsx"),sheet=2) %>%
   setNames(tolower(names(.))) %>% #variables to lower case
   mutate(ind_id =as.numeric(ind_id)) %>%
-  mutate_if(is.character, factor)  # converting variables into factors
+  mutate_if(is.character, factor) # converting variables into factors
 
 ###############################################.
 ## Indicator data ----
@@ -284,9 +290,6 @@ le_inequalities_m <- readRDS("/PHI_conf/ScotPHO/Profiles/Data/Data to be checked
   mutate(quint_type=case_when(code=="S00000001" ~ "sc_quin", TRUE ~ quint_type))  
 le_inequalities_f <- readRDS("/PHI_conf/ScotPHO/Profiles/Data/Data to be checked/life_expectancy_female_ineq.rds") %>%
   mutate(quint_type=case_when(code=="S00000001" ~ "sc_quin", TRUE ~ quint_type))  
-##new dying in hospital data
-dying_in_hosp_michael <-readRDS("/PHI_conf/ScotPHO/Profiles/Data/Data to be checked/dying_in_hosp_depr_ineq.rds") %>%
-  rename(measure = rate)
 ##new deaths <75 years
 # deaths_under75_michael <-readRDS("/PHI_conf/ScotPHO/Profiles/Data/Data to be checked/deaths_under75_depr_ineq.rds") %>%
 #   rename(measure = rate)
@@ -295,7 +298,7 @@ dying_in_hosp_michael <-readRDS("/PHI_conf/ScotPHO/Profiles/Data/Data to be chec
 
 # Merging with Andy's data and then formatting
 #data_depr <- bind_rows(data_depr, andyp_data) %>% ## JUST BEFORE THIS GOES LIVE REVERT TO THIS LINE
-data_depr <- bind_rows(data_depr, andyp_data,le_inequalities_m,le_inequalities_f,dying_in_hosp_michael) %>% ##adjust this line when removing temp chunk 
+data_depr <- bind_rows(data_depr, andyp_data,le_inequalities_m,le_inequalities_f) %>% ##adjust this line when removing temp chunk 
   mutate_if(is.character,factor) %>% #converting characters into factors
   mutate_at(c("numerator", "measure", "lowci", "upci", "rii", "upci_rii",
               "lowci_rii", "sii", "lowci_sii", "upci_sii", "par", "abs_range",
@@ -371,7 +374,6 @@ iz_bound <- readRDS(paste0(shapefiles, "IZ_boundary.rds"))
 saveRDS(iz_bound, "shiny_app/data/IZ_boundary.rds")
 
 ##END
-
 
 
 ################################################################
