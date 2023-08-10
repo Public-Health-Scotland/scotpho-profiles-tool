@@ -10,34 +10,30 @@ params:
 header-includes:
    - \usepackage[default]{sourcesanspro}
    - \usepackage[T1]{fontenc}
+   - \usepackage{fancyhdr}
+   - \usepackage{graphicx}
 mainfont: SourceSansPro
 
 
 ---
 
 
- 
-
-```{r setup, include=FALSE, dev="cairo_pdf"} 
-knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
-```
-
-
 ```{r echo=FALSE, message= FALSE}
-# required packages
+
 library(ggplot2)
-library(dplyr) 
+library(dplyr)
 library(kableExtra)
 library(tidyr)
 library(knitr)
 library(stringr)
 
+chosen_area <- gsub("&", "\\\\&", params$chosen_area)
 
-# Profile name to be displayed in pdf
+
 profile <- if(params$chosen_profile == "HWB"){
-  "Health & Wellbeing"
+  "Health and Wellbeing"
 } else if (params$chosen_profile == "CYP"){
-  "Children & Young People"
+  "Children and Young People"
 } else if (params$chosen_profile == "MEN"){
   "Mental Health"
 } else if (params$chosen_profile == "ALC"){
@@ -48,6 +44,30 @@ profile <- if(params$chosen_profile == "HWB"){
   "Drugs"
 } else {"Population"
 }
+
+```
+
+
+
+  \begin{minipage}{0.6\textwidth}
+    \raggedright
+    \textbf{\large{`r params$chosen_geography_level`: `r chosen_area`}} \\
+    ScotPHO Profile: `r profile`
+  \end{minipage}
+  \hfill
+  \begin{minipage}{0.3\textwidth}
+    \raggedleft
+    \includegraphics[width=100pt]{scotpho_reduced.png}
+  \end{minipage}
+
+
+
+```{r setup, include=FALSE, dev="cairo_pdf"} 
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+```
+
+
+```{r echo=FALSE, message= FALSE}
 
 
 # function to create spine plot for each indicator
@@ -60,28 +80,31 @@ create_indicator_plot <- function(data, chosen_area_colour) {
     geom_point(data = NULL, aes(x = indicator, y = chosen_value), shape = 19, size = 4, col = chosen_area_colour) +
     coord_flip() +
     theme_void() +
-    guides(fill = "none")
+    guides(fill = "none") +
+    theme(plot.margin = margin(0, 0, 0, 0, "cm"),
+          plot.background = element_rect(fill = "white", color = "white"),
+          panel.background = element_rect(fill = "white", color = "white")
+          )
 
   return(plot)
 }
 
- 
-# temporary folder to save charts to 
+
+# temporary folder to save charts to
 graph_directory <- tempdir()
 
 
 
 # pivot reactive dataframe in longer format (required for ggplot)
  df <- params$reactive_df %>%
-   select(indicator, one, two, three, four, scotland_value, measure, chosen_value, colour, def_period, type_definition) %>%
-   pivot_longer(cols = c("one", "two", "three", "four"), values_to = "GraphPoint", names_to = "quantiles") %>%
-   mutate(colour = case_when(colour == "red" ~ "orange", TRUE ~ colour))
- 
- 
+   select(indicator, one, two, three, four, scotland_value, measure, chosen_value, marker_colour, def_period, type_definition) %>%
+   pivot_longer(cols = c("one", "two", "three", "four"), values_to = "GraphPoint", names_to = "quantiles")
+
+
 # required to ensure % symbol displays correctly
 df$indicator <- str_replace(df$indicator, "%", "\\\\%")
 
-# trim down some measure descriptions 
+# trim down some measure descriptions
 df <- df %>%
   mutate(across('type_definition', str_replace, 'Age-sex standardised rate', 'EASR')) %>%
   mutate(across('type_definition', str_replace, 'children aged', ',')) %>%
@@ -116,24 +139,24 @@ counter <- 1
 
 # Iterate over each indicator and create/save a spineplot
 for (indicator in unique_indicators) {
-  
+
   # Filter the data for the current indicator
   indicator_data <- df %>% filter(indicator == !!indicator)
-  
-  # get colour for point 
-  chosen_area_colour <- unique(indicator_data$colour)
+
+  # get colour for point
+  chosen_area_colour <- unique(indicator_data$marker_colour)
 
   # create the plot
   plot <- create_indicator_plot(indicator_data, chosen_area_colour)
 
-  # create filename 
+  # create filename
   filename <- sprintf("%s/%s.png", graph_directory, counter)
 
   # increase counter variable
   counter <- counter + 1
 
   # Save the plot as a PNG with the filename created
-  ggsave(filename, plot = plot, units="mm", width=60, height=5, dpi=1200)
+  ggsave(filename, plot = plot, units="mm", width=60, height=6, dpi=300)
 }
 
 
@@ -145,8 +168,6 @@ col_names = c("indicator", chosen_area, "Scotland", "Spine chart")
 
 ```
 
-# ScotPHO Profile: `r profile`
-# `r params$chosen_geography_level` : `r params$chosen_area`
 
 
 ```{r, echo= FALSE, message = FALSE}
@@ -159,7 +180,6 @@ table %>%
     booktabs = TRUE, # generic formatting
     escape = FALSE, # ensures latex formatting on indicator column works (i.e.bold/italics,linebreaks)
     longtable = TRUE,
-    #col.names = c("indicator", "chosen area", "Scotland", "<- worse   better ->")
     col.names = col_names
     ) %>% # ensures table goes across multiple pages when too long
 

@@ -63,19 +63,13 @@ summary_data <- reactive ({
 
   # assign colours to values depending on statistical significance
   final <- chosen_area %>%
-    mutate(
-      # colours for values in table
-      colour = case_when(lowci <= scotland_value & upci >= scotland_value & interpret %in% c("H", "L") ~'gray',
-                         lowci > scotland_value & interpret == "H" ~ 'blue',
-                         lowci > scotland_value & interpret == "L" ~ 'red',
-                         upci < scotland_value & interpret == "L" ~ 'blue',
-                         upci < scotland_value & interpret == "H" ~ 'red',
-                         interpret == "O" ~ 'white', TRUE ~ 'white'),
+    mutate(marker_colour = case_when(lowci <= scotland_value & upci >= scotland_value & interpret %in% c("H", "L") ~'#6A6C6D',
+                         lowci > scotland_value & interpret == "H" ~ '#1B7CED',
+                         lowci > scotland_value & interpret == "L" ~ '#FFA500',
+                         upci < scotland_value & interpret == "L" ~ '#1B7CED',
+                         upci < scotland_value & interpret == "H" ~ '#FFA500',
+                         interpret == "O" ~ '#FFFFFF', TRUE ~ '#FFFFFF'))
 
-
-      marker_colour = case_when(colour == "blue" ~ "#1B7CED",
-                                colour == "red" ~ "#FFA500",
-                                colour == "gray" ~ "#6A6C6D", TRUE ~ "#FFFFFF"))
 
   # identify correct domain and arrange by domain
   # this is because there are 2 domain columns in dataset as some indicators belong to more than 1 profile/domain
@@ -118,7 +112,7 @@ summary_data <- reactive ({
 
   # selecting columns required for table
   final <- final %>%
-    select(domain, indicator, measure, scotland_value, type_definition, def_period, colour,
+    select(domain, indicator, measure, scotland_value, type_definition, def_period, 
            row_number, spine_chart, one, two, three, four, chosen_value, marker_colour)
   
   final <- final
@@ -164,10 +158,10 @@ output$download_summary_pdf <- downloadHandler(
     td <- tempdir()
     
     tempReport <- file.path(td, "spinecharts.Rmd")
-    #tempLogo <- file.path(td, "/www/logo_scotpho_updated.png")
+    tempLogo <- file.path(td, "scotpho_reduced.png")
     
     file.copy("spinecharts.Rmd", tempReport, overwrite = TRUE)
-    #file.copy("/www/logo_scotpho_updated.png", tempLogo, overwrite = TRUE)
+    file.copy("scotpho_reduced.png", tempLogo, overwrite = TRUE)
     
     # Set up parameters to pass to Rmd document
     params <- list(reactive_df = summary_data(),
@@ -445,7 +439,6 @@ output$summary_table <- renderUI({
                                  # note these columns are hidden but are used within various functions above for those columns that are displayed
                                  type_definition = colDef(show = FALSE),#, # required for indicator col
                                  def_period = colDef(show = FALSE), # required for indicator col
-                                 colour = colDef(show = FALSE), # required for measure col
                                  row_number = colDef(show = FALSE), # required for chart
                                  one = colDef(show = FALSE), # required for chart
                                  two = colDef(show = FALSE), # required for chart
