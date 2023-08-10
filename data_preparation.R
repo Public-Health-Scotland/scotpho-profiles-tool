@@ -215,9 +215,8 @@ View(optdata %>% filter(is.na(indicator)))
 
 optdata <- left_join(x=optdata, y=geo_lookup, by="code")
 
-#Apply supressions.
+#Apply suppressions.
 optdata %<>% apply_suppressions()
-
 
 # Check that suppression has been applied properly
 # If there are rows appearing it means there are figures that meet the criteria for suppression still being included
@@ -226,7 +225,6 @@ optdata %<>% apply_suppressions()
 opt_suppression_check <- optdata %>%
   filter(supression == "Y") %>%
   subset(numerator < supress_less_than)
-
 
 View(opt_suppression_check)
 
@@ -293,22 +291,9 @@ View(gsub(paste0(shiny_files, "/"), "", files_depr))
 data_depr <- do.call(rbind, lapply(files_depr, readRDS)) %>%
   rename(measure = rate)
 
-############TEMPORARY SCRIPT UNTIL LE/UPDATING ANDY P DATA IS READY FOR INCLUSION 
-## don't want to put new indicators in shiny data folder until we are ready incase loading them breaks live tool
-##life expectancy data
-le_inequalities_m <- readRDS("/PHI_conf/ScotPHO/Profiles/Data/Data to be checked/life_expectancy_male_ineq.rds") %>%
-  mutate(quint_type=case_when(code=="S00000001" ~ "sc_quin", TRUE ~ quint_type))  
-le_inequalities_f <- readRDS("/PHI_conf/ScotPHO/Profiles/Data/Data to be checked/life_expectancy_female_ineq.rds") %>%
-  mutate(quint_type=case_when(code=="S00000001" ~ "sc_quin", TRUE ~ quint_type))  
-##new deaths <75 years
-# deaths_under75_michael <-readRDS("/PHI_conf/ScotPHO/Profiles/Data/Data to be checked/deaths_under75_depr_ineq.rds") %>%
-#   rename(measure = rate)
-
-##end of temp chunk ( need to adjust line 283 too when removing this)
-
 # Merging with Andy's data and then formatting
-#data_depr <- bind_rows(data_depr, andyp_data) %>% ## JUST BEFORE THIS GOES LIVE REVERT TO THIS LINE
-data_depr <- bind_rows(data_depr, andyp_data,le_inequalities_m,le_inequalities_f) %>% ##adjust this line when removing temp chunk 
+data_depr <- bind_rows(data_depr, andyp_data) %>% ## JUST BEFORE THIS GOES LIVE REVERT TO THIS LINE
+#data_depr <- bind_rows(data_depr, andyp_data,le_inequalities_m,le_inequalities_f) %>% ##adjust this line when removing temp chunk 
   mutate_if(is.character,factor) %>% #converting characters into factors
   mutate_at(c("numerator", "measure", "lowci", "upci", "rii", "upci_rii",
               "lowci_rii", "sii", "lowci_sii", "upci_sii", "par", "abs_range",
