@@ -7,11 +7,11 @@
 
 ### 1. guided tour button ----
 # Start guided tour when 'take a tour' button is clicked
-guide$init()
-
-observeEvent(input$guide, {
-  guide$start()
-})
+# guide$init()
+# 
+# observeEvent(input$guide, {
+#   guide$start()
+# })
 
 
 ### 2. recent updates button ----
