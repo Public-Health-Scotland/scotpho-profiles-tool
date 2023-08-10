@@ -292,8 +292,7 @@ data_depr <- do.call(rbind, lapply(files_depr, readRDS)) %>%
   rename(measure = rate)
 
 # Merging with Andy's data and then formatting
-data_depr <- bind_rows(data_depr, andyp_data) %>% ## JUST BEFORE THIS GOES LIVE REVERT TO THIS LINE
-#data_depr <- bind_rows(data_depr, andyp_data,le_inequalities_m,le_inequalities_f) %>% ##adjust this line when removing temp chunk 
+data_depr <- bind_rows(data_depr, andyp_data) %>% ## joining the old andy pulford indicators with PHS generated inequalities indicators
   mutate_if(is.character,factor) %>% #converting characters into factors
   mutate_at(c("numerator", "measure", "lowci", "upci", "rii", "upci_rii",
               "lowci_rii", "sii", "lowci_sii", "upci_sii", "par", "abs_range",
