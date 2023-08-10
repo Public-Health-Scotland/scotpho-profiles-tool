@@ -14,13 +14,18 @@
 # 6. sourcing functions created for app (see functions folder) 
 
 
+
 # 1. required packages ----------------------------------------------------------
 library(cicerone) # for guided tours
 library(shiny) # shiny functions
+library(shinydashboard) # more shiny functions
 library(shinyBS) # modals
 library(dplyr) # data manipulation
 library(ggplot2) # data visualization
+library(highcharter) # data visualisation
 library(plotly) # interactive graphs
+library(BH)
+library(htmlwidgets)
 library(leaflet) #javascript maps
 library(shinyWidgets) # for extra widgets
 library(shinyjs) # for using javascript
@@ -33,7 +38,12 @@ library(stringr) # for working with strings
 library(reactable) # interactive tables
 library(htmltools) # for using html tags
 library(purrr) # for applying function to lists
-#library(rmarkdown) not currently in use
+library(data.table) # for working with large datasets
+library(jsonlite)
+library(rmarkdown)
+library(knitr)
+
+
 
 # As well as webshot, phantomjs is needed to download Plotly charts
 # https://github.com/rstudio/shinyapps-package-dependencies/pull/180
@@ -114,15 +124,15 @@ areatype_list <- c("Alcohol & drug partnership",
                    "Health board",  
                    "HSC locality", 
                    "HSC partnership",  
-                   "Intermediate zone", 
-                   "Scotland")
+                   "Intermediate zone")
+
+
 
 topic_list_filter <- as.factor(c("Show all",unique(sort(c(
   substr(optdata$profile_domain1, 5, nchar(as.vector(optdata$profile_domain1))), 
   substr(optdata$profile_domain2, 5, nchar(as.vector(optdata$profile_domain2)))))))) 
 
 topic_list <- topic_list_filter[-1] #taking out show all from list
-
 
 # for inequalities tab
 areatype_depr_list <- c("Scotland", 
@@ -173,34 +183,6 @@ profile_list <- setNames(c('HWB',
                            'Population'))
 
 profile_list_filter <-c(setNames("Show all", "Show all"), sort(profile_list))
-
-
-profile_areatype <- list(
-  "Scotland" = setNames(c('HWB','CYP','ALC','DRG','MEN', "TOB", "POP"),
-                        c('Health & wellbeing','Children & young people','Alcohol',
-                          'Drugs','Mental Health', "Tobacco control", "Population")),
-  
-  "Health board" = setNames(c('HWB','CYP','ALC','DRG', 'MEN', "TOB", "POP"),
-                            c('Health & wellbeing','Children & young people','Alcohol',
-                              'Drugs', 'Mental Health', "Tobacco control", "Population")),
-  
-  "Council area" = setNames(c('HWB','CYP','ALC', "DRG",'MEN', "TOB", "POP"),
-                            c('Health & wellbeing','Children & young people','Alcohol', "Drugs",
-                              'Mental Health', "Tobacco control", "Population")),
-  
-  "HSC partnership" = setNames(c('HWB','CYP', "POP"),
-                               c('Health & wellbeing','Children & young people', "Population")),
-  
-  "HSC locality" = setNames(c('HWB','CYP', "POP"),
-                            c('Health & wellbeing','Children & young people', "Population")),
-  
-  "Intermediate zone" = setNames(c('HWB','CYP', "POP"),
-                                 c('Health & wellbeing','Children & young people', "Population")),
-  
-  "Alcohol & drug partnership" = setNames(c('ALC','DRG', "POP"),
-                                          c('Alcohol','Drugs', "Population"))
-)
-
   
 #  measure options for inequalities tab -----
 depr_measure_options <- c("Patterns of inequality",
@@ -261,37 +243,38 @@ font_plots <- list(family = '"Helvetica Neue",
 # 5. extra UI components  ----------------------------------------------------------
 
 # define the step-by-step guided tour of the tool for homepage
-guide <- Cicerone$
-  new(allow_close = FALSE)$
-  
-  step(
-    "explore",
-    "Exploring indicators in the tool",
-    "A helpful starting point is exploring what types of indicators are included and at what geography level. 
-    Click this button to start exploring what is available. When you find an indicator you are interested in, 
-    there are further buttons to quickly explore the indicator in various ways. 
-    There are more guided-tours on each tab to help you find what you are looking for."
-  ) $
-  
-  step("tab-buttons",
-       "View indicators in multiple ways",
-       "Alternatively, you can navigate directly to tabs using the boxes below to start viewing data. Use the 
-       buttons highlighted (or the navigation bar at the top) to go to different tabs, depending on how you want 
-       to view the data.")$
-  
-  step("ind-updates-section",
-       "Check when indicators are updated",
-       "Use the buttons higlighted to see when an indicator is due to be updated and what has been updated recently"
-       )$
-  
-  step("whats-new-section", 
-       "New indicators",
-       "We are continously reviewing and adding to our suite of indicators. Use the buttons highlighted to see what's 
-       been added recently.")$
-  
-  step("further-links-section",
-       "Further ScotPHO Profiles links",
-       "Other useful links relating to the ScotPHO Collaboration and the profiles can be found below")
+# guide <- Cicerone$
+#   new(allow_close = FALSE)$
+# 
+#   step(
+#     "explore",
+#     "Exploring indicators in the tool",
+#     "A helpful starting point is exploring what types of indicators are included and at what geography level.
+#     Click this button to start exploring what is available. When you find an indicator you are interested in,
+#     there are further buttons to quickly explore the indicator in various ways.
+#     There are more guided-tours on each tab to help you find what you are looking for."
+#   ) $
+# 
+#   step("tab-buttons",
+#        "View indicators in multiple ways",
+#        "Alternatively, you can navigate directly to tabs using the boxes below to start viewing data. Use the
+#        buttons highlighted (or the navigation bar at the top) to go to different tabs, depending on how you want
+#        to view the data.")$
+# 
+#   step("ind-updates-section",
+#        "Check when indicators are updated",
+#        "Use the buttons higlighted to see when an indicator is due to be updated and what has been updated recently"
+#        )$
+# 
+#   step("whats-new-section",
+#        "New indicators",
+#        "We are continously reviewing and adding to our suite of indicators. Use the buttons highlighted to see what's
+#        been added recently.")$
+# 
+#   step("further-links-section",
+#        "Further ScotPHO Profiles links",
+#        "Other useful links relating to the ScotPHO Collaboration and the profiles can be found below")
+# 
 
 
 
@@ -328,6 +311,10 @@ updates_modal <- modalDialog(
 # 6. sourcing functions created for app (see functions folder) -------------------------------
 list.files("functions") %>% 
   map(~ source(paste0("functions/", .)))
+
+
+
+
 
 
 ##END

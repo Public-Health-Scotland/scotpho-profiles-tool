@@ -7,7 +7,7 @@
 
 function(input, output, session) {
   
-  # Source files with server code for each tab -----------------------------------------
+ # Source files with server code for each tab -----------------------------------------
   source(file.path("server scripts/homepageServer.R"), local = TRUE)$value # Homepage tab
   source(file.path("server scripts/summaryServer.R"), local = TRUE)$value # Summary tab
   source(file.path("server scripts/trendServer.R"), local = TRUE)$value # Time trend tab
@@ -17,26 +17,13 @@ function(input, output, session) {
   source(file.path("server scripts/definitionsServer.R"), local = TRUE)$value # Indicator definitions tab
 
   # Keeps the shiny app from timing out quickly 
-  
-  
-  auto_invalidate <- reactiveTimer(10000) 
-  
-  
-  observe({ 
-    
-    
-    auto_invalidate() 
-    
-    
-    cat(".") 
-    
-    
+  autoInvalidate <- reactiveTimer(10000)
+  observe({
+    autoInvalidate()
+    cat(".")
   })
   
-  }
+}
+
  
-
 ## END 
-    
-
-

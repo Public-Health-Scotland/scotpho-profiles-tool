@@ -6,38 +6,33 @@
 
 
 # Source files with UI code for each tab --------------
-source(file.path('ui scripts/homepageUI.R'),  local = TRUE)$value
-source(file.path('ui scripts/summaryUI.R'),  local = TRUE)$value
-source(file.path('ui scripts/trendUI.R'),  local = TRUE)$value
-source(file.path('ui scripts/rankUI.R'),  local = TRUE)$value
-source(file.path('ui scripts/inequalitiesUI.R'),  local = TRUE)$value
-source(file.path('ui scripts/dataUI.R'),  local = TRUE)$value
-source(file.path('ui scripts/aboutUI.R'),  local = TRUE)$value
-source(file.path('ui scripts/definitionsUI.R'),  local = TRUE)$value
+walk(list.files("ui scripts", full.names = TRUE), ~ source(.x))
 
 
 # define the UI structure -------------------------------
 tagList(
-  useShinyjs(), # Include shinyjs
-  navbarPage( 
-    
-  # add PHS logo to navigation bar 
+  useShinyjs(), 
+ navbarPage(
+   
+    # add PHS logo to navigation bar 
     title = div(style = "position: relative; 
                        top: -15px; 
                        margin-left: 10px; 
                        margin-top: 5px;",
-        tags$a(img(src = "phs-logo-updated.png", 
-                   width = 120, 
-                   alt = "link to Public Health Scotland website"),
-                   href = "https://www.publichealthscotland.scot/",
-                   target = "_blank")
-      ),
-  
+                tags$a(img(src = "phs-logo-updated.png", 
+                           width = 120, 
+                           alt = "link to Public Health Scotland website"),
+                       href = "https://www.publichealthscotland.scot/",
+                       target = "_blank")
+    ),
+    
+   
     # make navigation bar collapse on smaller screens
     windowTitle = "ScotPHO profiles",
     collapsible = TRUE,
-  
+    
     header = tags$head(
+
       # sourcing css style sheet 
       includeCSS("www/styles.css"),
       
@@ -49,11 +44,13 @@ tagList(
       # include google analytics scripts
       includeScript("google-analytics.js"), # GA 3 
       HTML('<script async src="https://www.googletagmanager.com/gtag/js?id=G-KE1C59RLNS"></script>'),
-      includeScript("gtag.js") # Google analytics 4 
+      includeScript("gtag.js") # GA 4 
       
     ),
     
+    
     # order of tabs --------------------------------
+    
     homepageTab,
     summaryTab,
     trendTab,
@@ -69,4 +66,5 @@ tagList(
 
 
 ## END
+
 

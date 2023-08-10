@@ -16,7 +16,9 @@ table_theme <- function() {
     backgroundColor = 'white',
     borderWidth = '1px',
     borderColor = 'lightgrey',
-    headerStyle = list(backgroundColor = "#ececec"),
+    headerStyle = list(backgroundColor = "hsl(205, 93%, 16%)",
+                       color = "white"),
+    
     searchInputStyle = list(
       borderColor = '#cccccc',
       paddingLeft = "3.5rem",
@@ -24,6 +26,34 @@ table_theme <- function() {
       backgroundSize = "2rem",
       backgroundPosition = "left 1rem center",
       backgroundRepeat = "no-repeat",
-      backgroundImage = search_icon("black")))
+      backgroundImage = search_icon("black")),
+    
+    #tableBodyStyle = list(flex = "auto"),
+    rowStyle=list(height="65px")
+    
+    
+    )
   
 }
+
+
+#2. reactable widget
+# purpose: builds a table using reactable. Use for quicker rendering of inline charts 
+widgetTable <- function(data, options = list(), columns = list(), deps = list(), ...){
+  
+  dt <- reactable(data, 
+                  columns,
+                  compact = TRUE,
+                  defaultExpanded = T,
+                  sortable = F,
+                  defaultPageSize = 60,
+                  theme = table_theme(), # see function above
+                  highlight = TRUE)
+  
+  
+  dt %>% tagList(deps) %>% browsable
+  
+
+}
+
+

@@ -453,17 +453,7 @@ color: #fff;
   }
 
 
-/* Format reactable column headers */
-.rt-thead {
-    border-bottom: solid;
-    margin-top:20px;
-    font-size:15px;
-}
 
-/* Expandable row details - responsive layout*/
-.rt-td-inner{
-  display:flex;
-}
 
 
 /* Smaller screens display button under text*/
@@ -473,3 +463,27 @@ color: #fff;
     flex-direction:column;
   }
 }
+
+
+@media (max-width: 800px) {
+    .summary-instructions{
+    display:flex;
+    flex-direction:column;
+  }
+}
+
+
+
+.summary-key {
+        display: flex;
+        align-items: center;
+      }
+      
+      
+ .summary-key-circle {
+        height: 25px;
+        width: 25px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 10px;
+      }
