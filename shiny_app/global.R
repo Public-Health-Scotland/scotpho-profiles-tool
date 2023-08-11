@@ -164,8 +164,7 @@ ind_hsc_list <- c("Preventable emergency hospitalisation for a chronic condition
                   "Repeat emergency hospitalisation in the same year",
                   "Mortality amenable to health care",                            
                   "All-cause premature mortality",
-                  "Dying in hospital", "Mortality amenable to health care")
-
+                  "Mortality amenable to health care")
 
 # scotpho profile names -----
 profile_list <- setNames(c('HWB',
@@ -185,13 +184,11 @@ profile_list <- setNames(c('HWB',
 
 profile_list_filter <-c(setNames("Show all", "Show all"), sort(profile_list))
   
-#  measure types -----
-
-depr_measure_types <- c("Trend", 
-                        "Gap", 
-                        "Risk") # for inequalities tab
-
-
+#  measure options for inequalities tab -----
+depr_measure_options <- c("Patterns of inequality",
+                          "Inequality gap", 
+                          "Potential for improvement",
+                          "About these options")
 
 # 4. chart themes  ----------------------------------------------------------------
 

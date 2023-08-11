@@ -16,17 +16,14 @@ function(input, output, session) {
   source(file.path("server scripts/dataServer.R"), local = TRUE)$value # Data tab
   source(file.path("server scripts/definitionsServer.R"), local = TRUE)$value # Indicator definitions tab
 
+  # Keeps the shiny app from timing out quickly 
   autoInvalidate <- reactiveTimer(10000)
   observe({
     autoInvalidate()
     cat(".")
   })
   
-
 }
+
  
-
 ## END 
-    
-
-
