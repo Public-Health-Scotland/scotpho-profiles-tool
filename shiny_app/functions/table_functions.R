@@ -46,7 +46,7 @@ widgetTable <- function(data, options = list(), columns = list(), deps = list(),
                   compact = TRUE,
                   defaultExpanded = T,
                   sortable = F,
-                  defaultPageSize = 60,
+                  defaultPageSize = nrow(data),
                   theme = table_theme(), # see function above
                   highlight = TRUE)
   
