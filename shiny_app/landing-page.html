@@ -94,13 +94,23 @@
          <h3>Indicator updates</h3>
          <hr>
          <div class = white-box-inner>
+           <div>
             <h4>Updates schedule</h4>
             <p>Click below to find out when an indicator is due to be updated.</p>
             <button class = "button" onclick="$('li:eq(8) a').tab('show');" role="button">View updates schedule</button>  
             <hr>
+            </div>
+            <div>
             <h4>Recent updates</h4>
             <p> Click below to view all indicators updated in the last 3 months. </p>
             {{ latest_updates_button }} <!-- Note: This is an R object - see UI/server scripts -->
+         </div>
+         <hr>
+         <div>
+            <h4>Feedback</h4>
+            <p>If you have any feedback about the ScotPHO profiles tool please contact us as <a href="mailto:phs.scotpho@phs.scot" target="_blank">phs.scotpho@phs.scot</a>.
+            </p>
+         </div>
          </div>
       </div>
       <!-- Links to new indicators/features in the dashboard -->
@@ -113,8 +123,12 @@
             <a href="https://scotland.shinyapps.io/phs-care-and-wellbeing-dashboard/">Care and Wellbeing Portfolio Dashboard</a> 
             to assist with their ambition of providing data and intelligence to improve population health, address health inequalities and improve the health and care system.</p>
             <hr>
-            <h4>Indicator definitions tab</h4>
-            <p>Our new Indicator definitions tab allows you to quickly explore what indicators are available in this tool and at what geography level, as well as detailed information about the methodology used to create each indicator and related links. 
+            <h4>Profile summary design</h4>
+            <p>Our <a onclick="$('li:eq(1) a').tab('show');" style="cursor: pointer;">‘Profiles Summary’ page</a> has been re-designed bringing back the spine chart style visualisations. 
+            </p>
+            <hr>
+            <h4>Inequalities indicators</h4>
+            <p>We have expanded the range of indicators available within the ‘Inequalities’ page, these now include indicators where an increasing value indicates a more favourable outcome such as life expectancy. 
             </p>
          </div>
       </div>
