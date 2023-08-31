@@ -3,7 +3,7 @@
 ###############################################.
 
 summaryTab <- tabPanel(
-  value = "rank",
+  value = "summary",
   div(div(class="fa fa-list-ul", role = "navigation"), "Summary"),
   
 
