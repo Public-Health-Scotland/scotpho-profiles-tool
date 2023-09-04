@@ -15,3 +15,11 @@ In this respository you can find the code used to produce [ScotPHO's Online Prof
 - ui scripts: collection of scripts controlling the user interface for various different tabs within the tool.For ease of navigation and code editing each tab of the dashboard has separate ui scripts
 - server scripts: collection of scripts controlling server side actions of various tabs.For ease of navigation and code editing each tab of the dashboard has separate server scripts
 - www: includes all the images and media used in the app.
+
+##RENV
+-The Project makes use of the RENV package to help create a reproducible environment for this repository
+-The version of R and all current packages needed to run this project are recorded in the renv lockfile
+-The lockfile, renv.lock, records the metadata about every package used for the project so that they can be re-installed in their correct versions as required by the project and also the repos to install from.
+-Packages can still be installed as normal but would have quicker install times by using the source argument in the install.packages() function e.g install.packages("package name", type="source"). this will copy binaries from PHS posit package manager directly into your project package library
+-Please remember to call renv::snapshot() after installing or updating packages and modifying code to use that new package. this will update the lock file to add data for this new package.Changes will be reflected when pushed to github 
+-Other users will be made aware of the changes after refreshing their local repo from github. they will have to run renv::restore() or install the packages manually.

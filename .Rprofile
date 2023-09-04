@@ -1,3 +1,7 @@
+## 1 Renv activation
+source("renv/activate.R")
+
+### 2 Load Geospatial libraries
 # Set environment variables to point to installations of geospatial libraries ----
 
 ## Amend 'LD_LIBRARY_PATH' ----
