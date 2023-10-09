@@ -67,6 +67,20 @@
 
 // Track downloads .......................................
 
+  $(document).on('click', '#download_summary_pdf', function(e) {
+  gtag('event', 'download', {'event_category' : 'data_download',
+    'event_label' : 'download_summary_pdf'
+  });
+  
+});
+
+  $(document).on('click', '#download_summary_csv', function(e) {
+  gtag('event', 'download', {'event_category' : 'data_download',
+    'event_label' : 'download_summary_csv'
+  });
+  
+});
+
   $(document).on('click', '#download_trend', function(e) {
   gtag('event', 'download', {'event_category' : 'data_download',
     'event_label' : 'download_trend_data'
