@@ -78,13 +78,15 @@ iz_bound <- readRDS("data/IZ_boundary.rds") # Intermediate zone
 ind_dat <- techdoc %>%
   mutate(across(contains("Profile_Domain"),  ~ sub("\\-.*", "", .))) %>%
   rename(Profile_short1 = Profile_Domain1,
-         Profile_short2 = Profile_Domain2)%>%
-  mutate(profile_short = ifelse(is.na(Profile_short2), Profile_short1, paste0(Profile_short1, ",", Profile_short2)))%>%
+         Profile_short2 = Profile_Domain2,
+         Profile_short3 = Profile_Domain3)%>%
+  rowwise() %>% 
+  mutate(profile_short = paste0(na.omit(c(Profile_short1, Profile_short2, Profile_short3)), collapse = ",")) %>% 
+  ungroup() %>% 
   bind_rows(mutate(., profile_short = "Show all")) %>%
-  select(-c("active", "interpretation", "COVID impact", "indicator_author", "analyst_notes", "days_since_update","source_last_updated", "source_next_update", "scotpho_profiles", "Profile_short1", "Profile_short2")) %>%
+  select(-c("active", "interpretation", "COVID impact", "indicator_author", "analyst_notes", "days_since_update","source_last_updated", "source_next_update", "scotpho_profiles", "Profile_short1", "Profile_short2", "Profile_short3")) %>%
   mutate(across(profile:profile_short, ~replace_na(.,"N/A"))) %>%
   mutate(next_update_column = ifelse(next_update == "TBC", NA, paste("01-", next_update, sep = "")))
-
 
 ind_dat$next_update_column <- format(
   as.Date(ind_dat$next_update_column, "%d-%b-%Y") , "%Y-%m-%d")
@@ -130,7 +132,9 @@ areatype_list <- c("Alcohol & drug partnership",
 
 topic_list_filter <- as.factor(c("Show all",unique(sort(c(
   substr(optdata$profile_domain1, 5, nchar(as.vector(optdata$profile_domain1))), 
-  substr(optdata$profile_domain2, 5, nchar(as.vector(optdata$profile_domain2)))))))) 
+  substr(optdata$profile_domain2, 5, nchar(as.vector(optdata$profile_domain2))),
+  substr(optdata$profile_domain3, 5, nchar(as.vector(optdata$profile_domain3)))
+  ))))) 
 
 topic_list <- topic_list_filter[-1] #taking out show all from list
 
@@ -173,14 +177,16 @@ profile_list <- setNames(c('HWB',
                            'DRG',
                            'MEN', 
                            'TOB', 
-                           'POP'),
+                           'POP',
+                           'CWB'),
                          c('Health & wellbeing',
                            'Children & young people',
                            'Alcohol',
                            'Drugs',
                            'Mental Health', 
                            'Tobacco control', 
-                           'Population'))
+                           'Population',
+                           'Care & wellbeing'))
 
 profile_list_filter <-c(setNames("Show all", "Show all"), sort(profile_list))
   

@@ -36,7 +36,9 @@ summary_data <- reactive ({
   dt <- as.data.table(optdata)
   
   # filter by selected profile
-  dt <- dt[substr(profile_domain1, 1, 3) == input$summary_profile | substr(profile_domain2, 1, 3) == input$summary_profile]
+  dt <- dt[substr(profile_domain1, 1, 3) == input$summary_profile |
+           substr(profile_domain2, 1, 3) == input$summary_profile |
+           substr(profile_domain3, 1, 3) == input$summary_profile  ]
   
   # filter by chosen area and get latest data for each indicator
   chosen_area <- dt[areaname == input$geoname_summary & areatype == input$geotype_summary & type_definition != "Number",
@@ -72,12 +74,14 @@ summary_data <- reactive ({
 
 
   # identify correct domain and arrange by domain
-  # this is because there are 2 domain columns in dataset as some indicators belong to more than 1 profile/domain
+  # this is because there are 3 domain columns in dataset as some indicators belong to more than 1 profile/domain
   final <- final %>%
     mutate(domain = as.factor(case_when(
       substr(profile_domain1,1,3)== input$summary_profile ~
         substr(profile_domain1, 5, nchar(as.vector(profile_domain1))),
-      TRUE ~ substr(profile_domain2, 5, nchar(as.vector(profile_domain2)))))) %>%
+      substr(profile_domain2,1,3)== input$summary_profile ~
+        substr(profile_domain2, 5, nchar(as.vector(profile_domain2))),
+      TRUE ~ substr(profile_domain3, 5, nchar(as.vector(profile_domain3)))))) %>%
     arrange(domain)
   
   

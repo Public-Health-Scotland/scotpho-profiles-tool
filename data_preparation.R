@@ -94,7 +94,7 @@ prepare_andyp_data <- function(filename, indic_id) {
 #   #filtering out non-active indicators
 #   filter(active == "A")
 
-definition_table <- read.xlsx(paste0(lookups,"Technical_Document.xlsx"),sheet=1,sep.names = " ") %>%
+definition_table <- read.xlsx(paste0(lookups,"Technical_Document_paul.xlsx"),sheet=1,sep.names = " ") %>%
   mutate(indicator_number = as.factor(indicator_number)) %>%
   mutate(across(c(source_last_updated,source_next_update,last_updated,next_update), ~ convertToDate(.)),
          days_since_update=day(as.period(floor_date(last_updated, "month") %--% today(), unit="days")),
@@ -124,7 +124,7 @@ saveRDS(geo_lookup, "shiny_app/data/geo_lookup.rds")
 #   mutate(ind_id =as.numeric(ind_id)) %>%
 #   mutate_if(is.character, factor)  # converting variables into factors
 
-ind_lookup <- read_excel(paste0(lookups,"Technical_Document.xlsx"),sheet=2) %>%
+ind_lookup <- read_excel(paste0(lookups,"Technical_Document_paul.xlsx"),sheet=2) %>%
   setNames(tolower(names(.))) %>% #variables to lower case
   mutate(ind_id =as.numeric(ind_id)) %>%
   mutate_if(is.character, factor) # converting variables into factors
@@ -256,7 +256,8 @@ optdata <- readRDS("shiny_app/data/optdata.rds")
 ###############################################.
 #Creating a file with a column for profile and another one for domain
 profile_lookup <- data.frame(profile_domain = c(paste(unique(optdata$profile_domain1)),
-                                                paste(unique(optdata$profile_domain2)))) %>%
+                                                paste(unique(optdata$profile_domain2)),
+                                                paste(unique(optdata$profile_domain3)))) %>%
   mutate(profile = substr(profile_domain, 1, 3),
          domain = substr(profile_domain, 5, nchar(as.vector(profile_domain)))) %>%
   select(-profile_domain)
@@ -309,7 +310,7 @@ data_depr <- bind_rows(data_depr, andyp_data) %>% ## joining the old andy pulfor
 #Merging with indicator and geography information
 data_depr <- left_join(x=data_depr, y=ind_lookup, by="ind_id")
 data_depr <- left_join(x=data_depr, y=geo_lookup, by="code") %>%
-  select(-profile_domain1, -profile_domain2, -areaname_full, -parent_area) %>%
+  select(-profile_domain1, -profile_domain2, -profile_domain3, -areaname_full, -parent_area) %>%
   mutate(quintile = recode(quintile, "1" = "1 - most deprived",
                            "5" = "5 - least deprived")) %>%
   droplevels()
