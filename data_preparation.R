@@ -96,6 +96,7 @@ prepare_andyp_data <- function(filename, indic_id) {
 
 definition_table <- read.xlsx(paste0(lookups,"Technical_Document.xlsx"),sheet=1,sep.names = " ") %>%
   mutate(indicator_number = as.factor(indicator_number)) %>%
+  #expect N/A to be introduced below as some dates are strings warning of TBC or not active indicators - probably safe to ignore warnings
   mutate(across(c(source_last_updated,source_next_update,last_updated,next_update), ~ convertToDate(.)),
          days_since_update=day(as.period(floor_date(last_updated, "month") %--% today(), unit="days")),
          across(c(source_last_updated,source_next_update,last_updated,next_update), ~ strftime(.,'%b-%Y')))%>%
