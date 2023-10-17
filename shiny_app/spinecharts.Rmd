@@ -42,6 +42,8 @@ profile <- if(params$chosen_profile == "HWB"){
   "Tobacco control"
 } else if (params$chosen_profile == "DRG"){
   "Drugs"
+} else if (params$chosen_profile == "CWB"){
+  "Care and Wellbeing"
 } else {"Population"
 }
 
