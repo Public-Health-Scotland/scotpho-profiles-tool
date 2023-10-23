@@ -94,7 +94,7 @@ prepare_andyp_data <- function(filename, indic_id) {
 #   #filtering out non-active indicators
 #   filter(active == "A")
 
-definition_table <- read.xlsx(paste0(lookups,"Technical_Document_paul.xlsx"),sheet=1,sep.names = " ") %>%
+definition_table <- read.xlsx(paste0(lookups,"Technical_Document.xlsx"),sheet=1,sep.names = " ") %>%
   mutate(indicator_number = as.factor(indicator_number)) %>%
   mutate(across(c(source_last_updated,source_next_update,last_updated,next_update), ~ convertToDate(.)),
          days_since_update=day(as.period(floor_date(last_updated, "month") %--% today(), unit="days")),
@@ -124,7 +124,7 @@ saveRDS(geo_lookup, "shiny_app/data/geo_lookup.rds")
 #   mutate(ind_id =as.numeric(ind_id)) %>%
 #   mutate_if(is.character, factor)  # converting variables into factors
 
-ind_lookup <- read_excel(paste0(lookups,"Technical_Document_paul.xlsx"),sheet=2) %>%
+ind_lookup <- read_excel(paste0(lookups,"Technical_Document.xlsx"),sheet=2) %>%
   setNames(tolower(names(.))) %>% #variables to lower case
   mutate(ind_id =as.numeric(ind_id)) %>%
   mutate_if(is.character, factor) # converting variables into factors
@@ -344,32 +344,6 @@ data_depr <- data_depr %>%
 
 saveRDS(data_depr, "shiny_app/data/deprivation_data.rds")
 
-###############################################.
-## Shapefiles ----
-###############################################.
-##########################.
-### Council area
-ca_bound_orig <- readRDS(paste0(shapefiles, "CA_boundary.rds"))
-saveRDS(ca_bound_orig, "shiny_app/data/CA_boundary.rds")
-##########################.
-###Health board
-hb_bound_orig <- readRDS(paste0(shapefiles, "HB_boundary.rds"))
-saveRDS(hb_bound_orig, "shiny_app/data/HB_boundary.rds")
-##########################.
-###HSC Partnership
-hscp_bound_orig <- readRDS(paste0(shapefiles, "HSCP_boundary.rds"))
-saveRDS(hscp_bound_orig, "shiny_app/data/HSCP_boundary.rds")
-###############################################.
-# HSC locality
-locality_shp <- readRDS(paste0(shapefiles, "HSC_locality_boundary.rds"))
-saveRDS(locality_shp, "shiny_app/data/HSC_locality_boundary.rds")
-##########################.
-###Intermediate zone
-iz_bound <- readRDS(paste0(shapefiles, "IZ_boundary.rds"))
-saveRDS(iz_bound, "shiny_app/data/IZ_boundary.rds")
-
-##END
-
 
 ################################################################
 # Gap year data generation
@@ -407,5 +381,32 @@ optdata_with_gap_years = rbind(
 
 # saving the optdata with gap years as the final optdata
 saveRDS(optdata_with_gap_years, "shiny_app/data/optdata.rds")
+
+
+###############################################.
+## Shapefiles ----
+###############################################.
+##########################.
+### Council area
+ca_bound_orig <- readRDS(paste0(shapefiles, "CA_boundary.rds"))
+saveRDS(ca_bound_orig, "shiny_app/data/CA_boundary.rds")
+##########################.
+###Health board
+hb_bound_orig <- readRDS(paste0(shapefiles, "HB_boundary.rds"))
+saveRDS(hb_bound_orig, "shiny_app/data/HB_boundary.rds")
+##########################.
+###HSC Partnership
+hscp_bound_orig <- readRDS(paste0(shapefiles, "HSCP_boundary.rds"))
+saveRDS(hscp_bound_orig, "shiny_app/data/HSCP_boundary.rds")
+###############################################.
+# HSC locality
+locality_shp <- readRDS(paste0(shapefiles, "HSC_locality_boundary.rds"))
+saveRDS(locality_shp, "shiny_app/data/HSC_locality_boundary.rds")
+##########################.
+###Intermediate zone
+iz_bound <- readRDS(paste0(shapefiles, "IZ_boundary.rds"))
+saveRDS(iz_bound, "shiny_app/data/IZ_boundary.rds")
+
+##END
 
 
