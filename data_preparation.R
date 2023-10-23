@@ -256,7 +256,8 @@ optdata <- readRDS("shiny_app/data/optdata.rds")
 ###############################################.
 #Creating a file with a column for profile and another one for domain
 profile_lookup <- data.frame(profile_domain = c(paste(unique(optdata$profile_domain1)),
-                                                paste(unique(optdata$profile_domain2)))) %>%
+                                                paste(unique(optdata$profile_domain2)),
+                                                paste(unique(optdata$profile_domain3)))) %>%
   mutate(profile = substr(profile_domain, 1, 3),
          domain = substr(profile_domain, 5, nchar(as.vector(profile_domain)))) %>%
   select(-profile_domain)
@@ -309,7 +310,7 @@ data_depr <- bind_rows(data_depr, andyp_data) %>% ## joining the old andy pulfor
 #Merging with indicator and geography information
 data_depr <- left_join(x=data_depr, y=ind_lookup, by="ind_id")
 data_depr <- left_join(x=data_depr, y=geo_lookup, by="code") %>%
-  select(-profile_domain1, -profile_domain2, -areaname_full, -parent_area) %>%
+  select(-profile_domain1, -profile_domain2, -profile_domain3, -areaname_full, -parent_area) %>%
   mutate(quintile = recode(quintile, "1" = "1 - most deprived",
                            "5" = "5 - least deprived")) %>%
   droplevels()
@@ -342,32 +343,6 @@ data_depr <- data_depr %>%
   ))) %>% droplevels()
 
 saveRDS(data_depr, "shiny_app/data/deprivation_data.rds")
-
-###############################################.
-## Shapefiles ----
-###############################################.
-##########################.
-### Council area
-ca_bound_orig <- readRDS(paste0(shapefiles, "CA_boundary.rds"))
-saveRDS(ca_bound_orig, "shiny_app/data/CA_boundary.rds")
-##########################.
-###Health board
-hb_bound_orig <- readRDS(paste0(shapefiles, "HB_boundary.rds"))
-saveRDS(hb_bound_orig, "shiny_app/data/HB_boundary.rds")
-##########################.
-###HSC Partnership
-hscp_bound_orig <- readRDS(paste0(shapefiles, "HSCP_boundary.rds"))
-saveRDS(hscp_bound_orig, "shiny_app/data/HSCP_boundary.rds")
-###############################################.
-# HSC locality
-locality_shp <- readRDS(paste0(shapefiles, "HSC_locality_boundary.rds"))
-saveRDS(locality_shp, "shiny_app/data/HSC_locality_boundary.rds")
-##########################.
-###Intermediate zone
-iz_bound <- readRDS(paste0(shapefiles, "IZ_boundary.rds"))
-saveRDS(iz_bound, "shiny_app/data/IZ_boundary.rds")
-
-##END
 
 
 ################################################################
@@ -406,5 +381,32 @@ optdata_with_gap_years = rbind(
 
 # saving the optdata with gap years as the final optdata
 saveRDS(optdata_with_gap_years, "shiny_app/data/optdata.rds")
+
+
+###############################################.
+## Shapefiles ----
+###############################################.
+##########################.
+### Council area
+ca_bound_orig <- readRDS(paste0(shapefiles, "CA_boundary.rds"))
+saveRDS(ca_bound_orig, "shiny_app/data/CA_boundary.rds")
+##########################.
+###Health board
+hb_bound_orig <- readRDS(paste0(shapefiles, "HB_boundary.rds"))
+saveRDS(hb_bound_orig, "shiny_app/data/HB_boundary.rds")
+##########################.
+###HSC Partnership
+hscp_bound_orig <- readRDS(paste0(shapefiles, "HSCP_boundary.rds"))
+saveRDS(hscp_bound_orig, "shiny_app/data/HSCP_boundary.rds")
+###############################################.
+# HSC locality
+locality_shp <- readRDS(paste0(shapefiles, "HSC_locality_boundary.rds"))
+saveRDS(locality_shp, "shiny_app/data/HSC_locality_boundary.rds")
+##########################.
+###Intermediate zone
+iz_bound <- readRDS(paste0(shapefiles, "IZ_boundary.rds"))
+saveRDS(iz_bound, "shiny_app/data/IZ_boundary.rds")
+
+##END
 
 

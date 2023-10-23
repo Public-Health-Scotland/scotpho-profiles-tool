@@ -278,7 +278,8 @@ filter_table <- reactive ({
         filtered_geos <- optdata %>%  
           filter(year>=input$date_from[1] & year<=input$date_from[2] &
                    (substr(profile_domain1, 5, nchar(as.vector(profile_domain1))) %in%  input$topic_filter |
-                      substr(profile_domain2, 5, nchar(as.vector(profile_domain2))) %in%  input$topic_filter))
+                    substr(profile_domain2, 5, nchar(as.vector(profile_domain2))) %in%  input$topic_filter |
+                    substr(profile_domain3, 5, nchar(as.vector(profile_domain3))) %in%  input$topic_filter))
         
       } else {
         
@@ -292,14 +293,16 @@ filter_table <- reactive ({
                    code %in% input$code) %>% 
           filter(year>=input$date_from[1] & year<=input$date_from[2] & 
                    (substr(profile_domain1, 5, nchar(as.vector(profile_domain1))) == input$topic_filter |
-                      substr(profile_domain2, 5, nchar(as.vector(profile_domain2))) == input$topic_filter))
+                    substr(profile_domain2, 5, nchar(as.vector(profile_domain2))) == input$topic_filter |
+                    substr(profile_domain3, 5, nchar(as.vector(profile_domain3))) == input$topic_filter))
         
         filtered_geo2 <- if (input$scotland == TRUE) {
           optdata %>% 
             filter(areaname == "Scotland" & 
                      year>=input$date_from[1] & year<=input$date_from[2] & 
                      (substr(profile_domain1, 5, nchar(as.vector(profile_domain1))) %in%  input$topic_filter |
-                        substr(profile_domain2, 5, nchar(as.vector(profile_domain2))) %in%  input$topic_filter))
+                      substr(profile_domain2, 5, nchar(as.vector(profile_domain2))) %in%  input$topic_filter|
+                      substr(profile_domain3, 5, nchar(as.vector(profile_domain3))) == input$topic_filter))
         }  
         
         # Merging together Scotland and other areas selected
@@ -312,9 +315,9 @@ filter_table <- reactive ({
       if (input$all_data == TRUE) {
         filtered_geos <- optdata %>%  
           filter(year>=input$date_from[1] & year<=input$date_from[2]) %>% 
-          filter((grepl((paste0("^",input$profile_filter,collapse="|")),
-                        profile_domain1))|(grepl((paste0("^",input$profile_filter,collapse="|")),
-                                                 profile_domain2)))
+          filter((grepl((paste0("^",input$profile_filter,collapse="|")), profile_domain1))|
+                  (grepl((paste0("^",input$profile_filter,collapse="|")), profile_domain2))|
+                  (grepl((paste0("^",input$profile_filter,collapse="|")), profile_domain3)))
       } else {
         filtered_geo <- optdata %>% 
           filter((areaname %in% input$iz_true & areatype == "Intermediate zone")|
@@ -325,18 +328,17 @@ filter_table <- reactive ({
                    (areaname %in% input$hscp_true & areatype == "HSC partnership")|
                    (code %in% input$code)) %>% 
           filter(year>=input$date_from[1] & year<=input$date_from[2]) %>% 
-          filter((grepl((paste0("^",input$profile_filter,collapse="|")),
-                        profile_domain1))|
-                   (grepl((paste0("^",input$profile_filter,collapse="|")),
-                          profile_domain2)))
+          filter((grepl((paste0("^",input$profile_filter,collapse="|")), profile_domain1))|
+                   (grepl((paste0("^",input$profile_filter,collapse="|")), profile_domain2))|
+                   (grepl((paste0("^",input$profile_filter,collapse="|")), profile_domain3)))
         
         filtered_geo2 <- if (input$scotland == TRUE) {
           optdata %>% 
             filter(areaname == "Scotland" &
                      year>=input$date_from[1] & year<=input$date_from[2]) %>% 
-            filter((grepl((paste0("^",input$profile_filter,collapse="|")),
-                          profile_domain1))|(grepl((paste0("^",input$profile_filter,collapse="|")),
-                                                   profile_domain2)))
+            filter((grepl((paste0("^",input$profile_filter,collapse="|")), profile_domain1))|
+                     (grepl((paste0("^",input$profile_filter,collapse="|")),profile_domain2))|
+                     (grepl((paste0("^",input$profile_filter,collapse="|")),profile_domain3)))
           
         }
         # Merging together Scotland and other areas selected
