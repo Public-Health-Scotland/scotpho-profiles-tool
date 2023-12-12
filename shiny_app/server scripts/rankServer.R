@@ -379,7 +379,9 @@ poly_map <- reactive({
   } else if(input$geotype_rank == "HSC partnership"){
     map_pol <- sp::merge(hscp_bound, rank_bar_data(), by='code')
   } else if(input$geotype_rank == "HSC locality"){
-    map_pol <- sp::merge(hscloc_bound, rank_bar_data(), by='code')
+    # Temporary fix: match localities on name rather than code due to recent boundary changes
+    # Until shape file has been updated
+    map_pol <- sp::merge(hscloc_bound, rank_bar_data(), by.x='area_name', by.x = 'areaname')
     map_pol <- map_pol %>% subset(parent_area == input$loc_iz_rank)
   } else if(input$geotype_rank == "Intermediate zone"){
     map_pol <- sp::merge(iz_bound, rank_bar_data(), by='code')
