@@ -12,6 +12,20 @@ header-includes:
    - \usepackage[T1]{fontenc}
    - \usepackage{fancyhdr}
    - \usepackage{graphicx}
+   - \usepackage{longtable}
+   - \usepackage{tabu}
+   - \usepackage{booktabs}
+   - \usepackage{array}
+   - \usepackage{multirow}
+   - \usepackage{wrapfig}
+   - \usepackage{float}
+   - \usepackage{colortbl}
+   - \usepackage{pdflscape}
+   - \usepackage{threeparttable}
+   - \usepackage{threeparttablex}
+   - \usepackage[normalem]{ulem}
+   - \usepackage{makecell}
+   - \usepackage{xcolor}
 mainfont: SourceSansPro
 
 
@@ -71,8 +85,8 @@ knitr::opts_chunk$set(warning = FALSE, message = FALSE)
 
 ```{r echo=FALSE, message= FALSE}
 
-
-# function to create spine plot for each indicator
+# 
+# # function to create spine plot for each indicator
 create_indicator_plot <- function(data, chosen_area_colour) {
   plot <- ggplot(data, aes(x = indicator, y = GraphPoint, fill = quantiles)) +
     geom_bar(stat = "identity", width = 0.75) +
@@ -97,14 +111,17 @@ graph_directory <- tempdir()
 
 
 
-# pivot reactive dataframe in longer format (required for ggplot)
+# # pivot reactive dataframe in longer format (required for ggplot)
  df <- params$reactive_df %>%
    select(indicator, one, two, three, four, scotland_value, measure, chosen_value, marker_colour, def_period, type_definition) %>%
    pivot_longer(cols = c("one", "two", "three", "four"), values_to = "GraphPoint", names_to = "quantiles")
 
 
-# required to ensure % symbol displays correctly
-df$indicator <- str_replace(df$indicator, "%", "\\\\%")
+# required to ensure special characters displays correctly
+df$indicator <- str_replace_all(df$indicator, "%", "\\\\%")
+df$indicator <- str_replace(df$indicator, "&", "\\\\&")
+
+
 
 # trim down some measure descriptions
 df <- df %>%
@@ -134,39 +151,41 @@ table$ind <- linebreak(table$ind)
 
 
 # get unique indicator list
-unique_indicators <- unique(df$indicator)
+ unique_indicators <- unique(df$indicator)
 
-# Counter variable to keep track of which chart being generated
+ # Counter variable to keep track of which chart being generated
 counter <- 1
 
 # Iterate over each indicator and create/save a spineplot
+
 for (indicator in unique_indicators) {
 
   # Filter the data for the current indicator
   indicator_data <- df %>% filter(indicator == !!indicator)
 
   # get colour for point
-  chosen_area_colour <- unique(indicator_data$marker_colour)
+   chosen_area_colour <- unique(indicator_data$marker_colour)
 
-  # create the plot
+ # create the plot
   plot <- create_indicator_plot(indicator_data, chosen_area_colour)
 
-  # create filename
+ # create filename
   filename <- sprintf("%s/%s.png", graph_directory, counter)
 
-  # increase counter variable
-  counter <- counter + 1
+ # increase counter variable
+   counter <- counter + 1
 
-  # Save the plot as a PNG with the filename created
+ # Save the plot as a PNG with the filename created
   ggsave(filename, plot = plot, units="mm", width=60, height=6, dpi=300)
 }
 
 
-# escape the '&' symbol from chosen geography so displays in column headers
-chosen_area <- gsub("&", "\\\\&", params$chosen_area)
+# # escape the '&' symbol from chosen geography so displays in column headers
+ chosen_area <- gsub("&", "\\\\&", params$chosen_area)
 
 # define column headers for the pdf table
-col_names = c("indicator", chosen_area, "Scotland", "Spine chart")
+col_names = c("indicator", chosen_area, "Scotland", "Spine chart"
+              )
 
 ```
 
@@ -183,8 +202,8 @@ table %>%
     escape = FALSE, # ensures latex formatting on indicator column works (i.e.bold/italics,linebreaks)
     longtable = TRUE,
     col.names = col_names
-    ) %>% # ensures table goes across multiple pages when too long
-
+     ) %>% # ensures table goes across multiple pages when too long
+  
   # format header
   row_spec(0, background = "#032F4F", color = "white") %>%
 
