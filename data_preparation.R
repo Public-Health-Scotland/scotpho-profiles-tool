@@ -162,10 +162,8 @@ View(duplicate_file_check)
 
 # Bringing data created by SPSS code extracting from database
 data_spss <- read_csv(paste0(shiny_files, "All Data for Shiny.csv"),
-                      col_types = cols(NUMERATOR = col_number())) %>%
-  setNames(tolower(names(.)))%>% #names to lower case
-  rename(ind_id = indicator_id, code = geography_code) %>%
-  select(-update_date) %>%
+                      col_types = cols(numerator = col_number())) %>%
+  setNames(tolower(names(.))) %>% #names to lower case
   # excluding indicators already present in shiny folder data files
   filter(!(ind_id %in% unique(optdata$ind_id))) %>%
   # exclude non-active indicators from old profiles tool dataset (drugs funded by crime)
