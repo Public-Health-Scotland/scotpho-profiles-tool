@@ -1,412 +1,387 @@
-#Code to create ScotPHO's Shiny profile platform
-#This script includes the data manipulation necessary to produce data in the way
-#the Shiny app needs.
-
-############################.
-##Filepaths ----
-############################.
-if (sessionInfo()$platform %in% c("x86_64-redhat-linux-gnu (64-bit)", "x86_64-pc-linux-gnu (64-bit)")) {
-  lookups <- "/PHI_conf/ScotPHO/Profiles/Data/Lookups/"
-  shapefiles <- "/PHI_conf/ScotPHO/Profiles/Data/Shapefiles/"
-  shiny_files <- "/PHI_conf/ScotPHO/Profiles/Data/Shiny Data/"
-} else  {
-  lookups <- "//stats/ScotPHO/Profiles/Data/Lookups/"
-  shapefiles <- "//stats/ScotPHO/Profiles/Data/Shapefiles/"
-  shiny_files <- "//stats/ScotPHO/Profiles/Data/Shiny Data/"
-}
-
-############################.
-##Packages ----
-############################.
-library(dplyr)
-library(tidyr)
-library(readr)
-library(magrittr)
-library(scales) #rescaling variables
-library(haven) #for SPPS file reading
-library(data.table) #reading data
-library(zoo) # dealing with dates
-library(lubridate) #for automated list of dates in welcome modal
-library(janitor) #cleaning names
-library(readxl)
-library(rgdal) #for reading shapefiles
-library(openxlsx)
-
-###############################################.
-## Functions ----
-###############################################.
-
-# If indicator is presented as standardised rate and suppression required
-# then suppress numerator where count is less than specified value.
-# standardised rates do not require suppression of rates or CI.
-# If indicator is presented as crude rate or percentage and suppression required
-# then suppress numerator where count is less than specified value.
-# crude rate and percentages DO require suppression of rates and CI as well as numerator.
-apply_suppressions <- function(dataset) {
-  dataset %<>%
-    mutate(numerator = case_when(#std rate case
-      supression=="Y" & substr(type_id,1,2)=='sr' & numerator<supress_less_than ~ NA_real_,
-      # crude rate and percentage cases
-      supression =="Y" & (substr(type_id,1,2)=='cr' | (substr(type_id,1,1))=='%') &
-        numerator<supress_less_than ~ NA_real_, TRUE ~ numerator ), #if not keep numerator
-      measure = case_when(# crude rate and percentage cases
-        supression =="Y" & (substr(type_id,1,2)=='cr' | (substr(type_id,1,1))=='%') &
-          numerator<supress_less_than ~ NA_real_, TRUE ~ measure ),
-      lowci =case_when(# crude rate and percentage cases
-        supression =="Y" & (substr(type_id,1,2)=='cr' | (substr(type_id,1,1))=='%') &
-          numerator<supress_less_than ~ NA_real_, TRUE ~ lowci ),
-      upci =case_when(# crude rate and percentage cases
-        supression =="Y" & (substr(type_id,1,2)=='cr' | (substr(type_id,1,1))=='%') &
-          numerator<supress_less_than ~ NA_real_, TRUE ~ upci )
-    )
-}
-
-# This functions reads Andy's HSC inequality data and formats it the way we need to be joined
-# with the rest of the deprivation data
-prepare_andyp_data <- function(filename, indic_id) {
-  read_csv(paste0(shiny_files, "Inequalities HSC Data/", filename, ".csv")) %>%
-    mutate(code = paste0(substr(code, 1, 3), "0", substr(code, 5, 9)),
-           quintile = recode(as.character(quintile), "0" = "Total"),
-           quint_type = case_when(substr(code, 1, 3) == "S08" ~ "hb_quin",
-                                  substr(code, 1, 3) == "S12" ~ "ca_quin",
-                                  substr(code, 1, 3) == "S00" ~ "sc_quin"),
-           ind_id=indic_id) %>%
-    rename(measure = rate) %>%
-    select (-code2)
-
-}
-
-###############################################.
-## Technical document ----
-###############################################.
-#This code updates the Technical Document table based on an online Google Drive version of the table
-#Run every time you want to refresh the data in the local copy to represent what's in the online copy
-#This file is where indicator names and definitions are stored and are loaded into the shiny tool.
-
-# definition_table <- read_csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vTzrwAG7IFBjLvxuxUO0vJ7mn2AgilWVA1ZJQ9oVaLOSG4mgkquMKWga8MY5g2OFkFn-3awM_GYaHjL/pub?gid=94312583&single=true&output=csv") %>%
-#   as.data.frame() %>% mutate(indicator_number = as.factor(indicator_number))
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#
+# This script prepares the data files required for the ScotPHO Profiles Tool
 # 
-# #automating dates
-# new_date <- fast_strptime(paste("01",definition_table$last_updated,sep="-"),"%d-%b-%Y")
-# 
-# definition_table %<>%
-#   mutate(days_since_update=day(as.period(new_date %--% today(), unit="days"))) %>%
-#   #filtering out non-active indicators
-#   filter(active == "A")
-
-definition_table <- read.xlsx(paste0(lookups,"Technical_Document.xlsx"),sheet=1,sep.names = " ") %>%
-  mutate(indicator_number = as.factor(indicator_number)) %>%
-  mutate(across(c(source_last_updated,source_next_update,last_updated,next_update), ~ convertToDate(.)),
-         days_since_update=day(as.period(floor_date(last_updated, "month") %--% today(), unit="days")),
-         across(c(source_last_updated,source_next_update,last_updated,next_update), ~ strftime(.,'%b-%Y')))%>%
-  #filtering out non-active indicators
-  filter(active == "A")
-
-saveRDS(definition_table,"shiny_app/data/techdoc.rds") #for opt
-techdoc <- readRDS("shiny_app/data/techdoc.rds")
-#backup copy in case issues with google drive
-write_csv(definition_table, paste0("/PHI_conf/ScotPHO/Profiles/Data/Backups/techdoc_backup_", today() ,".csv"))
-
-###############################################.
-## Lookups ----
-###############################################.
-# Lookup with all geography codes information. This file is created in the lookup repo
-geo_lookup <- readRDS(paste0(lookups, "Geography/opt_geo_lookup.rds"))
-saveRDS(geo_lookup, "shiny_app/data/geo_lookup.rds")
-
-###############################################.
-## Indicator lookup table
-#Can't use read_csv as it's not the first tab of the spreadsheet.
-# For some reason, it's important that the raw tab is alphabetically sorted for this to work properly
-
-# ind_lookup <- gsheet2tbl("docs.google.com/spreadsheets/d/1JOr1_MSnKdQfg4o8qEiqX-EKDsbXUjejnAV4NzbSg78#gid=2036303524") %>%
-#   setNames(tolower(names(.))) %>% #variables to lower case
-#   mutate(ind_id =as.numeric(ind_id)) %>%
-#   mutate_if(is.character, factor)  # converting variables into factors
-
-ind_lookup <- read_excel(paste0(lookups,"Technical_Document.xlsx"),sheet=2) %>%
-  setNames(tolower(names(.))) %>% #variables to lower case
-  mutate(ind_id =as.numeric(ind_id)) %>%
-  mutate_if(is.character, factor) # converting variables into factors
-
-###############################################.
-## Indicator data ----
-###############################################.
-# Brings data prepared by spss and then delete all the one already present in shiny files
-# Eventually the spss data will be deleted.
-
-#Start creating a backup of the old file
-optdata <- readRDS("shiny_app/data/optdata.rds")
-saveRDS(optdata, paste0("/PHI_conf/ScotPHO/Profiles/Data/Backups/shiny_tool_backup_data_", today() ,".rds"))
-
-#Finds all the csv files in the shiny folder
-files <-  list.files(path = shiny_files, pattern = "*.csv", full.names = TRUE)
-# taking out spss/old opt data
-files <- files[files != "/PHI_conf/ScotPHO/Profiles/Data/Shiny Data//All Data for Shiny.csv"]
-# To check dates of update of each file and who did it
-View(file.info(files,  extra_cols = TRUE))
-
-# reads the data and combines it, variables to lower case and variable with filename
-optdata <- do.call(rbind, lapply(files, function(x){
-  fread(x)[,file_name:= x] %>% clean_names() })) %>%
-  mutate(file_name = gsub("/PHI_conf/ScotPHO/Profiles/Data/Shiny Data//", "", file_name)) %>%
-  rename(measure = rate) %>%
-  mutate_at(c("numerator", "measure", "lowci", "upci"), as.numeric) %>%
-  mutate(ind_id = as.integer(ind_id))
-
-# to check if there is more then one file for the same indicator. This should be empty
-duplicate_file_check = 
-  optdata %>% select(ind_id, file_name) %>% unique %>% group_by(ind_id) %>%
-  add_tally() %>% filter(n >1)
-View(duplicate_file_check)
-
-# Bringing data created by SPSS code extracting from database
-data_spss <- read_csv(paste0(shiny_files, "All Data for Shiny.csv"),
-                      col_types = cols(NUMERATOR = col_number())) %>%
-  setNames(tolower(names(.)))%>% #names to lower case
-  rename(ind_id = indicator_id, code = geography_code) %>%
-  select(-update_date) %>%
-  # excluding indicators already present in shiny folder data files
-  filter(!(ind_id %in% unique(optdata$ind_id))) %>%
-  # exclude non-active indicators from old profiles tool dataset (drugs funded by crime)
-  filter(ind_id != "4131") %>%
-  droplevels()
-
-# Merging together spss and shiny data folder datasets
-optdata <- bind_rows(optdata, data_spss) %>%
-  mutate_if(is.character, factor) %>%  #converting characters into factors
-  #Dealing with changes in ca, hb and hscp codes. Transforms old code versions into 2019 ones
-  mutate(code = recode(code, "S12000015"='S12000047', "S12000024"='S12000048',
-              "S12000046"='S12000049', "S12000044"='S12000050',
-              "S08000018"='S08000029', "S08000027"= 'S08000030',
-              "S08000021"='S08000031', "S08000023"= 'S08000032',
-              "S37000014"='S37000032', "S37000023"='S37000033',
-              "S37000015"='S37000034', "S37000021"='S37000035'))
-
-# Adding update date for all indicators based on technical document
-update_table <- techdoc %>% rename(ind_id = indicator_number, update_date = last_updated) %>%
-  select(ind_id, update_date) %>% filter(ind_id != "no_id") %>%
-  mutate(update_date = as.yearmon(update_date, "%b-%Y"),
-         ind_id = as.integer(paste0(ind_id)))
-
-optdata <- left_join(x=optdata, y=update_table, by=c("ind_id"))
-
-# Removing some indicators from IZ level to reduce risk of secondary disclosure.
-# until we are sure that statistical disclosure signed off.
-# deaths from suicide - 20403
-# alcohol-related deaths - 20204
-# psychiatric hospital adm - 20402
-# cancer registrations - 20301
-# Rx for drugs for depression - 20401
-# teenage pregnancies - 21001
-# mothers smoking during pregnancy - 21002
-# drug-related hospital stays - 20205.
-optdata %<>% filter(!(ind_id %in% c("20205", "20403", "20204", "20402",
-                                              "20301", "20401", "21001", "21002") &
-                                  substr(code, 1, 3) == "S02"))
-
-# TEMPORARY - take out localities data for children low income as it's not updated yet
-optdata %<>% filter(!(ind_id == "20705" & substr(code, 1, 3) == "S99"))
-
-#Merging with indicator and geography information
-optdata <- left_join(x=optdata, y=ind_lookup, by="ind_id")
-# if for some reason some indicators haven't matched with the lookup this will show them
-View(optdata %>% filter(is.na(indicator)))
-
-optdata <- left_join(x=optdata, y=geo_lookup, by="code")
-
-#Apply suppressions.
-optdata %<>% apply_suppressions()
-
-# Check that suppression has been applied properly
-# If there are rows appearing it means there are figures that meet the criteria for suppression still being included
-# i.e. numerator is 1, but suppression threshold is <5
-# Check the indicator_lookup tab in the tech doc and make sure there is no text in the suppress_less_than column
-opt_suppression_check <- optdata %>%
-  filter(supression == "Y") %>%
-  subset(numerator < supress_less_than)
-
-View(opt_suppression_check)
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-# Scaling measures (0 to 1) in groups by year, area type and indicator.
-optdata %<>% group_by(ind_id, year, areatype) %>%
-  mutate(measure_sc = case_when(interpret=="H"~ as.vector(scales::rescale(measure, to=c(1,0))),
-                                interpret=="L" ~ as.vector(scales::rescale(measure, to=c(0,1))),
-                                TRUE ~ 0))  %>% ungroup()
+# 1. Set up --------------------------------------------------------------------
 
-# Tidying up the format
-optdata %<>% #taking out some variables
-  # we will be able to exclude ind_id here once release2.0 comes out
-  select(-c(supression, supress_less_than, type_id, file_name, label_ineq)) %>%
-  #rounding variables
-  mutate(numerator = round(numerator, 2), measure = round(measure, 2),
-         lowci = round(lowci, 2), upci = round(upci, 2)) %>%
-  droplevels() %>%  #to get rid of factor levels not present in data set.
-  #Making the numerator the measure for a few indicators, so it plots correctly
-  mutate(measure = ifelse(indicator %in% c('Mid-year population estimate - all ages',
-                                           'S2 pupils who smoke (SALSUS)', 'S4 pupils who smoke (SALSUS)',
-                                           "Smoking quit attempts"), numerator, measure))
+## Dependencies  -----
 
-saveRDS(optdata, "shiny_app/data/optdata.rds")
-optdata <- readRDS("shiny_app/data/optdata.rds")
+library(dplyr) # data wrangling
+library(openxlsx) # for reading in technical document / converting excel dates
+library(readr) # for reading csv files
+library(data.table) # for quickly combining multiple files
+library(scales) # for re-scaling measures
+library(arrow) # for writing parquet files
+library(janitor) # for cleaning column names
+library(assertthat) # for data validation tests
+library(purrr) # for copying multiple files at once
 
-###############################################.
-## Profile lookup ----
-###############################################.
-#Creating a file with a column for profile and another one for domain
-profile_lookup <- data.frame(profile_domain = c(paste(unique(optdata$profile_domain1)),
-                                                paste(unique(optdata$profile_domain2)),
-                                                paste(unique(optdata$profile_domain3)))) %>%
-  mutate(profile = substr(profile_domain, 1, 3),
-         domain = substr(profile_domain, 5, nchar(as.vector(profile_domain)))) %>%
-  select(-profile_domain)
-
-saveRDS(profile_lookup, "shiny_app/data/profile_lookup.rds")
-profile_lookup <- readRDS("shiny_app/data/profile_lookup.rds")
-
-###############################################.
-## Inequalities data ----
-###############################################.
-data_depr <- readRDS("shiny_app/data/deprivation_data.rds") #deprivation/inequalities dataset
-
-saveRDS(data_depr, paste0("/PHI_conf/ScotPHO/Profiles/Data/Backups/deprivation_data_", today() ,".rds"))
-
-###############################################.
-## Preparing Andy's indicators data
-
-andyp_data <- rbind( # merging together all indicators
-  prepare_andyp_data("01_pc_access_sii_rii_opt", 1),
-  prepare_andyp_data("04_prev_hosp_sii_rii_opt", 4),
-  prepare_andyp_data("05_rep_hosp_sii_rii_opt", 5),
-  prepare_andyp_data("07_hc_amenable_mort_3-year aggregate_sii_rii_opt", 7)) %>%
-  # patients by gp is all scotland simd
-  mutate(quint_type = case_when(ind_id ==1  ~ "sc_quin",
-                                TRUE ~ quint_type))
-
-###############################################.
-## Rest of the data
-#Finds all the rds for inequalities in the data folder reads them and combine them.
-files_depr <-  list.files(path = shiny_files, pattern = "*_ineq.rds", full.names = TRUE)
-View(gsub(paste0(shiny_files, "/"), "", files_depr))
-data_depr <- do.call(rbind, lapply(files_depr, readRDS)) %>%
-  rename(measure = rate)
-
-# Merging with Andy's data and then formatting
-data_depr <- bind_rows(data_depr, andyp_data) %>% ## joining the old andy pulford indicators with PHS generated inequalities indicators
-  mutate_if(is.character,factor) %>% #converting characters into factors
-  mutate_at(c("numerator", "measure", "lowci", "upci", "rii", "upci_rii",
-              "lowci_rii", "sii", "lowci_sii", "upci_sii", "par", "abs_range",
-              "rel_range", "rii_int", "lowci_rii_int", "upci_rii_int"),
-            round, 1) %>%
-  #Dealing with changes in ca, hb and hscp codes. Transforms old code versions into 2019 ones
-  mutate(code = recode(code, "S12000015"='S12000047', "S12000024"='S12000048',
-                       "S12000046"='S12000049', "S12000044"='S12000050',
-                       "S08000018"='S08000029', "S08000027"= 'S08000030',
-                       "S08000021"='S08000031', "S08000023"= 'S08000032',
-                       "S37000014"='S37000032', "S37000023"='S37000033',
-                       "S37000015"='S37000034', "S37000021"='S37000035'))
-
-#Merging with indicator and geography information
-data_depr <- left_join(x=data_depr, y=ind_lookup, by="ind_id")
-data_depr <- left_join(x=data_depr, y=geo_lookup, by="code") %>%
-  select(-profile_domain1, -profile_domain2, -profile_domain3, -areaname_full, -parent_area) %>%
-  mutate(quintile = recode(quintile, "1" = "1 - most deprived",
-                           "5" = "5 - least deprived")) %>%
-  droplevels()
-
-data_depr <- data_depr %>% apply_suppressions() #Apply suppressions.
-
-# Check suppression has been applied properly
-depr_suppression_check <- data_depr %>%
-  filter(supression == "Y") %>%
-  subset(numerator < supress_less_than)
-
-View(depr_suppression_check)
-
-# Manipulations/calculations required for inequalities module charting/dynamic text
-data_depr <- data_depr %>%
-  group_by(ind_id, year, quint_type, code) %>%
-  arrange(ind_id, year, quint_type, code, desc(measure)) %>%
-  mutate(sii_gradient = case_when(sii>0 ~ "positive", sii<0 ~ "negative", sii==0 ~ "zero")) %>%  # label if sii positive or negative (helps with health inequality dynamic summary text)
-  mutate(rii_gradient = case_when(rii_int>0 ~ "positive", rii_int<0 ~ "negative", rii_int==0 ~ "zero")) %>% # label if rii positive or negative (helps with health inequality dynamic summary text)
-  mutate(par_gradient = case_when(par>0 ~ "positive", par<0 ~ "negative", par==0 ~ "zero")) %>% # label if par positive or negative (helps with health inequality dynamic summary text)
-  mutate(qmax=quintile[which.max(measure)], # which quintile contains highest rate/value (quicker to add into dataset rather than do calculation in app?)
-         qmin=quintile[which.min(measure)]) %>% # which quintile contains lowest rate/value (quicker to add into dataset rather than do calculation in app?)
-  ungroup() %>%
-  arrange(ind_id, year, code, quint_type, quintile) 
-
-# Exclude indicators which need some additional investigation
-data_depr <- data_depr %>%
-  filter(!(indicator %in% c("Healthy birth weight", # check healthy weight as seems like reverse of what i'd expect
-                            "People living in 15% most 'access deprived' areas" # does this indicator make sense in inequalities module - can't quite get my head around what this means
-  ))) %>% droplevels()
-
-saveRDS(data_depr, "shiny_app/data/deprivation_data.rds")
+source("Data preparation/Data prep functions.R")
 
 
-################################################################
-# Gap year data generation
-#################################################################
-# indicator_id = the indicator number to generate data for
-# gap_year = the missing year
-# gap_trend_axis = the string to use in the trend axis,should follow pattern for years in that indicator e.g 20122/12, 2017-2018 , 2016 etc
-# base_year = a year present in the data, on which basis faux data can be generated 
 
-create_gap_year = function(indicator_id,gap_year,base_year,gap_trend_axis) {
-  
-  indicator = optdata %>% filter(ind_id==indicator_id)
-  
-  if(!(gap_year %in% unique(indicator$year))){
-    
-    gap_year_data = indicator %>% filter(year==base_year) %>% 
-      mutate(year = gap_year ) %>%
-      mutate(across(c("def_period", "trend_axis"), ~ gsub(unique(trend_axis),gap_trend_axis,.))) %>%
-      mutate(across(c("numerator","measure","lowci","upci","measure_sc"), ~ NA))
-    
-    return(gap_year_data) 
-  } 
-  
-  else {
-    warning(paste0("ABORT!!: ",gap_year," is already contained in the data for indicator ",indicator_id))
-  }
-  
-}
+## File-paths -----
 
-optdata_with_gap_years = rbind(
-  optdata,
-  create_gap_year(21005,2020,2019,"2020/21"), # child dental health pri 1
-  create_gap_year(20901,2020,2019,"2020") # Population within 500 metres of a derelict site 
+data_folder <- "/PHI_conf/ScotPHO/Profiles/Data/"
+lookups <- paste0(data_folder, "Lookups/")
+shape_files <- paste0(data_folder, "Shapefiles/")
+shiny_files <- paste0(data_folder, "Shiny Data")
+backups <- paste0(data_folder, "Backups/")
+
+
+
+
+## Look-ups -----
+
+geography_lookup <- readRDS(
+  file = paste0(lookups, "Geography/opt_geo_lookup.rds")
 )
 
-# saving the optdata with gap years as the final optdata
-saveRDS(optdata_with_gap_years, "shiny_app/data/optdata.rds")
+
+technical_doc <- read.xlsx(
+  xlsxFile = paste0(lookups, "Technical_Document_MM.xlsx"), 
+  sheet = "Raw", 
+  sep = " ") |>
+  clean_names() |>
+  filter(active == "A")
 
 
-###############################################.
-## Shapefiles ----
-###############################################.
-##########################.
-### Council area
-ca_bound_orig <- readRDS(paste0(shapefiles, "CA_boundary.rds"))
-saveRDS(ca_bound_orig, "shiny_app/data/CA_boundary.rds")
-##########################.
-###Health board
-hb_bound_orig <- readRDS(paste0(shapefiles, "HB_boundary.rds"))
-saveRDS(hb_bound_orig, "shiny_app/data/HB_boundary.rds")
-##########################.
-###HSC Partnership
-hscp_bound_orig <- readRDS(paste0(shapefiles, "HSCP_boundary.rds"))
-saveRDS(hscp_bound_orig, "shiny_app/data/HSCP_boundary.rds")
-###############################################.
-# HSC locality
-locality_shp <- readRDS(paste0(shapefiles, "HSC_locality_boundary.rds"))
-saveRDS(locality_shp, "shiny_app/data/HSC_locality_boundary.rds")
-##########################.
-###Intermediate zone
-iz_bound <- readRDS(paste0(shapefiles, "IZ_boundary.rds"))
-saveRDS(iz_bound, "shiny_app/data/IZ_boundary.rds")
-
-##END
 
 
+
+# 2. Prepare technical Document  -----------------------------------------------
+
+## Clean date columns -----
+technical_doc <- technical_doc |>
+  mutate(
+    last_updated_date = suppressWarnings(convertToDate(last_updated)), 
+    days_since_update = difftime(Sys.Date(), last_updated_date),
+    across(
+      contains("update"), 
+      ~ suppressWarnings(strftime(convertToDate(.), "%b-%Y"))
+    )
+  )
+
+
+
+## Save file -----
+write_parquet(technical_doc, "shiny_app/data/techdoc") # version for shiny app
+write_parquet(technical_doc, paste0(backups, "techdoc-", Sys.Date())) # version for backups folder
+
+
+
+## Select columns to be joined to main indicator dataset -----
+technical_doc <- technical_doc |>
+  select(
+    ind_id, indicator, type_id, interpret, supression,
+    supress_less_than, type_definition, profile_domain1,
+    profile_domain2, profile_domain3, label_inequality
+  )
+
+
+
+
+
+# 3. Create main indicator dataset ---------------------------------------------
+
+
+## 3.1 Read in and combine data --------
+
+### Create backup of existing data from local repo -----
+if (file.exists("shiny_app/data/optdata")) {
+  
+  file.copy(
+    "shiny_app/data/optdata", 
+    paste0(backups, "main_dataset_", Sys.Date()), 
+    overwrite = TRUE
+  )
+  
+} 
+
+
+### Find all separate indicator data files in the shiny data folder -----
+indicator_data_files <- list.files(
+  path = shiny_files, 
+  pattern = "*_shiny.csv", 
+  full.names = TRUE
+)
+
+
+
+### Combine separate files into one dataset  -----
+main_dataset <- combine_files(indicator_data_files)
+
+
+
+### Read in older data ----
+# note: most indicators will have their own separate data file. 
+# However, some indicators which haven't been updated in years sit in a file called 'All Data for Shiny.csv' 
+# from when there was a different process for creating indicator data
+old_data <- read_csv(paste0(shiny_files, "/All Data for Shiny.csv")) |>
+  filter(!(ind_id %in% unique(main_dataset$ind_id)))
+
+
+
+### Combine new and old data ----
+main_dataset <- bind_rows(main_dataset, old_data)
+
+
+### Tests ----
+# note: if tests pass, 'TRUE' will print in console
+# otherwise error message will appear with details of the issue
+TEST_no_duplicate_ids(main_dataset)
+
+TEST_no_missing_indicators(main_dataset)
+
+
+
+
+## 3.2 Add technical information  ---------
+
+### Attach metadata from the technical doc ----
+main_dataset <- left_join(x = main_dataset, y = technical_doc, by = "ind_id")
+
+
+TEST_no_missing_metadata(main_dataset)
+
+
+
+## 3.2. Add geography information --------
+main_dataset <- main_dataset |> 
+  # temporarily removing this indicator at HSC locality level as still uses old codes
+  filter(!(indicator == "Children in low income families" & 
+             substr(code, 1, 3) == "S99")
+  ) |>
+  replace_old_geography_codes(col_name = "code") |>
+  left_join(geography_lookup, by = "code")
+
+
+TEST_no_missing_geography_info(main_dataset)
+
+
+
+## 3.3  Apply suppression where required ---------
+main_dataset <- main_dataset |>
+  apply_suppressions()
+
+
+
+## 3.4 Format data ---------
+
+# convert some cols to numeric and round digits
+main_dataset <- main_dataset |>
+  mutate(
+    across(
+      c("numerator", "measure", "upci", "lowci"),
+      ~ round(as.numeric(.), digits = 2)
+    )
+  )
+
+
+# create new variable ?
+main_dataset <- main_dataset |> 
+  mutate(
+    measure_sc = case_when(
+      interpret == "H" ~ as.vector(rescale(measure, to = c(1, 0))),
+      interpret == "L" ~ as.vector(rescale(measure, to = c(0, 1))),
+      TRUE ~ 0
+    )
+  )
+
+
+
+# some indicators have years missing from their dataset (e.g. if no data was collected that year due to covid)
+# To ensure that the data in the trend tab doesn't drop to 0 for those years, we create data for those missing years
+# and populate the measure with 'NA' instead - this creates a gap in the trend chart, instead of an incorrect drop to 0
+# Note: This might make more sense to eventually add to the indicator production functions instead?
+main_dataset <- main_dataset |>
+  rbind(
+    # child dental health pri 1
+    create_gap_year(
+      indicator_id = 21005, 
+      gap_year = 2020, 
+      base_year = 2019, 
+      gap_trend_axis = "2020/21"
+    ), 
+    
+    # Population within 500 metres of a derelict site
+    create_gap_year(
+      indicator_id = 20901, 
+      gap_year = 2020, 
+      base_year = 2019, 
+      gap_trend_axis = "2020"
+    ) 
+  )
+
+
+
+# Temporarily remove some indicators from IZ level to reduce risk of secondary disclosure
+# until we are sure that statistical disclosure signed off
+main_dataset <- main_dataset |>
+  filter(
+    !(ind_id %in% c(
+      "20205", # drug-related hospital stays
+      "20403", # deaths from suicide
+      "20204", # alcohol-related deaths
+      "20402", # psychiatric hospital admissions
+      "20301", # cancer registrations
+      "20401", # teenage pregnancies
+      "21001", # Population prescribed drugs for anxiety/depression/psychosis
+      "21002" # mothers smoking during pregnancy
+    ) & substr(code, 1, 3) == "S02")
+  )
+
+
+# 3.5 Save final file -------------
+
+# double check suppression was applied
+TEST_suppression_applied(main_dataset) 
+
+# if test is passed, remove columns no longer required
+main_dataset <- main_dataset |>
+  select(-c(supression, supress_less_than, type_id, file_name))
+
+# save file to local repo
+write_parquet(main_dataset, "shiny_app/data/optdata")
+
+
+
+
+
+
+# 4. Create deprivation dataset ------------------------------------------------
+
+## Create backup of existing data from your local repo ----
+if (file.exists("shiny_app/data/deprivation_data")) {
+  
+  file.copy(
+    "shiny_app/data/deprivation_data", 
+    paste0(backups, "deprivation_data_", Sys.Date()), 
+    overwrite = TRUE
+  )
+  
+} 
+
+
+
+## combine files ----
+files_depr <- list.files(
+  path = shiny_files, 
+  pattern = "*_ineq.rds", 
+  full.names = TRUE
+)
+
+
+data_depr <- combine_files(files_depr)
+
+
+## prepare older data ----
+hsc_ineq_files <- list.files(
+  path = paste0(shiny_files, "/Inequalities HSC Data/reformatted"), 
+  pattern = "*.rds", 
+  full.names = TRUE
+)
+
+hsc_ineq_data <- combine_files(hsc_ineq_files)
+
+
+# combine old and new data ----
+data_depr <- bind_rows(data_depr, hsc_ineq_data)
+
+
+# attach metadata ----
+data_depr <- left_join(x = data_depr, y = technical_doc, by = "ind_id")
+
+
+# attach geography info ----
+data_depr <- data_depr |>
+  replace_old_geography_codes(col_name = "code") |>
+  left_join(geography_lookup, by = "code")
+
+
+TEST_no_missing_ineq_indicators(data_depr)
+TEST_no_missing_geography_info(data_depr)
+
+
+# apply suppression function ----
+data_depr <- data_depr |>
+  apply_suppressions()
+
+
+# formatting numbers ----
+data_depr <- data_depr |>
+  mutate(quintile = recode(quintile,
+                           "1" = "1 - most deprived",
+                           "5" = "5 - least deprived"
+  )) |>
+  mutate_at(
+    c(
+      "numerator", "measure", "lowci", "upci", "rii", "upci_rii",
+      "lowci_rii", "sii", "lowci_sii", "upci_sii", "par", "abs_range",
+      "rel_range", "rii_int", "lowci_rii_int", "upci_rii_int"
+    ),
+    round, 1
+  )
+
+
+
+
+data_depr <- data_depr |>
+  group_by(ind_id, year, quint_type, code) |>
+  # label if par, sii or rii  positive or negative (helps with health inequality dynamic summary text)
+  mutate(
+    across(c(sii, rii, par),
+           ~ case_when(. > 0 ~ "positive", . < 0 ~ "negative", TRUE ~ "zero"),
+           .names = "{.col}_gradient"
+    )
+  ) |>
+  mutate(
+    qmax = quintile[which.max(measure)], # which quintile contains highest rate/value
+    qmin = quintile[which.min(measure)] # which quintile contains lowest rate/value
+  ) |>
+  ungroup()
+
+
+# TEMPORARY - remove some indicators
+data_depr <- data_depr |>
+  filter(!(indicator %in% c(
+    "Healthy birth weight", # check healthy weight as seems like reverse of what i'd expect
+    "People living in 15% most 'access deprived' areas" # does this indicator make sense in inequalities module - can't quite get my head around what this means
+  )
+  )
+  )
+
+
+
+# make sure there's no deprivation indicators where latest year doesn't go up to the same year covered by the main dataset
+TEST_inequalities_trends(data_depr)
+
+
+# save file for shiny app
+TEST_suppression_applied(data_depr) # double checking suppression function wasn't skipped
+write_parquet(main_dataset, "shiny_app/data/deprivation_data")
+
+
+
+
+
+# 5. Shapefiles  --------------------------------------------------------------
+
+# Copy geography lookups to your local repository
+# Note: this step is only really necessary if you are running this script for the first time
+# OR if there have been updates to the geography lookups
+map_lgl(c("CA_boundary.rds", 
+          "HB_boundary.rds", 
+          "HSCP_boundary.rds",
+          "HSC_locality_boundary.rds",
+          "IZ_boundary.rds"), ~ {
+            
+            file.copy(
+              paste0(shape_files, .x), # old file path
+              paste0("shiny_app/data/", .x),  # new destination
+              overwrite = TRUE
+            )
+          })
