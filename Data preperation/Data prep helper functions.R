@@ -9,7 +9,7 @@
 
 apply_suppressions <- function(dataset) {
   
-  dataset %<>%
+  dataset <- dataset |>
     # suppress numerator if required (for crude rates, %'s and standardised rates)
     mutate(numerator = case_when(supression == "Y" & 
                                    type_id %in% c('cr', '%', 'sr') 
@@ -38,13 +38,13 @@ create_gap_year <- function(indicator_id, # ind_id
                             gap_trend_axis) { # axis label for missing year
   
   # take a copy of a years data for that indicator
-  base_year_data <- main_dataset %>% 
+  base_year_data <- main_dataset |> 
     filter(ind_id == indicator_id & year == base_year)
   
   if(!(gap_year %in% unique(base_year_data$year))){
     
     # generate data for the missing year
-    gap_year_data <- base_year_data %>%
+    gap_year_data <- base_year_data |>
       mutate(year = gap_year, # overwrite the year column with missing year
              across(c("def_period", "trend_axis"), ~ gsub(unique(trend_axis),gap_trend_axis,.)), # overwrite the axis label with missing years axis label
              across(c("numerator","measure","lowci","upci","measure_sc"), ~ NA)) # populate numeric columns with NA
@@ -65,7 +65,7 @@ create_gap_year <- function(indicator_id, # ind_id
 # Note: sometimes geography codes are made 'inactive' and replaced with a different one
 # any changes are usually published here: https://www.opendata.nhs.scot/dataset/geography-codes-and-labels
 replace_old_geography_codes <- function(data, col_name) {
-  data %>% 
+  data |> 
   mutate(., !!col_name := recode(!!sym(col_name), 
                                  # Council area code changes
                                  "S12000015" = 'S12000047', # Fife
@@ -155,10 +155,10 @@ combine_files <- function(file_list) {
 ## Test 1: Ensure no 2 files contain the same unique indicator ID
 TEST_no_duplicate_ids <- function(data) {
   
-  data <- data %>% 
-    distinct(ind_id, file_name) %>%
-    group_by(ind_id) %>%
-    add_tally() %>%
+  data <- data |> 
+    distinct(ind_id, file_name) |>
+    group_by(ind_id) |>
+    add_tally() |>
     filter(n > 1)
   
   
@@ -202,7 +202,7 @@ TEST_no_missing_indicators <- function(data) {
 ## Test 3: Ensure there are no indicators with missing metadata
 TEST_no_missing_metadata <- function(data) {
   
-  data <- data %>%
+  data <- data |>
     filter(is.na(indicator))
   
   
@@ -222,7 +222,7 @@ TEST_no_missing_metadata <- function(data) {
 ## Test 4: Ensure there are no indicators with missing geography info
 TEST_no_missing_geography_info <- function(data) {
   
-  data <- data %>%
+  data <- data |>
     filter(is.na(areaname_full))
   
   
@@ -242,8 +242,8 @@ TEST_no_missing_geography_info <- function(data) {
 ## Test 5: Ensure suppression has been applied
 TEST_suppression_applied <- function(data) {
   
-  data <- data %>%
-    filter(supression == "Y") %>%
+  data <- data |>
+    filter(supression == "Y") |>
     subset(numerator < supress_less_than)
   
  
@@ -266,12 +266,12 @@ TEST_suppression_applied <- function(data) {
 TEST_no_missing_ineq_indicators <- function(data) {
   
   # find indicators from tech doc with an inequalities label
-  depr_indicators <- technical_doc %>%
+  depr_indicators <- technical_doc |>
     filter(!is.na(label_inequality))
   
   # check what indicators are in deprivation dataset
-  data <- data %>%
-    select(indicator, ind_id) %>%
+  data <- data |>
+    select(indicator, ind_id) |>
     unique(.)
   
   # check which are missing
@@ -297,24 +297,24 @@ TEST_inequalities_trends <- function(data) {
   
   
   # get list of main indicators and they're max year
-  opt_indicators <- main_dataset %>% 
-    group_by(ind_id) %>%
+  opt_indicators <- main_dataset |> 
+    group_by(ind_id) |>
     summarise(year = max(year),
               ind_id = first(ind_id),
-              indicator = first(indicator)) %>%
+              indicator = first(indicator)) |>
     ungroup()
   
   
   # get list of inequalities indicators and they're max year
-  depr_indicators <- data %>% 
-    group_by(ind_id) %>%
+  depr_indicators <- data |> 
+    group_by(ind_id) |>
     summarise(year = max(year),
               ind_id = first(ind_id),
-              indicator = first(indicator)) %>%
+              indicator = first(indicator)) |>
     ungroup() 
   
   # get indicators where max years don't match
-  data <- left_join(depr_indicators, opt_indicators, by = c("ind_id")) %>%
+  data <- left_join(depr_indicators, opt_indicators, by = c("ind_id")) |>
     filter(year.x != year.y)
   
   
