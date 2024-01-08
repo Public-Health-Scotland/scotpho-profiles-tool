@@ -42,7 +42,7 @@ library(data.table) # for working with large datasets
 library(jsonlite)
 library(rmarkdown)
 library(knitr)
-library(arrow)
+library(arrow) #for parquet files
 
 
 
