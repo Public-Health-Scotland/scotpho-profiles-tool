@@ -49,7 +49,7 @@ output$iz_ui_trend <- renderUI({
                  multiple=TRUE, selected = "")
 })
 
-covid_impacted_Indicators = techdoc %>% filter(!is.na(`COVID impact`)) %>% select(indicator_name)
+covid_impacted_Indicators = techdoc %>% filter(!is.na(covid_impact)) %>% select(indicator_name)
 ###############################################.
 # disabling controls if no data available for a type of geography and
 # changing labels to indicate no data is available
