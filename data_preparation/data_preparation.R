@@ -5,7 +5,7 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-# 1. Set up --------------------------------------------------------------------
+# 1. Set up ----
 
 ## Dependencies  -----
 
@@ -20,11 +20,10 @@ library(assertthat) # for data validation tests
 library(purrr) # for copying multiple files at once
 library(tidyr) # for pivoting
 
-source("Data preparation/Data prep functions.R")
-
+## Source functions called within this script
+source("data_preparation/data_prep_functions.R")
 
 ## File-paths -----
-
 data_folder <- "/PHI_conf/ScotPHO/Profiles/Data/"
 lookups <- paste0(data_folder, "Lookups/")
 shape_files <- paste0(data_folder, "Shapefiles/")
@@ -34,11 +33,12 @@ backups <- paste0(data_folder, "Backups/")
 
 ## Look-ups -----
 
+# geography look-up enables matches on of areanames, area type and parent geographies to geography codes
 geography_lookup <- readRDS(
   file = paste0(lookups, "Geography/opt_geo_lookup.rds")
 )
 
-
+# technical document source of all meta data about individual indicators
 technical_doc <- read.xlsx(
   xlsxFile = paste0(lookups, "Technical_Document_MM.xlsx"), 
   sheet = "Raw", 
@@ -184,8 +184,9 @@ main_dataset <- main_dataset |>
   )
 
 
-# Temporarily remove some indicators from IZ level to reduce risk of secondary disclosure
-# until we are sure that statistical disclosure signed off
+# Remove some indicators from IZ level to reduce risk of secondary disclosure
+# Data is generated to allow ScotPHO analysts to review numbers and release to internal staff on request
+# However not likely to be able to satisfy statistical disclosure signed off to include in main tool
 main_dataset <- main_dataset |>
   filter(
     !(ind_id %in% c(
@@ -217,12 +218,12 @@ write_parquet(main_dataset, "shiny_app/data/optdata")
 # 4. create profile/domain lookup -----------------------------------------------
 
 profile_lookup <- main_dataset |>
-  select(contains("profile")) |>
+  select(contains("profile")) |> #select only columns containing 'profile'
   pivot_longer(cols = everything(), values_to = "value") |>
+  filter(!is.na(value))|> #filterout any NA
   transmute(profile = substr(value, 1, 3), 
             domain = substr(value, 5, nchar(value))) |>
   distinct()
-
 
 saveRDS(profile_lookup, "shiny_app/data/profile_lookup.rds")
 

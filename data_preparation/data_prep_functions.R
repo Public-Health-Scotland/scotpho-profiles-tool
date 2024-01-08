@@ -1,6 +1,6 @@
-
-# 1. functions  ------------------------------------------------------------
-
+######################################################################################################################################.
+# 1. Functions called during running of script that prepares data files included in the ScotPHO online profiles tool shiny app ----
+######################################################################################################################################.
 
 ## Suppression function ------
 # Purpose: applies statistical disclosure control (SDC) to any indicators where it is required (see technical document)
@@ -24,9 +24,7 @@ apply_suppressions <- function(dataset) {
 }
 
 
-
-
-## Gap year function --------
+## Gap year function ----
 # Purpose: Generates 'NA' data for indicators where there are years missing from their data file
 # e.g. if a data collection was paused due to the pandemic, or that years data is deemed to be of poor data quality
 # It ensures that when users are looking at trends in the profiles tool, the missing years still appear on the x-axis
@@ -59,11 +57,12 @@ create_gap_year <- function(indicator_id, # ind_id
 }
 
 
-
-## Re-coding geography codes function ------
+## Re-coding geography codes function ----
 # Purpose: replace any old/inactive geography codes with their new one
 # Note: sometimes geography codes are made 'inactive' and replaced with a different one
 # any changes are usually published here: https://www.opendata.nhs.scot/dataset/geography-codes-and-labels
+# can be linked with boundary changes where postcodes/IZ change organistion affiliation and new standard geography codes are released.
+
 replace_old_geography_codes <- function(data, col_name) {
   data |> 
   mutate(!!col_name := recode(!!sym(col_name), 
@@ -85,10 +84,10 @@ replace_old_geography_codes <- function(data, col_name) {
 }
 
 
-
-## Combine data files ------
+## Combine data files ----
 # Purpose: read in and combine individual indicator datasets to create one dataset
 # note: will stop process and throw an error if there is a dataset that has missing columns
+
 combine_files <- function(file_list) {
   
   # Determine the file type in list of files passed to function
@@ -148,9 +147,9 @@ combine_files <- function(file_list) {
 
 
 
-
-# 2. Data validation tests  ----------------------------------------------------
-
+######################################################################################################################################.
+# 2. Data validation tests on the data file prepared for shiny app   ----
+######################################################################################################################################.
 
 ## Test 1: Ensure no 2 files contain the same unique indicator ID
 TEST_no_duplicate_ids <- function(data) {
@@ -161,16 +160,12 @@ TEST_no_duplicate_ids <- function(data) {
     add_tally() |>
     filter(n > 1)
   
-  
     assert_that(nrow(data) == 0, 
                 msg = paste0("The same indicator ID was found in more than 1 data file.", 
                 "\nThis could be because the previous file for this indicator was named slightly differently, and therefore wasn't overwritten OR because the wrong indicator ID has accidentally been used for a particular indicator.\n 
                 Check the following files in the shiny folder: \n \n", 
                 paste(data$file_name, collapse = "\n")))
-  
-}
-
-
+  }
 
 
 ## Test 2: Ensure there are no indicator data files missing 
@@ -178,7 +173,6 @@ TEST_no_missing_indicators <- function(data) {
   
   data <- anti_join(technical_doc, data, by = c("ind_id"))
   
- 
     assert_that(nrow(data) == 0, 
                 msg = paste0("\nThe number of indicators in the dataset created DOES NOT match the number of indicators listed as 'Active' in the technical document. \n",
                              "This could be because there are indicators incorrectly listed as 'Active' in the technical document OR because there are data files missing from the shiny folder\n",
@@ -189,16 +183,11 @@ TEST_no_missing_indicators <- function(data) {
 }
 
 
-
-  
-  
-
 ## Test 3: Ensure there are no indicators with missing metadata
 TEST_no_missing_metadata <- function(data) {
   
   data <- data |>
     filter(is.na(indicator_name))
-  
   
     assert_that(nrow(data) == 0, 
                 msg = paste0("\n Metdata was not successfully joined for the following indicator(s) \n",
@@ -208,15 +197,12 @@ TEST_no_missing_metadata <- function(data) {
 }
 
 
-
-
 ## Test 4: Ensure there are no indicators with missing geography info
 TEST_no_missing_geography_info <- function(data) {
   
   data <- data |>
     filter(is.na(areaname_full))
-  
-  
+
     assert_that(nrow(data) == 0, 
                 msg = paste0("\n The following geography code(s) were not found in the geography lookup, either because they are invalid OR because they are 'old' codes no longer in use\n",
                        paste(paste0("• ", unique(data$code)), collapse = "\n")
@@ -226,15 +212,13 @@ TEST_no_missing_geography_info <- function(data) {
 }
 
 
-
 ## Test 5: Ensure suppression has been applied
 TEST_suppression_applied <- function(data) {
   
   data <- data |>
     filter(supression == "Y") |>
     subset(numerator < supress_less_than)
-  
- 
+
     assert_that(nrow(data) == 0, 
                 msg = paste0("SUPPRESSION NOT APPLIED! Please run the suppression function before saving this data.\n",
                        "The following indicators still contain numbers that shouldn't be there:\n",
@@ -242,9 +226,6 @@ TEST_suppression_applied <- function(data) {
                 )
   
 }
-
-
-
 
 
 ## Test 6: Ensure there are no inequalities indicators missing
@@ -262,7 +243,6 @@ TEST_no_missing_ineq_indicators <- function(data) {
   # check which are missing
   data <- anti_join(depr_indicators, data, by = c("ind_id"))
   
- 
   assert_that(nrow(data) == 0, 
               msg = paste0(
                 "\nThe number of indicators DOES NOT match the number of indicators in the technical doc with an inequalities label assigned to them. This could be because they should not be produced at this level OR because there are data files missing from the shiny folder\n",
@@ -273,13 +253,8 @@ TEST_no_missing_ineq_indicators <- function(data) {
   
 }
 
-
-
-
-
 # Test 7: Ensure deprivation files go up to the correct year
 TEST_inequalities_trends <- function(data) {
-  
   
   # get list of main indicators and they're max year
   opt_indicators <- main_dataset |> 
