@@ -4,7 +4,6 @@
 # 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
 # 1. Set up ----
 
 ## Dependencies  -----
@@ -78,7 +77,7 @@ technical_doc <- technical_doc |>
 
 
 
-# 3. Create main indicator dataset ---------------------------------------------
+# 3. Create main indicator dataset ----
 
 ## Create backup of existing data from local repo -----
 if (file.exists("shiny_app/data/optdata")) {
