@@ -42,6 +42,7 @@ library(data.table) # for working with large datasets
 library(jsonlite)
 library(rmarkdown)
 library(knitr)
+library(arrow)
 
 
 
@@ -56,9 +57,9 @@ if (is.null(suppressMessages(webshot:::find_phantom()))) {
 # 2. required datafiles ------------------------------------------------------------
 
 # main datasets 
-optdata <- readRDS("data/optdata.rds") # main dataset with indicator data
-depr_data <- readRDS("data/deprivation_data.rds") # deprivation/inequalities dataset
-techdoc <- readRDS("data/techdoc.rds") # technical doc including indicator definitions
+optdata <- read_parquet("data/optdata")  # main dataset with indicator data
+depr_data <- read_parquet("data/deprivation_data") # deprivation/inequalities dataset
+techdoc <- read_parquet("data/techdoc") # technical doc including indicator definitions
 
 
 # lookups 
@@ -76,20 +77,16 @@ iz_bound <- readRDS("data/IZ_boundary.rds") # Intermediate zone
 
 #formatting techdoc data to be used in indicator definitions tab
 ind_dat <- techdoc %>%
-  mutate(across(contains("Profile_Domain"),  ~ sub("\\-.*", "", .))) %>%
-  rename(Profile_short1 = Profile_Domain1,
-         Profile_short2 = Profile_Domain2,
-         Profile_short3 = Profile_Domain3)%>%
+  mutate(across(contains("profile_domain"),  ~ sub("\\-.*", "", .))) %>%
+  rename(Profile_short1 = profile_domain1,
+         Profile_short2 = profile_domain2,
+         Profile_short3 = profile_domain3)%>%
   rowwise() %>% 
   mutate(profile_short = paste0(na.omit(c(Profile_short1, Profile_short2, Profile_short3)), collapse = ",")) %>% 
   ungroup() %>% 
   bind_rows(mutate(., profile_short = "Show all")) %>%
-  select(-c("active", "interpretation", "COVID impact", "indicator_author", "analyst_notes", "days_since_update","source_last_updated", "source_next_update", "scotpho_profiles", "Profile_short1", "Profile_short2", "Profile_short3")) %>%
-  mutate(across(profile:profile_short, ~replace_na(.,"N/A"))) %>%
-  mutate(next_update_column = ifelse(next_update == "TBC", NA, paste("01-", next_update, sep = "")))
-
-ind_dat$next_update_column <- format(
-  as.Date(ind_dat$next_update_column, "%d-%b-%Y") , "%Y-%m-%d")
+  select(-c("active", "interpretation", "covid_impact", "indicator_author", "analyst_notes", "days_since_update","source_last_updated", "source_next_update", "scotpho_profiles", "Profile_short1", "Profile_short2", "Profile_short3")) %>%
+   mutate(across(profile:profile_short, ~replace_na(.,"N/A")))
 
 
 # indicators updated in the last 60 days
