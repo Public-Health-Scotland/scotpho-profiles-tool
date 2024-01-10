@@ -344,15 +344,15 @@ write_parquet(data_depr, "shiny_app/data/deprivation_data")
 
 # 6. Copy geography lookups  --------------------------------------------------------------
 
-# Copy all shapefiles and geography lookups to your local repository
 # Note: this step is only really necessary if you are running this script for the first time
 # OR if there have been updates to the geography lookups
+
+# Copy all shapefiles to your local repository
 map_lgl(c("CA_boundary.rds", 
           "HB_boundary.rds", 
           "HSCP_boundary.rds",
           "HSC_locality_boundary.rds",
-          "IZ_boundary.rds",
-          "opt_geo_lookup.rds"), ~ {
+          "IZ_boundary.rds"), ~ {
             
             file.copy(
               paste0(shape_files, .x), # old file path
@@ -360,6 +360,15 @@ map_lgl(c("CA_boundary.rds",
               overwrite = TRUE
             )
           })
+
+
+# copy the main geography lookup to your local repo
+file.copy(
+  paste0(lookups, "Geography/opt_geo_lookup.rds"), # old file path
+  paste0("shiny_app/data/opt_geo_lookup.rds"),  # new destination
+  overwrite = TRUE
+)
+
 
 
 ### END
