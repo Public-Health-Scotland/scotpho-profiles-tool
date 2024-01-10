@@ -361,31 +361,31 @@ output$simd_text <- renderUI({
     tags$ul( #if no data available for PAR only first two points
       #statement #1 : identifies which quintile has the least desirable rate (this statement changes according to 'interpret' field which flags if Higher or Lower rates are best)
       tags$li(class= "li-custom",
-              p(paste0(simd_text_data$statement1a," have the ",simd_text_data$statement1b," ",tolower(simd_text_data$label_ineq),". (see 'Patterns of inequality')"))),
+              p(paste0(simd_text_data$statement1a," have the ",simd_text_data$statement1b," ",tolower(simd_text_data$label_inequality),". (see 'Patterns of inequality')"))),
       #statement #2 : whe absolute inequality (from sii) has increased or decreased over time
       tags$li(class= "li-custom",
               p(paste0("Over the time period available ", simd_text_data$statement2,". (see 'Inequality gap')"))),
       #statement #3 based on rii (andy P data doesn't have same fields populated so need to call on simd_text_data object rather than simd_bar_data())
       tags$li(class= "li-custom",
               p(paste0("The most deprived areas have ", abs(round(unique(simd_text_data$rii_int), 0)),
-                       "% ", more_less, tolower(unique(simd_text_data$label_ineq)), than_as," ",input$geoname_simd," as a whole. (see 'Inequality gap')" )))
+                       "% ", more_less, tolower(unique(simd_text_data$label_inequality)), than_as," ",input$geoname_simd," as a whole. (see 'Inequality gap')" )))
     )
     
   } else { #if the data is available print the following messages
     tags$ul( 
       #statement #1 : identifies which quintile has the least desirable rate (this statement changes according to 'interpret' field which flags if Higher or Lower rates are best)
       tags$li(class= "li-custom",
-              p(paste0(simd_text_data$statement1a," have the ",simd_text_data$statement1b," ",tolower(simd_text_data$label_ineq),". (see 'Patterns of inequality')"))),
+              p(paste0(simd_text_data$statement1a," have the ",simd_text_data$statement1b," ",tolower(simd_text_data$label_inequality),". (see 'Patterns of inequality')"))),
       #statement #2 : whe absolute inequality (from sii) has increased or decreased over time
       tags$li(class= "li-custom",
               p(paste0("Over time ", simd_text_data$statement2,". (see 'Inequality gap')"))),
       #statement #3 based on rii
       tags$li(class= "li-custom",
               p(paste0("The most deprived areas have ", abs(round(unique(simd_bar_data()$rii_int), 0)),
-                       "% ", more_less, tolower(unique(simd_bar_data()$label_ineq)), than_as," ",input$geoname_simd," as a whole. (see 'Inequality gap')" ))),
+                       "% ", more_less, tolower(unique(simd_bar_data()$label_inequality)), than_as," ",input$geoname_simd," as a whole. (see 'Inequality gap')" ))),
       #statement #4 based on PAR
       tags$li(class= "li-custom",
-              p(paste0(unique(simd_bar_data()$label_ineq)," across ",input$geoname_simd," would be ", abs(round(unique(simd_bar_data()$par), 0)),"% ", unique(simd_text_data$statement4a)," if the levels of the ",
+              p(paste0(unique(simd_bar_data()$label_inequality)," across ",input$geoname_simd," would be ", abs(round(unique(simd_bar_data()$par), 0)),"% ", unique(simd_text_data$statement4a)," if the levels of the ",
                        unique(simd_text_data$statement4b)," areas were experienced across the whole population. (see 'Potential for improvement')")))
     )
   }

@@ -20,7 +20,7 @@ output$btn_techdoc_download <- downloadHandler(
   
   filename ="Indicator_definitions.csv",
   content = function(file) {
-    write.csv(ind_dat %>% select(-next_update_column, -indicator_number, - profile_short), 
+    write.csv(ind_dat %>% select(-ind_id, - profile_short), 
               file, row.names=FALSE) }
 )
 
@@ -131,7 +131,7 @@ output$ind_search_results <- renderReactable({
                      <td>${rowInfo.values['confidence_interval_method']}</td>
                      <td>${rowInfo.values['rounding']}</td>
                      <td>${rowInfo.values['disclosure_control']}</td>
-                     <td>${rowInfo.values['measure']}</td>
+                     <td>${rowInfo.values['type_definition']}</td>
                      </tr>
                      <tr class='spacer' style = 'line-height:5px; border-style:none;'>
                      <td colspan='4'>&nbsp;</td>
@@ -146,7 +146,7 @@ output$ind_search_results <- renderReactable({
                      <td>${rowInfo.values['age_group']}</td>
                      <td>${rowInfo.values['sex']}</td>
                      <td>${rowInfo.values['available_geographies']}</td>
-                     <td>${rowInfo.values['`label inequality`']}</td>
+                     <td>${rowInfo.values['label_inequality']}</td>
                      </tr>
                      </table>
                       <br>
@@ -174,14 +174,12 @@ output$ind_search_results <- renderReactable({
                      
 }")),
       # 2. format date column
-      next_update_column = colDef(cell = function(value) strftime(value, "%b-%Y"),
-                           defaultSortOrder = "desc", sortable = TRUE, name = "Next update due", na = "TBC"),
+      next_update = colDef(defaultSortOrder = "desc", sortable = TRUE, name = "Next update due", na = "TBC"),
       
       # 3. hide all other columns in the table. 
       profile = colDef(show = F),
       domain = colDef(show = F),
       last_updated = colDef(show = F),
-      next_update = colDef(show = F),
       trends_from = colDef(show = F),
       indicator_definition = colDef(show = F),
       data_source = colDef(show = F),
@@ -193,19 +191,23 @@ output$ind_search_results <- renderReactable({
       available_geographies = colDef(show = F),
       disclosure_control = colDef(show = F),
       confidence_interval_method = colDef(show = F),
-      measure = colDef(show = F),
+      type_definition = colDef(show = F),
       notes_caveats = colDef(show = F),
       denominator = colDef(show = F),
       year_type = colDef(show = F),
       diagnostic_code_position = colDef(show = F),
       rounding = colDef(show = F),
       aggregation = colDef(show = F),
-      indicator_number = colDef(show = F),
+      ind_id = colDef(show = F),
       age_group = colDef(show = F),
       sex = colDef(show = F),
       update_frequency = colDef(show = F),
       profile_short = colDef(show = F) ,
-      `label inequality` = colDef(show = F)
+      label_inequality = colDef(show = F),
+      supression =  colDef(show = F),
+      supress_less_than =  colDef(show = F),
+      type_id =  colDef(show = F),
+      interpret =  colDef(show = F)
        )
         )
   })
