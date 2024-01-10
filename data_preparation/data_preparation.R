@@ -39,7 +39,7 @@ geography_lookup <- readRDS(
 
 # technical document source of all meta data about individual indicators
 technical_doc <- read.xlsx(
-  xlsxFile = paste0(lookups, "Technical_Document_MM.xlsx"), 
+  xlsxFile = paste0(lookups, "Technical_Document.xlsx"), 
   sheet = "Raw", 
   sep = " ") |>
   clean_names() |>
