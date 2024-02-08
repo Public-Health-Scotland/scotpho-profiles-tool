@@ -24,10 +24,11 @@ source("data_preparation/data_prep_functions.R")
 
 ## File-paths -----
 data_folder <- "/PHI_conf/ScotPHO/Profiles/Data/"
-lookups <- paste0(data_folder, "Lookups/")
+lookups <- paste0(data_folder, "Lookups/") 
 shape_files <- paste0(data_folder, "Shapefiles/")
-shiny_files <- paste0(data_folder, "Shiny Data")
-backups <- paste0(data_folder, "Backups/")
+shiny_files <- paste0(data_folder, "Shiny Data") #folder which contains indicator data files ready for inclusion in live profiles tool
+test_shiny_files <- paste0(data_folder, "Test Shiny Data") #folder which contains indicator data files under development and not considered ready for live tool
+backups <- paste0(data_folder, "Backups/") #area for saving copies of historic files linked to shiny app in case we mess up a file and need to roll back
 
 
 ## Look-ups -----
@@ -37,13 +38,32 @@ geography_lookup <- readRDS(
   file = paste0(lookups, "Geography/opt_geo_lookup.rds")
 )
 
+
+## Test indicator inclusion ----
+## State if you wish to include test indicator data during data preparation -
+#  If you are planning to deploy the shiny app to live site then 'load test indicators' should be "no"
+#  If you are wanting to check how loading of new indicator data appears or impacts on the tool then set to "yes" 
+
+load_test_indicators <- "no"
+#load_test_indicators <- "yes"
+
 # technical document source of all meta data about individual indicators
 technical_doc <- read.xlsx(
   xlsxFile = paste0(lookups, "Technical_Document.xlsx"), 
   sheet = "Raw", 
   sep = " ") |>
-  clean_names() |>
-  filter(active == "A")
+  clean_names()
+
+# filter the technical document to include or exclude test indicators (filter runs based on clause set at start of this program)
+# technical document coontains a column called "active" which can be set as 'A' active, 'N' not active, 'T' test
+
+if (load_test_indicators=="yes"){
+  technical_doc <- technical_doc |>
+    filter(active %in% c("A","T")) # filter for active (A) or test (T) indicators
+  } else { #
+technical_doc <- technical_doc |>
+  filter(active == "A") # filter for active indicators only
+}
 
 
 
@@ -61,9 +81,10 @@ technical_doc <- technical_doc |>
   ) |>
   select(-last_updated_temp)
 
-
 ## Save file -----
 write_parquet(technical_doc, "shiny_app/data/techdoc") # version for shiny app
+
+## Optional - generate a techdoc backup - suggested to run only when deploying live shiny app otherwise this line can be skipped
 write_parquet(technical_doc, paste0(backups, "techdoc-", Sys.Date())) # version for backups folder
 
 
@@ -79,7 +100,7 @@ technical_doc <- technical_doc |>
 
 # 3. Create main indicator dataset ----
 
-## Create backup of existing data from local repo -----
+## Optional: Create backup of existing data from local repo -----
 if (file.exists("shiny_app/data/optdata")) {
   
   file.copy(
@@ -98,9 +119,28 @@ indicator_data_files <- list.files(
   full.names = TRUE
 )
 
-
 ## Combine into one dataset  -----
 main_dataset <- combine_files(indicator_data_files)
+
+
+
+## If test indicators are to be included then list files & combine files from test shiny folder
+if (load_test_indicators=="yes"){
+
+## Find new indicators data files in the test shiny data folder -----
+## 
+test_indicator_files <- list.files(
+  path = test_shiny_files, 
+  pattern = "*_shiny.csv", 
+  full.names = TRUE
+)
+
+## Combine into one dataset  -----
+test_indicator_dataset <- combine_files(test_indicator_files)
+
+## Combine main dataset and test indicators
+main_dataset <- bind_rows(main_dataset, test_indicator_dataset)
+}
 
 
 ## Read in older data ----
