@@ -44,8 +44,8 @@ geography_lookup <- readRDS(
 #  If you are planning to deploy the shiny app to live site then 'load test indicators' should be "no"
 #  If you are wanting to check how loading of new indicator data appears or impacts on the tool then set to "yes" 
 
-#load_test_indicators <- "no"
-load_test_indicators <- "yes"
+load_test_indicators <- "no"
+#load_test_indicators <- "yes"
 
 # technical document source of all meta data about individual indicators
 technical_doc <- read.xlsx(
