@@ -55,6 +55,7 @@ tagList(
     summaryTab,
     trendTab,
     rankTab,
+    simdTab,
     inequalitiesTab,
     dataTab,
     navbarMenu("Info",

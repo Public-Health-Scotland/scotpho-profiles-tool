@@ -43,6 +43,7 @@ library(jsonlite)
 library(rmarkdown)
 library(knitr)
 library(arrow) #for parquet files
+library(bslib) #for ui layout
 
 
 
