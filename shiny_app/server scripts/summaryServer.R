@@ -85,6 +85,16 @@ summary_data <- reactive ({
     arrange(domain)
   
   
+  # order care and wellbeing domains
+  if (input$summary_profile == "CWB") {
+
+    final <- final %>%
+      mutate(domain = ordered(domain, levels = CWB_domain_order)) %>% 
+      arrange(domain)
+
+  }
+  
+  
   # creating spine chart data
   final <- final %>%
     # duplicate chosen area value in another column so one can be used in the table and one can be used for spine chart
