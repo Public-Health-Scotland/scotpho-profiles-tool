@@ -246,7 +246,9 @@ tableData <- reactive({
           mutate(value = sii,
                  upper_confidence_interval = upci_sii,
                  lower_confidence_interval = lowci_sii) |>
-          mutate(measure = "Slope index of inequality (SII)")
+          mutate(measure = "Slope index of inequality (SII)",
+                 quintile = NULL
+                 )
         
         # rii data
         rii <- data |>
@@ -254,7 +256,8 @@ tableData <- reactive({
           mutate(value = rii,
                  upper_confidence_interval = upci_rii,
                  lower_confidence_interval = lowci_rii) |>
-          mutate(measure = "Relative index of inequality (RII)")
+          mutate(measure = "Relative index of inequality (RII)",
+                 quintile = NULL)
         
         # par data
         par <- data |>
@@ -262,7 +265,8 @@ tableData <- reactive({
           mutate(value = par,
                  upper_confidence_interval = upci_rii_int,
                  lower_confidence_interval = lowci_rii_int) |>
-          mutate(measure = "Population attributable risk (PAR)")
+          mutate(measure = "Population attributable risk (PAR)",
+                 quintile = NULL)
         
         # different inequalities measures combined
         data <- bind_rows(data, rii, sii, par) |>
@@ -300,13 +304,12 @@ output$data_tab_table <- renderDT({
 
 
   datatable(tableData(),
-            style = 'bootstrap', 
+            caption = sprintf('Total rows: %s', nrow(tableData())),
             rownames = FALSE,
             colnames = col_names,
             options = list(scrollX = TRUE,
                            scrollY = "600px", 
-                           pageLength = 20,
-                           dom = 't',
+                           pageLength = 10,
                            searching = FALSE,
                            language = list(
                             zeroRecords = "Select atleast one geography to display results."),
