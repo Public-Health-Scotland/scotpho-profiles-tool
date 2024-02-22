@@ -210,6 +210,21 @@ TEST_suppression_applied(main_dataset)
 # with the exception of IZs/HSC Localities i.e. HSC Locality/Edinburgh City/Edinburgh North-East
 main_dataset <- create_geography_path_column(main_dataset)
 
+
+
+# order the geographies
+main_dataset <- main_dataset |>
+  mutate(areatype = factor(areatype, levels = c("Scotland", 
+                                                "Council area", 
+                                                "Health board",
+                                                "Alcohol & drug partnership",
+                                                "HSC partnership",
+                                                "HSC locality",
+                                                "Intermediate zone"))) |>
+  arrange(areatype, parent_area, areaname)
+
+
+
 # get a distinct list of geography paths
 main_dataset_geography_list <- main_dataset |>
   select(path) |>
@@ -353,6 +368,13 @@ TEST_suppression_applied(data_depr) # double checking suppression function wasn'
 
 
 data_depr <- create_geography_path_column(data_depr)
+
+# order the geographies
+data_depr <- data_depr |>
+  mutate(areatype = factor(areatype, levels = c("Scotland", 
+                                                "Council area", 
+                                                "Health board"))) |>
+  arrange(areatype, areaname)
 
 data_depr_geography_list <- data_depr |>
   select(path) |>

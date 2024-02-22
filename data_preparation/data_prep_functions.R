@@ -183,10 +183,18 @@ makeNodes <- function(leaves){
       stringsAsFactors = FALSE
     )
   })
-  dat <- dfs[[1]]
-  for(i in 2:length(dfs)){
-    dat <- merge(dat, dfs[[i]], all = TRUE)
-  }
+  
+  #dat <- dfs[[1]]
+  # for(i in 2:length(dfs)){
+  #   dat <- merge(dat, dfs[[i]], all = TRUE)
+  # }
+  
+  # amending function usin 2 lines below to use rbind instead of merge 
+  # This allows parent nodes to be ordered based on how data is arranged before being passed to this function
+  # instead of alphabetically
+  dat <- do.call(rbind, dfs)
+  dat <- dat[!duplicated(dat), ]
+  
   f <- function(parent){
     i <- match(parent, dat$item)
     item <- dat$item[i]
