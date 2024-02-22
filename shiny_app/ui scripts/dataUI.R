@@ -25,11 +25,15 @@ dataTab <-
         # dataset selection filter
         radioGroupButtons(
           inputId = "dataset_selector",
-          label = "Choose a dataset",
-          choices = c("Main Dataset",
-                      "Inequalities Dataset"),
+          label = div("Select a dataset",icon("question-circle", id = "dataset_help", style = "cursor: pointer;")),
+          choices = c("Main Dataset","Inequalities Dataset"),
           selected = "Main Dataset" # default on main opt dataset
         ),
+        bsTooltip("dataset_help", 
+                  "The main dataset contains data on all indicators at various geography levels. The inequalities dataset is a smaller subset of indicators and geographies, which are split by SIMD quintiles and other measures of inequality (this dataset underpins the visualisations in the inequalities tab).", 
+                  placement = "bottom", 
+                  trigger = "hover"),
+
 
         # quintile type filter (only if inequalities dataset is selected)
         conditionalPanel(
@@ -73,7 +77,7 @@ dataTab <-
         radioGroupButtons(
           inputId = "time_period_selector",
           label = "Select time period:",
-          choices = c("Latest available year", "Trends"),
+          choices = c("Latest available year", "All years"),
           selected = "Latest available year"
         )
 
