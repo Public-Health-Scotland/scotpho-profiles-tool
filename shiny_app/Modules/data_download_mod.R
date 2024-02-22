@@ -18,7 +18,7 @@ downloadDataButtonsUI <- function(id) {
     circle = FALSE,
     status = 'download',
     #size = "lg",
-    tooltip = shinyWidgets::tooltipOptions(placement = "right", title = "Download data"),
+    tooltip = shinyWidgets::tooltipOptions(placement = "right", title = "Click to view available formats"),
     shiny::downloadLink(ns("downloadCSV"), 
                         label = "as CSV", 
                         icon = NULL),
@@ -52,7 +52,7 @@ downloadDataButtonsServer <- function(id, data, selectedColumns = NULL) {
     
     # download as csv
     output$downloadCSV <- downloadHandler(
-      filename = paste0("data_", Sys.Date(), ".csv"),
+      filename = paste0("scotpho_data_extract_", Sys.Date(), ".csv"),
       content = function(file) {
         write.csv(getData(), file, row.names = FALSE)
       }
@@ -60,7 +60,7 @@ downloadDataButtonsServer <- function(id, data, selectedColumns = NULL) {
     
     # download as rds
     output$downloadRDS <- downloadHandler(
-      filename = paste0("data_", Sys.Date(), ".rds"),
+      filename = paste0("scotpho_data_extract_", Sys.Date(), ".rds"),
       content = function(file) {
         saveRDS(getData(), file)
       }
@@ -68,7 +68,7 @@ downloadDataButtonsServer <- function(id, data, selectedColumns = NULL) {
     
     #download as json
     output$downloadJSON <- downloadHandler(
-      filename = paste0("data_", Sys.Date(), ".json"),
+      filename = paste0("scotpho_data_extract_", Sys.Date(), ".json"),
       content = function(file) {
         jsonlite::write_json(as.list(getData()), file)
       }
