@@ -58,19 +58,21 @@ dataTab <-
                            search = TRUE,
                            searchByStartsWith = TRUE,
                            width = '100%',
-                           zIndex = 10),
+                           zIndex = 100),
 
         # indicator filters
         virtualSelectInput(inputId = "indicator_selector",
                            label = "Select indicator(s)",
                            noOptionsText = "Select atleast one geography to see what indicators are available",
                            choices = NULL,
-                           disableSelectAll = FALSE,
+                           disableSelectAll = TRUE,
                            multiple = TRUE,
                            search = TRUE,
                            searchByStartsWith = TRUE,
+                           dropboxWrapper = "body",
+                           dropboxWidth = '400px',
                            width = '100%',
-                           zIndex = 10),
+                           zIndex = 100),
  
 
         # time period filter
