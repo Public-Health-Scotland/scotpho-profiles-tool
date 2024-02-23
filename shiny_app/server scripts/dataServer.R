@@ -304,17 +304,21 @@ output$data_tab_table <- renderDT({
 
 
   datatable(tableData(),
+            style = 'bootstrap', 
             caption = sprintf('Total rows: %s', nrow(tableData())),
             rownames = FALSE,
             colnames = col_names,
             options = list(scrollX = TRUE,
                            scrollY = "600px", 
-                           pageLength = 10,
+                           pageLength = 20,
                            searching = FALSE,
                            language = list(
-                            zeroRecords = "Select atleast one geography to display results."),
+                             zeroRecords = "Select atleast one geography to display results."),
                            columnDefs = cols_to_display
-                           ))
+            ))
+  
+  
+  
 })
 
 
