@@ -15,11 +15,11 @@ apply_suppressions <- function(dataset) {
                                    type_id %in% c('cr', '%', 'sr') 
                                  & numerator < supress_less_than 
                                  ~ NA_real_, TRUE ~ numerator),
-    # additionally, suppress measure, upper ci and lower ci if it's a crude rate or % (to avoid backwards calculating)     
-      across(.cols = c('measure', 'upci', 'lowci'),
-             ~ case_when(supression == "Y" & 
-                           type_id %in% c('cr', '%') & 
-                           numerator < supress_less_than ~ NA_real_, TRUE ~ .x))
+           # additionally, suppress measure, upper ci and lower ci if it's a crude rate or % (to avoid backwards calculating)     
+           across(.cols = c('measure', 'upci', 'lowci'),
+                  ~ case_when(supression == "Y" & 
+                                type_id %in% c('cr', '%') & 
+                                numerator < supress_less_than ~ NA_real_, TRUE ~ .x))
     )
 }
 
@@ -65,22 +65,22 @@ create_gap_year <- function(indicator_id, # ind_id
 
 replace_old_geography_codes <- function(data, col_name) {
   data |> 
-  mutate(!!col_name := recode(!!sym(col_name), 
-                                 # Council area code changes
-                                 "S12000015" = 'S12000047', # Fife
-                                 "S12000024" = 'S12000048', # Perth and Kinross
-                                 "S12000046" = 'S12000049', # Glasgow City
-                                 "S12000044" = 'S12000050', # North Lanarkshire
-                                 # Health board code changes
-                                 "S08000018" = 'S08000029', # NHS Fife
-                                 "S08000027" = 'S08000030', # NHS Tayside
-                                 "S08000021" ='S08000031', # NHS Greater Glasgow & Clyde
-                                 "S08000023" = 'S08000032', # NHS Lanarkshire
-                                 # HSCP code changes
-                                 "S37000014" ='S37000032', # Fife
-                                 "S37000023" ='S37000033', # Perth and Kinross
-                                 "S37000015" ='S37000034', # Glasgow City
-                                 "S37000021" ='S37000035')) # North Lanarkshire))
+    mutate(!!col_name := recode(!!sym(col_name), 
+                                # Council area code changes
+                                "S12000015" = 'S12000047', # Fife
+                                "S12000024" = 'S12000048', # Perth and Kinross
+                                "S12000046" = 'S12000049', # Glasgow City
+                                "S12000044" = 'S12000050', # North Lanarkshire
+                                # Health board code changes
+                                "S08000018" = 'S08000029', # NHS Fife
+                                "S08000027" = 'S08000030', # NHS Tayside
+                                "S08000021" ='S08000031', # NHS Greater Glasgow & Clyde
+                                "S08000023" = 'S08000032', # NHS Lanarkshire
+                                # HSCP code changes
+                                "S37000014" ='S37000032', # Fife
+                                "S37000023" ='S37000033', # Perth and Kinross
+                                "S37000015" ='S37000034', # Glasgow City
+                                "S37000021" ='S37000035')) # North Lanarkshire))
 }
 
 
@@ -93,7 +93,7 @@ combine_files <- function(file_list) {
   # Determine the file type in list of files passed to function
   file_type <- if (grepl("\\.csv$", file_list[1])) 'csv' else 'rds'
   
-
+  
   # Define expected columns 
   expected_cols <- if (file_type == 'csv') {
     
@@ -108,11 +108,11 @@ combine_files <- function(file_list) {
       "upci", "sii" , "lowci_sii" , "upci_sii" , "rii", 
       "lowci_rii", "upci_rii", "rii_int", "lowci_rii_int", 
       "upci_rii_int", "par", "abs_range", "rel_range", "ind_id"   
-      )
+    )
   }
   
   check_columns <- function(data, expected_cols, file_name) {
-
+    
     missing_cols <- setdiff(expected_cols, 
                             tolower(names(data)))
     
@@ -135,7 +135,7 @@ combine_files <- function(file_list) {
     data$file_name <- basename(x)
     #rename column
     colnames(data)[colnames(data) == 'rate'] <- 'measure'
-
+    
     # clean column names 
     clean_names(data)
     
@@ -145,6 +145,75 @@ combine_files <- function(file_list) {
 }
 
 
+# create gepgraphy path --------
+create_geography_path_column <- function(dataset) {
+  dataset <- dataset %>%
+    mutate(
+      path = paste(
+        areatype,
+        case_when(
+          areatype %in% c("Intermediate zone", "HSC locality") ~ parent_area,
+          TRUE ~ areaname
+        ),
+        case_when(
+          areatype %in% c("Intermediate zone", "HSC locality") ~ areaname,
+          TRUE ~ NA_character_
+        ),
+        sep = "/"
+      ),
+      path = sub("/NA$", "", path)
+    )
+  
+  return(dataset)
+}
+
+
+
+# Create geography nodes -------
+# creates geography lists to be used in geography filter for the data table tab of the profiles tool
+# this function is lifted from the documentation for the jsTreeR package (which is used to create this filter)
+# see examples here: https://www.rdocumentation.org/packages/jsTreeR/versions/1.1.0/topics/jstree-shiny 
+makeNodes <- function(leaves){
+  dfs <- lapply(strsplit(leaves, "/"), function(s){
+    item <-
+      Reduce(function(a,b) paste0(a,"/",b), s[-1], s[1], accumulate = TRUE)
+    data.frame(
+      item = item,
+      parent = c("root", item[-length(item)]),
+      stringsAsFactors = FALSE
+    )
+  })
+  
+  #dat <- dfs[[1]]
+  # for(i in 2:length(dfs)){
+  #   dat <- merge(dat, dfs[[i]], all = TRUE)
+  # }
+  
+  # amending function usin 2 lines below to use rbind instead of merge 
+  # This allows parent nodes to be ordered based on how data is arranged before being passed to this function
+  # instead of alphabetically
+  dat <- do.call(rbind, dfs)
+  dat <- dat[!duplicated(dat), ]
+  
+  f <- function(parent){
+    i <- match(parent, dat$item)
+    item <- dat$item[i]
+    children <- dat$item[dat$parent==item]
+    label <- tail(strsplit(item, "/")[[1]], 1)
+    if(length(children)){
+      list(
+        text = label,
+        children = lapply(children, f),
+        icon =FALSE,
+        state = list(selected = FALSE, opened = FALSE )
+      )
+    }else{
+      list(text = label, type = "child",icon = FALSE,
+           state = list(selected = FALSE,opened = FALSE ))
+    }
+  }
+  lapply(dat$item[dat$parent == "root"], f)
+}
 
 
 ######################################################################################################################################.
@@ -160,12 +229,12 @@ TEST_no_duplicate_ids <- function(data) {
     add_tally() |>
     filter(n > 1)
   
-    assert_that(nrow(data) == 0, 
-                msg = paste0("The same indicator ID was found in more than 1 data file.", 
-                "\nThis could be because the previous file for this indicator was named slightly differently, and therefore wasn't overwritten OR because the wrong indicator ID has accidentally been used for a particular indicator.\n 
+  assert_that(nrow(data) == 0, 
+              msg = paste0("The same indicator ID was found in more than 1 data file.", 
+                           "\nThis could be because the previous file for this indicator was named slightly differently, and therefore wasn't overwritten OR because the wrong indicator ID has accidentally been used for a particular indicator.\n 
                 Check the following files in the shiny folder: \n \n", 
-                paste(data$file_name, collapse = "\n")))
-  }
+                           paste(data$file_name, collapse = "\n")))
+}
 
 
 ## Test 2: Ensure there are no indicator data files missing 
@@ -173,12 +242,12 @@ TEST_no_missing_indicators <- function(data) {
   
   data <- anti_join(technical_doc, data, by = c("ind_id"))
   
-    assert_that(nrow(data) == 0, 
-                msg = paste0("\nThe number of indicators in the dataset created DOES NOT match the number of indicators listed as 'Active' in the technical document. \n",
-                             "This could be because there are indicators incorrectly listed as 'Active' in the technical document OR because there are data files missing from the shiny folder\n",
-                             "Check the following indicator(s): \n",
-                             paste(paste0("• ", data$indicator_name), collapse = "\n"))
-                )
+  assert_that(nrow(data) == 0, 
+              msg = paste0("\nThe number of indicators in the dataset created DOES NOT match the number of indicators listed as 'Active' in the technical document. \n",
+                           "This could be because there are indicators incorrectly listed as 'Active' in the technical document OR because there are data files missing from the shiny folder\n",
+                           "Check the following indicator(s): \n",
+                           paste(paste0("• ", data$indicator_name), collapse = "\n"))
+  )
   
 }
 
@@ -189,10 +258,10 @@ TEST_no_missing_metadata <- function(data) {
   data <- data |>
     filter(is.na(indicator_name))
   
-    assert_that(nrow(data) == 0, 
-                msg = paste0("\n Metdata was not successfully joined for the following indicator(s) \n",
-                             paste(paste0("• ", data$indicator_name), collapse = "\n"))
-                )
+  assert_that(nrow(data) == 0, 
+              msg = paste0("\n Metdata was not successfully joined for the following indicator(s) \n",
+                           paste(paste0("• ", data$indicator_name), collapse = "\n"))
+  )
   
 }
 
@@ -202,12 +271,12 @@ TEST_no_missing_geography_info <- function(data) {
   
   data <- data |>
     filter(is.na(areaname_full))
-
-    assert_that(nrow(data) == 0, 
-                msg = paste0("\n The following geography code(s) were not found in the geography lookup, either because they are invalid OR because they are 'old' codes no longer in use\n",
-                       paste(paste0("• ", unique(data$code)), collapse = "\n")
-                       )
-                )
+  
+  assert_that(nrow(data) == 0, 
+              msg = paste0("\n The following geography code(s) were not found in the geography lookup, either because they are invalid OR because they are 'old' codes no longer in use\n",
+                           paste(paste0("• ", unique(data$code)), collapse = "\n")
+              )
+  )
   
 }
 
@@ -218,12 +287,12 @@ TEST_suppression_applied <- function(data) {
   data <- data |>
     filter(supression == "Y") |>
     subset(numerator < supress_less_than)
-
-    assert_that(nrow(data) == 0, 
-                msg = paste0("SUPPRESSION NOT APPLIED! Please run the suppression function before saving this data.\n",
-                       "The following indicators still contain numbers that shouldn't be there:\n",
-                       paste(paste0("• ", data$indicators), collapse = "\n"))
-                )
+  
+  assert_that(nrow(data) == 0, 
+              msg = paste0("SUPPRESSION NOT APPLIED! Please run the suppression function before saving this data.\n",
+                           "The following indicators still contain numbers that shouldn't be there:\n",
+                           paste(paste0("• ", data$indicators), collapse = "\n"))
+  )
   
 }
 
@@ -248,7 +317,7 @@ TEST_no_missing_ineq_indicators <- function(data) {
                 "\nThe number of indicators DOES NOT match the number of indicators in the technical doc with an inequalities label assigned to them. This could be because they should not be produced at this level OR because there are data files missing from the shiny folder\n",
                 "Check the following indicator(s): \n",
                 paste(paste0("• ", data$indicator), collapse = "\n"))
-              )
+  )
   
   
 }
@@ -281,7 +350,7 @@ TEST_inequalities_trends <- function(data) {
   assert_that(nrow(data) == 0, 
               msg = paste0("The max year in the inequalities dataset is not the same as the max year in the main dataset for the indicators listed below.This could be because the deprivation function wasn't updated/run when refreshing these indicators, 
                            or because the new inequalities file wasn't moved across to the shiny folder \n", 
-                 paste("max year for ", paste0(data$indicator.x, " should be: ", data$year.y, " but is ", data$year.x), collapse = "\n"))
+                           paste("max year for ", paste0(data$indicator.x, " should be: ", data$year.y, " but is ", data$year.x), collapse = "\n"))
   )
   
 }

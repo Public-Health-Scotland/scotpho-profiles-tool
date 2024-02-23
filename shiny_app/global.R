@@ -43,6 +43,10 @@ library(jsonlite)
 library(rmarkdown)
 library(knitr)
 library(arrow) #for parquet files
+library(bslib) # for ui styling
+library(jsTreeR) # for geography tree
+library(rjson) # for .json downloads 
+library(DT) # for data tables
 
 
 
@@ -86,7 +90,7 @@ ind_dat <- techdoc %>%
   ungroup() %>% 
   bind_rows(mutate(., profile_short = "Show all")) %>%
   select(-c("active", "interpretation", "covid_impact", "indicator_author", "analyst_notes", "days_since_update","source_last_updated", "source_next_update", "scotpho_profiles", "Profile_short1", "Profile_short2", "Profile_short3")) %>%
-   mutate(across(profile:profile_short, ~replace_na(.,"N/A")))
+  mutate(across(profile:profile_short, ~replace_na(.,"N/A")))
 
 
 # indicators updated in the last 60 days
@@ -104,6 +108,7 @@ comparator_list <- sort(geo_lookup$areaname[geo_lookup$areatype %in%
                                               c("Health board", "Council area", "Scotland")])
 
 # for data tab
+# for data tab
 code_list <- unique(optdata$code)
 parent_geo_list <- c("Show all", sort(as.character((unique(optdata$parent_area))[-1])))
 parent_iz_list <- geo_lookup %>% filter(areatype=="Intermediate zone") %>% select(areaname,parent_area)
@@ -115,6 +120,10 @@ intzone_name <- sort(geo_lookup$areaname[geo_lookup$areatype=="Intermediate zone
 partnership_name <- sort(geo_lookup$areaname[geo_lookup$areatype=="HSC partnership"]) 
 locality_name <- sort(geo_lookup$areaname[geo_lookup$areatype=="HSC locality"]) 
 adp_name <- sort(geo_lookup$areaname[geo_lookup$areatype=="Alcohol & drug partnership"])
+
+# for hierachy geography filters
+depr_data_geo_nodes <- readRDS("data/data_depr_geography_nodes.rds") # deprivation dataset geographies
+optdata_geo_nodes <- readRDS("data/optdata_geography_nodes.rds") # optdataet geographie
 
 
 # for summary tab
@@ -131,7 +140,7 @@ topic_list_filter <- as.factor(c("Show all",unique(sort(c(
   substr(optdata$profile_domain1, 5, nchar(as.vector(optdata$profile_domain1))), 
   substr(optdata$profile_domain2, 5, nchar(as.vector(optdata$profile_domain2))),
   substr(optdata$profile_domain3, 5, nchar(as.vector(optdata$profile_domain3)))
-  ))))) 
+))))) 
 
 topic_list <- topic_list_filter[-1] #taking out show all from list
 
@@ -146,7 +155,6 @@ max_year <- max(optdata$year)
 
 
 # indicators names -----
-
 ind_depr_list <- sort(unique(depr_data$indicator))# for inequalities tab
 indicator_list <- sort(unique(optdata$indicator)) # for all other tabs
 
@@ -185,8 +193,13 @@ profile_list <- setNames(c('HWB',
                            'Population',
                            'Care & wellbeing'))
 
+# profile list for inequalities dataset 
+depr_profile_list <- profile_list[!profile_list %in% c("POP", "MEN")]
+
+
+
 profile_list_filter <-c(setNames("Show all", "Show all"), sort(profile_list))
-  
+
 #  measure options for inequalities tab -----
 depr_measure_options <- c("Patterns of inequality",
                           "Inequality gap", 
@@ -316,7 +329,9 @@ list.files("functions") %>%
   map(~ source(paste0("functions/", .)))
 
 
-
+# 7. sourcing modules created for app (see modules folder) -------------------------------
+list.files("Modules") %>% 
+  map(~ source(paste0("Modules/", .)))
 
 
 

@@ -244,7 +244,41 @@ main_dataset <- main_dataset |>
 # double check suppression was applied
 TEST_suppression_applied(main_dataset) 
 
-# if test is passed, remove columns no longer required
+
+# create a new column which contains the full geography path
+# most geographies have one path i.e. Health Board/NHS Ayrshire & Arran
+# with the exception of IZs/HSC Localities i.e. HSC Locality/Edinburgh City/Edinburgh North-East
+main_dataset <- create_geography_path_column(main_dataset)
+
+
+
+# order the geographies
+main_dataset <- main_dataset |>
+  mutate(areatype = factor(areatype, levels = c("Scotland", 
+                                                "Council area", 
+                                                "Health board",
+                                                "Alcohol & drug partnership",
+                                                "HSC partnership",
+                                                "HSC locality",
+                                                "Intermediate zone"))) |>
+  arrange(areatype, parent_area, areaname)
+
+
+
+# get a distinct list of geography paths
+main_dataset_geography_list <- main_dataset |>
+  select(path) |>
+  distinct()
+
+# convert them into lists of parent/child nodes that can be used in the shiny app
+# for any geography inputs that are displayed as a hierachy (e.g. the data table tab)
+main_dataset_geography_list <- makeNodes(main_dataset_geography_list$path)
+
+# save file to be used in app
+saveRDS(main_dataset_geography_list, "shiny_app/data/optdata_geography_nodes.rds")
+
+
+# remove columns no longer required
 main_dataset <- main_dataset |>
   select(-c(supression, supress_less_than, type_id, file_name, label_inequality)) |>
   rename(indicator = indicator_name)
@@ -372,9 +406,29 @@ TEST_inequalities_trends(data_depr)
 TEST_suppression_applied(data_depr) # double checking suppression function wasn't skipped
 
 
+
+data_depr <- create_geography_path_column(data_depr)
+
+# order the geographies
+data_depr <- data_depr |>
+  mutate(areatype = factor(areatype, levels = c("Scotland", 
+                                                "Council area", 
+                                                "Health board"))) |>
+  arrange(areatype, areaname)
+
+data_depr_geography_list <- data_depr |>
+  select(path) |>
+  distinct()
+
+data_depr_geography_list <- makeNodes(data_depr_geography_list$path)
+
+saveRDS(data_depr_geography_list, "shiny_app/data/data_depr_geography_nodes.rds")
+
+
+
 # if test passes then select final columns and save file to local repo
 data_depr <- data_depr |>
-  select(-c("file_name", "profile_domain1", "profile_domain2", "profile_domain3", "parent_area", "areaname_full")) |>
+  select(-c("file_name", "areaname_full")) |>
   rename(indicator = indicator_name)
 
 

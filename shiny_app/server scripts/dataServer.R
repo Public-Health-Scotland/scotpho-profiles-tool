@@ -5,412 +5,328 @@
 ###############################################
 
 
-#####################################.      
-#### Reactive data ----
-#####################################. 
-# Reactive data for IZ and locality filters
-#Filter iz_list and hscl list by parent area selection
-interzone_filtered <- reactive({ 
-  sort(parent_iz_list$areaname[parent_iz_list$parent_area==input$iz_parent]) 
+## Selected dataset -------
+selectedData <- reactive({
+  if(input$dataset_selector == "Main Dataset") {
+    optdata
+  } else {
+    depr_data
+  }
 })
 
-hsclocality_filtered <- reactive({ 
-  sort(parent_hscl_list$areaname[parent_hscl_list$parent_area==input$hscl_parent]) 
-})
 
-###############################################.
-## Reactive filters ----
-###############################################.
-#Filter IZ's by Parent area
-
-output$iz_filtered <- renderUI ({ 
-  
-  if (input$iz_parent == "Show all"){ 
-    choices_selected <- intzone_name
-  } else { # if a partnership selected reduce the list of IZs shown
-    choices_selected <- interzone_filtered()
-  }
-  
-  selectizeInput("iz_true", label = NULL, choices = choices_selected, 
-                 selected = NULL, multiple=TRUE, 
-                 options = list(maxOptions = 1300, placeholder = "Select or type specific intermediate zone"))
-}) 
-
-#Filter HSCL's by parent area
-output$hscl_filtered <- renderUI ({ 
-  if (input$hscl_parent == "Show all"){ 
-    choices_selected <- locality_name
-  } else {  # if a partnership selected reduce the list of localities shown
-    choices_selected <- hsclocality_filtered()
-  }
-  selectizeInput("hscl_true", label = NULL, choices = choices_selected, 
-                 selected = NULL, multiple=TRUE, options = 
-                   list(placeholder = "Select or type specific HSC locality"))
-}) 
-
-#########.
-#Clearing and modifying inputs through observes
-#select all IZ's belonging to a certain parent-area
+# update profile choices based on chosen dataset -----
 observe({
-  if (input$iz_parent_all == "FALSE")
-    return(if (input$iz_parent == "Show all"){ 
-      
-      updateSelectizeInput(session,"iz_true", label = NULL,
-                           choices = intzone_name, selected = character(0), 
-                           options = list(maxOptions = 1300, 
-                                          placeholder = "Select or type specific intermediate zone")) 
-    } else {
-      updateSelectizeInput(
-        session,"iz_true", label = NULL, choices = interzone_filtered(), 
-        selected = character(0), options = 
-          list(placeholder = "Select or type specific intermediate zone")) 
-    }
-    ) #return bracket
-  
-  isolate({
-    updateSelectizeInput(
-      session, "iz_true", label = NULL, choices = intzone_name, 
-      selected = interzone_filtered(), options = 
-        list(placeholder = "Select or type specific intermediate zone")) })
-})#end of observe
 
-#when you change initial filter, clear the second list of geographies and checkbox
-observeEvent(input$iz_parent, {
-  
-  updateCheckboxInput(session, "iz_parent_all", label = NULL, value = FALSE)
-  
-  if (input$iz_parent == "Show all"){ 
-    selectizeInput(
-      "iz_true", label = NULL, 
-      choices = intzone_name, selected = NULL, multiple=TRUE, options = 
-        list(maxOptions = 1300, placeholder = "Select or type specific intermediate zone")) 
-  } else {
-    selectizeInput(
-      "iz_true", label = NULL, choices = interzone_filtered(), 
-      selected = character(0), multiple=TRUE, options =
-        list(placeholder = "Select or type specific intermediate zone"))
-  }
+  available_profile_choices <- switch(input$dataset_selector,
+                            "Main Dataset" = profile_list,
+                            "Inequalities Dataset" = depr_profile_list)
+
+  updateVirtualSelect(session = session,
+                      inputId = "profile_selector",
+                      choices = available_profile_choices)
 })
 
 
-#select all IZ's belonging to a certain parent-area
+
+
+
+# Update indicator filter choices ----
+# based on dataset and geography selected
+# (and further updating if profile also selected)
 observe({
-  if (input$hscl_parent_all == "FALSE")
-    return(if (input$hscl_parent == "Show all"){ 
-      updateSelectizeInput(
-        session,"hscl_true", label = NULL,choices = locality_name, 
-        selected = character(0), options = 
-          list(maxOptions = 1300, placeholder = "Select or type specific HSC locality")) 
-    } else {
-      updateSelectizeInput(
-        session,"hscl_true", label = NULL, choices = hsclocality_filtered(), 
-        selected = character(0), options = 
-          list(placeholder = "Select or type specific HSC locality"))
-    }
-    ) #return bracket
-  
-  isolate({
-    updateSelectizeInput(
-      session, "hscl_true", label = NULL, choices = locality_name, 
-      selected = hsclocality_filtered(), options = 
-        list(placeholder = "Select or type specific HSC locality")) 
-  })
-}) #end of observe
 
-#when you change initial filter, clear the second list of geographies anc checkbox
-observeEvent(input$hscl_parent, {
-  updateCheckboxInput(session, "hscl_parent_all", label = NULL, value = FALSE)
+  # return selected geographies
+  paths <- sapply(input$geography_selector_checked_paths, `[[`, "path")
+
+  # filter selected dataset by selected geographies
+  data <- selectedData() |>
+    subset(path %in% paths)
+
+  # create vector of available indicators
+  available_indicators <- unique(data$indicator)
+
+  # Store the current selection of indicators (if there were any)
+  # i.e. if you've switched dataset but had previously selected some indicators
+  current_selected_indicators <- input$indicator_selector
+
+
+  # Further filter indicators if a profile is selected
+  if (!is.null(input$profile_selector) && input$profile_selector != "") {
+
+    profile_filtered_data <- data |>
+      filter(if_any(contains("profile_domain"),
+                    ~ substr(.x, 1, 3) %in% input$profile_selector))
+
+
+    available_indicators <- unique(profile_filtered_data$indicator)
+
+  }
+
+
+  # Update the filter choices
+  updateVirtualSelect(session = session,
+                      inputId = "indicator_selector",
+                      choices = available_indicators)
+
+  # Reapply the previous selection if they are still valid
+  valid_selections <- intersect(current_selected_indicators, available_indicators)
+
+  if (!is.null(valid_selections) && length(valid_selections) > 0) {
+    updateVirtualSelect(session = session,
+                        inputId = "indicator_selector",
+                        selected = valid_selections)
+
+  }
+
+})
+
+
+
+## reset all filters -----
+# when 'clear filters' button is clicked 
+observeEvent(input$clear_table_filters, {
   
-  if (input$hscl_parent == "Show all"){ 
-    selectizeInput(
-      "hscl_true", label = NULL, choices = locality_name, 
-      selected = NULL, multiple=TRUE, options = 
-        list(maxOptions = 1300, placeholder = "Select or type specific HSC locality")) 
+  # reset the dataset selector to "Main Dataset"
+  updateRadioGroupButtons(session, 
+                          inputId = "dataset_selector", 
+                          selected = "Main Dataset")
+  
+  # reset the geographies to those available for the main dataset
+  jstreeUpdate(session, "geography_selector", optdata_geo_nodes)
+  
+  
+  # reset the time period filter to max year per indicator
+  updateRadioGroupButtons(session = session,
+                          inputId = "time_period",
+                          selected = "Latest available year")
+  
+  # reset the indicator list to those present in main dataset
+  updateVirtualSelect(session = session,
+                      inputId = "indicator",
+                      selected = NULL,
+                      choices = NULL)
+  
+  # reset the profile filter
+  updateVirtualSelect(session = session,
+                      inputId = "profile_selector",
+                      selected = NULL,
+                      choices = profile_list)
+  
+})
+
+
+
+
+# determine choices for geography filter -----
+GeographyNodes <- reactive({
+  if(input$dataset_selector == "Main Dataset") {
+    optdata_geo_nodes
   } else {
-    selectizeInput(
-      "hscl_true", label = NULL, choices = hsclocality_filtered(), 
-      selected = character(0), multiple=TRUE, options = 
-        list(placeholder = "Select or type specific HSC locality"))
+    depr_data_geo_nodes
   }
 })
 
-#to clear choices when boxes are unticked/radio button is changed
-observeEvent(input$iz=="FALSE", { #for IZs
-  updateCheckboxInput(session, "iz_parent_all", label = NULL, value = FALSE)
-  updateSelectizeInput(session, "iz_true", label = NULL,
-                       choices = intzone_name, selected = character(0), options = 
-                         list(placeholder = "Select or type specific intermediate zone")) 
-  updateSelectizeInput(session, "iz_parent", label = "Filter intermediate zone list by HSC partnership", 
-                       selected = "Show all")
-})
 
-observeEvent(input$la=="FALSE", {#for CAs
-  updateSelectizeInput(session, "la_true", label = NULL, choices = la_name, 
-                       selected = character(0), options = 
-                         list(placeholder = "Select or type specific council area")) 
-})
 
-observeEvent(input$hb=="FALSE", { #for HBs
-  updateSelectizeInput(session, "hb_true", label = NULL,
-                       choices = hb_name, selected = character(0),
-                       options = list(placeholder = "Select or type specific health board")) 
-})
-
-observeEvent(input$hscl=="FALSE", { #for localities
-  updateSelectizeInput(session, "hscl_true", label = NULL,
-                       choices = locality_name, selected = character(0), options = 
-                         list(placeholder = "Select or type specific HSC locality"))
-  
-  updateSelectizeInput(session, "hscl_parent", label = "Filter locality list by HSC partnership",
-                       selected = "Show all")
-})
-
-observeEvent(input$hscp=="FALSE", { #for hsc partnerships
-  updateSelectizeInput(session, "hscp_true", label = NULL,
-                       choices = partnership_name, selected = character(0), options = 
-                         list(placeholder = "Select or type specific HSC partnership"))
-})
-
-observeEvent(input$adp=="FALSE", { #for ADPs
-  updateSelectizeInput(session, "adp_true", label = NULL,
-                       choices = adp_name, selected = character(0), options = 
-                         list(placeholder = "Select or type specific ADP")) 
-})
-
-observeEvent(input$product_filter, { # for indicator/topic/profile filters
-  updateSelectizeInput(session,"indicator_filter", label = NULL,
-                       choices = indicator_list, selected = character(0), options = 
-                         list(maxOptions = 1000,
-                              placeholder = "Click or type indicators to filter by"))
-  
-  updateSelectizeInput(session,"topic_filter", label = NULL, choices = topic_list, 
-                       selected = NULL, options = 
-                         list(maxOptions = 1000, 
-                              placeholder = "Click or type domains to filter by"))
-  
-  updateSelectizeInput(session,"profile_filter", label = NULL, choices = profile_list, 
-                       selected = NULL, options = 
-                         list(maxOptions = 1000, 
-                              placeholder = "Click or type profiles to filter by"))
-})
-
-#Clearing all user inputs to default
-observeEvent(input$clear, {
-  updateCheckboxInput(session, "iz", label = NULL, value = FALSE)
-  updateSelectizeInput(session, "iz_true", label = NULL,
-                       choices = intzone_name, selected = character(0), options = list(maxOptions = 1300, placeholder = "Select specific intermediate zones"))
-  updateSelectInput(session, "iz_parent", label = NULL,
-                    choices = parent_geo_list, selected = "Show All")
-  updateCheckboxInput(session, "la", label = NULL, value = FALSE)
-  updateSelectInput(session, "la_true", label = NULL,
-                    choices = la_name, selected = character(0))
-  updateCheckboxInput(session, "hb", label = NULL, value = FALSE)
-  updateSelectInput(session, "hb_true", label = "Type in the box to search",
-                    choices = hb_name, selected = character(0))
-  updateCheckboxInput(session, "hscl", label = NULL, value = FALSE)
-  updateSelectInput(session, "hscl_true", label = "Type in the box to search",
-                    choices = locality_name, selected = character(0))
-  updateCheckboxInput(session, "hscp", label = NULL, value = FALSE)
-  updateSelectInput(session, "hscp_true", label = "Type in the box to search",
-                    choices = partnership_name, selected = character(0))
-  updateCheckboxInput(session, "scotland", label = NULL, value = FALSE)
-  updateCheckboxInput(session, "all_data", label = NULL, value = FALSE)
-  updateSelectInput(session, "code", label = NULL,
-                    choices = code_list, selected = character(0))
-  updateSliderInput(session, "date_from", label = "From", value = c(min_year,max_year),
-                    min = min_year, max = max_year, step = 1)
-  updateSelectizeInput(session,"indicator_filter", label = NULL,
-                       choices = indicator_list, selected = character(0),
-                       options = list(maxOptions = 1000, placeholder = "Click or type indicators you would like to filter by"))
-  updateSelectizeInput(session,"topic_filter", label = NULL, choices = topic_list, selected = NULL,
-                       options = list(maxOptions = 1000, placeholder = "Click or type domains you would like to filter by"))
-  updateSelectizeInput(session,"profile_filter", label = NULL, choices = profile_list, selected = NULL,
-                       options = list(maxOptions = 1000, placeholder = "Click or type profiles you would like to filter by"))
-  updateAwesomeRadio(session,"product_filter", label=NULL, choices = c("Indicator", "Domain", "Profile"), selected = NULL, inline = FALSE,
-                     status = "primary", checkbox = TRUE)
-  
-})
-
-###############################################.
-## Reactive data ----
-###############################################.
-filter_table <- reactive ({
-  if (is.null(input$indicator_filter) & is.null(input$topic_filter) & 
-      is.null(input$profile_filter)) {
-    # if no data selected create empty dataset to avoid app crashing
-    table <- data.frame(code = factor(), areaname = factor(), areatype = factor(), 
-                        indicator = factor(), year = double(), 
-                        def_period = factor(), numerator =double(), measure =double(), 
-                        lowci =double(), upci=double(), type_definition = factor())
-    
-    #if list of indicators selected
-  } else {
-    if (!is.null(input$indicator_filter)) { #if indicator selected
-      if (input$all_data == TRUE) {
-        filtered_geos <- optdata %>%  
-          filter(year>=input$date_from[1] & year<=input$date_from[2] & 
-                   indicator %in% input$indicator_filter)
-      } else {
-        filtered_geo <- optdata %>% 
-          filter((areaname %in% input$iz_true & areatype == "Intermediate zone")|
-                   (areaname %in% input$la_true & areatype == "Council area")|
-                   (areaname %in% input$hb_true & areatype == "Health board")|
-                   (areaname %in% input$adp_true & areatype == "Alcohol & drug partnership")|
-                   (areaname %in% input$hscl_true & areatype == "HSC locality")|
-                   (areaname %in% input$hscp_true & areatype == "HSC partnership")|
-                   (code %in% input$code)) %>% 
-          filter(year>=input$date_from[1] & year<=input$date_from[2] & 
-                   indicator %in% input$indicator_filter)
-        
-        filtered_geo2 <- if (input$scotland == TRUE) {
-          optdata %>% filter(areaname == "Scotland" &
-                               (year>=input$date_from[1] & year<=input$date_from[2]) &
-                               indicator %in% input$indicator_filter)
-        }      
-        
-        filtered_geos <- rbind(filtered_geo, filtered_geo2)
-        
-      }
-      
-      #if list of domains selected
-    } else if (!is.null(input$topic_filter)) { 
-      if (input$all_data == TRUE) {
-        filtered_geos <- optdata %>%  
-          filter(year>=input$date_from[1] & year<=input$date_from[2] &
-                   (substr(profile_domain1, 5, nchar(as.vector(profile_domain1))) %in%  input$topic_filter |
-                    substr(profile_domain2, 5, nchar(as.vector(profile_domain2))) %in%  input$topic_filter |
-                    substr(profile_domain3, 5, nchar(as.vector(profile_domain3))) %in%  input$topic_filter))
-        
-      } else {
-        
-        filtered_geo <- optdata %>% 
-          filter((areaname %in% input$iz_true & areatype == "Intermediate zone")|
-                   (areaname %in% input$la_true & areatype == "Council area")|
-                   (areaname %in% input$hb_true & areatype == "Health board")|
-                   (areaname %in% input$adp_true & areatype == "Alcohol & drug partnership")|
-                   (areaname %in% input$hscl_true & areatype == "HSC locality")|
-                   (areaname %in% input$hscp_true & areatype == "HSC partnership")|
-                   code %in% input$code) %>% 
-          filter(year>=input$date_from[1] & year<=input$date_from[2] & 
-                   (substr(profile_domain1, 5, nchar(as.vector(profile_domain1))) == input$topic_filter |
-                    substr(profile_domain2, 5, nchar(as.vector(profile_domain2))) == input$topic_filter |
-                    substr(profile_domain3, 5, nchar(as.vector(profile_domain3))) == input$topic_filter))
-        
-        filtered_geo2 <- if (input$scotland == TRUE) {
-          optdata %>% 
-            filter(areaname == "Scotland" & 
-                     year>=input$date_from[1] & year<=input$date_from[2] & 
-                     (substr(profile_domain1, 5, nchar(as.vector(profile_domain1))) %in%  input$topic_filter |
-                      substr(profile_domain2, 5, nchar(as.vector(profile_domain2))) %in%  input$topic_filter|
-                      substr(profile_domain3, 5, nchar(as.vector(profile_domain3))) == input$topic_filter))
-        }  
-        
-        # Merging together Scotland and other areas selected
-        filtered_geos <- rbind(filtered_geo, filtered_geo2)
-        
-      } #end of else statement
-      
-      #if list of profiles selected    
-    } else if (!is.null(input$profile_filter)) { 
-      if (input$all_data == TRUE) {
-        filtered_geos <- optdata %>%  
-          filter(year>=input$date_from[1] & year<=input$date_from[2]) %>% 
-          filter((grepl((paste0("^",input$profile_filter,collapse="|")), profile_domain1))|
-                  (grepl((paste0("^",input$profile_filter,collapse="|")), profile_domain2))|
-                  (grepl((paste0("^",input$profile_filter,collapse="|")), profile_domain3)))
-      } else {
-        filtered_geo <- optdata %>% 
-          filter((areaname %in% input$iz_true & areatype == "Intermediate zone")|
-                   (areaname %in% input$la_true & areatype == "Council area")|
-                   (areaname %in% input$hb_true & areatype == "Health board")|
-                   (areaname %in% input$adp_true & areatype == "Alcohol & drug partnership")|
-                   (areaname %in% input$hscl_true & areatype == "HSC locality")|
-                   (areaname %in% input$hscp_true & areatype == "HSC partnership")|
-                   (code %in% input$code)) %>% 
-          filter(year>=input$date_from[1] & year<=input$date_from[2]) %>% 
-          filter((grepl((paste0("^",input$profile_filter,collapse="|")), profile_domain1))|
-                   (grepl((paste0("^",input$profile_filter,collapse="|")), profile_domain2))|
-                   (grepl((paste0("^",input$profile_filter,collapse="|")), profile_domain3)))
-        
-        filtered_geo2 <- if (input$scotland == TRUE) {
-          optdata %>% 
-            filter(areaname == "Scotland" &
-                     year>=input$date_from[1] & year<=input$date_from[2]) %>% 
-            filter((grepl((paste0("^",input$profile_filter,collapse="|")), profile_domain1))|
-                     (grepl((paste0("^",input$profile_filter,collapse="|")),profile_domain2))|
-                     (grepl((paste0("^",input$profile_filter,collapse="|")),profile_domain3)))
-          
-        }
-        # Merging together Scotland and other areas selected
-        filtered_geos <- rbind(filtered_geo,filtered_geo2)
-        
-      }
-    } else { #ending the profile selection bit
-      # if all available geographies checkbox checked
-      if (input$all_data == TRUE) {
-        filtered_geos <- optdata %>%  
-          filter(year>=input$date_from[1] & year<=input$date_from[2])
-        
-      } else {
-        filtered_geo <- optdata %>% 
-          filter((areaname %in% input$iz_true & areatype == "Intermediate zone")|
-                   (areaname %in% input$la_true & areatype == "Council area")|
-                   (areaname %in% input$hb_true & areatype == "Health board")|
-                   (areaname %in% input$adp_true & areatype == "Alcohol & drug partnership")|
-                   (areaname %in% input$hscl_true & areatype == "HSC locality")|
-                   (areaname %in% input$hscp_true & areatype == "HSC partnership")|
-                   (code %in% input$code)) %>% 
-          filter(year>=input$date_from[1] & year<=input$date_from[2])
-        
-        filtered_geo2 <- if (input$scotland == TRUE) {
-          optdata %>% 
-            filter(areaname == "Scotland" &
-                     year>=input$date_from[1] & year<=input$date_from[2])
-          
-        }
-        # Merging together Scotland and other areas selected
-        filtered_geos <- rbind(filtered_geo,filtered_geo2)
-        
-      } 
-      
-    } #end of the else if statement for all available geographies
-    
-    table <- filtered_geos %>% select(code, areaname, areatype, indicator, year, 
-                                      def_period, numerator, measure, lowci, upci, type_definition)
-  } #end of the whole if statement (if users have selected any data)
-  
-})
-
-###############################################.
-## Table ----
-###############################################.
-
-#display table based on selection made by user on indicator tab
-output$table_filtered <- DT::renderDataTable({
-  
-  DT::datatable(filter_table(),
-                style = 'bootstrap', rownames = FALSE, options = list(dom = 'tp', language = list(
-                  zeroRecords = "No records found matching your selection - 
-                    have you selected a geography and at least one indicator/domain/profile? 
-                    See 'Indicator definitions' under the Info tab for Geographies available."), 
-                  columnDefs = list(list(visible=FALSE, targets=c(4,8,9)))), 
-                colnames = c("Area code", "Area", "Type", "Indicator", "Year","Period", "Numerator", 
-                             "Measure", "Lower CI","Upper CI", "Definition")
+# render the geography filter ----
+#using the dynamic choices from step above
+output$geography_selector <- renderJstree({
+  jstree(
+    GeographyNodes(),
+    checkboxes = TRUE,
+    selectLeavesOnly = TRUE,
+    theme = "proton"
   )
 })
 
-###############################################.
-## Downloads ----
-###############################################.
-# Downloading data in csv format
-table_csv <- reactive({ format_csv(filter_table()) })
 
-#The filters the user applies in the data table will determine what data they download - indicator tab table
-output$download_table_csv <- downloadHandler(
-  filename ="scotpho_data_extract.csv",
-  content = function(file) {
-    write.csv(table_csv(),
-              file, row.names=FALSE) } 
-)
 
-##END
+
+# observe changes in data selected and update geographies
+observeEvent(input$dataset_selector, {
+
+  updated_nodes <- GeographyNodes() # what is available with currently selected dataset
+
+  jstreeUpdate(session, "geography_selector", updated_nodes) # update the choices
+
+})
+
+
+
+# data to display/download ----
+tableData <- reactive({
+  
+  # selected dataset
+  data <- selectedData() 
+  
+  # filter by selected geographies
+  paths <- sapply(input$geography_selector_checked_paths, `[[`, "path")
+  data <- data |> subset(path %in% paths)
+  
+  
+  # filter by time period 
+  if(input$time_period_selector == "Latest available year") {
+    setDT(data) # switch to data.table format here as quicker than grouping using dplyr
+    data <- data[, .SD[year == max(year)], by = indicator]
+  } else data
+  
+  
+  # filter by quint type (if inequalities dataset selected)
+  if(input$dataset_selector == "Inequalities Dataset") {
+    if(input$quint_type_selector == "Scotland") {
+      data <- data |> filter(quint_type == "sc_quin")
+    } else {
+      data <- data |> filter(quint_type != "sc_quin")
+    }
+  } else data
+  
+  
+  # if profile selected (but indicators have not been)
+  # then filter by selected profiles only 
+  if(isTruthy(input$profile_selector) & !isTruthy(input$indicator_selector)) {
+    data <- data |>
+      filter(if_any(contains("profile_domain"),
+                    ~ substr(.x, 1, 3) %in% input$profile_selector))
+    
+    
+    # if a profile has been selected (and some indicators too)
+    # then filter by profile and indicator
+  } else if(isTruthy(input$profile_selector) & isTruthy(input$indicator_selector)) {
+    
+    data <- data |>
+      filter(if_any(contains("profile_domain"),
+                    ~ substr(.x, 1, 3) %in% input$profile_selector)) |>
+      filter(indicator %in% input$indicator_selector)
+    
+    
+    
+    # if no profile has been selected but some indicators have
+    # then filter by indicators only 
+  } else if(!isTruthy(input$profile_selector) & isTruthy(input$indicator_selector)) {
+    
+    data <- data |>
+      filter(indicator %in% input$indicator_selector)
+    
+  } else {
+    
+    # if nothings been selected from profile or indicator filter then return all available indicators
+    # for chosen dataset/geography/time period
+    data <- data
+  }
+  
+  # rename some columns 
+  data <- data |>
+    rename(area_code = code, 
+           area_type = areatype, 
+           area_name = areaname, 
+           period = def_period, 
+           upper_confidence_interval = upci, 
+           lower_confidence_interval = lowci)
+  
+  # columns to return if main dataset was selected
+  if(input$dataset_selector == "Main Dataset") {
+    
+    data <- data |>
+      select(area_code, area_type, area_name, year, period, type_definition,
+             indicator, numerator, measure, 
+             upper_confidence_interval, lower_confidence_interval) } else {
+        
+        # columns to return if inequalities dataset was selected
+        # note this requires some reshaping due to the format of the inequalities dataset
+        
+        # all inequalities data
+        data <- data |>
+          rename(value = measure,
+                 measure = type_definition)
+        
+        # sii data
+        sii <- data |>
+          filter(quintile == "Total") |>
+          mutate(value = sii,
+                 upper_confidence_interval = upci_sii,
+                 lower_confidence_interval = lowci_sii) |>
+          mutate(measure = "Slope index of inequality (SII)",
+                 quintile = NULL
+                 )
+        
+        # rii data
+        rii <- data |>
+          filter(quintile == "Total") |>
+          mutate(value = rii,
+                 upper_confidence_interval = upci_rii,
+                 lower_confidence_interval = lowci_rii) |>
+          mutate(measure = "Relative index of inequality (RII)",
+                 quintile = NULL)
+        
+        # par data
+        par <- data |>
+          filter(quintile == "Total") |>
+          mutate(value = par,
+                 upper_confidence_interval = upci_rii_int,
+                 lower_confidence_interval = lowci_rii_int) |>
+          mutate(measure = "Population attributable risk (PAR)",
+                 quintile = NULL)
+        
+        # different inequalities measures combined
+        data <- bind_rows(data, rii, sii, par) |>
+          select(area_code, area_type, area_name, year, period, indicator, 
+                 quintile, measure, value, upper_confidence_interval, 
+                 lower_confidence_interval, label_inequality) |>
+          arrange(indicator, area_name, year)
+      }
+ 
+})
+
+
+# table of results ---------
+output$data_tab_table <- renderDT({
+  
+  # columns to hide in table
+  if(input$dataset_selector == "Main Dataset") {
+  cols_to_display = list(list(visible=FALSE, targets=c(0,3, 9,10)))
+
+  } else {
+    cols_to_display = list(list(visible=FALSE, targets=c(0,3,9,10,11)))
+  }
+  
+
+  
+  # column names for table
+  if(input$dataset_selector == "Main Dataset") {
+    col_names = c("hidden", "Type", "Area", "hidden", "Period", "Indicator", 
+                  "Measure type", "Numerator", "Measure", "hidden", "hidden")
+
+  } else {
+    col_names = c("hidden", "Type", "Area", "hidden", "Period", "Indicator", 
+                  "Quintile", "Measure", "Value", "hidden", "hidden", "hidden")
+  }
+
+
+  datatable(tableData(),
+            style = 'bootstrap', 
+            caption = sprintf('Total rows: %s', nrow(tableData())),
+            rownames = FALSE,
+            colnames = col_names,
+            options = list(scrollX = TRUE,
+                           scrollY = "600px", 
+                           pageLength = 20,
+                           searching = FALSE,
+                           language = list(
+                             zeroRecords = "Select atleast one geography to display results."),
+                           columnDefs = cols_to_display
+            ))
+  
+  
+  
+})
+
+
+
+
+# data downloads -------
+downloadDataButtonsServer(id = "datatable_downloads", 
+                          data = tableData)
+
+
+## END

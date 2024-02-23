@@ -20,7 +20,9 @@ output$btn_techdoc_download <- downloadHandler(
   
   filename ="Indicator_definitions.csv",
   content = function(file) {
-    write.csv(ind_dat %>% select(-ind_id, - profile_short), 
+    write.csv(ind_dat %>% 
+                filter(profile_short != "Show all") %>%
+                select(-ind_id, - profile_short), 
               file, row.names=FALSE) }
 )
 
