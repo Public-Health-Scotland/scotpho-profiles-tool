@@ -113,7 +113,7 @@ graph_directory <- tempdir()
 
 # # pivot reactive dataframe in longer format (required for ggplot)
  df <- params$reactive_df %>%
-   select(indicator, one, two, three, four, scotland_value, measure, chosen_value, marker_colour, def_period, type_definition) %>%
+   select(domain, indicator, one, two, three, four, scotland_value, measure, chosen_value, marker_colour, def_period, type_definition) %>%
    pivot_longer(cols = c("one", "two", "three", "four"), values_to = "GraphPoint", names_to = "quantiles")
 
 
@@ -137,11 +137,11 @@ df$quantiles <- factor(df$quantiles, levels = c("one", "two", "three", "four"))
 
 # the data to be displayed in table
 table <- df %>%
-  select(indicator, scotland_value, measure, def_period, type_definition) %>%
+  select(domain, indicator, scotland_value, measure, def_period, type_definition) %>%
   distinct() %>%
   mutate(ind = paste0(
     "\\textbf{",indicator, "}\n", "\\textit{\\small", def_period, " . ", type_definition, "}"))%>%
-  select(ind, measure, scotland_value) %>%
+  select(domain, ind, measure, scotland_value) %>%
   rename(scotland  = scotland_value) %>%
   mutate(id = row_number())
 
@@ -176,7 +176,7 @@ for (indicator in unique_indicators) {
    counter <- counter + 1
 
  # Save the plot as a PNG with the filename created
-  ggsave(filename, plot = plot, units="mm", width=60, height=6, dpi=300)
+  ggsave(filename, plot = plot, units="mm", width=50, height=5, dpi=300)
 }
 
 
@@ -184,7 +184,7 @@ for (indicator in unique_indicators) {
  chosen_area <- gsub("&", "\\\\&", params$chosen_area)
 
 # define column headers for the pdf table
-col_names = c("indicator", chosen_area, "Scotland", "Spine chart"
+col_names = c("Domain", "Indicator", chosen_area, "Scotland", "Spine chart"
               )
 
 ```
@@ -208,12 +208,13 @@ table %>%
   row_spec(0, background = "#032F4F", color = "white") %>%
 
   # set column widths
-   column_spec(1, width = "27em") %>% # indicator column
-   column_spec(2, width = "6em") %>% # chosen area column
-   column_spec(3, width = "3em") %>% # scotland column
+   column_spec(1, width = "8em") %>% # domain column
+   column_spec(2, width = "20em") %>% # indicator column
+   column_spec(3, width = "6em") %>% # chosen area column
+   column_spec(4, width = "3em") %>% # scotland column
 
   # embed chart images on each row of final column
-   kableExtra::column_spec(4, image = sprintf("%s/%s.png", graph_directory, table$id), color = "white") %>%
+   kableExtra::column_spec(5, image = sprintf("%s/%s.png", graph_directory, table$id), color = "white") %>%
 
   # repeats column headings when table goes across multiple pages
    kable_styling(latex_options = c("repeat_header")) %>%
