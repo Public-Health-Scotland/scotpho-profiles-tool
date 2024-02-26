@@ -198,12 +198,12 @@ depr_measure_options <- c("Patterns of inequality",
 CWB_domain_order<-c("Over-arching indicators",
                     "Early years", 
                     "Education",
-                    "Fair employment and good work",
-                    "Healthy standard of living",
-                    "Places",
+                    "Work",
+                    "Living standards",
+                    "Healthy places",
                     "Impact of ill health prevention",
                     "Discrimination and racism",
-                    "Environmental sustainability and health equity")
+                    "Sustainability and equity")
 
 
 # 4. chart themes  ----------------------------------------------------------------
