@@ -174,16 +174,18 @@ profile_list <- setNames(c('HWB',
                            'DRG',
                            'MEN', 
                            'TOB', 
-                           'POP',
-                           'CWB'),
+                           'CWB',
+                           'PAO',
+                           'POP'),
                          c('Health & wellbeing',
                            'Children & young people',
                            'Alcohol',
                            'Drugs',
                            'Mental Health', 
                            'Tobacco control', 
-                           'Population',
-                           'Care & wellbeing'))
+                           'Care & wellbeing',
+                           'Physical Activity',
+                           'Population'))
 
 profile_list_filter <-c(setNames("Show all", "Show all"), sort(profile_list))
   
