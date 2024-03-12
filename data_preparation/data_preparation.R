@@ -73,13 +73,19 @@ technical_doc <- technical_doc |>
 technical_doc <- technical_doc |>
   mutate(
     last_updated_temp = suppressWarnings(convertToDate(last_updated)), 
-    days_since_update = difftime(Sys.Date(), last_updated_temp),
+    days_since_update = difftime(Sys.Date(), last_updated_temp)) |>
+  mutate(
     across(
-      c("last_updated", "next_update", "source_next_update", "source_last_updated"), 
-      ~ suppressWarnings(strftime(convertToDate(.), "%b-%Y"))
+      .cols = c("last_updated", "next_update", "source_next_update"),
+      .fns = ~ suppressWarnings(
+        case_when(
+          !is.na(as.numeric(.)) ~ strftime(convertToDate(.), "%b-%Y"), TRUE ~ .
+        )
+      )
     )
   ) |>
-  select(-last_updated_temp)
+  select(-c(last_updated_temp, data_request_needed, if_so_who, r_script_name))
+
 
 ## Save file -----
 write_parquet(technical_doc, "shiny_app/data/techdoc") # version for shiny app

@@ -20,7 +20,9 @@ output$btn_techdoc_download <- downloadHandler(
   
   filename ="Indicator_definitions.csv",
   content = function(file) {
-    write.csv(ind_dat %>% select(-ind_id, - profile_short), 
+    write.csv(ind_dat |> 
+              filter(profile_short != "Show all") |>
+                select(-ind_id, - profile_short),
               file, row.names=FALSE) }
 )
 
@@ -174,7 +176,7 @@ output$ind_search_results <- renderReactable({
                      
 }")),
       # 2. format date column
-      next_update = colDef(defaultSortOrder = "desc", sortable = TRUE, name = "Next update due", na = "TBC"),
+      next_update = colDef(defaultSortOrder = "desc", sortable = TRUE, name = "Next update due"),
       
       # 3. hide all other columns in the table. 
       profile = colDef(show = F),
