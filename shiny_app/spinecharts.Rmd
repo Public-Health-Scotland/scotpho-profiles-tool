@@ -180,8 +180,10 @@ for (indicator in unique_indicators) {
 }
 
 
-# # escape the '&' symbol from chosen geography so displays in column headers
+# escape the '&' symbol from chosen geography so displays in column headers
  chosen_area <- gsub("&", "\\\\&", params$chosen_area)
+# escape the '&' symbol from domains 
+ table$domain <- gsub("&", "\\\\&", table$domain)
 
 # define column headers for the pdf table
 col_names = c("Domain", "Indicator", chosen_area, "Scotland", "Spine chart"
@@ -194,8 +196,9 @@ col_names = c("Domain", "Indicator", chosen_area, "Scotland", "Spine chart"
 ```{r, echo= FALSE, message = FALSE}
 
  # the final table to be displayed with charts embedded
-table %>%
 
+table %>%
+  group_by(domain) %>%
   knitr::kable(
     format = "latex", # must be in latex format for pdf download
     booktabs = TRUE, # generic formatting
@@ -215,6 +218,8 @@ table %>%
 
   # embed chart images on each row of final column
    kableExtra::column_spec(5, image = sprintf("%s/%s.png", graph_directory, table$id), color = "white") %>%
+  
+  
 
   # repeats column headings when table goes across multiple pages
    kable_styling(latex_options = c("repeat_header")) %>%
@@ -223,8 +228,8 @@ table %>%
   footnote(general="\\\\url{https://scotland.shinyapps.io/ScotPHO_profiles_tool/}",
            general_title = "Source: ", footnote_as_chunk = T, escape=F) %>%
 
-  # add lines under each row
-  row_spec(1:nrow(table), hline_after = T, background = "white")
+  # prevent domain from appearing on every row of column 
+  kableExtra::collapse_rows(columns = 1, valign = "top", row_group_label_position = "first", custom_latex_hline = 2:5, longtable_clean_cut = F)
 
 
 
