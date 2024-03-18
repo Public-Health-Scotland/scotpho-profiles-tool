@@ -193,6 +193,19 @@ depr_measure_options <- c("Patterns of inequality",
                           "Potential for improvement",
                           "About these options")
 
+
+#Order of CWB domains -----	
+CWB_domain_order<-c("Over-arching indicators",
+                    "Early years", 
+                    "Education",
+                    "Work",
+                    "Living standards",
+                    "Healthy places",
+                    "Impact of ill health prevention",
+                    "Discrimination and racism",
+                    "Sustainability and equity")
+
+
 # 4. chart themes  ----------------------------------------------------------------
 
 # colour palettes for SIMD.

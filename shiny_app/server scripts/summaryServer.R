@@ -84,6 +84,12 @@ summary_data <- reactive ({
       TRUE ~ substr(profile_domain3, 5, nchar(as.vector(profile_domain3)))))) %>%
     arrange(domain)
   
+  #order care and wellbeing domains	
+  if(input$summary_profile=="CWB") {
+    final<-final%>%
+      mutate(domain=ordered(domain, levels=CWB_domain_order)) %>% 
+      arrange(domain)
+  }
   
   # creating spine chart data
   final <- final %>%
