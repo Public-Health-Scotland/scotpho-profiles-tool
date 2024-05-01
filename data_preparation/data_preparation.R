@@ -211,12 +211,28 @@ main_dataset <- main_dataset |>
 # Note: This might make more sense to eventually add to the indicator production functions instead?
 main_dataset <- main_dataset |>
   rbind(
-    # child dental health pri 1
+    # child dental health p1 - no data due to pandemic
     create_gap_year(
       indicator_id = 21005, 
       gap_year = 2020, 
       base_year = 2019, 
       gap_trend_axis = "2020/21"
+    ), 
+    
+    # child dental health p7 - no data due to pandemic
+    create_gap_year(
+      indicator_id = 21006, 
+      gap_year = 2020, 
+      base_year = 2019, 
+      gap_trend_axis = "2020/21"
+    ), 
+    
+    # child dental health p7 - no data
+    create_gap_year(
+      indicator_id = 21006, 
+      gap_year = 2021, 
+      base_year = 2019, 
+      gap_trend_axis = "2021/22"
     ), 
     
     # Population within 500 metres of a derelict site
