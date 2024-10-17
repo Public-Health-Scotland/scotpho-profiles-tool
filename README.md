@@ -1,5 +1,12 @@
-# ScotPHO profiles tool
-In this respository you can find the code used to produce [ScotPHO's Online Profiles Tool](https://scotland.shinyapps.io/ScotPHO_profiles_tool/).
+# Historic ScotPHO profiles tool
+OCTOBER 2024: A major refactoring exercise was carried out on the code within this repository.
+The active ScotPHO online profiles tool continues to be available at the same url however the repo containing code behind the app is in a new location
+[ScotPHO's Online Profiles Tool](https://scotland.shinyapps.io/ScotPHO_profiles_tool/)
+[New code repo behind shiny app ](https://github.com/Public-Health-Scotland/scotpho-profiles-app)
+
+The hisotric version of the shiny app (which is no longer being updated with new indicator data) is available
+[Historic ScotPHO's Online Profiles Tool](https://scotland.shinyapps.io/Historic_ScotPHO_profiles/)
+
 ## Code
 - data_preparation: reads the data prepared for each indicator and produces a file for the shiny tool. It also prepares a geography lookup, indicator metadata and shapefiles. It's not necessary to run the app.
 - ui: visual interface, what the user can see in the app (main ui script sources separate ui scripts for different tabs within dashboard)
